@@ -6,16 +6,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(value: number, country: CountryCode = 'ar'): string {
-  const config = getCountryConfig(country);
-  return new Intl.NumberFormat(config.locale, {
-    style: 'currency',
-    currency: config.localCurrency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
-
 export function formatCurrencySimple(value: number, country: CountryCode = 'ar'): string {
   const config = getCountryConfig(country);
   return `${config.currencySymbol} ${formatNumber(value, 2)}`;
@@ -26,38 +16,6 @@ export function formatNumber(value: number, decimals: number = 2): string {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value);
-}
-
-export function formatNumberByCountry(value: number, country: CountryCode, decimals: number = 2): string {
-  const config = getCountryConfig(country);
-  return new Intl.NumberFormat(config.locale, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  }).format(value);
-}
-
-export function formatPercent(value: number): string {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
-}
-
-export function formatDate(date: string | Date, country: CountryCode = 'ar'): string {
-  const config = getCountryConfig(country);
-  return new Intl.DateTimeFormat(config.locale, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(new Date(date));
-}
-
-export function formatDateTime(date: string | Date, country: CountryCode = 'ar'): string {
-  const config = getCountryConfig(country);
-  return new Intl.DateTimeFormat(config.locale, {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date));
 }
 
 export function getGapColor(level: string): string {
@@ -91,5 +49,3 @@ export function getGapClass(level: string): string {
       return 'text-gray-500';
   }
 }
-
-

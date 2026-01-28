@@ -61,10 +61,8 @@ describe('ReservasWidget', () => {
   });
 
   it('handles loading state when reservas is null', () => {
-    // @ts-expect-error - Testing null case intentionally
     render(<ReservasWidget reservas={null} />);
     
-    // Should show loading or placeholder
     expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
   });
 
@@ -74,7 +72,6 @@ describe('ReservasWidget', () => {
     });
     render(<ReservasWidget reservas={reservas} />);
     
-    // Should show formatted value (e.g., "28.5B" or "$28,500,000,000")
     const container = screen.getByText(/reservas/i).closest('div');
     expect(container).toBeInTheDocument();
   });
