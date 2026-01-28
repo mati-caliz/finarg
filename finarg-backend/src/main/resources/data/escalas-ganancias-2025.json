@@ -1,0 +1,28 @@
+{
+  "escalas2025": {
+    "minimoNoImponible": 3091035,
+    "deduccionEspecial4ta": 14837448,
+    "conyuge": 2911135,
+    "hijo": 1468096,
+    "tramos": [
+      {"desde": 0, "hasta": 1193521, "alicuota": 5},
+      {"desde": 1193521, "hasta": 2387043, "alicuota": 9},
+      {"desde": 2387043, "hasta": 3580564, "alicuota": 12},
+      {"desde": 3580564, "hasta": 5371347, "alicuota": 15},
+      {"desde": 5371347, "hasta": 10742695, "alicuota": 19},
+      {"desde": 10742695, "hasta": 16114042, "alicuota": 23},
+      {"desde": 16114042, "hasta": 24171563, "alicuota": 27},
+      {"desde": 24171563, "hasta": 48343127, "alicuota": 31},
+      {"desde": 48343127, "hasta": 999999999999, "alicuota": 35}
+    ]
+  },
+  "deduccionesMaximas": {
+    "alquilerVivienda": "40% del sueldo bruto",
+    "servicioDomestico": "Igual al minimo no imponible",
+    "gastosEducativos": "40% del sueldo bruto",
+    "seguroVida": 167678,
+    "donaciones": "5% de la ganancia neta"
+  },
+  "actualizadoAl": "2025-01-01",
+  "fuente": "AFIP - RG 5531/2024"
+}
