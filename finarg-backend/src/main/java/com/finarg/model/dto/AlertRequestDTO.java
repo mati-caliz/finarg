@@ -1,0 +1,27 @@
+package com.finarg.model.dto;
+
+import com.finarg.model.enums.AlertType;
+import jakarta.validation.constraints.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertRequestDTO {
+    
+    @NotNull(message = "Alert type is required")
+    private AlertType type;
+    
+    private String condition;
+    
+    private BigDecimal targetValue;
+
+    @Builder.Default
+    private boolean emailNotification = true;
+
+    @Builder.Default
+    private boolean pushNotification = false;
+}

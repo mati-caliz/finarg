@@ -14,18 +14,18 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/cauciones")
+@RequestMapping("/api/v1/repos")
 @RequiredArgsConstructor
-@Tag(name = "Cauciones", description = "Optimizador de cauciones bursatiles")
+@Tag(name = "Repos", description = "Stock market repo optimizer")
 public class CaucionController {
 
     private final CaucionOptimizerService caucionService;
 
-    @PostMapping("/optimizar")
-    @Operation(summary = "Optimizar estrategia de caucion")
-    public ResponseEntity<Map<String, Object>> optimizar(
-            @RequestParam BigDecimal monto,
-            @RequestParam(defaultValue = "7") int plazoDias) {
-        return ResponseEntity.ok(caucionService.optimizar(monto, plazoDias));
+    @PostMapping("/optimize")
+    @Operation(summary = "Optimize repo strategy")
+    public ResponseEntity<Map<String, Object>> optimize(
+            @RequestParam BigDecimal amount,
+            @RequestParam(defaultValue = "7") int termDays) {
+        return ResponseEntity.ok(caucionService.optimize(amount, termDays));
     }
 }

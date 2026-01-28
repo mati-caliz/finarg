@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { arbitrajeApi } from '@/lib/api';
+import { arbitrageApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Arbitraje } from '@/types';
+import { Arbitrage } from '@/types';
 import {
   ArrowRightLeft,
   AlertTriangle,
@@ -13,12 +13,15 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
-const getRiesgoColor = (riesgo: string) => {
-  switch (riesgo?.toUpperCase()) {
+const getRiskColor = (risk: string) => {
+  switch (risk?.toUpperCase()) {
+    case 'LOW':
     case 'BAJO':
       return 'text-green-500 bg-green-500/10';
+    case 'MEDIUM':
     case 'MEDIO':
       return 'text-yellow-500 bg-yellow-500/10';
+    case 'HIGH':
     case 'ALTO':
       return 'text-red-500 bg-red-500/10';
     default:
@@ -26,23 +29,23 @@ const getRiesgoColor = (riesgo: string) => {
   }
 };
 
-export default function ArbitrajePage() {
+export default function ArbitragePage() {
   const {
-    data: oportunidades,
+    data: opportunities,
     isLoading,
     refetch,
     dataUpdatedAt,
   } = useQuery({
-    queryKey: ['arbitraje'],
+    queryKey: ['arbitrage'],
     queryFn: async () => {
-      const response = await arbitrajeApi.getOportunidades();
-      return response.data as Arbitraje[];
+      const response = await arbitrageApi.getOpportunities();
+      return response.data as Arbitrage[];
     },
-    refetchInterval: 30000, // Refrescar cada 30 segundos
+    refetchInterval: 30000,
   });
 
-  const viables = oportunidades?.filter((o) => o.viable) || [];
-  const noViables = oportunidades?.filter((o) => !o.viable) || [];
+  const viable = opportunities?.filter((o) => o.viable) || [];
+  const notViable = opportunities?.filter((o) => !o.viable) || [];
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
@@ -52,14 +55,14 @@ export default function ArbitrajePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Detector de Arbitraje</h1>
+          <h1 className="text-2xl font-bold text-white">Arbitrage Detector</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Oportunidades de ganancia entre diferentes cotizaciones del dólar
+            Profit opportunities between different dollar quotes
           </p>
         </div>
         <div className="flex items-center gap-4">
           <p className="text-xs text-gray-500">
-            Actualizado:{' '}
+            Updated:{' '}
             {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString('es-AR') : '-'}
           </p>
           <Button
@@ -69,12 +72,12 @@ export default function ArbitrajePage() {
             className="flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            Actualizar
+            Refresh
           </Button>
         </div>
       </div>
 
-      {/* Resumen */}
+      {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-card">
           <CardContent className="p-4 flex items-center gap-4">
@@ -82,8 +85,8 @@ export default function ArbitrajePage() {
               <ArrowRightLeft className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Total Oportunidades</p>
-              <p className="text-2xl font-bold text-white">{oportunidades?.length || 0}</p>
+              <p className="text-xs text-gray-400">Total Opportunities</p>
+              <p className="text-2xl font-bold text-white">{opportunities?.length || 0}</p>
             </div>
           </CardContent>
         </Card>
@@ -93,8 +96,8 @@ export default function ArbitrajePage() {
               <CheckCircle className="h-6 w-6 text-green-500" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Viables</p>
-              <p className="text-2xl font-bold text-green-500">{viables.length}</p>
+              <p className="text-xs text-gray-400">Viable</p>
+              <p className="text-2xl font-bold text-green-500">{viable.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -104,8 +107,8 @@ export default function ArbitrajePage() {
               <XCircle className="h-6 w-6 text-red-500" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">No Viables</p>
-              <p className="text-2xl font-bold text-red-500">{noViables.length}</p>
+              <p className="text-xs text-gray-400">Not Viable</p>
+              <p className="text-2xl font-bold text-red-500">{notViable.length}</p>
             </div>
           </CardContent>
         </Card>
@@ -117,74 +120,74 @@ export default function ArbitrajePage() {
         </div>
       ) : (
         <>
-          {/* Oportunidades viables */}
-          {viables.length > 0 && (
+          {/* Viable opportunities */}
+          {viable.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                Oportunidades Viables
+                Viable Opportunities
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {viables.map((oportunidad, index) => (
+                {viable.map((opportunity, index) => (
                   <Card key={index} className="bg-card border-green-500/20">
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-start">
                         <CardTitle className="text-base flex items-center gap-2">
-                          <span className="text-gray-400">{oportunidad.tipoOrigen}</span>
+                          <span className="text-gray-400">{opportunity.sourceType}</span>
                           <ArrowRightLeft className="h-4 w-4 text-primary" />
-                          <span className="text-white">{oportunidad.tipoDestino}</span>
+                          <span className="text-white">{opportunity.targetType}</span>
                         </CardTitle>
                         <span
-                          className={`px-2 py-1 rounded text-xs font-medium ${getRiesgoColor(
-                            oportunidad.riesgo
+                          className={`px-2 py-1 rounded text-xs font-medium ${getRiskColor(
+                            opportunity.risk
                           )}`}
                         >
-                          Riesgo {oportunidad.riesgo}
+                          Risk {opportunity.risk}
                         </span>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {/* Cotizaciones */}
+                        {/* Quotes */}
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-3 bg-gray-800/50 rounded-lg">
-                            <p className="text-xs text-gray-400">Compra ({oportunidad.tipoOrigen})</p>
+                            <p className="text-xs text-gray-400">Buy ({opportunity.sourceType})</p>
                             <p className="text-lg font-semibold text-white">
-                              {formatCurrency(oportunidad.cotizacionOrigen)}
+                              {formatCurrency(opportunity.sourceQuote)}
                             </p>
                           </div>
                           <div className="p-3 bg-gray-800/50 rounded-lg">
-                            <p className="text-xs text-gray-400">Venta ({oportunidad.tipoDestino})</p>
+                            <p className="text-xs text-gray-400">Sell ({opportunity.targetType})</p>
                             <p className="text-lg font-semibold text-white">
-                              {formatCurrency(oportunidad.cotizacionDestino)}
+                              {formatCurrency(opportunity.targetQuote)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Spread y ganancia */}
+                        {/* Spread and profit */}
                         <div className="flex justify-between items-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                           <div>
                             <p className="text-xs text-gray-400">Spread</p>
                             <p className="text-xl font-bold text-green-500">
-                              +{oportunidad.spreadPorcentaje.toFixed(2)}%
+                              +{opportunity.spreadPercentage.toFixed(2)}%
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-gray-400">Ganancia por USD 1.000</p>
+                            <p className="text-xs text-gray-400">Profit per USD 1,000</p>
                             <p className="text-xl font-bold text-green-500">
-                              {formatCurrency(oportunidad.gananciaEstimadaPor1000USD)}
+                              {formatCurrency(opportunity.estimatedProfitPer1000USD)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Descripción */}
-                        <p className="text-sm text-gray-400">{oportunidad.descripcion}</p>
+                        {/* Description */}
+                        <p className="text-sm text-gray-400">{opportunity.description}</p>
 
-                        {/* Pasos */}
-                        {oportunidad.pasos && (
+                        {/* Steps */}
+                        {opportunity.steps && (
                           <div className="p-3 bg-gray-800/30 rounded-lg">
-                            <p className="text-xs text-gray-500 mb-2">Pasos para ejecutar:</p>
-                            <p className="text-sm text-gray-300">{oportunidad.pasos}</p>
+                            <p className="text-xs text-gray-500 mb-2">Steps to execute:</p>
+                            <p className="text-sm text-gray-300">{opportunity.steps}</p>
                           </div>
                         )}
                       </div>
@@ -195,29 +198,29 @@ export default function ArbitrajePage() {
             </div>
           )}
 
-          {/* Oportunidades no viables */}
-          {noViables.length > 0 && (
+          {/* Not viable opportunities */}
+          {notViable.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-gray-500" />
-                Monitoreo (No Viables Actualmente)
+                Monitoring (Currently Not Viable)
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                {noViables.map((oportunidad, index) => (
+                {notViable.map((opportunity, index) => (
                   <Card key={index} className="bg-card opacity-60">
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500">{oportunidad.tipoOrigen}</span>
+                          <span className="text-gray-500">{opportunity.sourceType}</span>
                           <ArrowRightLeft className="h-3 w-3 text-gray-600" />
-                          <span className="text-gray-400">{oportunidad.tipoDestino}</span>
+                          <span className="text-gray-400">{opportunity.targetType}</span>
                         </div>
                         <span
-                          className={`px-2 py-0.5 rounded text-xs ${getRiesgoColor(
-                            oportunidad.riesgo
+                          className={`px-2 py-0.5 rounded text-xs ${getRiskColor(
+                            opportunity.risk
                           )}`}
                         >
-                          {oportunidad.riesgo}
+                          {opportunity.risk}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -225,17 +228,17 @@ export default function ArbitrajePage() {
                           <p className="text-xs text-gray-500">Spread</p>
                           <p
                             className={`text-lg font-semibold ${
-                              oportunidad.spreadPorcentaje >= 0 ? 'text-gray-400' : 'text-red-500'
+                              opportunity.spreadPercentage >= 0 ? 'text-gray-400' : 'text-red-500'
                             }`}
                           >
-                            {oportunidad.spreadPorcentaje >= 0 ? '+' : ''}
-                            {oportunidad.spreadPorcentaje.toFixed(2)}%
+                            {opportunity.spreadPercentage >= 0 ? '+' : ''}
+                            {opportunity.spreadPercentage.toFixed(2)}%
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">Ganancia USD 1k</p>
+                          <p className="text-xs text-gray-500">Profit USD 1k</p>
                           <p className="text-lg font-semibold text-gray-400">
-                            {formatCurrency(oportunidad.gananciaEstimadaPor1000USD)}
+                            {formatCurrency(opportunity.estimatedProfitPer1000USD)}
                           </p>
                         </div>
                       </div>
@@ -246,16 +249,16 @@ export default function ArbitrajePage() {
             </div>
           )}
 
-          {/* Sin oportunidades */}
-          {oportunidades?.length === 0 && (
+          {/* No opportunities */}
+          {opportunities?.length === 0 && (
             <Card className="bg-card">
               <CardContent className="p-12 text-center">
                 <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  No hay oportunidades de arbitraje
+                  No arbitrage opportunities
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  Las cotizaciones están equilibradas. Volveremos a verificar en 30 segundos.
+                  Quotes are balanced. We will check again in 30 seconds.
                 </p>
               </CardContent>
             </Card>
@@ -271,10 +274,10 @@ export default function ArbitrajePage() {
             <div className="text-sm">
               <p className="text-yellow-500 font-medium mb-1">Disclaimer</p>
               <p className="text-gray-400">
-                Las oportunidades de arbitraje son estimaciones basadas en cotizaciones públicas.
-                Los spreads reales pueden variar debido a comisiones, tiempos de transferencia y
-                disponibilidad de moneda. Siempre verificar las condiciones antes de operar.
-                Esta información no constituye asesoramiento financiero.
+                Arbitrage opportunities are estimates based on public quotes.
+                Actual spreads may vary due to commissions, transfer times, and
+                currency availability. Always verify conditions before trading.
+                This information does not constitute financial advice.
               </p>
             </div>
           </div>

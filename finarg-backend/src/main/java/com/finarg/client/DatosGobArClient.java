@@ -20,14 +20,14 @@ public class DatosGobArClient {
         this.webClient = webClient;
     }
 
-    private static final String RESERVAS_SERIES_ID = "92.2_RESERVAS_IRES_0_0_32_40";
+    private static final String RESERVES_SERIES_ID = "92.2_RESERVAS_IRES_0_0_32_40";
 
-    public List<SeriesDataPoint> getReservasBCRA(int limit) {
+    public List<SeriesDataPoint> getBCRAReserves(int limit) {
         try {
             SeriesApiResponse response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/series/")
-                            .queryParam("ids", RESERVAS_SERIES_ID)
+                            .queryParam("ids", RESERVES_SERIES_ID)
                             .queryParam("limit", limit)
                             .queryParam("sort", "desc")
                             .queryParam("format", "json")
@@ -47,7 +47,7 @@ public class DatosGobArClient {
                     ))
                     .toList();
         } catch (Exception e) {
-            log.error("Error fetching reservas from datos.gob.ar: {}", e.getMessage());
+            log.error("Error fetching reserves from datos.gob.ar: {}", e.getMessage());
             return List.of();
         }
     }

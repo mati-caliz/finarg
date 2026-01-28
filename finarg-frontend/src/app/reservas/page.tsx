@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { reservasApi } from '@/lib/api';
+import { reservesApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AreaChart } from '@/components/charts';
-import { Reservas } from '@/types';
+import { Reserves } from '@/types';
 import {
   Building2,
   TrendingUp,
@@ -17,33 +17,33 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const PERIODOS = [
-  { value: 7, label: '7 días' },
-  { value: 30, label: '30 días' },
-  { value: 90, label: '3 meses' },
-  { value: 180, label: '6 meses' },
+const PERIODS = [
+  { value: 7, label: '7 days' },
+  { value: 30, label: '30 days' },
+  { value: 90, label: '3 months' },
+  { value: 180, label: '6 months' },
 ];
 
-export default function ReservasPage() {
-  const [periodo, setPeriodo] = useState(30);
+export default function ReservesPage() {
+  const [period, setPeriod] = useState(30);
 
   const {
-    data: reservasActuales,
+    data: currentReserves,
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['reservas'],
+    queryKey: ['reserves'],
     queryFn: async () => {
-      const response = await reservasApi.getActuales();
-      return response.data as Reservas;
+      const response = await reservesApi.getCurrent();
+      return response.data as Reserves;
     },
-    refetchInterval: 300000, // Refrescar cada 5 minutos
+    refetchInterval: 300000,
   });
 
-  const { data: historicoReservas, isLoading: historicoLoading } = useQuery({
-    queryKey: ['reservas-historico', periodo],
+  const { data: historicalReserves, isLoading: historicalLoading } = useQuery({
+    queryKey: ['reserves-historical', period],
     queryFn: async () => {
-      const response = await reservasApi.getHistorico(periodo);
+      const response = await reservesApi.getHistorical(period);
       return response.data;
     },
   });
@@ -68,10 +68,12 @@ export default function ReservasPage() {
     return date.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
   };
 
-  const getTendenciaIcon = (tendencia: string) => {
-    switch (tendencia?.toUpperCase()) {
+  const getTrendIcon = (trend: string) => {
+    switch (trend?.toUpperCase()) {
+      case 'RISING':
       case 'SUBIENDO':
         return <TrendingUp className="h-4 w-4 text-green-500" />;
+      case 'FALLING':
       case 'BAJANDO':
         return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
@@ -79,10 +81,12 @@ export default function ReservasPage() {
     }
   };
 
-  const getTendenciaColor = (tendencia: string) => {
-    switch (tendencia?.toUpperCase()) {
+  const getTrendColor = (trend: string) => {
+    switch (trend?.toUpperCase()) {
+      case 'RISING':
       case 'SUBIENDO':
         return 'text-green-500';
+      case 'FALLING':
       case 'BAJANDO':
         return 'text-red-500';
       default:
@@ -95,9 +99,9 @@ export default function ReservasPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Reservas del BCRA</h1>
+          <h1 className="text-2xl font-bold text-white">BCRA Reserves</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Reservas internacionales del Banco Central de la República Argentina
+            International reserves of the Central Bank of Argentina
           </p>
         </div>
         <Button
@@ -107,11 +111,11 @@ export default function ReservasPage() {
           className="flex items-center gap-2"
         >
           <RefreshCw className="h-4 w-4" />
-          Actualizar
+          Refresh
         </Button>
       </div>
 
-      {/* KPIs principales */}
+      {/* Main KPIs */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -127,22 +131,22 @@ export default function ReservasPage() {
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Reservas Brutas</p>
+                <p className="text-xs text-gray-400">Gross Reserves</p>
                 <Landmark className="h-5 w-5 text-primary" />
               </div>
               <p className="text-2xl font-bold text-white">
-                {reservasActuales ? formatUSD(reservasActuales.reservasBrutas) : '-'}
+                {currentReserves ? formatUSD(currentReserves.grossReserves) : '-'}
               </p>
               <div className="flex items-center gap-2 mt-2">
-                {reservasActuales && getTendenciaIcon(reservasActuales.tendencia)}
+                {currentReserves && getTrendIcon(currentReserves.trend)}
                 <span
                   className={`text-sm ${
-                    reservasActuales ? getTendenciaColor(reservasActuales.tendencia) : ''
+                    currentReserves ? getTrendColor(currentReserves.trend) : ''
                   }`}
                 >
-                  {reservasActuales?.variacionDiaria
-                    ? `${reservasActuales.variacionDiaria >= 0 ? '+' : ''}${formatUSD(
-                        reservasActuales.variacionDiaria
+                  {currentReserves?.dailyChange
+                    ? `${currentReserves.dailyChange >= 0 ? '+' : ''}${formatUSD(
+                        currentReserves.dailyChange
                       )}`
                     : '-'}
                 </span>
@@ -153,59 +157,59 @@ export default function ReservasPage() {
           <Card className="bg-card border-primary/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Reservas Netas (Est.)</p>
+                <p className="text-xs text-gray-400">Net Reserves (Est.)</p>
                 <Building2 className="h-5 w-5 text-green-500" />
               </div>
               <p className="text-2xl font-bold text-green-500">
-                {reservasActuales ? formatUSD(reservasActuales.reservasNetas) : '-'}
+                {currentReserves ? formatUSD(currentReserves.netReserves) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Estimación sin swaps ni encajes</p>
+              <p className="text-xs text-gray-500 mt-2">Estimated without swaps or deposits</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Swap con China</p>
+                <p className="text-xs text-gray-400">China Swap</p>
                 <Globe className="h-5 w-5 text-red-500" />
               </div>
               <p className="text-2xl font-bold text-white">
-                {reservasActuales ? formatUSD(reservasActuales.swapChina) : '-'}
+                {currentReserves ? formatUSD(currentReserves.chinaSwap) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Se descuenta de netas</p>
+              <p className="text-xs text-gray-500 mt-2">Subtracted from net</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Encajes Bancarios</p>
+                <p className="text-xs text-gray-400">Bank Reserves</p>
                 <Banknote className="h-5 w-5 text-yellow-500" />
               </div>
               <p className="text-2xl font-bold text-white">
-                {reservasActuales ? formatUSD(reservasActuales.encajesBancarios) : '-'}
+                {currentReserves ? formatUSD(currentReserves.bankDeposits) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Depósitos en USD del público</p>
+              <p className="text-xs text-gray-500 mt-2">Public USD deposits</p>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Desglose de reservas */}
-      {reservasActuales && (
+      {/* Reserves breakdown */}
+      {currentReserves && (
         <Card className="bg-card">
           <CardHeader>
-            <CardTitle className="text-lg">Composición de las Reservas</CardTitle>
+            <CardTitle className="text-lg">Reserves Composition</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {/* Barra de composición */}
+              {/* Composition bar */}
               <div className="relative h-8 rounded-lg overflow-hidden bg-gray-800">
                 <div
                   className="absolute h-full bg-green-500"
                   style={{
                     width: `${
-                      (reservasActuales.reservasNetas / reservasActuales.reservasBrutas) * 100
+                      (currentReserves.netReserves / currentReserves.grossReserves) * 100
                     }%`,
                   }}
                 />
@@ -213,10 +217,10 @@ export default function ReservasPage() {
                   className="absolute h-full bg-red-500"
                   style={{
                     left: `${
-                      (reservasActuales.reservasNetas / reservasActuales.reservasBrutas) * 100
+                      (currentReserves.netReserves / currentReserves.grossReserves) * 100
                     }%`,
                     width: `${
-                      (reservasActuales.swapChina / reservasActuales.reservasBrutas) * 100
+                      (currentReserves.chinaSwap / currentReserves.grossReserves) * 100
                     }%`,
                   }}
                 />
@@ -224,52 +228,52 @@ export default function ReservasPage() {
                   className="absolute h-full bg-yellow-500"
                   style={{
                     left: `${
-                      ((reservasActuales.reservasNetas + reservasActuales.swapChina) /
-                        reservasActuales.reservasBrutas) *
+                      ((currentReserves.netReserves + currentReserves.chinaSwap) /
+                        currentReserves.grossReserves) *
                       100
                     }%`,
                     width: `${
-                      (reservasActuales.encajesBancarios / reservasActuales.reservasBrutas) * 100
+                      (currentReserves.bankDeposits / currentReserves.grossReserves) * 100
                     }%`,
                   }}
                 />
               </div>
 
-              {/* Leyenda */}
+              {/* Legend */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-green-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Reservas Netas</p>
+                    <p className="text-xs text-gray-400">Net Reserves</p>
                     <p className="text-sm text-white">
-                      {formatFullUSD(reservasActuales.reservasNetas)}
+                      {formatFullUSD(currentReserves.netReserves)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-red-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Swap China</p>
+                    <p className="text-xs text-gray-400">China Swap</p>
                     <p className="text-sm text-white">
-                      {formatFullUSD(reservasActuales.swapChina)}
+                      {formatFullUSD(currentReserves.chinaSwap)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-yellow-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Encajes</p>
+                    <p className="text-xs text-gray-400">Bank Deposits</p>
                     <p className="text-sm text-white">
-                      {formatFullUSD(reservasActuales.encajesBancarios)}
+                      {formatFullUSD(currentReserves.bankDeposits)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-blue-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Dep. Gobierno</p>
+                    <p className="text-xs text-gray-400">Gov. Deposits</p>
                     <p className="text-sm text-white">
-                      {formatFullUSD(reservasActuales.depositosGobierno)}
+                      {formatFullUSD(currentReserves.governmentDeposits)}
                     </p>
                   </div>
                 </div>
@@ -279,18 +283,18 @@ export default function ReservasPage() {
         </Card>
       )}
 
-      {/* Gráfico histórico */}
+      {/* Historical chart */}
       <Card className="bg-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-lg">Evolución Histórica</CardTitle>
+            <CardTitle className="text-lg">Historical Evolution</CardTitle>
             <div className="flex flex-wrap gap-2">
-              {PERIODOS.map((p) => (
+              {PERIODS.map((p) => (
                 <Button
                   key={p.value}
-                  variant={periodo === p.value ? 'default' : 'outline'}
+                  variant={period === p.value ? 'default' : 'outline'}
                   size="sm"
-                  onClick={() => setPeriodo(p.value)}
+                  onClick={() => setPeriod(p.value)}
                 >
                   {p.label}
                 </Button>
@@ -299,13 +303,13 @@ export default function ReservasPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {historicoLoading ? (
+          {historicalLoading ? (
             <div className="h-[300px] flex items-center justify-center">
               <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
             </div>
-          ) : historicoReservas && historicoReservas.length > 0 ? (
+          ) : historicalReserves && historicalReserves.length > 0 ? (
             <AreaChart
-              data={historicoReservas.map((r: { fecha: string; reservasBrutas: number }) => ({
+              data={historicalReserves.map((r: { fecha: string; reservasBrutas: number }) => ({
                 fecha: formatDate(r.fecha),
                 reservasBrutas: r.reservasBrutas,
               }))}
@@ -314,28 +318,28 @@ export default function ReservasPage() {
               color="#10b981"
               height={300}
               formatY={(v) => formatUSD(v)}
-              gradientId="reservasGradient"
+              gradientId="reservesGradient"
             />
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500">
-              No hay datos históricos disponibles
+              No historical data available
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Información adicional */}
+      {/* Additional information */}
       <Card className="bg-blue-500/5 border-blue-500/20">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <Building2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-blue-500 font-medium mb-1">Sobre las Reservas Netas</p>
+              <p className="text-blue-500 font-medium mb-1">About Net Reserves</p>
               <p className="text-gray-400">
-                Las reservas netas son una estimación que descuenta de las reservas brutas: el swap
-                con China, los encajes bancarios (depósitos del público en dólares), y los
-                depósitos del gobierno nacional. El cálculo exacto es complejo ya que depende de
-                datos que el BCRA no publica diariamente.
+                Net reserves are an estimate that subtracts from gross reserves: the swap
+                with China, bank deposits (public dollar deposits), and
+                national government deposits. The exact calculation is complex as it depends on
+                data that the BCRA does not publish daily.
               </p>
             </div>
           </div>

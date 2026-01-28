@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { simuladorApi } from '@/lib/api';
+import { simulatorApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LineChart } from '@/components/charts';
-import { SimulacionRequest, SimulacionResponse } from '@/types';
+import { SimulationRequest, SimulationResponse } from '@/types';
 import {
   TrendingUp,
   DollarSign,
@@ -19,56 +19,56 @@ import {
   Bitcoin,
 } from 'lucide-react';
 
-const TIPOS_INVERSION = [
-  { value: 'PLAZO_FIJO', label: 'Plazo Fijo', icon: Building, color: 'text-blue-500' },
-  { value: 'PLAZO_FIJO_UVA', label: 'Plazo Fijo UVA', icon: TrendingUp, color: 'text-green-500' },
-  { value: 'FCI_MONEY_MARKET', label: 'FCI Money Market', icon: PiggyBank, color: 'text-purple-500' },
-  { value: 'CAUCION_BURSATIL', label: 'Caución Bursátil', icon: Coins, color: 'text-yellow-500' },
+const INVESTMENT_TYPES = [
+  { value: 'PLAZO_FIJO', label: 'Fixed Term Deposit', icon: Building, color: 'text-blue-500' },
+  { value: 'PLAZO_FIJO_UVA', label: 'UVA Fixed Term', icon: TrendingUp, color: 'text-green-500' },
+  { value: 'FCI_MONEY_MARKET', label: 'Money Market Fund', icon: PiggyBank, color: 'text-purple-500' },
+  { value: 'CAUCION_BURSATIL', label: 'Stock Exchange Repo', icon: Coins, color: 'text-yellow-500' },
   { value: 'STABLECOIN', label: 'Stablecoin DeFi', icon: Bitcoin, color: 'text-orange-500' },
 ];
 
-const PLAZOS = [
-  { value: 30, label: '30 días' },
-  { value: 60, label: '60 días' },
-  { value: 90, label: '90 días' },
-  { value: 180, label: '180 días' },
-  { value: 365, label: '1 año' },
+const TERMS = [
+  { value: 30, label: '30 days' },
+  { value: 60, label: '60 days' },
+  { value: 90, label: '90 days' },
+  { value: 180, label: '180 days' },
+  { value: 365, label: '1 year' },
 ];
 
-export default function SimuladorPage() {
-  const [formData, setFormData] = useState<SimulacionRequest>({
-    montoInicial: 1000000,
-    tipoInversion: 'PLAZO_FIJO',
-    plazoDias: 30,
-    reinvertir: true,
+export default function SimulatorPage() {
+  const [formData, setFormData] = useState<SimulationRequest>({
+    initialAmount: 1000000,
+    investmentType: 'PLAZO_FIJO',
+    termDays: 30,
+    reinvest: true,
   });
 
-  const [resultado, setResultado] = useState<SimulacionResponse | null>(null);
+  const [result, setResult] = useState<SimulationResponse | null>(null);
 
   useQuery({
-    queryKey: ['tasas'],
+    queryKey: ['rates'],
     queryFn: async () => {
-      const response = await simuladorApi.getTasas();
+      const response = await simulatorApi.getRates();
       return response.data;
     },
   });
 
-  const simularMutation = useMutation({
-    mutationFn: async (data: SimulacionRequest) => {
-      const response = await simuladorApi.simular(data);
-      return response.data as SimulacionResponse;
+  const simulateMutation = useMutation({
+    mutationFn: async (data: SimulationRequest) => {
+      const response = await simulatorApi.simulate(data);
+      return response.data as SimulationResponse;
     },
     onSuccess: (data) => {
-      setResultado(data);
+      setResult(data);
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    simularMutation.mutate(formData);
+    simulateMutation.mutate(formData);
   };
 
-  const handleInputChange = (field: keyof SimulacionRequest, value: SimulacionRequest[keyof SimulacionRequest]) => {
+  const handleInputChange = (field: keyof SimulationRequest, value: SimulationRequest[keyof SimulationRequest]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -84,222 +84,222 @@ export default function SimuladorPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Simulador de Inversiones</h1>
+        <h1 className="text-2xl font-bold text-white">Investment Simulator</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Compara rendimientos de diferentes instrumentos financieros
+          Compare returns from different financial instruments
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulario */}
+        {/* Form */}
         <Card className="bg-card lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Configurar Simulación
+              Configure Simulation
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Monto inicial */}
+              {/* Initial amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Monto a Invertir
+                  Amount to Invest
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     type="number"
                     placeholder="1000000"
-                    value={formData.montoInicial || ''}
+                    value={formData.initialAmount || ''}
                     onChange={(e) =>
-                      handleInputChange('montoInicial', parseFloat(e.target.value) || 0)
+                      handleInputChange('initialAmount', parseFloat(e.target.value) || 0)
                     }
                     className="pl-10"
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  {formatCurrency(formData.montoInicial)}
+                  {formatCurrency(formData.initialAmount)}
                 </p>
               </div>
 
-              {/* Tipo de inversión */}
+              {/* Investment type */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Tipo de Inversión
+                  Investment Type
                 </label>
                 <div className="space-y-2">
-                  {TIPOS_INVERSION.map((tipo) => {
-                    const Icon = tipo.icon;
+                  {INVESTMENT_TYPES.map((type) => {
+                    const Icon = type.icon;
                     return (
                       <button
-                        key={tipo.value}
+                        key={type.value}
                         type="button"
-                        onClick={() => handleInputChange('tipoInversion', tipo.value)}
+                        onClick={() => handleInputChange('investmentType', type.value)}
                         className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                          formData.tipoInversion === tipo.value
+                          formData.investmentType === type.value
                             ? 'border-primary bg-primary/10'
                             : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
                         }`}
                       >
-                        <Icon className={`h-5 w-5 ${tipo.color}`} />
-                        <span className="text-sm text-white">{tipo.label}</span>
+                        <Icon className={`h-5 w-5 ${type.color}`} />
+                        <span className="text-sm text-white">{type.label}</span>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Plazo */}
+              {/* Term */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
                   <Calendar className="h-4 w-4" />
-                  Plazo
+                  Term
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {PLAZOS.map((plazo) => (
+                  {TERMS.map((term) => (
                     <Button
-                      key={plazo.value}
+                      key={term.value}
                       type="button"
-                      variant={formData.plazoDias === plazo.value ? 'default' : 'outline'}
+                      variant={formData.termDays === term.value ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => handleInputChange('plazoDias', plazo.value)}
+                      onClick={() => handleInputChange('termDays', term.value)}
                     >
-                      {plazo.label}
+                      {term.label}
                     </Button>
                   ))}
                 </div>
               </div>
 
-              {/* Reinvertir */}
+              {/* Reinvest */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
-                  id="reinvertir"
-                  checked={formData.reinvertir}
-                  onChange={(e) => handleInputChange('reinvertir', e.target.checked)}
+                  id="reinvest"
+                  checked={formData.reinvest}
+                  onChange={(e) => handleInputChange('reinvest', e.target.checked)}
                   className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary"
                 />
-                <label htmlFor="reinvertir" className="text-sm text-gray-300">
-                  Reinvertir intereses (interés compuesto)
+                <label htmlFor="reinvest" className="text-sm text-gray-300">
+                  Reinvest interest (compound interest)
                 </label>
               </div>
 
               <Button
                 type="submit"
                 className="w-full"
-                disabled={simularMutation.isPending || formData.montoInicial <= 0}
+                disabled={simulateMutation.isPending || formData.initialAmount <= 0}
               >
-                {simularMutation.isPending ? (
+                {simulateMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Simulando...
+                    Simulating...
                   </>
                 ) : (
-                  'Simular Inversión'
+                  'Simulate Investment'
                 )}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Resultados */}
+        {/* Results */}
         <div className="lg:col-span-2 space-y-6">
-          {resultado ? (
+          {result ? (
             <>
-              {/* KPIs principales */}
+              {/* Main KPIs */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Monto Final</p>
+                    <p className="text-xs text-gray-400">Final Amount</p>
                     <p className="text-xl font-bold text-white mt-1">
-                      {formatCurrency(resultado.montoFinal)}
+                      {formatCurrency(result.finalAmount)}
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Ganancia ARS</p>
+                    <p className="text-xs text-gray-400">ARS Profit</p>
                     <p className="text-xl font-bold text-green-500 mt-1">
-                      +{formatCurrency(resultado.gananciaARS)}
+                      +{formatCurrency(result.profitARS)}
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Rendimiento Nominal</p>
+                    <p className="text-xs text-gray-400">Nominal Return</p>
                     <p className="text-xl font-bold text-primary mt-1">
-                      {formatPercent(resultado.rendimientoNominal)}
+                      {formatPercent(result.nominalReturn)}
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Rendimiento Real</p>
+                    <p className="text-xs text-gray-400">Real Return</p>
                     <p
                       className={`text-xl font-bold mt-1 ${
-                        resultado.rendimientoReal >= 0 ? 'text-green-500' : 'text-red-500'
+                        result.realReturn >= 0 ? 'text-green-500' : 'text-red-500'
                       }`}
                     >
-                      {resultado.rendimientoReal >= 0 ? '+' : ''}
-                      {formatPercent(resultado.rendimientoReal)}
+                      {result.realReturn >= 0 ? '+' : ''}
+                      {formatPercent(result.realReturn)}
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Detalles y tasas */}
+              {/* Details and rates */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Detalles de la Simulación</CardTitle>
+                  <CardTitle className="text-lg">Simulation Details</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-3 bg-gray-800/50 rounded-lg">
                       <p className="text-xs text-gray-400">TNA</p>
                       <p className="text-lg font-semibold text-white">
-                        {formatPercent(resultado.tasaTNA)}
+                        {formatPercent(result.rateTNA)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
                       <p className="text-xs text-gray-400">TEA</p>
                       <p className="text-lg font-semibold text-white">
-                        {formatPercent(resultado.tasaTEA)}
+                        {formatPercent(result.rateTEA)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">Ganancia USD (estimada)</p>
+                      <p className="text-xs text-gray-400">USD Profit (estimated)</p>
                       <p className="text-lg font-semibold text-green-500">
-                        {formatUSD(resultado.gananciaUSD)}
+                        {formatUSD(result.profitUSD)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">Rendimiento en USD</p>
+                      <p className="text-xs text-gray-400">USD Return</p>
                       <p
                         className={`text-lg font-semibold ${
-                          resultado.rendimientoEnDolares >= 0 ? 'text-green-500' : 'text-red-500'
+                          result.dollarReturn >= 0 ? 'text-green-500' : 'text-red-500'
                         }`}
                       >
-                        {resultado.rendimientoEnDolares >= 0 ? '+' : ''}
-                        {formatPercent(resultado.rendimientoEnDolares)}
+                        {result.dollarReturn >= 0 ? '+' : ''}
+                        {formatPercent(result.dollarReturn)}
                       </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Gráfico de proyección */}
-              {resultado.proyeccion && resultado.proyeccion.length > 0 && (
+              {/* Projection chart */}
+              {result.projection && result.projection.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Proyección de Capital</CardTitle>
+                    <CardTitle className="text-lg">Capital Projection</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <LineChart
-                      data={resultado.proyeccion.map((p) => ({
-                        mes: `Mes ${p.mes}`,
-                        capital: p.capitalAcumulado,
-                        rendimientoReal: p.rendimientoReal,
+                      data={result.projection.map((p) => ({
+                        mes: `Month ${p.month}`,
+                        capital: p.accumulatedCapital,
+                        rendimientoReal: p.realReturn,
                       }))}
                       xKey="mes"
                       yKey={['capital']}
@@ -311,44 +311,44 @@ export default function SimuladorPage() {
                 </Card>
               )}
 
-              {/* Tabla de proyección mensual */}
-              {resultado.proyeccion && resultado.proyeccion.length > 0 && (
+              {/* Monthly projection table */}
+              {result.projection && result.projection.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Proyección Mensual</CardTitle>
+                    <CardTitle className="text-lg">Monthly Projection</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">Mes</th>
+                            <th className="text-left py-2 text-gray-400">Month</th>
                             <th className="text-right py-2 text-gray-400">Capital</th>
-                            <th className="text-right py-2 text-gray-400">Intereses</th>
-                            <th className="text-right py-2 text-gray-400">Inflación Est.</th>
-                            <th className="text-right py-2 text-gray-400">Rend. Real</th>
+                            <th className="text-right py-2 text-gray-400">Interest</th>
+                            <th className="text-right py-2 text-gray-400">Est. Inflation</th>
+                            <th className="text-right py-2 text-gray-400">Real Return</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {resultado.proyeccion.map((mes) => (
-                            <tr key={mes.mes} className="border-b border-gray-800/50">
-                              <td className="py-2 text-white">{mes.mes}</td>
+                          {result.projection.map((month) => (
+                            <tr key={month.month} className="border-b border-gray-800/50">
+                              <td className="py-2 text-white">{month.month}</td>
                               <td className="text-right py-2 text-white">
-                                {formatCurrency(mes.capitalAcumulado)}
+                                {formatCurrency(month.accumulatedCapital)}
                               </td>
                               <td className="text-right py-2 text-green-500">
-                                +{formatCurrency(mes.interesesMes)}
+                                +{formatCurrency(month.monthlyInterest)}
                               </td>
                               <td className="text-right py-2 text-yellow-500">
-                                {formatPercent(mes.inflacionEstimada)}
+                                {formatPercent(month.estimatedInflation)}
                               </td>
                               <td
                                 className={`text-right py-2 ${
-                                  mes.rendimientoReal >= 0 ? 'text-green-500' : 'text-red-500'
+                                  month.realReturn >= 0 ? 'text-green-500' : 'text-red-500'
                                 }`}
                               >
-                                {mes.rendimientoReal >= 0 ? '+' : ''}
-                                {formatPercent(mes.rendimientoReal)}
+                                {month.realReturn >= 0 ? '+' : ''}
+                                {formatPercent(month.realReturn)}
                               </td>
                             </tr>
                           ))}
@@ -364,10 +364,10 @@ export default function SimuladorPage() {
               <CardContent className="text-center">
                 <TrendingUp className="h-16 w-16 text-gray-700 mx-auto mb-4" />
                 <p className="text-gray-500">
-                  Configura los parámetros y simula tu inversión
+                  Configure the parameters and simulate your investment
                 </p>
                 <p className="text-gray-600 text-sm mt-2">
-                  Compara plazos fijos, FCI, stablecoins y más
+                  Compare fixed terms, funds, stablecoins and more
                 </p>
               </CardContent>
             </Card>

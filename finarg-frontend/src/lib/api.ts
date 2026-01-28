@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { GananciasRequest, SimulacionRequest } from '@/types';
+import { IncomeTaxRequest, SimulationRequest } from '@/types';
+import { CountryCode } from '@/config/countries';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
@@ -10,7 +11,6 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor para agregar token
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('accessToken');
@@ -21,7 +21,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor para manejar errores
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,51 +34,59 @@ api.interceptors.response.use(
   }
 );
 
-// API Functions
-export const cotizacionesApi = {
-  getAll: () => api.get('/cotizaciones'),
-  getByTipo: (tipo: string) => api.get(`/cotizaciones/${tipo}`),
-  getBrecha: () => api.get('/cotizaciones/brecha'),
-  getHistorico: (tipo: string, desde: string, hasta: string) =>
-    api.get(`/cotizaciones/historico/${tipo}`, { params: { desde, hasta } }),
+export const quotesApi = {
+  getAll: () => api.get('/quotes'),
+  getAllByCountry: (country: CountryCode) => api.get(`/${country}/quotes`),
+  getByType: (type: string) => api.get(`/quotes/${type}`),
+  getByCountryAndType: (country: CountryCode, type: string) => api.get(`/${country}/quotes/${type}`),
+  getGap: () => api.get('/quotes/gap'),
+  getGapByCountry: (country: CountryCode) => api.get(`/${country}/quotes/gap`),
+  getHistory: (type: string, from: string, to: string) =>
+    api.get(`/quotes/history/${type}`, { params: { country: 'ar', from, to } }),
+  getCountries: () => api.get('/countries'),
 };
 
-export const inflacionApi = {
-  getActual: () => api.get('/inflacion/actual'),
-  getMensual: (meses: number = 12) => api.get('/inflacion/mensual', { params: { meses } }),
-  getInteranual: () => api.get('/inflacion/interanual'),
-  ajustar: (monto: number, fechaOrigen: string, fechaDestino: string) =>
-    api.post('/inflacion/ajustar', null, { params: { monto, fechaOrigen, fechaDestino } }),
+export const inflationApi = {
+  getCurrent: () => api.get('/inflation/current'),
+  getMonthly: (months: number = 12) => api.get('/inflation/monthly', { params: { months } }),
+  getYearOverYear: () => api.get('/inflation/year-over-year'),
+  adjust: (amount: number, fromDate: string, toDate: string) =>
+    api.post('/inflation/adjust', null, { params: { amount, fromDate, toDate } }),
 };
 
-export const reservasApi = {
-  getActuales: () => api.get('/reservas'),
-  getHistorico: (dias: number = 30) => api.get('/reservas/historico', { params: { dias } }),
+export const reservesApi = {
+  getCurrent: () => api.get('/reserves'),
+  getHistory: (days: number = 30) => api.get('/reserves/history', { params: { days } }),
 };
 
-export const gananciasApi = {
-  calcular: (data: GananciasRequest) => api.post('/ganancias/calcular', data),
+export const incomeTaxApi = {
+  calculate: (data: IncomeTaxRequest) => api.post('/income-tax/calculate', data),
 };
 
-export const arbitrajeApi = {
-  getOportunidades: () => api.get('/arbitraje/oportunidades'),
+export const arbitrageApi = {
+  getOpportunities: () => api.get('/arbitrage/opportunities'),
 };
 
-export const simuladorApi = {
-  simular: (data: SimulacionRequest) => api.post('/simulador/rendimiento', data),
-  getTasas: () => api.get('/simulador/tasas'),
+export const simulatorApi = {
+  simulate: (data: SimulationRequest) => api.post('/simulator/returns', data),
+  getRates: () => api.get('/simulator/rates'),
 };
 
-export const caucionesApi = {
-  optimizar: (monto: number, plazoDias: number) =>
-    api.post('/cauciones/optimizar', null, { params: { monto, plazoDias } }),
+export const reposApi = {
+  optimize: (amount: number, termDays: number) =>
+    api.post('/repos/optimize', null, { params: { amount, termDays } }),
 };
 
 export const authApi = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
-  register: (email: string, password: string, nombre: string) =>
-    api.post('/auth/register', { email, password, nombre }),
+  register: (email: string, password: string, name: string) =>
+    api.post('/auth/register', { email, password, name }),
   refresh: (refreshToken: string) =>
     api.post('/auth/refresh', refreshToken),
 };
+
+export const cotizacionesApi = quotesApi;
+export const inflacionApi = inflationApi;
+export const gananciasApi = incomeTaxApi;
+export const caucionesApi = reposApi;

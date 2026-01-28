@@ -27,23 +27,23 @@ public class AuthService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     public AuthResponseDTO register(AuthRequestDTO request) {
-        log.info("Registrando nuevo usuario: {}", request.getEmail());
+        log.info("Registering new user: {}", request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El email ya esta registrado");
+            throw new RuntimeException("Email already registered");
         }
 
         User user = User.builder()
-                .nombre(request.getNombre())
+                .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .emailVerificado(false)
-                .notificacionesEmail(true)
-                .notificacionesPush(false)
+                .emailVerified(false)
+                .emailNotifications(true)
+                .pushNotifications(false)
                 .build();
 
         userRepository.save(user);
@@ -55,14 +55,14 @@ public class AuthService implements UserDetailsService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO request) {
-        log.info("Login de usuario: {}", request.getEmail());
+        log.info("User login: {}", request.getEmail());
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -73,10 +73,10 @@ public class AuthService implements UserDetailsService {
     public AuthResponseDTO refreshToken(String refreshToken) {
         String email = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!jwtService.isTokenValid(refreshToken, user)) {
-            throw new RuntimeException("Token invalido");
+            throw new RuntimeException("Invalid token");
         }
 
         String newAccessToken = jwtService.generateToken(user);
@@ -92,9 +92,9 @@ public class AuthService implements UserDetailsService {
                 .expiresIn(jwtService.getExpirationTime())
                 .user(AuthResponseDTO.UserDTO.builder()
                         .id(user.getId())
-                        .nombre(user.getNombre())
+                        .name(user.getName())
                         .email(user.getEmail())
-                        .emailVerificado(user.isEmailVerificado())
+                        .emailVerified(user.isEmailVerified())
                         .build())
                 .build();
     }

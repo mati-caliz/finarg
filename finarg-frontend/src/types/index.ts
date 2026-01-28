@@ -1,134 +1,138 @@
-export interface Cotizacion {
-  tipo: string;
-  nombre: string;
-  compra: number;
-  venta: number;
+import { CountryCode } from '@/config/countries';
+
+export interface Quote {
+  type: string;
+  country?: CountryCode;
+  name: string;
+  buy: number;
+  sell: number;
   spread: number;
-  variacion: number;
-  fechaActualizacion: string;
+  variation: number;
+  lastUpdate: string;
 }
 
-export interface Brecha {
-  dolarOficial: number;
-  dolarBlue: number;
-  porcentajeBrecha: number;
-  nivel: 'BAJA' | 'MEDIA' | 'ALTA';
-  colorSemaforo: string;
-  descripcion: string;
+export interface Gap {
+  country?: CountryCode;
+  officialRate: number;
+  parallelRate: number;
+  gapPercentage: number;
+  level: 'LOW' | 'MEDIUM' | 'HIGH';
+  trafficLightColor: string;
+  description: string;
 }
 
-export interface Inflacion {
-  fecha: string;
-  valor: number;
-  interanual?: number;
-  acumuladoAnio?: number;
+export interface Inflation {
+  date: string;
+  value: number;
+  yearOverYear?: number;
+  yearToDate?: number;
 }
 
-export interface AjusteInflacion {
-  montoOriginal: number;
-  montoAjustado: number;
-  fechaOrigen: string;
-  fechaDestino: string;
-  inflacionAcumulada: number;
-  mesesTranscurridos: number;
+export interface InflationAdjustment {
+  originalAmount: number;
+  adjustedAmount: number;
+  fromDate: string;
+  toDate: string;
+  accumulatedInflation: number;
+  monthsElapsed: number;
 }
 
-export interface Reservas {
-  reservasBrutas: number;
-  reservasNetas: number;
-  swapChina: number;
-  encajesBancarios: number;
-  depositosGobierno: number;
-  fecha: string;
-  variacionDiaria: number;
-  tendencia: string;
+export interface Reserves {
+  grossReserves: number;
+  netReserves: number;
+  chinaSwap: number;
+  bankReserves: number;
+  governmentDeposits: number;
+  date: string;
+  dailyVariation: number;
+  trend: string;
 }
 
-export interface GananciasRequest {
-  sueldoBrutoMensual: number;
-  tipoEmpleado: 'RELACION_DEPENDENCIA' | 'AUTONOMO';
-  obraSocial?: number;
-  jubilacion?: number;
-  sindicato?: number;
-  tieneConyuge: boolean;
-  cantidadHijos: number;
-  alquilerVivienda?: number;
-  servicioDomestico?: number;
-  gastosEducativos?: number;
+export interface IncomeTaxRequest {
+  grossMonthlySalary: number;
+  employeeType: 'EMPLOYEE' | 'SELF_EMPLOYED';
+  healthInsurance?: number;
+  retirement?: number;
+  union?: number;
+  hasSpouse: boolean;
+  childrenCount: number;
+  housingRent?: number;
+  domesticService?: number;
+  educationExpenses?: number;
 }
 
-export interface GananciasResponse {
-  sueldoBrutoAnual: number;
-  totalDeducciones: number;
-  gananciaNetaSujetaAImpuesto: number;
-  impuestoAnual: number;
-  impuestoMensual: number;
-  alicuotaEfectiva: number;
-  sueldoNetoMensual: number;
-  detalleCalculo: {
-    minimoNoImponible: number;
-    deduccionEspecial: number;
-    cargasFamilia: number;
-    deduccionesPersonales: number;
-    totalDeduccionesPermitidas: number;
+export interface IncomeTaxResponse {
+  grossAnnualSalary: number;
+  totalDeductions: number;
+  taxableNetIncome: number;
+  annualTax: number;
+  monthlyTax: number;
+  effectiveRate: number;
+  monthlyNetSalary: number;
+  calculationDetails: {
+    nonTaxableMinimum: number;
+    specialDeduction: number;
+    familyCharges: number;
+    personalDeductions: number;
+    totalAllowedDeductions: number;
   };
-  desglosePorTramo: {
-    tramo: number;
-    desde: number;
-    hasta: number;
-    alicuota: number;
-    baseImponible: number;
-    impuestoTramo: number;
+  bracketBreakdown: {
+    bracket: number;
+    from: number;
+    to: number;
+    rate: number;
+    taxableBase: number;
+    bracketTax: number;
   }[];
 }
 
-export interface Arbitraje {
-  tipoOrigen: string;
-  tipoDestino: string;
-  cotizacionOrigen: number;
-  cotizacionDestino: number;
-  spreadPorcentaje: number;
-  gananciaEstimadaPor1000USD: number;
-  descripcion: string;
-  pasos: string;
+export interface Arbitrage {
+  sourceType: string;
+  targetType: string;
+  sourceRate: number;
+  targetRate: number;
+  spreadPercentage: number;
+  estimatedProfitPer1000USD: number;
+  description: string;
+  steps: string;
   viable: boolean;
-  riesgo: string;
+  risk: string;
 }
 
-export interface SimulacionRequest {
-  montoInicial: number;
-  tipoInversion: string;
-  plazoDias: number;
-  reinvertir?: boolean;
-  tasaPersonalizada?: number;
+export interface SimulationRequest {
+  initialAmount: number;
+  investmentType: string;
+  termDays: number;
+  reinvest?: boolean;
+  customRate?: number;
 }
 
-export interface SimulacionResponse {
-  tipoInversion: string;
-  montoInicial: number;
-  plazoDias: number;
-  tasaTNA: number;
-  tasaTEA: number;
-  rendimientoNominal: number;
-  rendimientoReal: number;
-  montoFinal: number;
-  gananciaARS: number;
-  gananciaUSD: number;
-  rendimientoEnDolares: number;
-  proyeccion: {
-    mes: number;
-    capitalAcumulado: number;
-    interesesMes: number;
-    inflacionEstimada: number;
-    rendimientoReal: number;
+export interface SimulationResponse {
+  investmentType: string;
+  initialAmount: number;
+  termDays: number;
+  nominalAnnualRate: number;
+  effectiveAnnualRate: number;
+  nominalReturn: number;
+  realReturn: number;
+  finalAmount: number;
+  profitARS: number;
+  profitUSD: number;
+  dollarReturn: number;
+  projection: {
+    month: number;
+    accumulatedCapital: number;
+    monthlyInterest: number;
+    estimatedInflation: number;
+    realReturn: number;
   }[];
 }
 
 export interface User {
   id: number;
-  nombre: string;
+  name: string;
   email: string;
-  emailVerificado: boolean;
+  emailVerified: boolean;
 }
 
 export interface AuthResponse {
@@ -138,3 +142,29 @@ export interface AuthResponse {
   expiresIn: number;
   user: User;
 }
+
+export interface CountryInfo {
+  code: string;
+  name: string;
+  localCurrency: string;
+  locale: string;
+  currencyTypes: CurrencyTypeInfo[];
+}
+
+export interface CurrencyTypeInfo {
+  code: string;
+  name: string;
+}
+
+export type Cotizacion = Quote;
+export type Brecha = Gap;
+export type Inflacion = Inflation;
+export type AjusteInflacion = InflationAdjustment;
+export type Reservas = Reserves;
+export type GananciasRequest = IncomeTaxRequest;
+export type GananciasResponse = IncomeTaxResponse;
+export type Arbitraje = Arbitrage;
+export type SimulacionRequest = SimulationRequest;
+export type SimulacionResponse = SimulationResponse;
+export type PaisInfo = CountryInfo;
+export type TipoMonedaInfo = CurrencyTypeInfo;
