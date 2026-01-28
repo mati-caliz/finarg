@@ -69,8 +69,8 @@ export default function QuotesPage() {
     enabled: !!selectedType,
   });
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
+  const formatDate = (value: string | number) => {
+    const date = new Date(value);
     return date.toLocaleDateString(countryConfig.locale, { day: '2-digit', month: 'short' });
   };
 
