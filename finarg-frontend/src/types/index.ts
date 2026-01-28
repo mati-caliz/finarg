@@ -143,28 +143,3 @@ export interface AuthResponse {
   user: User;
 }
 
-export interface CountryInfo {
-  code: string;
-  name: string;
-  localCurrency: string;
-  locale: string;
-  currencyTypes: CurrencyTypeInfo[];
-}
-
-export interface CurrencyTypeInfo {
-  code: string;
-  name: string;
-}
-
-export type Cotizacion = Quote;
-export type Brecha = Gap;
-export type Inflacion = Inflation;
-export type AjusteInflacion = InflationAdjustment;
-export type Reservas = Reserves;
-export type GananciasRequest = IncomeTaxRequest;
-export type GananciasResponse = IncomeTaxResponse;
-export type Arbitraje = Arbitrage;
-export type SimulacionRequest = SimulationRequest;
-export type SimulacionResponse = SimulationResponse;
-export type PaisInfo = CountryInfo;
-export type TipoMonedaInfo = CurrencyTypeInfo;
