@@ -34,9 +34,11 @@ public class User implements UserDetails {
     @Column(name = "email_verificado")
     private boolean emailVerificado;
 
+    @Builder.Default
     @Column(name = "notificaciones_email")
     private boolean notificacionesEmail = true;
 
+    @Builder.Default
     @Column(name = "notificaciones_push")
     private boolean notificacionesPush = false;
 

@@ -1,7 +1,6 @@
 package com.finarg.service;
 
 import com.finarg.client.ArgentinaDatosClient;
-import com.finarg.client.DatosGobArClient;
 import com.finarg.model.dto.AjusteInflacionDTO;
 import com.finarg.model.dto.InflacionDTO;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import java.util.List;
 public class InflacionService {
 
     private final ArgentinaDatosClient argentinaDatosClient;
-    private final DatosGobArClient datosGobArClient;
 
     @Cacheable(value = "inflacion", key = "'mensual_' + #limit")
     public List<InflacionDTO> getInflacionMensual(int limit) {
@@ -31,7 +29,7 @@ public class InflacionService {
 
     @Cacheable(value = "inflacion", key = "'actual'")
     public InflacionDTO getInflacionActual() {
-        List<InflacionDTO> inflaciones = getInflacionMensual(1);
+        List<InflacionDTO> inflaciones = argentinaDatosClient.getInflacionMensual(1);
         if (inflaciones.isEmpty()) {
             return InflacionDTO.builder()
                     .fecha(LocalDate.now())
@@ -46,24 +44,24 @@ public class InflacionService {
         return argentinaDatosClient.getInflacionInteranual();
     }
 
-    public AjusteInflacionDTO ajustarPorInflacion(BigDecimal montoOriginal, LocalDate fechaOrigen, LocalDate fechaDestino) {
+    public AjusteInflacionDTO ajustarPorInflacion(BigDecimal montoOriginal,
+                                                     LocalDate fechaOrigen,
+                                                     LocalDate fechaDestino) {
         log.info("Ajustando por inflacion: {} desde {} hasta {}", montoOriginal, fechaOrigen, fechaDestino);
 
-        List<InflacionDTO> inflaciones = getInflacionMensual(120);
+        List<InflacionDTO> inflaciones = argentinaDatosClient.getInflacionMensual(120);
         
         BigDecimal factorAcumulado = BigDecimal.ONE;
-        int mesesContados = 0;
 
         for (InflacionDTO inf : inflaciones) {
-            if (inf.getFecha() != null && 
-                !inf.getFecha().isBefore(fechaOrigen) && 
-                !inf.getFecha().isAfter(fechaDestino)) {
+            if (inf.getFecha() != null
+                    && !inf.getFecha().isBefore(fechaOrigen)
+                    && !inf.getFecha().isAfter(fechaDestino)) {
                 
                 BigDecimal factorMes = BigDecimal.ONE.add(
                         inf.getValor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
                 );
                 factorAcumulado = factorAcumulado.multiply(factorMes);
-                mesesContados++;
             }
         }
 
@@ -86,8 +84,4 @@ public class InflacionService {
                 .build();
     }
 
-    @Cacheable(value = "inflacion", key = "'uva_' + #limit")
-    public List<ArgentinaDatosClient.UvaResponse> getUva(int limit) {
-        return argentinaDatosClient.getUva(limit);
-    }
 }

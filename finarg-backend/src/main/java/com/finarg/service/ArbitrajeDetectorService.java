@@ -20,8 +20,8 @@ public class ArbitrajeDetectorService {
 
     private final CotizacionService cotizacionService;
 
-    private static final BigDecimal COMISION_ESTIMADA = new BigDecimal("0.5"); // 0.5%
-    private static final BigDecimal UMBRAL_RENTABILIDAD = new BigDecimal("1.5"); // 1.5% minimo
+    private static final BigDecimal COMISION_ESTIMADA = new BigDecimal("0.5");
+    private static final BigDecimal UMBRAL_RENTABILIDAD = new BigDecimal("1.5");
 
     public List<ArbitrajeDTO> detectarOportunidades() {
         log.info("Detectando oportunidades de arbitraje");
@@ -29,29 +29,34 @@ public class ArbitrajeDetectorService {
         Map<TipoDolar, CotizacionDTO> cotizaciones = cotizacionService.getCotizacionesMap();
         List<ArbitrajeDTO> oportunidades = new ArrayList<>();
 
-        // MEP vs Blue
         ArbitrajeDTO mepBlue = analizarArbitraje(
                 cotizaciones.get(TipoDolar.BOLSA),
                 cotizaciones.get(TipoDolar.BLUE),
                 "Comprar MEP, vender Blue",
-                "1. Comprar bonos AL30 en pesos\n2. Vender bonos AL30 contra dolar MEP\n3. Retirar dolares\n4. Vender en mercado Blue"
+                """
+                        1. Comprar bonos AL30 en pesos
+                        2. Vender bonos AL30 contra dolar MEP
+                        3. Retirar dolares
+                        4. Vender en mercado Blue"""
         );
         if (mepBlue != null && mepBlue.isViable()) {
             oportunidades.add(mepBlue);
         }
 
-        // CCL vs Blue
         ArbitrajeDTO cclBlue = analizarArbitraje(
                 cotizaciones.get(TipoDolar.CCL),
                 cotizaciones.get(TipoDolar.BLUE),
                 "Comprar CCL, vender Blue",
-                "1. Comprar bonos AL30 en pesos\n2. Transferir a broker extranjero\n3. Vender contra dolares\n4. Traer y vender en Blue"
+                """
+                        1. Comprar bonos AL30 en pesos
+                        2. Transferir a broker extranjero
+                        3. Vender contra dolares
+                        4. Traer y vender en Blue"""
         );
         if (cclBlue != null && cclBlue.isViable()) {
             oportunidades.add(cclBlue);
         }
 
-        // Crypto vs Blue
         ArbitrajeDTO cryptoBlue = analizarArbitraje(
                 cotizaciones.get(TipoDolar.CRIPTO),
                 cotizaciones.get(TipoDolar.BLUE),
@@ -62,12 +67,9 @@ public class ArbitrajeDetectorService {
             oportunidades.add(cryptoBlue);
         }
 
-        // Blue vs Oficial (reverso - si el blue esta muy bajo)
         ArbitrajeDTO oficialBlue = analizarArbitrajeReverso(
                 cotizaciones.get(TipoDolar.OFICIAL),
-                cotizaciones.get(TipoDolar.BLUE),
-                "Comprar Oficial (si accedes), vender Blue",
-                "Solo aplica si tenes acceso al dolar oficial (importador, etc)"
+                cotizaciones.get(TipoDolar.BLUE)
         );
         if (oficialBlue != null && oficialBlue.isViable()) {
             oportunidades.add(oficialBlue);
@@ -83,8 +85,8 @@ public class ArbitrajeDetectorService {
             return null;
         }
 
-        BigDecimal precioCompra = origen.getVenta(); // Compro al precio de venta
-        BigDecimal precioVenta = destino.getCompra(); // Vendo al precio de compra
+        BigDecimal precioCompra = origen.getVenta();
+        BigDecimal precioVenta = destino.getCompra();
 
         if (precioCompra.compareTo(BigDecimal.ZERO) == 0) {
             return null;
@@ -117,8 +119,7 @@ public class ArbitrajeDetectorService {
                 .build();
     }
 
-    private ArbitrajeDTO analizarArbitrajeReverso(CotizacionDTO origen, CotizacionDTO destino,
-                                                   String descripcion, String pasos) {
+    private ArbitrajeDTO analizarArbitrajeReverso(CotizacionDTO origen, CotizacionDTO destino) {
         if (origen == null || destino == null) {
             return null;
         }
@@ -134,7 +135,7 @@ public class ArbitrajeDetectorService {
                 .divide(precioCompra, 4, RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
 
-        boolean viable = spreadBruto.compareTo(new BigDecimal("20")) > 0; // Solo si la brecha es muy alta
+        boolean viable = spreadBruto.compareTo(new BigDecimal("20")) > 0;
 
         return ArbitrajeDTO.builder()
                 .tipoOrigen(origen.getTipo())
@@ -143,8 +144,8 @@ public class ArbitrajeDetectorService {
                 .cotizacionDestino(precioVenta)
                 .spreadPorcentaje(spreadBruto.setScale(2, RoundingMode.HALF_UP))
                 .gananciaEstimadaPor1000USD(BigDecimal.ZERO)
-                .descripcion(descripcion)
-                .pasos(pasos)
+                .descripcion("Comprar Oficial (si accedes), vender Blue")
+                .pasos("Solo aplica si tenes acceso al dolar oficial (importador, etc)")
                 .viable(viable)
                 .riesgo("alto")
                 .build();

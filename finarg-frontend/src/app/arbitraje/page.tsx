@@ -7,12 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Arbitraje } from '@/types';
 import {
   ArrowRightLeft,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
   XCircle,
   RefreshCw,
-  DollarSign,
 } from 'lucide-react';
 
 const getRiesgoColor = (riesgo: string) => {
@@ -48,9 +46,6 @@ export default function ArbitrajePage() {
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
-
-  const formatUSD = (value: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 
   return (
     <div className="space-y-6">

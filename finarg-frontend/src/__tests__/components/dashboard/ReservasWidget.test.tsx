@@ -61,7 +61,7 @@ describe('ReservasWidget', () => {
   });
 
   it('handles loading state when reservas is null', () => {
-    // @ts-ignore - Testing null case
+    // @ts-expect-error - Testing null case intentionally
     render(<ReservasWidget reservas={null} />);
     
     // Should show loading or placeholder

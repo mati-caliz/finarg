@@ -14,13 +14,11 @@ import java.util.List;
 @Service
 public class GananciasCalculatorService {
 
-    // Valores 2025 (actualizables via configuracion)
     private static final BigDecimal MINIMO_NO_IMPONIBLE_ANUAL = new BigDecimal("3091035");
     private static final BigDecimal DEDUCCION_ESPECIAL_4TA = new BigDecimal("14837448");
     private static final BigDecimal CONYUGE = new BigDecimal("2911135");
     private static final BigDecimal HIJO = new BigDecimal("1468096");
     
-    // Escalas de alicuotas 2025
     private static final List<TramoEscala> ESCALAS = List.of(
             new TramoEscala(BigDecimal.ZERO, new BigDecimal("1193521"), new BigDecimal("5")),
             new TramoEscala(new BigDecimal("1193521"), new BigDecimal("2387043"), new BigDecimal("9")),
@@ -36,29 +34,20 @@ public class GananciasCalculatorService {
     public GananciasResponseDTO calcular(GananciasRequestDTO request) {
         log.info("Calculando impuesto a las ganancias para sueldo: {}", request.getSueldoBrutoMensual());
 
-        BigDecimal sueldoBrutoAnual = request.getSueldoBrutoMensual().multiply(BigDecimal.valueOf(13)); // + SAC
+        BigDecimal sueldoBrutoAnual = request.getSueldoBrutoMensual().multiply(BigDecimal.valueOf(13));
         
-        // Calcular deducciones de ley
-        BigDecimal jubilacion = request.getJubilacion() != null ? 
-                request.getJubilacion().multiply(BigDecimal.valueOf(12)) : 
-                sueldoBrutoAnual.multiply(new BigDecimal("0.11"));
+        BigDecimal jubilacion = calcularJubilacion(request.getJubilacion(), sueldoBrutoAnual);
         
-        BigDecimal obraSocial = request.getObraSocial() != null ?
-                request.getObraSocial().multiply(BigDecimal.valueOf(12)) :
-                sueldoBrutoAnual.multiply(new BigDecimal("0.03"));
+        BigDecimal obraSocial = calcularObraSocial(request.getObraSocial(), sueldoBrutoAnual);
         
-        BigDecimal sindicato = request.getSindicato() != null ?
-                request.getSindicato().multiply(BigDecimal.valueOf(12)) :
-                BigDecimal.ZERO;
+        BigDecimal sindicato = calcularSindicato(request.getSindicato());
 
-        // Cargas de familia
         BigDecimal cargasFamilia = BigDecimal.ZERO;
         if (request.isTieneConyuge()) {
             cargasFamilia = cargasFamilia.add(CONYUGE);
         }
         cargasFamilia = cargasFamilia.add(HIJO.multiply(BigDecimal.valueOf(request.getCantidadHijos())));
 
-        // Deducciones personales
         BigDecimal deduccionesPersonales = BigDecimal.ZERO;
         if (request.getAlquilerVivienda() != null) {
             BigDecimal maxAlquiler = sueldoBrutoAnual.multiply(new BigDecimal("0.40"));
@@ -78,7 +67,6 @@ public class GananciasCalculatorService {
             );
         }
 
-        // Total deducciones
         BigDecimal totalDeduccionesLey = jubilacion.add(obraSocial).add(sindicato);
         BigDecimal gananciaNetaLey = sueldoBrutoAnual.subtract(totalDeduccionesLey);
 
@@ -93,14 +81,15 @@ public class GananciasCalculatorService {
             gananciaNetaSujetaAImpuesto = BigDecimal.ZERO;
         }
 
-        // Calcular impuesto por tramos
         List<GananciasResponseDTO.TramoImpuesto> desglose = new ArrayList<>();
         BigDecimal impuestoTotal = BigDecimal.ZERO;
         BigDecimal baseRestante = gananciaNetaSujetaAImpuesto;
         int tramoNum = 1;
 
         for (TramoEscala escala : ESCALAS) {
-            if (baseRestante.compareTo(BigDecimal.ZERO) <= 0) break;
+            if (baseRestante.compareTo(BigDecimal.ZERO) <= 0) {
+                break;
+            }
 
             BigDecimal rangoTramo = escala.hasta.subtract(escala.desde);
             BigDecimal baseTramo = baseRestante.min(rangoTramo);
@@ -127,10 +116,7 @@ public class GananciasCalculatorService {
                 .subtract(totalDeduccionesLey.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP))
                 .subtract(impuestoMensual);
 
-        BigDecimal alicuotaEfectiva = sueldoBrutoAnual.compareTo(BigDecimal.ZERO) > 0 ?
-                impuestoTotal.divide(sueldoBrutoAnual, 4, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100)) :
-                BigDecimal.ZERO;
+        BigDecimal alicuotaEfectiva = calcularAlicuotaEfectiva(sueldoBrutoAnual, impuestoTotal);
 
         return GananciasResponseDTO.builder()
                 .sueldoBrutoAnual(sueldoBrutoAnual.setScale(2, RoundingMode.HALF_UP))
@@ -151,5 +137,34 @@ public class GananciasCalculatorService {
                 .build();
     }
 
-    private record TramoEscala(BigDecimal desde, BigDecimal hasta, BigDecimal alicuota) {}
+    private record TramoEscala(BigDecimal desde, BigDecimal hasta, BigDecimal alicuota) { }
+
+    private BigDecimal calcularJubilacion(BigDecimal jubilacion, BigDecimal sueldoBrutoAnual) {
+        if (jubilacion != null) {
+            return jubilacion.multiply(BigDecimal.valueOf(12));
+        }
+        return sueldoBrutoAnual.multiply(new BigDecimal("0.11"));
+    }
+
+    private BigDecimal calcularObraSocial(BigDecimal obraSocial, BigDecimal sueldoBrutoAnual) {
+        if (obraSocial != null) {
+            return obraSocial.multiply(BigDecimal.valueOf(12));
+        }
+        return sueldoBrutoAnual.multiply(new BigDecimal("0.03"));
+    }
+
+    private BigDecimal calcularSindicato(BigDecimal sindicato) {
+        if (sindicato != null) {
+            return sindicato.multiply(BigDecimal.valueOf(12));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private BigDecimal calcularAlicuotaEfectiva(BigDecimal sueldoBrutoAnual, BigDecimal impuestoTotal) {
+        if (sueldoBrutoAnual.compareTo(BigDecimal.ZERO) > 0) {
+            return impuestoTotal.divide(sueldoBrutoAnual, 4, RoundingMode.HALF_UP)
+                    .multiply(BigDecimal.valueOf(100));
+        }
+        return BigDecimal.ZERO;
+    }
 }

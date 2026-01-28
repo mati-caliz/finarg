@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { GananciasRequest, SimulacionRequest } from '@/types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
 
@@ -57,7 +58,7 @@ export const reservasApi = {
 };
 
 export const gananciasApi = {
-  calcular: (data: any) => api.post('/ganancias/calcular', data),
+  calcular: (data: GananciasRequest) => api.post('/ganancias/calcular', data),
 };
 
 export const arbitrajeApi = {
@@ -65,7 +66,7 @@ export const arbitrajeApi = {
 };
 
 export const simuladorApi = {
-  simular: (data: any) => api.post('/simulador/rendimiento', data),
+  simular: (data: SimulacionRequest) => api.post('/simulador/rendimiento', data),
   getTasas: () => api.get('/simulador/tasas'),
 };
 

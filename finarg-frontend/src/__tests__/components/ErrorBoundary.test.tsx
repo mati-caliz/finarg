@@ -96,7 +96,7 @@ describe('ErrorBoundary', () => {
 
   it('displays error message in development mode', () => {
     const originalEnv = process.env.NODE_ENV;
-    // @ts-ignore
+    // @ts-expect-error - Testing environment variable override
     process.env.NODE_ENV = 'development';
 
     render(
@@ -107,7 +107,7 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByText('Test error')).toBeInTheDocument();
 
-    // @ts-ignore
+    // @ts-expect-error - Restoring environment variable
     process.env.NODE_ENV = originalEnv;
   });
 });

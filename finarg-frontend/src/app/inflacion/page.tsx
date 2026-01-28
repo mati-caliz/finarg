@@ -6,11 +6,10 @@ import { inflacionApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { BarChart, LineChart } from '@/components/charts';
+import { BarChart } from '@/components/charts';
 import { Inflacion, AjusteInflacion } from '@/types';
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Calendar,
   Calculator,
@@ -42,7 +41,7 @@ export default function InflacionPage() {
     },
   });
 
-  const { data: inflacionInteranual } = useQuery({
+  useQuery({
     queryKey: ['inflacion-interanual'],
     queryFn: async () => {
       const response = await inflacionApi.getInteranual();

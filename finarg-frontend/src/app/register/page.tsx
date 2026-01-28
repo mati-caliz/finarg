@@ -34,7 +34,7 @@ export default function RegisterPage() {
       setUser(data.user);
       router.push('/');
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       setError(
         error.response?.data?.message || 'Error al registrarse. Intenta nuevamente.'
       );
@@ -61,26 +61,46 @@ export default function RegisterPage() {
   const passwordStrength = () => {
     const password = formData.password;
     let strength = 0;
-    if (password.length >= 8) strength++;
-    if (/[A-Z]/.test(password)) strength++;
-    if (/[0-9]/.test(password)) strength++;
-    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    if (password.length >= 8) {
+      strength++;
+    }
+    if (/[A-Z]/.test(password)) {
+      strength++;
+    }
+    if (/[0-9]/.test(password)) {
+      strength++;
+    }
+    if (/[^A-Za-z0-9]/.test(password)) {
+      strength++;
+    }
     return strength;
   };
 
   const getStrengthColor = () => {
     const strength = passwordStrength();
-    if (strength <= 1) return 'bg-red-500';
-    if (strength === 2) return 'bg-yellow-500';
-    if (strength === 3) return 'bg-blue-500';
+    if (strength <= 1) {
+      return 'bg-red-500';
+    }
+    if (strength === 2) {
+      return 'bg-yellow-500';
+    }
+    if (strength === 3) {
+      return 'bg-blue-500';
+    }
     return 'bg-green-500';
   };
 
   const getStrengthText = () => {
     const strength = passwordStrength();
-    if (strength <= 1) return 'Débil';
-    if (strength === 2) return 'Regular';
-    if (strength === 3) return 'Buena';
+    if (strength <= 1) {
+      return 'Débil';
+    }
+    if (strength === 2) {
+      return 'Regular';
+    }
+    if (strength === 3) {
+      return 'Buena';
+    }
     return 'Fuerte';
   };
 

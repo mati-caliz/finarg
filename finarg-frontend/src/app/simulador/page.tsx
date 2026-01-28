@@ -12,7 +12,6 @@ import {
   TrendingUp,
   DollarSign,
   Calendar,
-  Percent,
   Loader2,
   PiggyBank,
   Building,
@@ -46,7 +45,7 @@ export default function SimuladorPage() {
 
   const [resultado, setResultado] = useState<SimulacionResponse | null>(null);
 
-  const { data: tasas } = useQuery({
+  useQuery({
     queryKey: ['tasas'],
     queryFn: async () => {
       const response = await simuladorApi.getTasas();
@@ -69,7 +68,7 @@ export default function SimuladorPage() {
     simularMutation.mutate(formData);
   };
 
-  const handleInputChange = (field: keyof SimulacionRequest, value: any) => {
+  const handleInputChange = (field: keyof SimulacionRequest, value: SimulacionRequest[keyof SimulacionRequest]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 

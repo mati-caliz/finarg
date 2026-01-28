@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { reservasApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AreaChart, LineChart } from '@/components/charts';
+import { AreaChart } from '@/components/charts';
 import { Reservas } from '@/types';
 import {
   Building2,
@@ -305,7 +305,7 @@ export default function ReservasPage() {
             </div>
           ) : historicoReservas && historicoReservas.length > 0 ? (
             <AreaChart
-              data={historicoReservas.map((r: any) => ({
+              data={historicoReservas.map((r: { fecha: string; reservasBrutas: number }) => ({
                 fecha: formatDate(r.fecha),
                 reservasBrutas: r.reservasBrutas,
               }))}
