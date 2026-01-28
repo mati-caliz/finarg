@@ -1,0 +1,83 @@
+spring:
+  application:
+    name: finarg-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/finarg
+    username: finarg
+    password: finarg123
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 60000
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+      cache-null-values: false
+  
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:finarg-super-secret-key-que-debe-ser-muy-larga-para-ser-segura-2024-argentina-finanzas}
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+external:
+  apis:
+    dolar-api:
+      base-url: https://dolarapi.com/v1
+      timeout: 10000
+    argentina-datos:
+      base-url: https://api.argentinadatos.com/v1
+      timeout: 10000
+    datos-gob-ar:
+      base-url: https://apis.datos.gob.ar/series/api
+      timeout: 15000
+
+scheduler:
+  cotizaciones:
+    cron: "0 */5 * * * *"
+  arbitraje:
+    cron: "0 */10 * * * *"
+  enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.finarg: DEBUG
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
