@@ -7,7 +7,7 @@ import { Quote } from '@/types';
 import { useAppStore } from '@/store/useStore';
 import { CountryCode } from '@/config/countries';
 
-interface QuoteCardProps {
+export interface QuoteCardProps {
   quote: Quote;
   country?: CountryCode;
 }
@@ -57,6 +57,3 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
     </Card>
   );
 }
-
-export { QuoteCard as DolarCard };
-export type { QuoteCardProps as DolarCardProps };
