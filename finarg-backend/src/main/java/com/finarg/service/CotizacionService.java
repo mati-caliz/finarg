@@ -41,14 +41,14 @@ public class CotizacionService {
     }
 
     public Map<TipoDolar, CotizacionDTO> getCotizacionesMap() {
-        return getAllCotizaciones().stream()
+        return dolarApiClient.getAllCotizaciones().stream()
                 .collect(Collectors.toMap(CotizacionDTO::getTipo, c -> c, (a, b) -> a));
     }
 
     @Cacheable(value = "cotizaciones", key = "'brecha'")
     public BrechaDTO calcularBrecha() {
-        CotizacionDTO oficial = getCotizacion(TipoDolar.OFICIAL);
-        CotizacionDTO blue = getCotizacion(TipoDolar.BLUE);
+        CotizacionDTO oficial = dolarApiClient.getCotizacionBlocking(TipoDolar.OFICIAL);
+        CotizacionDTO blue = dolarApiClient.getCotizacionBlocking(TipoDolar.BLUE);
 
         if (oficial == null || blue == null) {
             return BrechaDTO.builder()
@@ -68,9 +68,9 @@ public class CotizacionService {
 
         NivelBrecha nivel = NivelBrecha.fromPorcentaje(brecha.doubleValue());
         String color = switch (nivel) {
-            case BAJA -> "#22c55e";  // Verde
-            case MEDIA -> "#eab308"; // Amarillo
-            case ALTA -> "#ef4444";  // Rojo
+            case BAJA -> "#22c55e";
+            case MEDIA -> "#eab308";
+            case ALTA -> "#ef4444";
         };
 
         String descripcion = switch (nivel) {

@@ -1,0 +1,24 @@
+{
+  "name": "finarg",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for FinArg - Frontend and Backend",
+  "scripts": {
+    "lint:frontend": "cd finarg-frontend && npm run lint",
+    "lint:backend": "cd finarg-backend && mvn checkstyle:check",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "finarg-frontend/**/*.{js,jsx,ts,tsx}": [
+      "bash -c 'cd finarg-frontend && npx eslint --fix --max-warnings=0 \"$@\"' _"
+    ],
+    "finarg-backend/**/*.java": [
+      "bash -c 'cd finarg-backend && mvn checkstyle:check -q'"
+    ]
+  }
+}

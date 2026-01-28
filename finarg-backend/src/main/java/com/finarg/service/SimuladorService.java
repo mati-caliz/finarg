@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -24,8 +25,7 @@ public class SimuladorService {
     private final CotizacionService cotizacionService;
     private final InflacionService inflacionService;
 
-    // Tasas default (se actualizan con datos reales)
-    private static final BigDecimal TASA_PF_DEFAULT = new BigDecimal("35"); // TNA
+    private static final BigDecimal TASA_PF_DEFAULT = new BigDecimal("35");
     private static final BigDecimal TASA_FCI_MM = new BigDecimal("32");
     private static final BigDecimal TASA_CAUCION = new BigDecimal("30");
     private static final BigDecimal TASA_STABLECOIN = new BigDecimal("5");
@@ -45,7 +45,6 @@ public class SimuladorService {
 
         BigDecimal montoFinal = request.getMontoInicial().add(rendimientoNominal);
 
-        // Calcular en dolares
         CotizacionDTO dolarBlue = cotizacionService.getCotizacion(TipoDolar.BLUE);
         BigDecimal cotizacionDolar = dolarBlue != null ? dolarBlue.getVenta() : new BigDecimal("1000");
 
@@ -54,11 +53,9 @@ public class SimuladorService {
         BigDecimal montoFinalUSD = montoFinal.divide(cotizacionDolar, 2, RoundingMode.HALF_UP);
         BigDecimal gananciaUSD = montoFinalUSD.subtract(montoInicialUSD);
 
-        // Estimar inflacion del periodo
         BigDecimal inflacionEstimada = estimarInflacion(request.getPlazoDias());
         BigDecimal rendimientoReal = tasaTNA.subtract(inflacionEstimada);
 
-        // Generar proyeccion mensual
         List<SimulacionResponseDTO.ProyeccionMensual> proyeccion = generarProyeccion(
                 request.getMontoInicial(),
                 tasaTNA,
@@ -103,8 +100,8 @@ public class SimuladorService {
             List<ArgentinaDatosClient.TasaPlazoFijoResponse> tasas = argentinaDatosClient.getTasasPlazoFijo();
             if (!tasas.isEmpty()) {
                 return tasas.stream()
-                        .filter(t -> t.getTnaClientes() != null)
                         .map(ArgentinaDatosClient.TasaPlazoFijoResponse::getTnaClientes)
+                        .filter(Objects::nonNull)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                         .divide(BigDecimal.valueOf(tasas.size()), 2, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100));
@@ -116,7 +113,6 @@ public class SimuladorService {
     }
 
     private BigDecimal obtenerTasaUVA() {
-        // Tasa UVA + spread
         return inflacionService.getInflacionActual().getValor()
                 .multiply(BigDecimal.valueOf(12))
                 .add(new BigDecimal("1"));
@@ -181,5 +177,5 @@ public class SimuladorService {
         );
     }
 
-    public record TasaActual(TipoInversion tipo, BigDecimal tasa) {}
+    public record TasaActual(TipoInversion tipo, BigDecimal tasa) { }
 }

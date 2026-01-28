@@ -41,7 +41,7 @@ export default function GananciasPage() {
     calcularMutation.mutate(formData);
   };
 
-  const handleInputChange = (field: keyof GananciasRequest, value: any) => {
+  const handleInputChange = (field: keyof GananciasRequest, value: GananciasRequest[keyof GananciasRequest]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 

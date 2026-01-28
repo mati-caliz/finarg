@@ -78,7 +78,9 @@ export function Sidebar() {
                   key={item.name}
                   href={item.href}
                   onClick={() => {
-                    if (window.innerWidth < 1024) toggleSidebar();
+                    if (window.innerWidth < 1024) {
+                      toggleSidebar();
+                    }
                   }}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',

@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.finarg.model.dto.CotizacionDTO;
 import com.finarg.model.enums.TipoDolar;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,11 +17,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DolarApiClient {
 
-    @Qualifier("dolarApiWebClient")
     private final WebClient webClient;
+
+    public DolarApiClient(@Qualifier("dolarApiWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public List<CotizacionDTO> getAllCotizaciones() {
         try {
@@ -45,18 +45,6 @@ public class DolarApiClient {
             log.error("Error fetching cotizaciones from DolarAPI: {}", e.getMessage());
             return List.of();
         }
-    }
-
-    public Mono<CotizacionDTO> getCotizacion(TipoDolar tipo) {
-        return webClient.get()
-                .uri("/dolares/{tipo}", tipo.getCodigo())
-                .retrieve()
-                .bodyToMono(DolarApiResponse.class)
-                .map(this::mapToCotizacionDTO)
-                .onErrorResume(e -> {
-                    log.error("Error fetching cotizacion {}: {}", tipo, e.getMessage());
-                    return Mono.empty();
-                });
     }
 
     public CotizacionDTO getCotizacionBlocking(TipoDolar tipo) {
@@ -90,7 +78,8 @@ public class DolarApiClient {
         if (response.getFechaActualizacion() != null) {
             try {
                 fechaActualizacion = ZonedDateTime.parse(response.getFechaActualizacion()).toLocalDateTime();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return CotizacionDTO.builder()

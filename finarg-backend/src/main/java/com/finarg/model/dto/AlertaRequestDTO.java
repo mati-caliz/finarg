@@ -18,8 +18,10 @@ public class AlertaRequestDTO {
     private String condicion;
     
     private BigDecimal valorObjetivo;
-    
+
+    @Builder.Default
     private boolean notificarEmail = true;
-    
+
+    @Builder.Default
     private boolean notificarPush = false;
 }

@@ -1,8 +1,6 @@
 package com.finarg.client;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -14,14 +12,15 @@ import java.util.List;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DatosGobArClient {
 
-    @Qualifier("datosGobArWebClient")
     private final WebClient webClient;
 
+    public DatosGobArClient(@Qualifier("datosGobArWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
+
     private static final String RESERVAS_SERIES_ID = "92.2_RESERVAS_IRES_0_0_32_40";
-    private static final String IPC_SERIES_ID = "148.3_INIVELam_2016_M_21";
 
     public List<SeriesDataPoint> getReservasBCRA(int limit) {
         try {
@@ -49,36 +48,6 @@ public class DatosGobArClient {
                     .toList();
         } catch (Exception e) {
             log.error("Error fetching reservas from datos.gob.ar: {}", e.getMessage());
-            return List.of();
-        }
-    }
-
-    public List<SeriesDataPoint> getIPCHistorico(LocalDate desde, LocalDate hasta) {
-        try {
-            SeriesApiResponse response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/series/")
-                            .queryParam("ids", IPC_SERIES_ID)
-                            .queryParam("start_date", desde.toString())
-                            .queryParam("end_date", hasta.toString())
-                            .queryParam("format", "json")
-                            .build())
-                    .retrieve()
-                    .bodyToMono(SeriesApiResponse.class)
-                    .block();
-
-            if (response == null || response.getData() == null) {
-                return List.of();
-            }
-
-            return response.getData().stream()
-                    .map(arr -> new SeriesDataPoint(
-                            LocalDate.parse(arr.get(0).toString()),
-                            arr.get(1) != null ? new BigDecimal(arr.get(1).toString()) : BigDecimal.ZERO
-                    ))
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error fetching IPC from datos.gob.ar: {}", e.getMessage());
             return List.of();
         }
     }

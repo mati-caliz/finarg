@@ -32,7 +32,7 @@ export default function LoginPage() {
       setUser(data.user);
       router.push('/');
     },
-    onError: (error: any) => {
+    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       setError(
         error.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.'
       );

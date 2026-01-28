@@ -28,11 +28,9 @@ public class CaucionOptimizerService {
 
         Map<String, Object> resultado = new HashMap<>();
 
-        // Calcular rendimiento caucion
         BigDecimal tasaCaucion = obtenerTasaCaucion(plazoDias);
         BigDecimal rendimientoCaucion = calcularRendimiento(monto, tasaCaucion, plazoDias);
 
-        // Comparar con plazo fijo
         SimulacionResponseDTO simulacionPF = simuladorService.simular(
                 SimulacionRequestDTO.builder()
                         .montoInicial(monto)
@@ -41,7 +39,6 @@ public class CaucionOptimizerService {
                         .build()
         );
 
-        // Comparar con FCI Money Market
         SimulacionResponseDTO simulacionFCI = simuladorService.simular(
                 SimulacionRequestDTO.builder()
                         .montoInicial(monto)
@@ -68,7 +65,6 @@ public class CaucionOptimizerService {
                 "montoFinal", simulacionFCI.getMontoFinal()
         ));
 
-        // Determinar mejor opcion
         String mejorOpcion = "caucion";
         BigDecimal mejorRendimiento = rendimientoCaucion;
 
@@ -112,7 +108,9 @@ public class CaucionOptimizerService {
             case "plazoFijo" -> Map.of(
                     "simplicidad", "Facil de operar desde homebanking",
                     "garantia", "Garantizado por SEDESA hasta cierto monto",
-                    "ideal", plazo >= 30 ? "Ideal para plazos de 30+ dias" : "Considerar otras opciones para plazos cortos"
+                    "ideal", plazo >= 30
+                            ? "Ideal para plazos de 30+ dias"
+                            : "Considerar otras opciones para plazos cortos"
             );
             case "fciMoneyMarket" -> Map.of(
                     "liquidez", "Rescate en 24-48hs",

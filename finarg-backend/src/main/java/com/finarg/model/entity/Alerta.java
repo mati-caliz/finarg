@@ -33,11 +33,14 @@ public class Alerta {
     @Column(name = "valor_objetivo")
     private BigDecimal valorObjetivo;
 
+    @Builder.Default
     private boolean activa = true;
 
+    @Builder.Default
     @Column(name = "notificar_email")
     private boolean notificarEmail = true;
 
+    @Builder.Default
     @Column(name = "notificar_push")
     private boolean notificarPush = false;
 

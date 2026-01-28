@@ -8,6 +8,7 @@ export function ServiceWorkerRegistration() {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
+          // eslint-disable-next-line no-console
           console.log('[SW] Service Worker registered:', registration.scope);
 
           // Check for updates
@@ -17,6 +18,7 @@ export function ServiceWorkerRegistration() {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New content is available
+                  // eslint-disable-next-line no-console
                   console.log('[SW] New content available, refresh to update');
                 }
               });

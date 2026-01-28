@@ -11,8 +11,6 @@ import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 import { QueryError } from '@/components/QueryError';
 import {
   DolarCardSkeleton,
-  ChartSkeleton,
-  TableSkeleton,
 } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 

@@ -12,13 +12,13 @@ import {
 } from 'recharts';
 
 interface LineChartProps {
-  data: any[];
+  data: Record<string, string | number>[];
   xKey: string;
   yKey: string | string[];
   colors?: string[];
   height?: number;
-  formatX?: (value: any) => string;
-  formatY?: (value: any) => string;
+  formatX?: (value: string | number) => string;
+  formatY?: (value: string | number) => string;
   showGrid?: boolean;
   showLegend?: boolean;
 }

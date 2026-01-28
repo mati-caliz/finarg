@@ -25,11 +25,13 @@ const createWrapper = () => {
     },
   });
   
-  return ({ children }: { children: React.ReactNode }) => (
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       {children}
     </QueryClientProvider>
   );
+  Wrapper.displayName = 'QueryClientWrapper';
+  return Wrapper;
 };
 
 describe('useCotizaciones', () => {
@@ -43,7 +45,7 @@ describe('useCotizaciones', () => {
       { tipo: 'OFICIAL', nombre: 'Dólar Oficial', compra: 900, venta: 920, spread: 2.2, variacion: 0.5 },
     ];
 
-    mockCotizacionesApi.getAll.mockResolvedValue({ data: mockData } as any);
+    mockCotizacionesApi.getAll.mockResolvedValue({ data: mockData } as Awaited<ReturnType<typeof cotizacionesApi.getAll>>);
 
     const { result } = renderHook(() => useCotizaciones(), {
       wrapper: createWrapper(),
