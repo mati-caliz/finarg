@@ -21,7 +21,7 @@ public class NotificationService {
     @Async
     public void sendEmail(String to, String subject, String body) {
         if (fromEmail == null || fromEmail.isEmpty()) {
-            log.warn("Email no configurado, notificacion no enviada");
+            log.warn("Email not configured, notification not sent");
             return;
         }
 
@@ -29,50 +29,50 @@ public class NotificationService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
             message.setTo(to);
-            message.setSubject("[FinArg] " + subject);
+            message.setSubject("[FinLatam] " + subject);
             message.setText(body);
             
             mailSender.send(message);
-            log.info("Email enviado a: {}", to);
+            log.info("Email sent to: {}", to);
         } catch (Exception e) {
-            log.error("Error enviando email a {}: {}", to, e.getMessage());
+            log.error("Error sending email to {}: {}", to, e.getMessage());
         }
     }
 
-    public void sendArbitrajeAlert(String email, String oportunidad, String gananciaEstimada) {
-        String subject = "Oportunidad de Arbitraje Detectada";
+    public void sendArbitrageAlert(String email, String opportunity, String estimatedProfit) {
+        String subject = "Arbitrage Opportunity Detected";
         String body = String.format("""
-                Hola!
+                Hello!
                 
-                Se detecto una oportunidad de arbitraje:
+                An arbitrage opportunity has been detected:
                 
                 %s
                 
-                Ganancia estimada: %s USD por cada 1000 USD
+                Estimated profit: %s USD per 1000 USD
                 
-                Ingresa a FinArg para mas detalles.
+                Log in to FinLatam for more details.
                 
-                Saludos,
-                El equipo de FinArg
-                """, oportunidad, gananciaEstimada);
+                Best regards,
+                The FinLatam Team
+                """, opportunity, estimatedProfit);
 
         sendEmail(email, subject, body);
     }
 
-    public void sendBrechaAlert(String email, String nivelBrecha, String porcentaje) {
-        String subject = "Alerta de Brecha Cambiaria";
+    public void sendGapAlert(String email, String gapLevel, String percentage) {
+        String subject = "Exchange Gap Alert";
         String body = String.format("""
-                Hola!
+                Hello!
                 
-                La brecha cambiaria cambio a nivel: %s
+                The exchange gap has changed to level: %s
                 
-                Brecha actual: %s%%
+                Current gap: %s%%
                 
-                Ingresa a FinArg para mas detalles.
+                Log in to FinLatam for more details.
                 
-                Saludos,
-                El equipo de FinArg
-                """, nivelBrecha, porcentaje);
+                Best regards,
+                The FinLatam Team
+                """, gapLevel, percentage);
 
         sendEmail(email, subject, body);
     }

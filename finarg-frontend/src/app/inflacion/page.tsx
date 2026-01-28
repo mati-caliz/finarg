@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { inflacionApi } from '@/lib/api';
+import { inflationApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BarChart } from '@/components/charts';
-import { Inflacion, AjusteInflacion } from '@/types';
+import { Inflation, InflationAdjustment } from '@/types';
 import {
   TrendingUp,
   DollarSign,
@@ -17,51 +17,51 @@ import {
   BarChart3,
 } from 'lucide-react';
 
-export default function InflacionPage() {
-  const [montoOriginal, setMontoOriginal] = useState<number>(100000);
-  const [fechaOrigen, setFechaOrigen] = useState<string>('2023-01-01');
-  const [fechaDestino, setFechaDestino] = useState<string>(
+export default function InflationPage() {
+  const [originalAmount, setOriginalAmount] = useState<number>(100000);
+  const [startDate, setStartDate] = useState<string>('2023-01-01');
+  const [endDate, setEndDate] = useState<string>(
     new Date().toISOString().split('T')[0]
   );
-  const [ajusteResultado, setAjusteResultado] = useState<AjusteInflacion | null>(null);
+  const [adjustmentResult, setAdjustmentResult] = useState<InflationAdjustment | null>(null);
 
-  const { data: inflacionActual } = useQuery({
-    queryKey: ['inflacion-actual'],
+  const { data: currentInflation } = useQuery({
+    queryKey: ['inflation-current'],
     queryFn: async () => {
-      const response = await inflacionApi.getActual();
-      return response.data as Inflacion;
+      const response = await inflationApi.getCurrent();
+      return response.data as Inflation;
     },
   });
 
-  const { data: inflacionMensual } = useQuery({
-    queryKey: ['inflacion-mensual'],
+  const { data: monthlyInflation } = useQuery({
+    queryKey: ['inflation-monthly'],
     queryFn: async () => {
-      const response = await inflacionApi.getMensual(24);
-      return response.data as Inflacion[];
+      const response = await inflationApi.getMonthly(24);
+      return response.data as Inflation[];
     },
   });
 
   useQuery({
-    queryKey: ['inflacion-interanual'],
+    queryKey: ['inflation-yearly'],
     queryFn: async () => {
-      const response = await inflacionApi.getInteranual();
+      const response = await inflationApi.getYearly();
       return response.data;
     },
   });
 
-  const ajustarMutation = useMutation({
+  const adjustMutation = useMutation({
     mutationFn: async () => {
-      const response = await inflacionApi.ajustar(montoOriginal, fechaOrigen, fechaDestino);
-      return response.data as AjusteInflacion;
+      const response = await inflationApi.adjust(originalAmount, startDate, endDate);
+      return response.data as InflationAdjustment;
     },
     onSuccess: (data) => {
-      setAjusteResultado(data);
+      setAdjustmentResult(data);
     },
   });
 
-  const handleAjustar = (e: React.FormEvent) => {
+  const handleAdjust = (e: React.FormEvent) => {
     e.preventDefault();
-    ajustarMutation.mutate();
+    adjustMutation.mutate();
   };
 
   const formatCurrency = (value: number) =>
@@ -78,25 +78,25 @@ export default function InflacionPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Inflación Argentina</h1>
+        <h1 className="text-2xl font-bold text-white">Argentina Inflation</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Datos del IPC y calculadora de ajuste por inflación
+          CPI data and inflation adjustment calculator
         </p>
       </div>
 
-      {/* KPIs principales */}
+      {/* Main KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Inflación Mensual</p>
+                <p className="text-xs text-gray-400">Monthly Inflation</p>
                 <p className="text-2xl font-bold text-white mt-1">
-                  {inflacionActual ? formatPercent(inflacionActual.valor) : '-'}
+                  {currentInflation ? formatPercent(currentInflation.value) : '-'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {inflacionActual?.fecha
-                    ? new Date(inflacionActual.fecha).toLocaleDateString('es-AR', {
+                  {currentInflation?.date
+                    ? new Date(currentInflation.date).toLocaleDateString('es-AR', {
                         month: 'long',
                         year: 'numeric',
                       })
@@ -114,11 +114,11 @@ export default function InflacionPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Inflación Interanual</p>
+                <p className="text-xs text-gray-400">Year-over-Year Inflation</p>
                 <p className="text-2xl font-bold text-red-500 mt-1">
-                  {inflacionActual?.interanual ? formatPercent(inflacionActual.interanual) : '-'}
+                  {currentInflation?.yearOverYear ? formatPercent(currentInflation.yearOverYear) : '-'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Últimos 12 meses</p>
+                <p className="text-xs text-gray-500 mt-1">Last 12 months</p>
               </div>
               <div className="p-3 bg-red-500/10 rounded-lg">
                 <BarChart3 className="h-6 w-6 text-red-500" />
@@ -131,14 +131,14 @@ export default function InflacionPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Acumulado del Año</p>
+                <p className="text-xs text-gray-400">Year-to-Date</p>
                 <p className="text-2xl font-bold text-yellow-500 mt-1">
-                  {inflacionActual?.acumuladoAnio
-                    ? formatPercent(inflacionActual.acumuladoAnio)
+                  {currentInflation?.yearToDate
+                    ? formatPercent(currentInflation.yearToDate)
                     : '-'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Desde enero {new Date().getFullYear()}
+                  Since January {new Date().getFullYear()}
                 </p>
               </div>
               <div className="p-3 bg-yellow-500/10 rounded-lg">
@@ -150,51 +150,51 @@ export default function InflacionPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Calculadora de ajuste */}
+        {/* Adjustment Calculator */}
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Calculator className="h-5 w-5 text-primary" />
-              Calculadora de Ajuste
+              Adjustment Calculator
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleAjustar} className="space-y-4">
+            <form onSubmit={handleAdjust} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Monto Original
+                  Original Amount
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     type="number"
                     placeholder="100000"
-                    value={montoOriginal || ''}
-                    onChange={(e) => setMontoOriginal(parseFloat(e.target.value) || 0)}
+                    value={originalAmount || ''}
+                    onChange={(e) => setOriginalAmount(parseFloat(e.target.value) || 0)}
                     className="pl-10"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Fecha Origen</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Start Date</label>
                 <Input
                   type="date"
-                  value={fechaOrigen}
-                  onChange={(e) => setFechaOrigen(e.target.value)}
-                  max={fechaDestino}
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  max={endDate}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Fecha Destino
+                  End Date
                 </label>
                 <Input
                   type="date"
-                  value={fechaDestino}
-                  onChange={(e) => setFechaDestino(e.target.value)}
-                  min={fechaOrigen}
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate}
                   max={new Date().toISOString().split('T')[0]}
                 />
               </div>
@@ -202,46 +202,46 @@ export default function InflacionPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={ajustarMutation.isPending || montoOriginal <= 0}
+                disabled={adjustMutation.isPending || originalAmount <= 0}
               >
-                {ajustarMutation.isPending ? (
+                {adjustMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Calculando...
+                    Calculating...
                   </>
                 ) : (
-                  'Calcular Ajuste'
+                  'Calculate Adjustment'
                 )}
               </Button>
             </form>
 
-            {/* Resultado del ajuste */}
-            {ajusteResultado && (
+            {/* Adjustment Result */}
+            {adjustmentResult && (
               <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Monto Original</span>
-                    <span className="text-white">{formatCurrency(ajusteResultado.montoOriginal)}</span>
+                    <span className="text-gray-400 text-sm">Original Amount</span>
+                    <span className="text-white">{formatCurrency(adjustmentResult.originalAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Meses Transcurridos</span>
-                    <span className="text-white">{ajusteResultado.mesesTranscurridos}</span>
+                    <span className="text-gray-400 text-sm">Months Elapsed</span>
+                    <span className="text-white">{adjustmentResult.monthsElapsed}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Inflación Acumulada</span>
+                    <span className="text-gray-400 text-sm">Cumulative Inflation</span>
                     <span className="text-red-500">
-                      +{formatPercent(ajusteResultado.inflacionAcumulada)}
+                      +{formatPercent(adjustmentResult.cumulativeInflation)}
                     </span>
                   </div>
                   <div className="pt-3 border-t border-gray-700">
                     <div className="flex justify-between items-center">
-                      <span className="text-white font-medium">Monto Ajustado</span>
+                      <span className="text-white font-medium">Adjusted Amount</span>
                       <span className="text-2xl font-bold text-primary">
-                        {formatCurrency(ajusteResultado.montoAjustado)}
+                        {formatCurrency(adjustmentResult.adjustedAmount)}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Para mantener el mismo poder adquisitivo
+                      To maintain the same purchasing power
                     </p>
                   </div>
                 </div>
@@ -250,19 +250,19 @@ export default function InflacionPage() {
           </CardContent>
         </Card>
 
-        {/* Gráficos */}
+        {/* Charts */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Gráfico de inflación mensual */}
+          {/* Monthly inflation chart */}
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-lg">Evolución Mensual (últimos 24 meses)</CardTitle>
+              <CardTitle className="text-lg">Monthly Evolution (last 24 months)</CardTitle>
             </CardHeader>
             <CardContent>
-              {inflacionMensual && inflacionMensual.length > 0 ? (
+              {monthlyInflation && monthlyInflation.length > 0 ? (
                 <BarChart
-                  data={inflacionMensual.map((i) => ({
-                    fecha: formatDate(i.fecha),
-                    valor: i.valor,
+                  data={monthlyInflation.map((i) => ({
+                    fecha: formatDate(i.date),
+                    valor: i.value,
                   }))}
                   xKey="fecha"
                   yKey="valor"
@@ -272,45 +272,45 @@ export default function InflacionPage() {
                 />
               ) : (
                 <div className="h-[250px] flex items-center justify-center text-gray-500">
-                  Cargando datos...
+                  Loading data...
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Tabla de datos mensuales */}
+          {/* Monthly data table */}
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-lg">Datos Mensuales</CardTitle>
+              <CardTitle className="text-lg">Monthly Data</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto max-h-[300px]">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-card">
                     <tr className="border-b border-gray-800">
-                      <th className="text-left py-2 text-gray-400">Período</th>
-                      <th className="text-right py-2 text-gray-400">Mensual</th>
-                      <th className="text-right py-2 text-gray-400">Interanual</th>
-                      <th className="text-right py-2 text-gray-400">Acumulado</th>
+                      <th className="text-left py-2 text-gray-400">Period</th>
+                      <th className="text-right py-2 text-gray-400">Monthly</th>
+                      <th className="text-right py-2 text-gray-400">Year-over-Year</th>
+                      <th className="text-right py-2 text-gray-400">Year-to-Date</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {inflacionMensual?.map((inflacion, index) => (
+                    {monthlyInflation?.map((inflation, index) => (
                       <tr key={index} className="border-b border-gray-800/50">
                         <td className="py-2 text-white">
-                          {new Date(inflacion.fecha).toLocaleDateString('es-AR', {
+                          {new Date(inflation.date).toLocaleDateString('es-AR', {
                             month: 'long',
                             year: 'numeric',
                           })}
                         </td>
                         <td className="text-right py-2 text-white">
-                          {formatPercent(inflacion.valor)}
+                          {formatPercent(inflation.value)}
                         </td>
                         <td className="text-right py-2 text-red-500">
-                          {inflacion.interanual ? formatPercent(inflacion.interanual) : '-'}
+                          {inflation.yearOverYear ? formatPercent(inflation.yearOverYear) : '-'}
                         </td>
                         <td className="text-right py-2 text-yellow-500">
-                          {inflacion.acumuladoAnio ? formatPercent(inflacion.acumuladoAnio) : '-'}
+                          {inflation.yearToDate ? formatPercent(inflation.yearToDate) : '-'}
                         </td>
                       </tr>
                     ))}

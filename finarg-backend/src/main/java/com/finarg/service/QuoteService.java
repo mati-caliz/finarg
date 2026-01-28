@@ -1,0 +1,156 @@
+package com.finarg.service;
+
+import com.finarg.client.QuoteClient;
+import com.finarg.client.QuoteClientFactory;
+import com.finarg.model.dto.GapDTO;
+import com.finarg.model.dto.QuoteDTO;
+import com.finarg.model.entity.QuoteHistory;
+import com.finarg.model.enums.Country;
+import com.finarg.model.enums.CurrencyType;
+import com.finarg.model.enums.GapLevel;
+import com.finarg.repository.QuoteHistoryRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class QuoteService {
+
+    private final QuoteClientFactory quoteClientFactory;
+    private final QuoteHistoryRepository quoteHistoryRepository;
+
+    @Cacheable(value = "quotes", key = "'all_' + #country.code")
+    public List<QuoteDTO> getAllQuotes(Country country) {
+        log.info("Fetching all quotes for country: {}", country);
+        QuoteClient client = quoteClientFactory.getClient(country);
+        return client.getAllQuotes();
+    }
+
+    @Cacheable(value = "quotes", key = "#country.code + '_' + #type.code")
+    public QuoteDTO getQuote(Country country, CurrencyType type) {
+        log.info("Fetching quote for country: {}, type: {}", country, type);
+        QuoteClient client = quoteClientFactory.getClient(country);
+        return client.getQuote(type);
+    }
+
+    public Map<CurrencyType, QuoteDTO> getQuotesMap(Country country) {
+        QuoteClient client = quoteClientFactory.getClient(country);
+        return client.getAllQuotes().stream()
+                .collect(Collectors.toMap(QuoteDTO::getType, q -> q, (a, b) -> a));
+    }
+
+    @Cacheable(value = "quotes", key = "'gap_' + #country.code")
+    public GapDTO calculateGap(Country country) {
+        QuoteClient client = quoteClientFactory.getClient(country);
+        List<QuoteDTO> quotes = client.getAllQuotes();
+        
+        CurrencyType officialType = getOfficialType(country);
+        CurrencyType parallelType = getParallelType(country);
+        
+        QuoteDTO official = quotes.stream()
+                .filter(q -> q.getType() == officialType)
+                .findFirst()
+                .orElse(null);
+                
+        QuoteDTO parallel = quotes.stream()
+                .filter(q -> q.getType() == parallelType)
+                .findFirst()
+                .orElse(null);
+
+        if (official == null || parallel == null) {
+            return GapDTO.builder()
+                    .country(country)
+                    .gapPercentage(BigDecimal.ZERO)
+                    .level(GapLevel.LOW)
+                    .trafficLightColor("#22c55e")
+                    .description("No data available")
+                    .build();
+        }
+
+        BigDecimal officialSell = official.getSell();
+        BigDecimal parallelSell = parallel.getSell();
+
+        BigDecimal gap = parallelSell.subtract(officialSell)
+                .divide(officialSell, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        GapLevel level = GapLevel.fromPercentage(gap.doubleValue());
+        String color = switch (level) {
+            case LOW -> "#22c55e";
+            case MEDIUM -> "#eab308";
+            case HIGH -> "#ef4444";
+        };
+
+        String description = switch (level) {
+            case LOW -> "Low gap - Stable market";
+            case MEDIUM -> "Moderate gap - Attention";
+            case HIGH -> "High gap - Exchange tension";
+        };
+
+        return GapDTO.builder()
+                .country(country)
+                .officialRate(officialSell)
+                .parallelRate(parallelSell)
+                .gapPercentage(gap.setScale(2, RoundingMode.HALF_UP))
+                .level(level)
+                .trafficLightColor(color)
+                .description(description)
+                .build();
+    }
+
+    private CurrencyType getOfficialType(Country country) {
+        return switch (country) {
+            case ARGENTINA -> CurrencyType.AR_OFFICIAL;
+            case COLOMBIA -> CurrencyType.CO_TRM;
+            case BRAZIL -> CurrencyType.BR_PTAX;
+            case CHILE -> CurrencyType.CL_OBSERVED;
+            case URUGUAY -> CurrencyType.UY_INTERBANK;
+        };
+    }
+
+    private CurrencyType getParallelType(Country country) {
+        return switch (country) {
+            case ARGENTINA -> CurrencyType.AR_BLUE;
+            case COLOMBIA -> CurrencyType.CO_EXCHANGE_HOUSES;
+            case BRAZIL -> CurrencyType.BR_PARALLEL;
+            case CHILE -> CurrencyType.CL_INFORMAL;
+            case URUGUAY -> CurrencyType.UY_BILL;
+        };
+    }
+
+    @Cacheable(value = "history", key = "#type.code + '_' + #from + '_' + #to")
+    public List<QuoteHistory> getHistory(CurrencyType type, LocalDate from, LocalDate to) {
+        return quoteHistoryRepository.findByTypeAndDateBetweenOrderByDateAsc(type, from, to);
+    }
+
+    @CacheEvict(value = "quotes", allEntries = true)
+    public void refreshCache() {
+        log.info("Quotes cache cleared");
+    }
+
+    public void saveQuoteHistory(QuoteDTO quote) {
+        LocalDate today = LocalDate.now();
+        if (!quoteHistoryRepository.existsByTypeAndDate(quote.getType(), today)) {
+            QuoteHistory history = QuoteHistory.builder()
+                    .type(quote.getType())
+                    .country(quote.getCountry())
+                    .date(today)
+                    .buy(quote.getBuy())
+                    .sell(quote.getSell())
+                    .build();
+            quoteHistoryRepository.save(history);
+            log.info("Saved quote history: {} - {} - {}", quote.getCountry(), quote.getType(), today);
+        }
+    }
+}

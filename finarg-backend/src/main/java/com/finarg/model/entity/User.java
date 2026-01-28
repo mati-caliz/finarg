@@ -23,7 +23,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false)
-    private String nombre;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -32,15 +32,15 @@ public class User implements UserDetails {
     private String password;
 
     @Column(name = "email_verificado")
-    private boolean emailVerificado;
+    private boolean emailVerified;
 
     @Builder.Default
     @Column(name = "notificaciones_email")
-    private boolean notificacionesEmail = true;
+    private boolean emailNotifications = true;
 
     @Builder.Default
     @Column(name = "notificaciones_push")
-    private boolean notificacionesPush = false;
+    private boolean pushNotifications = false;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -9,13 +9,13 @@ import lombok.*;
 @AllArgsConstructor
 public class AuthRequestDTO {
     
-    @NotBlank(message = "El email es requerido")
-    @Email(message = "El formato del email no es valido")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
     
-    @NotBlank(message = "La contraseña es requerida")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
     
-    private String nombre;
+    private String name;
 }

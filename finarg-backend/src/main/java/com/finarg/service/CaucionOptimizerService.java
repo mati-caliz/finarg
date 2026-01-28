@@ -1,8 +1,8 @@
 package com.finarg.service;
 
-import com.finarg.model.dto.SimulacionRequestDTO;
-import com.finarg.model.dto.SimulacionResponseDTO;
-import com.finarg.model.enums.TipoInversion;
+import com.finarg.model.dto.SimulationRequestDTO;
+import com.finarg.model.dto.SimulationResponseDTO;
+import com.finarg.model.enums.InvestmentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,105 +17,105 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CaucionOptimizerService {
 
-    private final SimuladorService simuladorService;
+    private final SimulatorService simulatorService;
 
-    private static final BigDecimal TASA_CAUCION_COLOCADORA_1D = new BigDecimal("28");
-    private static final BigDecimal TASA_CAUCION_COLOCADORA_7D = new BigDecimal("30");
-    private static final BigDecimal TASA_CAUCION_COLOCADORA_30D = new BigDecimal("32");
+    private static final BigDecimal REPO_RATE_1D = new BigDecimal("28");
+    private static final BigDecimal REPO_RATE_7D = new BigDecimal("30");
+    private static final BigDecimal REPO_RATE_30D = new BigDecimal("32");
 
-    public Map<String, Object> optimizar(BigDecimal monto, int plazoDias) {
-        log.info("Optimizando caucion: monto={}, plazo={}", monto, plazoDias);
+    public Map<String, Object> optimize(BigDecimal amount, int termDays) {
+        log.info("Optimizing repo: amount={}, term={}", amount, termDays);
 
-        Map<String, Object> resultado = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
 
-        BigDecimal tasaCaucion = obtenerTasaCaucion(plazoDias);
-        BigDecimal rendimientoCaucion = calcularRendimiento(monto, tasaCaucion, plazoDias);
+        BigDecimal repoRate = getRepoRate(termDays);
+        BigDecimal repoReturn = calculateReturn(amount, repoRate, termDays);
 
-        SimulacionResponseDTO simulacionPF = simuladorService.simular(
-                SimulacionRequestDTO.builder()
-                        .montoInicial(monto)
-                        .tipoInversion(TipoInversion.PLAZO_FIJO)
-                        .plazoDias(plazoDias)
+        SimulationResponseDTO fixedTermSimulation = simulatorService.simulate(
+                SimulationRequestDTO.builder()
+                        .initialAmount(amount)
+                        .investmentType(InvestmentType.FIXED_TERM)
+                        .termDays(termDays)
                         .build()
         );
 
-        SimulacionResponseDTO simulacionFCI = simuladorService.simular(
-                SimulacionRequestDTO.builder()
-                        .montoInicial(monto)
-                        .tipoInversion(TipoInversion.FCI_MONEY_MARKET)
-                        .plazoDias(plazoDias)
+        SimulationResponseDTO moneyMarketSimulation = simulatorService.simulate(
+                SimulationRequestDTO.builder()
+                        .initialAmount(amount)
+                        .investmentType(InvestmentType.MONEY_MARKET_FUND)
+                        .termDays(termDays)
                         .build()
         );
 
-        resultado.put("monto", monto);
-        resultado.put("plazoDias", plazoDias);
-        resultado.put("caucion", Map.of(
-                "tasa", tasaCaucion,
-                "rendimiento", rendimientoCaucion,
-                "montoFinal", monto.add(rendimientoCaucion)
+        result.put("amount", amount);
+        result.put("termDays", termDays);
+        result.put("repo", Map.of(
+                "rate", repoRate,
+                "return", repoReturn,
+                "finalAmount", amount.add(repoReturn)
         ));
-        resultado.put("plazoFijo", Map.of(
-                "tasa", simulacionPF.getTasaTNA(),
-                "rendimiento", simulacionPF.getRendimientoNominal(),
-                "montoFinal", simulacionPF.getMontoFinal()
+        result.put("fixedTerm", Map.of(
+                "rate", fixedTermSimulation.getNominalAnnualRate(),
+                "return", fixedTermSimulation.getNominalReturn(),
+                "finalAmount", fixedTermSimulation.getFinalAmount()
         ));
-        resultado.put("fciMoneyMarket", Map.of(
-                "tasa", simulacionFCI.getTasaTNA(),
-                "rendimiento", simulacionFCI.getRendimientoNominal(),
-                "montoFinal", simulacionFCI.getMontoFinal()
+        result.put("moneyMarketFund", Map.of(
+                "rate", moneyMarketSimulation.getNominalAnnualRate(),
+                "return", moneyMarketSimulation.getNominalReturn(),
+                "finalAmount", moneyMarketSimulation.getFinalAmount()
         ));
 
-        String mejorOpcion = "caucion";
-        BigDecimal mejorRendimiento = rendimientoCaucion;
+        String bestOption = "repo";
+        BigDecimal bestReturn = repoReturn;
 
-        if (simulacionPF.getRendimientoNominal().compareTo(mejorRendimiento) > 0) {
-            mejorOpcion = "plazoFijo";
-            mejorRendimiento = simulacionPF.getRendimientoNominal();
+        if (fixedTermSimulation.getNominalReturn().compareTo(bestReturn) > 0) {
+            bestOption = "fixedTerm";
+            bestReturn = fixedTermSimulation.getNominalReturn();
         }
-        if (simulacionFCI.getRendimientoNominal().compareTo(mejorRendimiento) > 0) {
-            mejorOpcion = "fciMoneyMarket";
+        if (moneyMarketSimulation.getNominalReturn().compareTo(bestReturn) > 0) {
+            bestOption = "moneyMarketFund";
         }
 
-        resultado.put("recomendacion", mejorOpcion);
-        resultado.put("ventajas", obtenerVentajas(mejorOpcion, plazoDias));
+        result.put("recommendation", bestOption);
+        result.put("advantages", getAdvantages(bestOption, termDays));
 
-        return resultado;
+        return result;
     }
 
-    private BigDecimal obtenerTasaCaucion(int plazoDias) {
-        if (plazoDias <= 1) {
-            return TASA_CAUCION_COLOCADORA_1D;
-        } else if (plazoDias <= 7) {
-            return TASA_CAUCION_COLOCADORA_7D;
+    private BigDecimal getRepoRate(int termDays) {
+        if (termDays <= 1) {
+            return REPO_RATE_1D;
+        } else if (termDays <= 7) {
+            return REPO_RATE_7D;
         } else {
-            return TASA_CAUCION_COLOCADORA_30D;
+            return REPO_RATE_30D;
         }
     }
 
-    private BigDecimal calcularRendimiento(BigDecimal monto, BigDecimal tasa, int dias) {
-        return monto.multiply(tasa)
-                .multiply(BigDecimal.valueOf(dias))
+    private BigDecimal calculateReturn(BigDecimal amount, BigDecimal rate, int days) {
+        return amount.multiply(rate)
+                .multiply(BigDecimal.valueOf(days))
                 .divide(BigDecimal.valueOf(36500), 2, RoundingMode.HALF_UP);
     }
 
-    private Map<String, String> obtenerVentajas(String opcion, int plazo) {
-        return switch (opcion) {
-            case "caucion" -> Map.of(
-                    "liquidez", "Disponibilidad inmediata al vencimiento",
-                    "seguridad", "Garantizado por BYMA",
-                    "flexibilidad", "Plazos desde 1 dia"
+    private Map<String, String> getAdvantages(String option, int term) {
+        return switch (option) {
+            case "repo" -> Map.of(
+                    "liquidity", "Immediate availability at maturity",
+                    "security", "Guaranteed by BYMA",
+                    "flexibility", "Terms starting from 1 day"
             );
-            case "plazoFijo" -> Map.of(
-                    "simplicidad", "Facil de operar desde homebanking",
-                    "garantia", "Garantizado por SEDESA hasta cierto monto",
-                    "ideal", plazo >= 30
-                            ? "Ideal para plazos de 30+ dias"
-                            : "Considerar otras opciones para plazos cortos"
+            case "fixedTerm" -> Map.of(
+                    "simplicity", "Easy to operate from home banking",
+                    "guarantee", "Guaranteed by SEDESA up to a certain amount",
+                    "ideal", term >= 30
+                            ? "Ideal for terms of 30+ days"
+                            : "Consider other options for short terms"
             );
-            case "fciMoneyMarket" -> Map.of(
-                    "liquidez", "Rescate en 24-48hs",
-                    "diversificacion", "Cartera diversificada",
-                    "profesional", "Gestion profesional del fondo"
+            case "moneyMarketFund" -> Map.of(
+                    "liquidity", "Redemption in 24-48hrs",
+                    "diversification", "Diversified portfolio",
+                    "professional", "Professional fund management"
             );
             default -> Map.of();
         };

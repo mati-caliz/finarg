@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { caucionesApi } from '@/lib/api';
+import { reposApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,52 +18,52 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-interface CaucionResult {
-  montoInicial: number;
-  plazoDias: number;
-  tasaTNA: number;
-  tasaTEA: number;
-  rendimientoTotal: number;
-  montoFinal: number;
-  gananciaARS: number;
-  comisionEstimada: number;
-  rendimientoNeto: number;
-  estrategiaOptima: string;
-  comparativa: {
-    plazo: number;
-    tasaTNA: number;
-    montoFinal: number;
-    rendimiento: number;
+interface RepoResult {
+  initialAmount: number;
+  termDays: number;
+  rateTNA: number;
+  rateTEA: number;
+  totalReturn: number;
+  finalAmount: number;
+  profitARS: number;
+  estimatedCommission: number;
+  netReturn: number;
+  optimalStrategy: string;
+  comparison: {
+    term: number;
+    rateTNA: number;
+    finalAmount: number;
+    returnRate: number;
   }[];
-  recomendaciones: string[];
+  recommendations: string[];
 }
 
-const PLAZOS = [
-  { value: 1, label: '1 día' },
-  { value: 7, label: '7 días' },
-  { value: 14, label: '14 días' },
-  { value: 30, label: '30 días' },
-  { value: 60, label: '60 días' },
+const TERMS = [
+  { value: 1, label: '1 day' },
+  { value: 7, label: '7 days' },
+  { value: 14, label: '14 days' },
+  { value: 30, label: '30 days' },
+  { value: 60, label: '60 days' },
 ];
 
-export default function CaucionesPage() {
-  const [monto, setMonto] = useState<number>(1000000);
-  const [plazoDias, setPlazoDias] = useState<number>(7);
-  const [resultado, setResultado] = useState<CaucionResult | null>(null);
+export default function ReposPage() {
+  const [amount, setAmount] = useState<number>(1000000);
+  const [termDays, setTermDays] = useState<number>(7);
+  const [result, setResult] = useState<RepoResult | null>(null);
 
-  const optimizarMutation = useMutation({
+  const optimizeMutation = useMutation({
     mutationFn: async () => {
-      const response = await caucionesApi.optimizar(monto, plazoDias);
-      return response.data as CaucionResult;
+      const response = await reposApi.optimize(amount, termDays);
+      return response.data as RepoResult;
     },
     onSuccess: (data) => {
-      setResultado(data);
+      setResult(data);
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    optimizarMutation.mutate();
+    optimizeMutation.mutate();
   };
 
   const formatCurrency = (value: number) =>
@@ -75,57 +75,57 @@ export default function CaucionesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Optimizador de Cauciones</h1>
+        <h1 className="text-2xl font-bold text-white">Repo Optimizer</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Encuentra la mejor estrategia de caución bursátil para tu capital
+          Find the best stock exchange repo strategy for your capital
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Formulario */}
+        {/* Form */}
         <Card className="bg-card lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Coins className="h-5 w-5 text-primary" />
-              Configurar Caución
+              Configure Repo
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Monto */}
+              {/* Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Monto a Colocar
+                  Amount to Invest
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     type="number"
                     placeholder="1000000"
-                    value={monto || ''}
-                    onChange={(e) => setMonto(parseFloat(e.target.value) || 0)}
+                    value={amount || ''}
+                    onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
                     className="pl-10"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{formatCurrency(monto)}</p>
+                <p className="text-xs text-gray-500 mt-1">{formatCurrency(amount)}</p>
               </div>
 
-              {/* Plazo */}
+              {/* Term */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
                   <Calendar className="h-4 w-4" />
-                  Plazo
+                  Term
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {PLAZOS.map((plazo) => (
+                  {TERMS.map((term) => (
                     <Button
-                      key={plazo.value}
+                      key={term.value}
                       type="button"
-                      variant={plazoDias === plazo.value ? 'default' : 'outline'}
+                      variant={termDays === term.value ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setPlazoDias(plazo.value)}
+                      onClick={() => setTermDays(term.value)}
                     >
-                      {plazo.label}
+                      {term.label}
                     </Button>
                   ))}
                 </div>
@@ -134,53 +134,53 @@ export default function CaucionesPage() {
               <Button
                 type="submit"
                 className="w-full"
-                disabled={optimizarMutation.isPending || monto <= 0}
+                disabled={optimizeMutation.isPending || amount <= 0}
               >
-                {optimizarMutation.isPending ? (
+                {optimizeMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Optimizando...
+                    Optimizing...
                   </>
                 ) : (
                   <>
                     <Calculator className="mr-2 h-4 w-4" />
-                    Optimizar Caución
+                    Optimize Repo
                   </>
                 )}
               </Button>
             </form>
 
-            {/* Info sobre cauciones */}
+            {/* Info about repos */}
             <div className="mt-6 p-4 bg-gray-800/30 rounded-lg">
-              <h4 className="text-sm font-medium text-white mb-2">¿Qué es una caución?</h4>
+              <h4 className="text-sm font-medium text-white mb-2">What is a repo?</h4>
               <p className="text-xs text-gray-400">
-                Una caución bursátil es un préstamo de corto plazo donde tu dinero está garantizado
-                por títulos valores. Es una opción de renta fija con liquidez diaria y tasas
-                competitivas.
+                A stock exchange repo is a short-term loan where your money is guaranteed
+                by securities. It is a fixed income option with daily liquidity and
+                competitive rates.
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Resultados */}
+        {/* Results */}
         <div className="lg:col-span-2 space-y-6">
-          {resultado ? (
+          {result ? (
             <>
-              {/* KPIs principales */}
+              {/* Main KPIs */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Monto Final</p>
+                    <p className="text-xs text-gray-400">Final Amount</p>
                     <p className="text-xl font-bold text-white mt-1">
-                      {formatCurrency(resultado.montoFinal)}
+                      {formatCurrency(result.finalAmount)}
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Ganancia Bruta</p>
+                    <p className="text-xs text-gray-400">Gross Profit</p>
                     <p className="text-xl font-bold text-green-500 mt-1">
-                      +{formatCurrency(resultado.gananciaARS)}
+                      +{formatCurrency(result.profitARS)}
                     </p>
                   </CardContent>
                 </Card>
@@ -188,7 +188,7 @@ export default function CaucionesPage() {
                   <CardContent className="p-4">
                     <p className="text-xs text-gray-400">TNA</p>
                     <p className="text-xl font-bold text-primary mt-1">
-                      {formatPercent(resultado.tasaTNA)}
+                      {formatPercent(result.rateTNA)}
                     </p>
                   </CardContent>
                 </Card>
@@ -196,65 +196,65 @@ export default function CaucionesPage() {
                   <CardContent className="p-4">
                     <p className="text-xs text-gray-400">TEA</p>
                     <p className="text-xl font-bold text-primary mt-1">
-                      {formatPercent(resultado.tasaTEA)}
+                      {formatPercent(result.rateTEA)}
                     </p>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Detalle */}
+              {/* Detail */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Detalle de la Operación</CardTitle>
+                  <CardTitle className="text-lg">Operation Detail</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Monto Inicial</span>
-                        <span className="text-white">{formatCurrency(resultado.montoInicial)}</span>
+                        <span className="text-gray-400">Initial Amount</span>
+                        <span className="text-white">{formatCurrency(result.initialAmount)}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Plazo</span>
-                        <span className="text-white">{resultado.plazoDias} días</span>
+                        <span className="text-gray-400">Term</span>
+                        <span className="text-white">{result.termDays} days</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Rendimiento Total</span>
+                        <span className="text-gray-400">Total Return</span>
                         <span className="text-green-500">
-                          +{formatPercent(resultado.rendimientoTotal)}
+                          +{formatPercent(result.totalReturn)}
                         </span>
                       </div>
                     </div>
                     <div className="space-y-3">
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Comisión Est.</span>
+                        <span className="text-gray-400">Est. Commission</span>
                         <span className="text-red-500">
-                          -{formatCurrency(resultado.comisionEstimada)}
+                          -{formatCurrency(result.estimatedCommission)}
                         </span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Rend. Neto</span>
+                        <span className="text-gray-400">Net Return</span>
                         <span className="text-green-500">
-                          {formatPercent(resultado.rendimientoNeto)}
+                          {formatPercent(result.netReturn)}
                         </span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-white font-medium">Monto Final</span>
+                        <span className="text-white font-medium">Final Amount</span>
                         <span className="text-primary font-bold">
-                          {formatCurrency(resultado.montoFinal)}
+                          {formatCurrency(result.finalAmount)}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Estrategia óptima */}
-                  {resultado.estrategiaOptima && (
+                  {/* Optimal strategy */}
+                  {result.optimalStrategy && (
                     <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
                       <div className="flex items-start gap-3">
                         <TrendingUp className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-medium text-primary">Estrategia Óptima</p>
-                          <p className="text-sm text-gray-300 mt-1">{resultado.estrategiaOptima}</p>
+                          <p className="text-sm font-medium text-primary">Optimal Strategy</p>
+                          <p className="text-sm text-gray-300 mt-1">{result.optimalStrategy}</p>
                         </div>
                       </div>
                     </div>
@@ -262,18 +262,18 @@ export default function CaucionesPage() {
                 </CardContent>
               </Card>
 
-              {/* Comparativa de plazos */}
-              {resultado.comparativa && resultado.comparativa.length > 0 && (
+              {/* Term comparison */}
+              {result.comparison && result.comparison.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Comparativa por Plazo</CardTitle>
+                    <CardTitle className="text-lg">Term Comparison</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <LineChart
-                      data={resultado.comparativa.map((c) => ({
-                        plazo: `${c.plazo}d`,
-                        tasaTNA: c.tasaTNA,
-                        rendimiento: c.rendimiento,
+                      data={result.comparison.map((c) => ({
+                        plazo: `${c.term}d`,
+                        tasaTNA: c.rateTNA,
+                        rendimiento: c.returnRate,
                       }))}
                       xKey="plazo"
                       yKey={['tasaTNA']}
@@ -286,34 +286,34 @@ export default function CaucionesPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">Plazo</th>
+                            <th className="text-left py-2 text-gray-400">Term</th>
                             <th className="text-right py-2 text-gray-400">TNA</th>
-                            <th className="text-right py-2 text-gray-400">Monto Final</th>
-                            <th className="text-right py-2 text-gray-400">Rendimiento</th>
+                            <th className="text-right py-2 text-gray-400">Final Amount</th>
+                            <th className="text-right py-2 text-gray-400">Return</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {resultado.comparativa.map((comp) => (
+                          {result.comparison.map((comp) => (
                             <tr
-                              key={comp.plazo}
+                              key={comp.term}
                               className={`border-b border-gray-800/50 ${
-                                comp.plazo === resultado.plazoDias ? 'bg-primary/5' : ''
+                                comp.term === result.termDays ? 'bg-primary/5' : ''
                               }`}
                             >
                               <td className="py-2 text-white">
-                                {comp.plazo} días
-                                {comp.plazo === resultado.plazoDias && (
-                                  <span className="ml-2 text-xs text-primary">(seleccionado)</span>
+                                {comp.term} days
+                                {comp.term === result.termDays && (
+                                  <span className="ml-2 text-xs text-primary">(selected)</span>
                                 )}
                               </td>
                               <td className="text-right py-2 text-primary">
-                                {formatPercent(comp.tasaTNA)}
+                                {formatPercent(comp.rateTNA)}
                               </td>
                               <td className="text-right py-2 text-white">
-                                {formatCurrency(comp.montoFinal)}
+                                {formatCurrency(comp.finalAmount)}
                               </td>
                               <td className="text-right py-2 text-green-500">
-                                +{formatPercent(comp.rendimiento)}
+                                +{formatPercent(comp.returnRate)}
                               </td>
                             </tr>
                           ))}
@@ -324,18 +324,18 @@ export default function CaucionesPage() {
                 </Card>
               )}
 
-              {/* Recomendaciones */}
-              {resultado.recomendaciones && resultado.recomendaciones.length > 0 && (
+              {/* Recommendations */}
+              {result.recommendations && result.recommendations.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <CheckCircle className="h-5 w-5 text-green-500" />
-                      Recomendaciones
+                      Recommendations
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
-                      {resultado.recomendaciones.map((rec, index) => (
+                      {result.recommendations.map((rec, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm text-gray-300">
                           <span className="text-primary mt-1">•</span>
                           {rec}
@@ -350,9 +350,9 @@ export default function CaucionesPage() {
             <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
               <CardContent className="text-center">
                 <Coins className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-                <p className="text-gray-500">Configura los parámetros para optimizar tu caución</p>
+                <p className="text-gray-500">Configure the parameters to optimize your repo</p>
                 <p className="text-gray-600 text-sm mt-2">
-                  Compara tasas y plazos para maximizar tu rendimiento
+                  Compare rates and terms to maximize your return
                 </p>
               </CardContent>
             </Card>
@@ -366,11 +366,11 @@ export default function CaucionesPage() {
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-yellow-500 font-medium mb-1">Información importante</p>
+              <p className="text-yellow-500 font-medium mb-1">Important information</p>
               <p className="text-gray-400">
-                Las tasas de caución son indicativas y pueden variar según las condiciones del
-                mercado y tu broker. Las comisiones estimadas son aproximadas y dependen del
-                intermediario. Siempre verificá las condiciones antes de operar.
+                Repo rates are indicative and may vary according to market conditions
+                and your broker. Estimated commissions are approximate and depend on the
+                intermediary. Always verify the conditions before trading.
               </p>
             </div>
           </div>

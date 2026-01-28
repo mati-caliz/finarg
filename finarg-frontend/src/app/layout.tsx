@@ -9,13 +9,13 @@ import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistratio
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'FinArg - App Financiera Argentina',
-  description: 'Cotizaciones, calculadoras y herramientas financieras para Argentina',
+  title: 'FinLatam - App Financiera Latinoamerica',
+  description: 'Cotizaciones, calculadoras y herramientas financieras para Argentina, Colombia, Brasil, Chile y Uruguay',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'FinArg',
+    title: 'FinLatam',
   },
   formatDetection: {
     telephone: false,
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'es_AR',
-    url: 'https://finarg.app',
-    siteName: 'FinArg',
-    title: 'FinArg - App Financiera Argentina',
-    description: 'Cotizaciones del dólar, calculadoras y herramientas financieras para Argentina',
+    url: 'https://finlatam.app',
+    siteName: 'FinLatam',
+    title: 'FinLatam - App Financiera Latinoamerica',
+    description: 'Cotizaciones del dolar, calculadoras y herramientas financieras para Latinoamerica',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FinArg - App Financiera Argentina',
-    description: 'Cotizaciones del dólar, calculadoras y herramientas financieras para Argentina',
+    title: 'FinLatam - App Financiera Latinoamerica',
+    description: 'Cotizaciones del dolar, calculadoras y herramientas financieras para Latinoamerica',
   },
 };
 

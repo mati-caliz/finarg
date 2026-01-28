@@ -21,8 +21,8 @@ public class AuthResponseDTO implements Serializable {
     @AllArgsConstructor
     public static class UserDTO implements Serializable {
         private Long id;
-        private String nombre;
+        private String name;
         private String email;
-        private boolean emailVerificado;
+        private boolean emailVerified;
     }
 }

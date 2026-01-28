@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/types';
+import { CountryCode } from '@/config/countries';
 
 interface AuthState {
   user: User | null;
@@ -31,10 +32,26 @@ interface AppState {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
+  selectedCountry: CountryCode;
+  setSelectedCountry: (country: CountryCode) => void;
+  selectedPais: CountryCode;
+  setSelectedPais: (pais: CountryCode) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  sidebarOpen: true,
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-  setSidebarOpen: (open) => set({ sidebarOpen: open }),
-}));
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      sidebarOpen: true,
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      setSidebarOpen: (open) => set({ sidebarOpen: open }),
+      selectedCountry: 'ar' as CountryCode,
+      setSelectedCountry: (country) => set({ selectedCountry: country, selectedPais: country }),
+      selectedPais: 'ar' as CountryCode,
+      setSelectedPais: (pais) => set({ selectedPais: pais, selectedCountry: pais }),
+    }),
+    {
+      name: 'app-storage',
+      partialize: (state) => ({ selectedCountry: state.selectedCountry, selectedPais: state.selectedPais }),
+    }
+  )
+);

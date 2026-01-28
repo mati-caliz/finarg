@@ -60,6 +60,18 @@ external:
     datos-gob-ar:
       base-url: https://apis.datos.gob.ar/series/api
       timeout: 15000
+    colombia:
+      base-url: https://www.datos.gov.co/api
+      timeout: 10000
+    brasil:
+      base-url: https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata
+      timeout: 10000
+    chile:
+      base-url: https://mindicador.cl/api
+      timeout: 10000
+    uruguay:
+      base-url: https://www.bcu.gub.uy/api
+      timeout: 10000
 
 scheduler:
   cotizaciones:
