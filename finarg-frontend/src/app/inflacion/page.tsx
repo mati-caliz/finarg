@@ -16,8 +16,10 @@ import {
   Loader2,
   BarChart3,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function InflationPage() {
+  const { translate } = useTranslation();
   const [originalAmount, setOriginalAmount] = useState<number>(100000);
   const [startDate, setStartDate] = useState<string>('2023-01-01');
   const [endDate, setEndDate] = useState<string>(
@@ -76,21 +78,19 @@ export default function InflationPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Argentina Inflation</h1>
+        <h1 className="text-2xl font-bold text-white">{translate('inflationTitle')}</h1>
         <p className="text-gray-400 text-sm mt-1">
-          CPI data and inflation adjustment calculator
+          {translate('inflationDesc')}
         </p>
       </div>
 
-      {/* Main KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Monthly Inflation</p>
+                <p className="text-xs text-gray-400">{translate('monthlyInflation')}</p>
                 <p className="text-2xl font-bold text-white mt-1">
                   {currentInflation ? formatPercent(currentInflation.value) : '-'}
                 </p>
@@ -114,11 +114,11 @@ export default function InflationPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Year-over-Year Inflation</p>
+                <p className="text-xs text-gray-400">{translate('yearOverYear')}</p>
                 <p className="text-2xl font-bold text-red-500 mt-1">
                   {currentInflation?.yearOverYear ? formatPercent(currentInflation.yearOverYear) : '-'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Last 12 months</p>
+                <p className="text-xs text-gray-500 mt-1">{translate('last12Months')}</p>
               </div>
               <div className="p-3 bg-red-500/10 rounded-lg">
                 <BarChart3 className="h-6 w-6 text-red-500" />
@@ -131,14 +131,14 @@ export default function InflationPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400">Year-to-Date</p>
+                <p className="text-xs text-gray-400">{translate('yearToDate')}</p>
                 <p className="text-2xl font-bold text-yellow-500 mt-1">
                   {currentInflation?.yearToDate
                     ? formatPercent(currentInflation.yearToDate)
                     : '-'}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  Since January {new Date().getFullYear()}
+                  {translate('sinceJan')} {new Date().getFullYear()}
                 </p>
               </div>
               <div className="p-3 bg-yellow-500/10 rounded-lg">
@@ -150,19 +150,18 @@ export default function InflationPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Adjustment Calculator */}
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Calculator className="h-5 w-5 text-primary" />
-              Adjustment Calculator
+              {translate('adjustmentCalculator')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAdjust} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Original Amount
+                  {translate('originalAmount')}
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -177,7 +176,7 @@ export default function InflationPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Start Date</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">{translate('startDate')}</label>
                 <Input
                   type="date"
                   value={startDate}
@@ -188,7 +187,7 @@ export default function InflationPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  End Date
+                  {translate('endDate')}
                 </label>
                 <Input
                   type="date"
@@ -207,41 +206,40 @@ export default function InflationPage() {
                 {adjustMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Calculating...
+                    {translate('calculating')}
                   </>
                 ) : (
-                  'Calculate Adjustment'
+                  translate('calculateAdjustment')
                 )}
               </Button>
             </form>
 
-            {/* Adjustment Result */}
             {adjustmentResult && (
               <div className="mt-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Original Amount</span>
+                    <span className="text-gray-400 text-sm">{translate('originalAmount')}</span>
                     <span className="text-white">{formatCurrency(adjustmentResult.originalAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Months Elapsed</span>
+                    <span className="text-gray-400 text-sm">{translate('monthsElapsed')}</span>
                     <span className="text-white">{adjustmentResult.monthsElapsed}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">Cumulative Inflation</span>
+                    <span className="text-gray-400 text-sm">{translate('cumulativeInflation')}</span>
                     <span className="text-red-500">
                       +{formatPercent(adjustmentResult.cumulativeInflation)}
                     </span>
                   </div>
                   <div className="pt-3 border-t border-gray-700">
                     <div className="flex justify-between items-center">
-                      <span className="text-white font-medium">Adjusted Amount</span>
+                      <span className="text-white font-medium">{translate('adjustedAmount')}</span>
                       <span className="text-2xl font-bold text-primary">
                         {formatCurrency(adjustmentResult.adjustedAmount)}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      To maintain the same purchasing power
+                      {translate('maintainPurchasingPower')}
                     </p>
                   </div>
                 </div>
@@ -250,12 +248,10 @@ export default function InflationPage() {
           </CardContent>
         </Card>
 
-        {/* Charts */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Monthly inflation chart */}
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-lg">Monthly Evolution (last 24 months)</CardTitle>
+              <CardTitle className="text-lg">{translate('monthlyEvolution')} (24m)</CardTitle>
             </CardHeader>
             <CardContent>
               {monthlyInflation && monthlyInflation.length > 0 ? (
@@ -278,20 +274,19 @@ export default function InflationPage() {
             </CardContent>
           </Card>
 
-          {/* Monthly data table */}
           <Card className="bg-card">
             <CardHeader>
-              <CardTitle className="text-lg">Monthly Data</CardTitle>
+              <CardTitle className="text-lg">{translate('monthlyData')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto max-h-[300px]">
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-card">
                     <tr className="border-b border-gray-800">
-                      <th className="text-left py-2 text-gray-400">Period</th>
-                      <th className="text-right py-2 text-gray-400">Monthly</th>
-                      <th className="text-right py-2 text-gray-400">Year-over-Year</th>
-                      <th className="text-right py-2 text-gray-400">Year-to-Date</th>
+                      <th className="text-left py-2 text-gray-400">{translate('period')}</th>
+                      <th className="text-right py-2 text-gray-400">{translate('monthly')}</th>
+                      <th className="text-right py-2 text-gray-400">{translate('yearOverYear')}</th>
+                      <th className="text-right py-2 text-gray-400">{translate('yearToDate')}</th>
                     </tr>
                   </thead>
                   <tbody>

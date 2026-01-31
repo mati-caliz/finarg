@@ -12,6 +12,7 @@ import {
   XCircle,
   RefreshCw,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const getRiskColor = (risk: string) => {
   switch (risk?.toUpperCase()) {
@@ -30,6 +31,8 @@ const getRiskColor = (risk: string) => {
 };
 
 export default function ArbitragePage() {
+  const { translate } = useTranslation();
+  
   const {
     data: opportunities,
     isLoading,
@@ -52,12 +55,11 @@ export default function ArbitragePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Arbitrage Detector</h1>
+          <h1 className="text-2xl font-bold text-white">{translate('arbitrageDetector')}</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Profit opportunities between different dollar quotes
+            {translate('arbitrageDesc')}
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -72,12 +74,11 @@ export default function ArbitragePage() {
             className="flex items-center gap-2"
           >
             <RefreshCw className="h-4 w-4" />
-            Refresh
+            {translate('refresh')}
           </Button>
         </div>
       </div>
 
-      {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-card">
           <CardContent className="p-4 flex items-center gap-4">
@@ -85,7 +86,7 @@ export default function ArbitragePage() {
               <ArrowRightLeft className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Total Opportunities</p>
+              <p className="text-xs text-gray-400">{translate('totalOpportunities')}</p>
               <p className="text-2xl font-bold text-white">{opportunities?.length || 0}</p>
             </div>
           </CardContent>
@@ -96,7 +97,7 @@ export default function ArbitragePage() {
               <CheckCircle className="h-6 w-6 text-green-500" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Viable</p>
+              <p className="text-xs text-gray-400">{translate('viable')}</p>
               <p className="text-2xl font-bold text-green-500">{viable.length}</p>
             </div>
           </CardContent>
@@ -107,7 +108,7 @@ export default function ArbitragePage() {
               <XCircle className="h-6 w-6 text-red-500" />
             </div>
             <div>
-              <p className="text-xs text-gray-400">Not Viable</p>
+              <p className="text-xs text-gray-400">{translate('notViable')}</p>
               <p className="text-2xl font-bold text-red-500">{notViable.length}</p>
             </div>
           </CardContent>
@@ -120,12 +121,11 @@ export default function ArbitragePage() {
         </div>
       ) : (
         <>
-          {/* Viable opportunities */}
           {viable.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                Viable Opportunities
+                {translate('viableOpportunities')}
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {viable.map((opportunity, index) => (
@@ -148,45 +148,41 @@ export default function ArbitragePage() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {/* Quotes */}
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-3 bg-gray-800/50 rounded-lg">
-                            <p className="text-xs text-gray-400">Buy ({opportunity.sourceType})</p>
+                            <p className="text-xs text-gray-400">{translate('buy')} ({opportunity.sourceType})</p>
                             <p className="text-lg font-semibold text-white">
-                              {formatCurrency(opportunity.sourceQuote)}
+                              {formatCurrency(opportunity.sourceRate)}
                             </p>
                           </div>
                           <div className="p-3 bg-gray-800/50 rounded-lg">
-                            <p className="text-xs text-gray-400">Sell ({opportunity.targetType})</p>
+                            <p className="text-xs text-gray-400">{translate('sell')} ({opportunity.targetType})</p>
                             <p className="text-lg font-semibold text-white">
-                              {formatCurrency(opportunity.targetQuote)}
+                              {formatCurrency(opportunity.targetRate)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Spread and profit */}
                         <div className="flex justify-between items-center p-3 bg-green-500/10 rounded-lg border border-green-500/20">
                           <div>
-                            <p className="text-xs text-gray-400">Spread</p>
+                            <p className="text-xs text-gray-400">{translate('spread')}</p>
                             <p className="text-xl font-bold text-green-500">
                               +{opportunity.spreadPercentage.toFixed(2)}%
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-gray-400">Profit per USD 1,000</p>
+                            <p className="text-xs text-gray-400">{translate('profitPer1k')}</p>
                             <p className="text-xl font-bold text-green-500">
                               {formatCurrency(opportunity.estimatedProfitPer1000USD)}
                             </p>
                           </div>
                         </div>
 
-                        {/* Description */}
                         <p className="text-sm text-gray-400">{opportunity.description}</p>
 
-                        {/* Steps */}
                         {opportunity.steps && (
                           <div className="p-3 bg-gray-800/30 rounded-lg">
-                            <p className="text-xs text-gray-500 mb-2">Steps to execute:</p>
+                            <p className="text-xs text-gray-500 mb-2">{translate('stepsToExecute')}</p>
                             <p className="text-sm text-gray-300">{opportunity.steps}</p>
                           </div>
                         )}
@@ -198,12 +194,11 @@ export default function ArbitragePage() {
             </div>
           )}
 
-          {/* Not viable opportunities */}
           {notViable.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
                 <XCircle className="h-5 w-5 text-gray-500" />
-                Monitoring (Currently Not Viable)
+                {translate('monitoring')}
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {notViable.map((opportunity, index) => (
@@ -225,7 +220,7 @@ export default function ArbitragePage() {
                       </div>
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-xs text-gray-500">Spread</p>
+                          <p className="text-xs text-gray-500">{translate('spread')}</p>
                           <p
                             className={`text-lg font-semibold ${
                               opportunity.spreadPercentage >= 0 ? 'text-gray-400' : 'text-red-500'
@@ -236,7 +231,7 @@ export default function ArbitragePage() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-gray-500">Profit USD 1k</p>
+                          <p className="text-xs text-gray-500">{translate('profitPer1k')}</p>
                           <p className="text-lg font-semibold text-gray-400">
                             {formatCurrency(opportunity.estimatedProfitPer1000USD)}
                           </p>
@@ -249,16 +244,15 @@ export default function ArbitragePage() {
             </div>
           )}
 
-          {/* No opportunities */}
           {opportunities?.length === 0 && (
             <Card className="bg-card">
               <CardContent className="p-12 text-center">
                 <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-white mb-2">
-                  No arbitrage opportunities
+                  {translate('noArbitrage')}
                 </h3>
                 <p className="text-gray-400 text-sm">
-                  Quotes are balanced. We will check again in 30 seconds.
+                  {translate('arbitrageBalanced')}
                 </p>
               </CardContent>
             </Card>
@@ -266,18 +260,14 @@ export default function ArbitragePage() {
         </>
       )}
 
-      {/* Disclaimer */}
       <Card className="bg-yellow-500/5 border-yellow-500/20">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-yellow-500 font-medium mb-1">Disclaimer</p>
+              <p className="text-yellow-500 font-medium mb-1">{translate('arbitrageDisclaimerTitle')}</p>
               <p className="text-gray-400">
-                Arbitrage opportunities are estimates based on public quotes.
-                Actual spreads may vary due to commissions, transfer times, and
-                currency availability. Always verify conditions before trading.
-                This information does not constitute financial advice.
+                {translate('arbitrageDisclaimer')}
               </p>
             </div>
           </div>

@@ -16,16 +16,18 @@ import {
   Globe,
 } from 'lucide-react';
 import { useState } from 'react';
-
-const PERIODS = [
-  { value: 7, label: '7 days' },
-  { value: 30, label: '30 days' },
-  { value: 90, label: '3 months' },
-  { value: 180, label: '6 months' },
-];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ReservesPage() {
+  const { translate } = useTranslation();
   const [period, setPeriod] = useState(30);
+
+  const PERIODS = [
+    { value: 7, label: translate('days7') },
+    { value: 30, label: translate('days30') },
+    { value: 90, label: translate('months3') },
+    { value: 180, label: translate('months6') },
+  ];
 
   const {
     data: currentReserves,
@@ -96,12 +98,11 @@ export default function ReservesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">BCRA Reserves</h1>
+          <h1 className="text-2xl font-bold text-white">{translate('bcraReservesTitle')}</h1>
           <p className="text-gray-400 text-sm mt-1">
-            International reserves of the Central Bank of Argentina
+            {translate('bcraReservesDesc')}
           </p>
         </div>
         <Button
@@ -111,11 +112,10 @@ export default function ReservesPage() {
           className="flex items-center gap-2"
         >
           <RefreshCw className="h-4 w-4" />
-          Refresh
+          {translate('refresh')}
         </Button>
       </div>
 
-      {/* Main KPIs */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -131,7 +131,7 @@ export default function ReservesPage() {
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Gross Reserves</p>
+                <p className="text-xs text-gray-400">{translate('grossReserves')}</p>
                 <Landmark className="h-5 w-5 text-primary" />
               </div>
               <p className="text-2xl font-bold text-white">
@@ -157,53 +157,51 @@ export default function ReservesPage() {
           <Card className="bg-card border-primary/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Net Reserves (Est.)</p>
+                <p className="text-xs text-gray-400">{translate('netReservesEst')}</p>
                 <Building2 className="h-5 w-5 text-green-500" />
               </div>
               <p className="text-2xl font-bold text-green-500">
                 {currentReserves ? formatUSD(currentReserves.netReserves) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Estimated without swaps or deposits</p>
+              <p className="text-xs text-gray-500 mt-2">{translate('estWithoutSwaps')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">China Swap</p>
+                <p className="text-xs text-gray-400">{translate('chinaSwap')}</p>
                 <Globe className="h-5 w-5 text-red-500" />
               </div>
               <p className="text-2xl font-bold text-white">
                 {currentReserves ? formatUSD(currentReserves.chinaSwap) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Subtracted from net</p>
+              <p className="text-xs text-gray-500 mt-2">{translate('subtractedFromNet')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">Bank Reserves</p>
+                <p className="text-xs text-gray-400">{translate('bankReserves')}</p>
                 <Banknote className="h-5 w-5 text-yellow-500" />
               </div>
               <p className="text-2xl font-bold text-white">
                 {currentReserves ? formatUSD(currentReserves.bankDeposits) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">Public USD deposits</p>
+              <p className="text-xs text-gray-500 mt-2">{translate('publicUsdDeposits')}</p>
             </CardContent>
           </Card>
         </div>
       )}
 
-      {/* Reserves breakdown */}
       {currentReserves && (
         <Card className="bg-card">
           <CardHeader>
-            <CardTitle className="text-lg">Reserves Composition</CardTitle>
+            <CardTitle className="text-lg">{translate('reservesComposition')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {/* Composition bar */}
               <div className="relative h-8 rounded-lg overflow-hidden bg-gray-800">
                 <div
                   className="absolute h-full bg-green-500"
@@ -239,12 +237,11 @@ export default function ReservesPage() {
                 />
               </div>
 
-              {/* Legend */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-green-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Net Reserves</p>
+                    <p className="text-xs text-gray-400">{translate('netReservesEst')}</p>
                     <p className="text-sm text-white">
                       {formatFullUSD(currentReserves.netReserves)}
                     </p>
@@ -253,7 +250,7 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-red-500" />
                   <div>
-                    <p className="text-xs text-gray-400">China Swap</p>
+                    <p className="text-xs text-gray-400">{translate('chinaSwap')}</p>
                     <p className="text-sm text-white">
                       {formatFullUSD(currentReserves.chinaSwap)}
                     </p>
@@ -262,7 +259,7 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-yellow-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Bank Deposits</p>
+                    <p className="text-xs text-gray-400">{translate('bankReserves')}</p>
                     <p className="text-sm text-white">
                       {formatFullUSD(currentReserves.bankDeposits)}
                     </p>
@@ -271,7 +268,7 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-blue-500" />
                   <div>
-                    <p className="text-xs text-gray-400">Gov. Deposits</p>
+                    <p className="text-xs text-gray-400">{translate('govDeposits')}</p>
                     <p className="text-sm text-white">
                       {formatFullUSD(currentReserves.governmentDeposits)}
                     </p>
@@ -283,11 +280,10 @@ export default function ReservesPage() {
         </Card>
       )}
 
-      {/* Historical chart */}
       <Card className="bg-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-lg">Historical Evolution</CardTitle>
+            <CardTitle className="text-lg">{translate('historicalEvolution')}</CardTitle>
             <div className="flex flex-wrap gap-2">
               {PERIODS.map((p) => (
                 <Button
@@ -322,24 +318,20 @@ export default function ReservesPage() {
             />
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500">
-              No historical data available
+              {translate('noHistoricalData')}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Additional information */}
       <Card className="bg-blue-500/5 border-blue-500/20">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <Building2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-blue-500 font-medium mb-1">About Net Reserves</p>
+              <p className="text-blue-500 font-medium mb-1">{translate('aboutNetReserves')}</p>
               <p className="text-gray-400">
-                Net reserves are an estimate that subtracts from gross reserves: the swap
-                with China, bank deposits (public dollar deposits), and
-                national government deposits. The exact calculation is complex as it depends on
-                data that the BCRA does not publish daily.
+                {translate('netReservesInfo')}
               </p>
             </div>
           </div>

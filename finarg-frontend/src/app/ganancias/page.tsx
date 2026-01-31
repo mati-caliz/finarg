@@ -9,19 +9,21 @@ import { Input } from '@/components/ui/input';
 import { BarChart } from '@/components/charts';
 import { IncomeTaxRequest, IncomeTaxResponse } from '@/types';
 import { Calculator, DollarSign, Users, Home, GraduationCap, Loader2 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function IncomeTaxPage() {
+  const { translate } = useTranslation();
   const [formData, setFormData] = useState<IncomeTaxRequest>({
     grossMonthlySalary: 0,
-    employeeType: 'RELACION_DEPENDENCIA',
+    employeeType: 'EMPLOYEE',
     hasSpouse: false,
-    numberOfChildren: 0,
+    childrenCount: 0,
     healthInsurance: undefined,
     retirement: undefined,
     union: undefined,
     housingRent: undefined,
     domesticService: undefined,
-    educationalExpenses: undefined,
+    educationExpenses: undefined,
   });
 
   const [result, setResult] = useState<IncomeTaxResponse | null>(null);
@@ -52,30 +54,27 @@ export default function IncomeTaxPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Income Tax Calculator</h1>
+        <h1 className="text-2xl font-bold text-white">{translate('incomeTaxTitle')}</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Calculate your tax with updated 2025 brackets
+          {translate('incomeTaxSubtitle')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Form */}
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Calculator className="h-5 w-5 text-primary" />
-              Employee Data
+              {translate('employeeData')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Basic data */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Gross Monthly Salary
+                    {translate('grossMonthlySalary')}
                   </label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -93,40 +92,39 @@ export default function IncomeTaxPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Employee Type
+                    {translate('employeeType')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       type="button"
                       variant={
-                        formData.employeeType === 'RELACION_DEPENDENCIA' ? 'default' : 'outline'
+                        formData.employeeType === 'EMPLOYEE' ? 'default' : 'outline'
                       }
-                      onClick={() => handleInputChange('employeeType', 'RELACION_DEPENDENCIA')}
+                      onClick={() => handleInputChange('employeeType', 'EMPLOYEE')}
                       className="w-full"
                     >
-                      Employee
+                      {translate('employee')}
                     </Button>
                     <Button
                       type="button"
-                      variant={formData.employeeType === 'AUTONOMO' ? 'default' : 'outline'}
-                      onClick={() => handleInputChange('employeeType', 'AUTONOMO')}
+                      variant={formData.employeeType === 'SELF_EMPLOYED' ? 'default' : 'outline'}
+                      onClick={() => handleInputChange('employeeType', 'SELF_EMPLOYED')}
                       className="w-full"
                     >
-                      Self-Employed
+                      {translate('selfEmployed')}
                     </Button>
                   </div>
                 </div>
               </div>
 
-              {/* Family dependents */}
               <div className="space-y-4">
                 <h3 className="flex items-center gap-2 text-sm font-medium text-gray-300">
                   <Users className="h-4 w-4" />
-                  Family Dependents
+                  {translate('familyDependents')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Spouse</label>
+                    <label className="block text-xs text-gray-400 mb-1">{translate('spouse')}</label>
                     <div className="flex gap-2">
                       <Button
                         type="button"
@@ -134,7 +132,7 @@ export default function IncomeTaxPage() {
                         variant={formData.hasSpouse ? 'default' : 'outline'}
                         onClick={() => handleInputChange('hasSpouse', true)}
                       >
-                        Yes
+                        {translate('yes')}
                       </Button>
                       <Button
                         type="button"
@@ -142,34 +140,33 @@ export default function IncomeTaxPage() {
                         variant={!formData.hasSpouse ? 'default' : 'outline'}
                         onClick={() => handleInputChange('hasSpouse', false)}
                       >
-                        No
+                        {translate('no')}
                       </Button>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Number of Children</label>
+                    <label className="block text-xs text-gray-400 mb-1">{translate('numberOfChildren')}</label>
                     <Input
                       type="number"
                       min="0"
                       max="10"
-                      value={formData.numberOfChildren}
+                      value={formData.childrenCount}
                       onChange={(e) =>
-                        handleInputChange('numberOfChildren', parseInt(e.target.value) || 0)
+                        handleInputChange('childrenCount', parseInt(e.target.value) || 0)
                       }
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Optional deductions */}
               <div className="space-y-4">
                 <h3 className="flex items-center gap-2 text-sm font-medium text-gray-300">
                   <Home className="h-4 w-4" />
-                  Optional Deductions
+                  {translate('optionalDeductions')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Housing Rent</label>
+                    <label className="block text-xs text-gray-400 mb-1">{translate('housingRent')}</label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -183,7 +180,7 @@ export default function IncomeTaxPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Domestic Service</label>
+                    <label className="block text-xs text-gray-400 mb-1">{translate('domesticService')}</label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -200,14 +197,14 @@ export default function IncomeTaxPage() {
                 <div>
                   <label className="flex items-center gap-1 text-xs text-gray-400 mb-1">
                     <GraduationCap className="h-3 w-3" />
-                    Educational Expenses
+                    {translate('educationalExpenses')}
                   </label>
                   <Input
                     type="number"
                     placeholder="0"
-                    value={formData.educationalExpenses || ''}
+                    value={formData.educationExpenses ?? ''}
                     onChange={(e) =>
-                      handleInputChange('educationalExpenses', parseFloat(e.target.value) || undefined)
+                      handleInputChange('educationExpenses', parseFloat(e.target.value) || undefined)
                     }
                   />
                 </div>
@@ -221,47 +218,45 @@ export default function IncomeTaxPage() {
                 {calculateMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Calculating...
+                    {translate('calculating')}
                   </>
                 ) : (
-                  'Calculate Tax'
+                  translate('calculateTax')
                 )}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Results */}
         <div className="space-y-6">
           {result ? (
             <>
-              {/* Main summary */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Calculation Result</CardTitle>
+                  <CardTitle className="text-lg">{translate('calculationResult')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">Annual Gross Salary</p>
+                      <p className="text-xs text-gray-400">{translate('annualGrossSalary')}</p>
                       <p className="text-xl font-bold text-white">
-                        {formatCurrency(result.annualGrossSalary)}
+                        {formatCurrency(result.grossAnnualSalary)}
                       </p>
                     </div>
                     <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">Total Deductions</p>
+                      <p className="text-xs text-gray-400">{translate('totalDeductions')}</p>
                       <p className="text-xl font-bold text-green-500">
                         {formatCurrency(result.totalDeductions)}
                       </p>
                     </div>
                     <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">Taxable Net Income</p>
+                      <p className="text-xs text-gray-400">{translate('taxableNetIncome')}</p>
                       <p className="text-xl font-bold text-white">
                         {formatCurrency(result.taxableNetIncome)}
                       </p>
                     </div>
                     <div className="p-4 bg-red-900/30 rounded-lg border border-red-800">
-                      <p className="text-xs text-gray-400">Annual Tax</p>
+                      <p className="text-xs text-gray-400">{translate('annualTax')}</p>
                       <p className="text-xl font-bold text-red-500">
                         {formatCurrency(result.annualTax)}
                       </p>
@@ -271,20 +266,20 @@ export default function IncomeTaxPage() {
                   <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-xs text-gray-400">Monthly Tax</p>
+                        <p className="text-xs text-gray-400">{translate('monthlyTax')}</p>
                         <p className="text-2xl font-bold text-primary">
                           {formatCurrency(result.monthlyTax)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-400">Effective Rate</p>
+                        <p className="text-xs text-gray-400">{translate('effectiveRate')}</p>
                         <p className="text-2xl font-bold text-primary">
                           {formatPercent(result.effectiveRate)}
                         </p>
                       </div>
                     </div>
                     <div className="mt-3 pt-3 border-t border-gray-700">
-                      <p className="text-xs text-gray-400">Monthly Net Salary (after tax)</p>
+                      <p className="text-xs text-gray-400">{translate('monthlyNetSalary')}</p>
                       <p className="text-xl font-bold text-green-500">
                         {formatCurrency(result.monthlyNetSalary)}
                       </p>
@@ -293,76 +288,74 @@ export default function IncomeTaxPage() {
                 </CardContent>
               </Card>
 
-              {/* Deductions detail */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Deductions Detail</CardTitle>
+                  <CardTitle className="text-lg">{translate('deductionsDetail')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">Non-Taxable Minimum</span>
+                      <span className="text-gray-400">{translate('nonTaxableMinimum')}</span>
                       <span className="text-white">
-                        {formatCurrency(result.calculationDetail.nonTaxableMinimum)}
+                        {formatCurrency(result.calculationDetails.nonTaxableMinimum)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">Special Deduction</span>
+                      <span className="text-gray-400">{translate('specialDeduction')}</span>
                       <span className="text-white">
-                        {formatCurrency(result.calculationDetail.specialDeduction)}
+                        {formatCurrency(result.calculationDetails.specialDeduction)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">Family Dependents</span>
+                      <span className="text-gray-400">{translate('familyDependents')}</span>
                       <span className="text-white">
-                        {formatCurrency(result.calculationDetail.familyDependents)}
+                        {formatCurrency(result.calculationDetails.familyCharges)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">Personal Deductions</span>
+                      <span className="text-gray-400">{translate('personalDeductions')}</span>
                       <span className="text-white">
-                        {formatCurrency(result.calculationDetail.personalDeductions)}
+                        {formatCurrency(result.calculationDetails.personalDeductions)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 font-bold">
-                      <span className="text-white">Total Allowed Deductions</span>
+                      <span className="text-white">{translate('totalAllowedDeductions')}</span>
                       <span className="text-green-500">
-                        {formatCurrency(result.calculationDetail.totalAllowedDeductions)}
+                        {formatCurrency(result.calculationDetails.totalAllowedDeductions)}
                       </span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Brackets chart */}
               {result.bracketBreakdown && result.bracketBreakdown.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Breakdown by Bracket</CardTitle>
+                    <CardTitle className="text-lg">{translate('breakdownByBracket')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <BarChart
-                      data={result.bracketBreakdown.map((t) => ({
-                        tramo: `Bracket ${t.bracket}`,
-                        impuesto: t.bracketTax,
-                        alicuota: t.rate,
+                      data={result.bracketBreakdown.map((item) => ({
+                        tramo: `${translate('bracket')} ${item.bracket}`,
+                        impuesto: item.bracketTax,
+                        alicuota: item.rate,
                       }))}
                       xKey="tramo"
                       yKey="impuesto"
                       color="#ef4444"
                       height={200}
-                      formatY={(v) => formatCurrency(v)}
+                      formatY={(v) => formatCurrency(Number(v))}
                     />
                     <div className="mt-4 overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">Bracket</th>
-                            <th className="text-right py-2 text-gray-400">From</th>
-                            <th className="text-right py-2 text-gray-400">To</th>
-                            <th className="text-right py-2 text-gray-400">Rate</th>
-                            <th className="text-right py-2 text-gray-400">Tax Base</th>
-                            <th className="text-right py-2 text-gray-400">Tax</th>
+                            <th className="text-left py-2 text-gray-400">{translate('bracket')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('from')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('to')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('rate')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('taxBase')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('tax')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -377,7 +370,7 @@ export default function IncomeTaxPage() {
                               </td>
                               <td className="text-right py-2 text-primary">{bracket.rate}%</td>
                               <td className="text-right py-2 text-white">
-                                {formatCurrency(bracket.taxBase)}
+                                {formatCurrency(bracket.taxableBase)}
                               </td>
                               <td className="text-right py-2 text-red-500">
                                 {formatCurrency(bracket.bracketTax)}
@@ -396,7 +389,7 @@ export default function IncomeTaxPage() {
               <CardContent className="text-center">
                 <Calculator className="h-16 w-16 text-gray-700 mx-auto mb-4" />
                 <p className="text-gray-500">
-                  Complete the form to see the calculation result
+                  {translate('completeFormMessage')}
                 </p>
               </CardContent>
             </Card>

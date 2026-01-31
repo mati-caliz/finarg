@@ -48,7 +48,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <TrendingUp className="h-10 w-10 text-primary" />
@@ -137,7 +136,6 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        {/* Features preview */}
         <div className="mt-8 grid grid-cols-3 gap-4 text-center">
           <div className="p-3">
             <p className="text-2xl font-bold text-primary">7+</p>
