@@ -230,7 +230,7 @@ export default function InflationPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">{translate('cumulativeInflation')}</span>
                     <span className="text-red-500">
-                      +{formatPercent(adjustmentResult.accumulatedInflation)}
+                      +{formatPercent(adjustmentResult.cumulativeInflation ?? adjustmentResult.accumulatedInflation ?? 0)}
                     </span>
                   </div>
                   <div className="pt-3 border-t border-gray-700">

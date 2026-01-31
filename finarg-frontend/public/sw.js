@@ -72,7 +72,7 @@ const cacheStrategies = {
     }
     try {
       const response = await fetch(request);
-      if (response.ok) {
+      if (response.ok && request.method === 'GET') {
         const cache = await caches.open(STATIC_CACHE);
         cache.put(request, response.clone());
       }
@@ -86,7 +86,7 @@ const cacheStrategies = {
   networkFirst: async (request) => {
     try {
       const response = await fetch(request);
-      if (response.ok) {
+      if (response.ok && request.method === 'GET') {
         const cache = await caches.open(DYNAMIC_CACHE);
         cache.put(request, response.clone());
       }
@@ -102,12 +102,15 @@ const cacheStrategies = {
 
   // Stale while revalidate (ideal para APIs)
   staleWhileRevalidate: async (request) => {
+    if (request.method !== 'GET') {
+      return fetch(request);
+    }
     const cache = await caches.open(API_CACHE);
     const cached = await cache.match(request);
 
     const fetchPromise = fetch(request)
       .then((response) => {
-        if (response.ok) {
+        if (response.ok && request.method === 'GET') {
           cache.put(request, response.clone());
         }
         return response;
@@ -123,8 +126,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // No cachear requests de Chrome extensions
   if (url.protocol === 'chrome-extension:') {
+    return;
+  }
+
+  if (request.method !== 'GET') {
     return;
   }
 

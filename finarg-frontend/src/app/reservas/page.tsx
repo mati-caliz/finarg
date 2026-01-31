@@ -92,7 +92,7 @@ export default function ReservesPage() {
       case 'BAJANDO':
         return 'text-red-500';
       default:
-        return 'text-gray-400';
+        return 'text-muted-foreground';
     }
   };
 
@@ -100,8 +100,8 @@ export default function ReservesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">{translate('bcraReservesTitle')}</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-foreground">{translate('bcraReservesTitle')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">
             {translate('bcraReservesDesc')}
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function ReservesPage() {
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="bg-card animate-pulse">
               <CardContent className="p-6">
-                <div className="h-20 bg-gray-800 rounded" />
+                <div className="h-20 bg-muted rounded" />
               </CardContent>
             </Card>
           ))}
@@ -131,10 +131,10 @@ export default function ReservesPage() {
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">{translate('grossReserves')}</p>
+                <p className="text-xs text-muted-foreground">{translate('grossReserves')}</p>
                 <Landmark className="h-5 w-5 text-primary" />
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-foreground">
                 {currentReserves ? formatUSD(currentReserves.grossReserves) : '-'}
               </p>
               <div className="flex items-center gap-2 mt-2">
@@ -157,39 +157,39 @@ export default function ReservesPage() {
           <Card className="bg-card border-primary/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">{translate('netReservesEst')}</p>
+                <p className="text-xs text-muted-foreground">{translate('netReservesEst')}</p>
                 <Building2 className="h-5 w-5 text-green-500" />
               </div>
               <p className="text-2xl font-bold text-green-500">
                 {currentReserves ? formatUSD(currentReserves.netReserves) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">{translate('estWithoutSwaps')}</p>
+              <p className="text-xs text-muted-foreground mt-2">{translate('estWithoutSwaps')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">{translate('chinaSwap')}</p>
+                <p className="text-xs text-muted-foreground">{translate('chinaSwap')}</p>
                 <Globe className="h-5 w-5 text-red-500" />
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-foreground">
                 {currentReserves ? formatUSD(currentReserves.chinaSwap) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">{translate('subtractedFromNet')}</p>
+              <p className="text-xs text-muted-foreground mt-2">{translate('subtractedFromNet')}</p>
             </CardContent>
           </Card>
 
           <Card className="bg-card">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-gray-400">{translate('bankReserves')}</p>
+                <p className="text-xs text-muted-foreground">{translate('bankReserves')}</p>
                 <Banknote className="h-5 w-5 text-yellow-500" />
               </div>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-bold text-foreground">
                 {currentReserves ? formatUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0) : '-'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">{translate('publicUsdDeposits')}</p>
+              <p className="text-xs text-muted-foreground mt-2">{translate('publicUsdDeposits')}</p>
             </CardContent>
           </Card>
         </div>
@@ -202,7 +202,7 @@ export default function ReservesPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="relative h-8 rounded-lg overflow-hidden bg-gray-800">
+              <div className="relative h-8 rounded-lg overflow-hidden bg-muted">
                 <div
                   className="absolute h-full bg-green-500"
                   style={{
@@ -241,8 +241,8 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-green-500" />
                   <div>
-                    <p className="text-xs text-gray-400">{translate('netReservesEst')}</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-muted-foreground">{translate('netReservesEst')}</p>
+                    <p className="text-sm text-foreground">
                       {formatFullUSD(currentReserves.netReserves)}
                     </p>
                   </div>
@@ -250,8 +250,8 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-red-500" />
                   <div>
-                    <p className="text-xs text-gray-400">{translate('chinaSwap')}</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-muted-foreground">{translate('chinaSwap')}</p>
+                    <p className="text-sm text-foreground">
                       {formatFullUSD(currentReserves.chinaSwap)}
                     </p>
                   </div>
@@ -259,8 +259,8 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-yellow-500" />
                   <div>
-                    <p className="text-xs text-gray-400">{translate('bankReserves')}</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-muted-foreground">{translate('bankReserves')}</p>
+                    <p className="text-sm text-foreground">
                       {formatFullUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0)}
                     </p>
                   </div>
@@ -268,8 +268,8 @@ export default function ReservesPage() {
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-blue-500" />
                   <div>
-                    <p className="text-xs text-gray-400">{translate('govDeposits')}</p>
-                    <p className="text-sm text-white">
+                    <p className="text-xs text-muted-foreground">{translate('govDeposits')}</p>
+                    <p className="text-sm text-foreground">
                       {formatFullUSD(currentReserves.governmentDeposits)}
                     </p>
                   </div>
@@ -301,7 +301,7 @@ export default function ReservesPage() {
         <CardContent>
           {historicalLoading ? (
             <div className="h-[300px] flex items-center justify-center">
-              <RefreshCw className="h-8 w-8 animate-spin text-gray-500" />
+              <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : historicalReserves && historicalReserves.length > 0 ? (
             <AreaChart
@@ -317,7 +317,7 @@ export default function ReservesPage() {
               gradientId="reservesGradient"
             />
           ) : (
-            <div className="h-[300px] flex items-center justify-center text-gray-500">
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
               {translate('noHistoricalData')}
             </div>
           )}
@@ -330,7 +330,7 @@ export default function ReservesPage() {
             <Building2 className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="text-blue-500 font-medium mb-1">{translate('aboutNetReserves')}</p>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 {translate('netReservesInfo')}
               </p>
             </div>
