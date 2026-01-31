@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useEffect, useState } from 'react';
 import { User } from '@/types';
 import { CountryCode } from '@/config/countries';
 
@@ -36,6 +37,8 @@ interface AppState {
   setSelectedCountry: (country: CountryCode) => void;
   selectedPais: CountryCode;
   setSelectedPais: (pais: CountryCode) => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -48,10 +51,33 @@ export const useAppStore = create<AppState>()(
       setSelectedCountry: (country) => set({ selectedCountry: country, selectedPais: country }),
       selectedPais: 'ar' as CountryCode,
       setSelectedPais: (pais) => set({ selectedPais: pais, selectedCountry: pais }),
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
       name: 'app-storage',
       partialize: (state) => ({ selectedCountry: state.selectedCountry, selectedPais: state.selectedPais }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
+
+export function useHydration() {
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const unsubFinishHydration = useAppStore.persist.onFinishHydration(() => {
+      setHydrated(true);
+    });
+
+    setHydrated(useAppStore.persist.hasHydrated());
+
+    return () => {
+      unsubFinishHydration();
+    };
+  }, []);
+
+  return hydrated;
+}
