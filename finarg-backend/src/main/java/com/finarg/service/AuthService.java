@@ -4,6 +4,7 @@ import com.finarg.model.dto.AuthRequestDTO;
 import com.finarg.model.dto.AuthResponseDTO;
 import com.finarg.model.entity.User;
 import com.finarg.repository.UserRepository;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,35 +23,39 @@ public class AuthService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final GoogleIdTokenVerifierService googleIdTokenVerifier;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            @Lazy AuthenticationManager authenticationManager
+            @Lazy AuthenticationManager authenticationManager,
+            GoogleIdTokenVerifierService googleIdTokenVerifier
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        return userRepository.findByEmailIgnoreCase(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     public AuthResponseDTO register(AuthRequestDTO request) {
-        log.info("Registering new user: {}", request.getEmail());
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
+        log.info("Registering new user: {}", email);
 
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new com.finarg.exception.EmailAlreadyRegisteredException();
         }
 
         User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
+                .name(request.getName() != null ? request.getName().trim() : "")
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .emailVerified(false)
                 .emailNotifications(true)
@@ -66,13 +71,14 @@ public class AuthService implements UserDetailsService {
     }
 
     public AuthResponseDTO login(AuthRequestDTO request) {
-        log.info("User login: {}", request.getEmail());
+        String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
+        log.info("User login: {}", email);
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
         );
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String accessToken = jwtService.generateToken(user);
@@ -83,7 +89,7 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponseDTO refreshToken(String refreshToken) {
         String email = jwtService.extractUsername(refreshToken);
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!jwtService.isTokenValid(refreshToken, user)) {
@@ -93,6 +99,35 @@ public class AuthService implements UserDetailsService {
         String newAccessToken = jwtService.generateToken(user);
 
         return buildAuthResponse(user, newAccessToken, refreshToken);
+    }
+
+    public AuthResponseDTO loginWithGoogle(String idToken) {
+        GoogleIdToken.Payload payload = googleIdTokenVerifier.verify(idToken);
+        if (payload == null) {
+            throw new IllegalArgumentException("Token de Google inválido");
+        }
+        String email = payload.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("El token de Google no contiene email");
+        }
+        final String emailNormalized = email.trim().toLowerCase();
+        final String name = payload.get("name") != null ? payload.get("name").toString().trim() : emailNormalized;
+
+        User user = userRepository.findByEmailIgnoreCase(emailNormalized).orElseGet(() -> {
+            User newUser = User.builder()
+                    .name(name)
+                    .email(emailNormalized)
+                    .password(passwordEncoder.encode(java.util.UUID.randomUUID().toString()))
+                    .emailVerified(true)
+                    .emailNotifications(true)
+                    .pushNotifications(false)
+                    .build();
+            return userRepository.save(newUser);
+        });
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return buildAuthResponse(user, accessToken, refreshToken);
     }
 
     private AuthResponseDTO buildAuthResponse(User user, String accessToken, String refreshToken) {

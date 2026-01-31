@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,9 +35,13 @@ export default function RegisterPage() {
       setAuth(data.user, data.accessToken);
       router.push('/');
     },
-    onError: (error: Error & { response?: { data?: { message?: string } } }) => {
+    onError: (error: Error & { response?: { data?: { message?: string }; status?: number } }) => {
+      const msg = error.response?.data?.message;
+      const isEmailTaken = error.response?.status === 409 || msg?.toLowerCase().includes('already registered') || msg?.toLowerCase().includes('ya está registrado');
       setError(
-        error.response?.data?.message || 'Error al registrarse. Intenta nuevamente.'
+        isEmailTaken
+          ? 'Este email ya está registrado. Si tenés cuenta, iniciá sesión.'
+          : msg || 'Error al registrarse. Intentá nuevamente.'
       );
     },
   });
@@ -56,6 +61,28 @@ export default function RegisterPage() {
     }
 
     registerMutation.mutate();
+  };
+
+  const googleLoginMutation = useMutation({
+    mutationFn: async (idToken: string) => {
+      const response = await authApi.loginWithGoogle(idToken);
+      return response.data as AuthResponse;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      setAuth(data.user, data.accessToken);
+      router.push('/');
+    },
+    onError: (err: Error & { response?: { data?: { message?: string } } }) => {
+      setError(err.response?.data?.message || 'Error al registrarse con Google.');
+    },
+  });
+
+  const handleGoogleSuccess = (credential: string | undefined) => {
+    if (!credential) {return;}
+    setError(null);
+    googleLoginMutation.mutate(credential);
   };
 
   const passwordStrength = () => {
@@ -122,9 +149,16 @@ export default function RegisterPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
-                  <p className="text-sm text-red-500">{error}</p>
+                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+                    <p className="text-sm text-red-500">{error}</p>
+                  </div>
+                  {error.includes('ya está registrado') && (
+                    <Link href="/login" className="text-sm text-primary hover:underline">
+                      Ir a Iniciar sesión
+                    </Link>
+                  )}
                 </div>
               )}
 
@@ -247,6 +281,42 @@ export default function RegisterPage() {
                   'Crear Cuenta'
                 )}
               </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">o</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+                  <GoogleLogin
+                    onSuccess={(res) => handleGoogleSuccess(res?.credential)}
+                    onError={() => setError('Error al registrarse con Google.')}
+                    useOneTap={false}
+                    theme="filled_black"
+                    size="large"
+                    text="continue_with"
+                  />
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full max-w-[240px]"
+                      disabled
+                    >
+                      Continuar con Google
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Para habilitar: agregá NEXT_PUBLIC_GOOGLE_CLIENT_ID en .env.local (ver README)
+                    </p>
+                  </>
+                )}
+              </div>
             </form>
 
             <div className="mt-6 text-center">
