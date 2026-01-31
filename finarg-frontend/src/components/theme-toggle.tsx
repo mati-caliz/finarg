@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,12 @@ const labels: Record<ThemeValue, string> = {
 };
 
 export function ThemeToggle() {
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const currentTheme = (theme ?? 'system') as ThemeValue;
   const isDark = resolvedTheme === 'dark';
@@ -39,7 +45,11 @@ export function ThemeToggle() {
           className="h-9 w-9 shrink-0"
           aria-label="Cambiar tema"
         >
-          <Icon className="h-5 w-5" />
+          {mounted ? (
+            <Icon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" aria-hidden />
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
