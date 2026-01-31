@@ -33,7 +33,8 @@ export interface InflationAdjustment {
   adjustedAmount: number;
   fromDate: string;
   toDate: string;
-  accumulatedInflation: number;
+  accumulatedInflation?: number;
+  cumulativeInflation?: number;
   monthsElapsed: number;
 }
 

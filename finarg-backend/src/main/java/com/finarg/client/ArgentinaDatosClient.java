@@ -38,8 +38,8 @@ public class ArgentinaDatosClient {
                 return List.of();
             }
 
-            return responses.stream()
-                    .limit(limit)
+            int fromIndex = Math.max(0, responses.size() - limit);
+            return responses.subList(fromIndex, responses.size()).stream()
                     .map(this::mapToInflationDTO)
                     .collect(Collectors.toList());
         } catch (Exception e) {

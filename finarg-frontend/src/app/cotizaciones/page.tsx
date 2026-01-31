@@ -84,10 +84,10 @@ export default function QuotesPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             {translate('allQuotesRealTime')}
           </p>
         </div>
@@ -104,10 +104,10 @@ export default function QuotesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-2xl font-bold text-foreground">
             {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             {translate('allQuotesRealTime')} ({countryConfig.localCurrency}/USD)
           </p>
         </div>
@@ -137,8 +137,8 @@ export default function QuotesPage() {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-sm text-gray-400">{translate(quote.type as TranslationKey)}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-sm text-muted-foreground">{translate(quote.type as TranslationKey)}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
                       {translate('spread')}: {formatCurrencySimple(quote.spread, selectedCountry)}
                     </p>
                   </div>
@@ -157,19 +157,19 @@ export default function QuotesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500">{translate('buy')}</p>
-                    <p className="text-lg font-semibold text-white">
+                    <p className="text-xs text-muted-foreground">{translate('buy')}</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {formatCurrencySimple(quote.buy, selectedCountry)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">{translate('sell')}</p>
-                    <p className="text-lg font-semibold text-white">
+                    <p className="text-xs text-muted-foreground">{translate('sell')}</p>
+                    <p className="text-lg font-semibold text-foreground">
                       {formatCurrencySimple(quote.sell, selectedCountry)}
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-600 mt-3">
+                <p className="text-xs text-muted-foreground mt-3">
                   {new Date(quote.lastUpdate).toLocaleString(countryConfig.locale)}
                 </p>
               </CardContent>
@@ -221,7 +221,7 @@ export default function QuotesPage() {
               showLegend
             />
           ) : (
-            <div className="h-[300px] flex items-center justify-center text-gray-500">
+            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
               {translate('noHistoricalData')}
             </div>
           )}
@@ -249,30 +249,30 @@ export default function QuotesPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-800">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">{translate('type')}</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('buy')}</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('sell')}</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('spread')}</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('variation')}</th>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 text-muted-foreground font-medium">{translate('type')}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{translate('buy')}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{translate('sell')}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{translate('spread')}</th>
+                    <th className="text-right py-3 px-4 text-muted-foreground font-medium">{translate('variation')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {quotes?.map((quote) => (
                     <tr
                       key={quote.type}
-                      className="border-b border-gray-800/50 hover:bg-gray-800/30"
+                      className="border-b border-border/50 hover:bg-muted/50"
                     >
                       <td className="py-3 px-4">
-                        <span className="font-medium text-white">{translate(quote.type as TranslationKey)}</span>
+                        <span className="font-medium text-foreground">{translate(quote.type as TranslationKey)}</span>
                       </td>
-                      <td className="text-right py-3 px-4 text-white">
+                      <td className="text-right py-3 px-4 text-foreground">
                         {formatCurrencySimple(quote.buy, selectedCountry)}
                       </td>
-                      <td className="text-right py-3 px-4 text-white">
+                      <td className="text-right py-3 px-4 text-foreground">
                         {formatCurrencySimple(quote.sell, selectedCountry)}
                       </td>
-                      <td className="text-right py-3 px-4 text-gray-400">
+                      <td className="text-right py-3 px-4 text-muted-foreground">
                         {formatCurrencySimple(quote.spread, selectedCountry)}
                       </td>
                       <td

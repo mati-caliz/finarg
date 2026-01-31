@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
+                                "/api/v1/quotes/**",
                                 "/api/v1/ar/**",
                                 "/api/v1/br/**",
                                 "/api/v1/cl/**",
