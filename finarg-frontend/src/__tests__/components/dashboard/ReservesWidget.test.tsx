@@ -50,22 +50,12 @@ describe('ReservesWidget', () => {
     expect(container).toBeInTheDocument();
   });
 
-  it('displays china swap value', () => {
-    const reserves = mockReserves({
-      chinaSwap: 18000000000,
-    });
+  it('displays liability values', () => {
+    const reserves = mockReserves();
     render(<ReservesWidget reserves={reserves} />);
-    
-    expect(screen.getByText(/China Swap/i)).toBeInTheDocument();
-  });
 
-  it('displays bank reserves value', () => {
-    const reserves = mockReserves({
-      bankReserves: 10000000000,
-    });
-    render(<ReservesWidget reserves={reserves} />);
-    
-    expect(screen.getByText(/Bank Reserves/i)).toBeInTheDocument();
+    expect(screen.getByText(/Swap China/i)).toBeInTheDocument();
+    expect(screen.getByText(/Encajes Bancarios/i)).toBeInTheDocument();
   });
 
   it('formats large numbers correctly', () => {

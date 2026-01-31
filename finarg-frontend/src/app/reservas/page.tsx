@@ -12,21 +12,28 @@ import {
   TrendingDown,
   RefreshCw,
   Landmark,
-  Banknote,
-  Globe,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
+import { formatReservesUSD } from '@/lib/utils';
+
+const LIABILITY_COLORS = ['#ef4444', '#3b82f6', '#eab308', '#8b5cf6', '#06b6d4'];
 
 export default function ReservesPage() {
   const { translate } = useTranslation();
-  const [period, setPeriod] = useState(30);
+  const [period, setPeriod] = useState(365);
 
   const PERIODS = [
     { value: 7, label: translate('days7') },
     { value: 30, label: translate('days30') },
     { value: 90, label: translate('months3') },
     { value: 180, label: translate('months6') },
+    { value: 365, label: translate('years1') },
+    { value: 1095, label: translate('years3') },
+    { value: 1825, label: translate('years5') },
+    { value: 3650, label: translate('years10') },
+    { value: 5475, label: translate('years15') },
+    { value: 7000, label: translate('max') },
   ];
 
   const {
@@ -34,9 +41,9 @@ export default function ReservesPage() {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['reserves'],
+    queryKey: ['reserves', 'ar'],
     queryFn: async () => {
-      const response = await reservesApi.getCurrent();
+      const response = await reservesApi.getCurrent('ar');
       return response.data as Reserves;
     },
     refetchInterval: 300000,
@@ -48,22 +55,8 @@ export default function ReservesPage() {
       const response = await reservesApi.getHistory(period);
       return response.data;
     },
+    staleTime: 0,
   });
-
-  const formatUSD = (value: number) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      notation: 'compact',
-      maximumFractionDigits: 1,
-    }).format(value);
-
-  const formatFullUSD = (value: number) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(value);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -102,7 +95,7 @@ export default function ReservesPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">{translate('bcraReservesTitle')}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {translate('bcraReservesDesc')}
+            {translate('bcraReservesDesc')} · {translate('reservesInMillions')}
           </p>
         </div>
         <Button
@@ -117,7 +110,7 @@ export default function ReservesPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Card key={i} className="bg-card animate-pulse">
               <CardContent className="p-6">
@@ -127,158 +120,219 @@ export default function ReservesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="bg-card">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{translate('grossReserves')}</p>
-                <Landmark className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-2xl font-bold text-foreground">
-                {currentReserves ? formatUSD(currentReserves.grossReserves) : '-'}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                {currentReserves && getTrendIcon(currentReserves.trend)}
-                <span
-                  className={`text-sm ${
-                    currentReserves ? getTrendColor(currentReserves.trend) : ''
-                  }`}
-                >
-                  {currentReserves && currentReserves.dailyVariation !== null
-                    ? `${currentReserves.dailyVariation >= 0 ? '+' : ''}${formatUSD(
-                        currentReserves.dailyVariation
-                      )}`
-                    : '-'}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-3">
+              {translate('grossReserves')} · {translate('netReservesByMethodology')}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Card className="bg-card">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-muted-foreground">{translate('grossReserves')}</p>
+                    <Landmark className="h-5 w-5 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">
+                    {currentReserves ? formatReservesUSD(currentReserves.grossReserves) : '-'}
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    {currentReserves && getTrendIcon(currentReserves.trend)}
+                    <span
+                      className={`text-sm ${
+                        currentReserves ? getTrendColor(currentReserves.trend) : ''
+                      }`}
+                    >
+                      {currentReserves && currentReserves.dailyVariation !== null
+                        ? `${currentReserves.dailyVariation >= 0 ? '+' : ''}${currentReserves.dailyVariation.toLocaleString('es-AR', { maximumFractionDigits: 0 })} M`
+                        : '-'}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-card border-primary/30">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{translate('netReservesEst')}</p>
-                <Building2 className="h-5 w-5 text-green-500" />
-              </div>
-              <p className="text-2xl font-bold text-green-500">
-                {currentReserves ? formatUSD(currentReserves.netReserves) : '-'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">{translate('estWithoutSwaps')}</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-card border-green-500/50 ring-1 ring-green-500/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-muted-foreground">{translate('netReservesBCRA')}</p>
+                    <Building2 className="h-5 w-5 text-green-500" />
+                  </div>
+                  <p className="text-2xl font-bold text-green-500">
+                    {currentReserves &&
+                      currentReserves.netReservesBCRA !== undefined &&
+                      currentReserves.netReservesBCRA !== null
+                      ? formatReservesUSD(currentReserves.netReservesBCRA)
+                      : currentReserves
+                        ? formatReservesUSD(currentReserves.netReserves)
+                        : '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">{translate('methodologyBCRA')}</p>
+                </CardContent>
+              </Card>
 
-          <Card className="bg-card">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{translate('chinaSwap')}</p>
-                <Globe className="h-5 w-5 text-red-500" />
-              </div>
-              <p className="text-2xl font-bold text-foreground">
-                {currentReserves ? formatUSD(currentReserves.chinaSwap) : '-'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">{translate('subtractedFromNet')}</p>
-            </CardContent>
-          </Card>
+              <Card className="bg-card border-amber-500/50 ring-1 ring-amber-500/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs text-muted-foreground">{translate('netReservesFMI')}</p>
+                    <Building2 className="h-5 w-5 text-amber-500" />
+                  </div>
+                  <p
+                    className={`text-2xl font-bold ${
+                      currentReserves &&
+                        currentReserves.netReservesFMI !== undefined &&
+                        currentReserves.netReservesFMI !== null &&
+                        currentReserves.netReservesFMI < 0
+                        ? 'text-red-500'
+                        : 'text-amber-600'
+                    }`}
+                  >
+                    {currentReserves &&
+                      currentReserves.netReservesFMI !== undefined &&
+                      currentReserves.netReservesFMI !== null
+                      ? (currentReserves.netReservesFMI < 0 ? '−' : '') +
+                        formatReservesUSD(Math.abs(currentReserves.netReservesFMI))
+                      : '-'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">{translate('methodologyFMI')}</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-          <Card className="bg-card">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{translate('bankReserves')}</p>
-                <Banknote className="h-5 w-5 text-yellow-500" />
-              </div>
-              <p className="text-2xl font-bold text-foreground">
-                {currentReserves ? formatUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0) : '-'}
+          {(currentReserves?.liabilitiesBCRA?.length ?? 0) > 0 && (
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                <span className="inline-block w-1 h-4 rounded bg-green-500" />
+                {translate('liabilitiesBCRA')}
               </p>
-              <p className="text-xs text-muted-foreground mt-2">{translate('publicUsdDeposits')}</p>
-            </CardContent>
-          </Card>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-lg bg-green-500/5 border border-green-500/20">
+                {currentReserves!.liabilitiesBCRA!.map((liability) => (
+                  <div
+                    key={liability.id}
+                    className="flex flex-col gap-1 p-3 rounded-md bg-background/80 border border-border"
+                  >
+                    <p className="text-xs text-muted-foreground">{liability.name}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      −{formatReservesUSD(liability.amount)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(currentReserves?.liabilitiesFMI?.length ?? 0) > 0 && (
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                <span className="inline-block w-1 h-4 rounded bg-amber-500" />
+                {translate('liabilitiesFMI')}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-lg bg-amber-500/5 border border-amber-500/20">
+                {currentReserves!.liabilitiesFMI!.map((liability) => (
+                  <div
+                    key={liability.id}
+                    className="flex flex-col gap-1 p-3 rounded-md bg-background/80 border border-border"
+                  >
+                    <p className="text-xs text-muted-foreground">{liability.name}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      −{formatReservesUSD(liability.amount)}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {currentReserves && (
-        <Card className="bg-card">
-          <CardHeader>
-            <CardTitle className="text-lg">{translate('reservesComposition')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="relative h-8 rounded-lg overflow-hidden bg-muted">
-                <div
-                  className="absolute h-full bg-green-500"
-                  style={{
-                    width: `${
-                      (currentReserves.netReserves / currentReserves.grossReserves) * 100
-                    }%`,
-                  }}
-                />
-                <div
-                  className="absolute h-full bg-red-500"
-                  style={{
-                    left: `${
-                      (currentReserves.netReserves / currentReserves.grossReserves) * 100
-                    }%`,
-                    width: `${
-                      (currentReserves.chinaSwap / currentReserves.grossReserves) * 100
-                    }%`,
-                  }}
-                />
-                <div
-                  className="absolute h-full bg-yellow-500"
-                  style={{
-                    left: `${
-                      ((currentReserves.netReserves + currentReserves.chinaSwap) /
-                        currentReserves.grossReserves) *
-                      100
-                    }%`,
-                    width: `${
-                      (((currentReserves.bankDeposits ?? currentReserves.bankReserves) ?? 0) / currentReserves.grossReserves) * 100
-                    }%`,
-                  }}
-                />
-              </div>
+      {currentReserves &&
+        currentReserves.grossReserves > 0 &&
+        (currentReserves.liabilitiesBCRA?.length ?? 0) > 0 && (
+          <Card className="bg-card">
+            <CardHeader>
+              <CardTitle className="text-lg">{translate('reservesComposition')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="relative h-8 rounded-lg overflow-hidden bg-muted">
+                  <div
+                    className="absolute h-full bg-green-500"
+                    style={{
+                      width: `${
+                        ((currentReserves.netReservesBCRA ?? currentReserves.netReserves) /
+                          currentReserves.grossReserves) *
+                        100
+                      }%`,
+                    }}
+                  />
+                  {currentReserves.liabilitiesBCRA!.reduce<{
+                    total: number;
+                    elements: JSX.Element[];
+                  }>(
+                    (acc, liability, i) => {
+                      const net =
+                        currentReserves.netReservesBCRA ?? currentReserves.netReserves;
+                      const left =
+                        ((net + acc.total) / currentReserves.grossReserves) * 100;
+                      const width =
+                        (liability.amount / currentReserves.grossReserves) * 100;
+                      acc.elements.push(
+                        <div
+                          key={liability.id}
+                          className="absolute h-full"
+                          style={{
+                            left: `${left}%`,
+                            width: `${width}%`,
+                            backgroundColor:
+                              LIABILITY_COLORS[i % LIABILITY_COLORS.length],
+                          }}
+                        />
+                      );
+                      acc.total += liability.amount;
+                      return acc;
+                    },
+                    { total: 0, elements: [] }
+                  ).elements}
+                </div>
 
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded bg-green-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{translate('netReservesEst')}</p>
-                    <p className="text-sm text-foreground">
-                      {formatFullUSD(currentReserves.netReserves)}
-                    </p>
+                <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-green-500" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">
+                        {translate('netReservesBCRA')}
+                      </p>
+                      <p className="text-sm text-foreground">
+                        {formatReservesUSD(
+                          currentReserves.netReservesBCRA ??
+                            currentReserves.netReserves
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded bg-red-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{translate('chinaSwap')}</p>
-                    <p className="text-sm text-foreground">
-                      {formatFullUSD(currentReserves.chinaSwap)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded bg-yellow-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{translate('bankReserves')}</p>
-                    <p className="text-sm text-foreground">
-                      {formatFullUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded bg-blue-500" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">{translate('govDeposits')}</p>
-                    <p className="text-sm text-foreground">
-                      {formatFullUSD(currentReserves.governmentDeposits)}
-                    </p>
-                  </div>
+                  {currentReserves.liabilitiesBCRA!.map((liability, index) => (
+                    <div key={liability.id} className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded"
+                        style={{
+                          backgroundColor:
+                            LIABILITY_COLORS[index % LIABILITY_COLORS.length],
+                        }}
+                      />
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {liability.name}
+                        </p>
+                        <p className="text-sm text-foreground">
+                          {formatReservesUSD(liability.amount)}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )}
 
       <Card className="bg-card">
         <CardHeader>
@@ -304,18 +358,35 @@ export default function ReservesPage() {
               <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : historicalReserves && historicalReserves.length > 0 ? (
-            <AreaChart
-              data={historicalReserves.map((r: { fecha: string; reservasBrutas: number }) => ({
-                fecha: formatDate(r.fecha),
-                reservasBrutas: r.reservasBrutas,
-              }))}
-              xKey="fecha"
-              yKey="reservasBrutas"
-              color="#10b981"
-              height={300}
-              formatY={(v) => formatUSD(Number(v))}
-              gradientId="reservesGradient"
-            />
+            (() => {
+              const chartData = [...historicalReserves]
+                .reverse()
+                .map((r: { fecha: string; valor: number }) => ({
+                  fecha: formatDate(r.fecha),
+                  valor: Number(r.valor),
+                }));
+              const values = chartData.map((d) => d.valor);
+              const minVal = Math.min(...values);
+              const maxVal = Math.max(...values);
+              const padding = Math.max((maxVal - minVal) * 0.05, 500);
+              return (
+                <AreaChart
+                  data={chartData}
+                  xKey="fecha"
+                  yKey="valor"
+                  color="#10b981"
+                  height={300}
+                  formatY={(v) => `${Number(v).toLocaleString('es-AR')} M`}
+                  gradientId="reservesGradient"
+                  yDomain={[Math.floor(minVal - padding), Math.ceil(maxVal + padding)]}
+                  xAxisInterval={
+                    chartData.length > 20
+                      ? Math.max(1, Math.floor(chartData.length / 12))
+                      : 0
+                  }
+                />
+              );
+            })()
           ) : (
             <div className="h-[300px] flex items-center justify-center text-muted-foreground">
               {translate('noHistoricalData')}
@@ -332,6 +403,9 @@ export default function ReservesPage() {
               <p className="text-blue-500 font-medium mb-1">{translate('aboutNetReserves')}</p>
               <p className="text-muted-foreground">
                 {translate('netReservesInfo')}
+              </p>
+              <p className="text-muted-foreground text-xs mt-2">
+                {translate('reservesDataSource')}
               </p>
             </div>
           </div>

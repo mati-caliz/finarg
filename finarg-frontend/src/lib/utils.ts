@@ -18,6 +18,13 @@ export function formatNumber(value: number, decimals: number = 2): string {
   }).format(value);
 }
 
+export function formatReservesUSD(value: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(Math.abs(value)) + ' M USD';
+}
+
 export function getGapColor(level: string): string {
   switch (level) {
     case 'LOW':

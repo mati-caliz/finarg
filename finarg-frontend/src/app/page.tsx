@@ -21,13 +21,13 @@ export default function DashboardPage() {
   
   const { data: quotes, isLoading: loadingQuotes } = useQuotes();
   const { data: gap, isLoading: loadingGap } = useGap();
-  const { data: reserves, isLoading: loadingReserves } = useReserves();
+  const { data: reserves, isLoading: loadingReserves } = useReserves(selectedCountry);
   const { data: arbitrage } = useArbitrage();
   const { data: inflation } = useCurrentInflation();
 
   const viableOpportunities = arbitrage?.filter((a) => a.viable) || [];
 
-  if (loadingQuotes || loadingGap || loadingReserves) {
+  if (loadingQuotes || loadingGap || (selectedCountry === 'ar' && loadingReserves)) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -77,7 +77,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {countryConfig.features.gap && gap && <GapGauge gap={gap} />}
 
-        {countryConfig.features.reserves && reserves && (
+        {selectedCountry === 'ar' && reserves && (
           <ReservesWidget reserves={reserves} label={countryConfig.reservesLabel} />
         )}
 

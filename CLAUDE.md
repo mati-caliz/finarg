@@ -7,6 +7,10 @@
 - Code should be self-documenting through clear naming
 - Remove any existing comments when refactoring
 
+### Equality
+- **Always use strict equality**: `===` and `!==` never `==` or `!=`
+- To check for both null and undefined, use: `x !== undefined && x !== null`
+
 ### Language
 - Use English for all variable names, method names, and class names
 - Exception: Domain-specific terms in Spanish are acceptable for Argentine financial context (e.g., "cotizacion", "inflacion")

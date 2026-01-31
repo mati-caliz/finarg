@@ -38,13 +38,20 @@ export interface InflationAdjustment {
   monthsElapsed: number;
 }
 
+export interface ReserveLiability {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 export interface Reserves {
   grossReserves: number;
   netReserves: number;
-  chinaSwap: number;
-  bankReserves?: number;
-  bankDeposits?: number;
-  governmentDeposits: number;
+  netReservesBCRA?: number;
+  netReservesFMI?: number;
+  liabilities: ReserveLiability[];
+  liabilitiesBCRA?: ReserveLiability[];
+  liabilitiesFMI?: ReserveLiability[];
   date: string;
   dailyVariation: number;
   trend: string;
