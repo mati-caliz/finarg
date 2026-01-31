@@ -18,7 +18,7 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-full items-center justify-between px-4 lg:px-6">
-        <div className="lg:pl-64">
+        <div>
           <h1 className="text-lg font-semibold">Panel Financiero</h1>
         </div>
 

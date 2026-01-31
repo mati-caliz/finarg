@@ -30,11 +30,27 @@ export function ThemeToggle() {
   const currentTheme = (theme ?? 'system') as ThemeValue;
   const isDark = resolvedTheme === 'dark';
 
-  const Icon = currentTheme === 'system' ? Monitor : isDark ? Moon : Sun;
-
-  const handleThemeChange = (newTheme: ThemeValue) => {
-    setTheme(newTheme);
+  const getIcon = () => {
+    if (currentTheme === 'system') {return Monitor;}
+    if (isDark) {return Moon;}
+    return Sun;
   };
+
+  if (!mounted) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 shrink-0"
+        aria-label="Cambiar tema"
+        disabled
+      >
+        <Sun className="h-5 w-5" />
+      </Button>
+    );
+  }
+
+  const Icon = getIcon();
 
   return (
     <DropdownMenu>
@@ -45,11 +61,7 @@ export function ThemeToggle() {
           className="h-9 w-9 shrink-0"
           aria-label="Cambiar tema"
         >
-          {mounted ? (
-            <Icon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" aria-hidden />
-          )}
+          <Icon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -59,21 +71,21 @@ export function ThemeToggle() {
       >
         <DropdownMenuItem
           className="cursor-pointer"
-          onSelect={() => handleThemeChange('light')}
+          onSelect={() => setTheme('light')}
         >
           <Sun className="mr-2 h-4 w-4" />
           {labels.light}
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
-          onSelect={() => handleThemeChange('dark')}
+          onSelect={() => setTheme('dark')}
         >
           <Moon className="mr-2 h-4 w-4" />
           {labels.dark}
         </DropdownMenuItem>
         <DropdownMenuItem
           className="cursor-pointer"
-          onSelect={() => handleThemeChange('system')}
+          onSelect={() => setTheme('system')}
         >
           <Monitor className="mr-2 h-4 w-4" />
           {labels.system}
