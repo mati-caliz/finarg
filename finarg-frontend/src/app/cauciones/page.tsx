@@ -269,7 +269,7 @@ export default function ReposPage() {
                       yKey={['tasaTNA']}
                       colors={['#10b981']}
                       height={200}
-                      formatY={(v) => `${v.toFixed(1)}%`}
+                      formatY={(v) => `${Number(v).toFixed(1)}%`}
                     />
 
                     <div className="mt-4 overflow-x-auto">

@@ -70,7 +70,7 @@ export function BarChart({
             ? data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry[yKey] >= 0 ? positiveColor : negativeColor}
+                  fill={Number(entry[yKey]) >= 0 ? positiveColor : negativeColor}
                 />
               ))
             : data.map((_, index) => <Cell key={`cell-${index}`} fill={color} />)}

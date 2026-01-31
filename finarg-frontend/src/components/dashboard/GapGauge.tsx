@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getGapColor, getGapClass } from '@/lib/utils';
 import { Gap } from '@/types';
 
-interface GapGaugeProps {
+export interface GapGaugeProps {
   gap: Gap;
 }
 

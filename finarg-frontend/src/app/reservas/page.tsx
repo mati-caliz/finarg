@@ -45,7 +45,7 @@ export default function ReservesPage() {
   const { data: historicalReserves, isLoading: historicalLoading } = useQuery({
     queryKey: ['reserves-historical', period],
     queryFn: async () => {
-      const response = await reservesApi.getHistorical(period);
+      const response = await reservesApi.getHistory(period);
       return response.data;
     },
   });
@@ -144,9 +144,9 @@ export default function ReservesPage() {
                     currentReserves ? getTrendColor(currentReserves.trend) : ''
                   }`}
                 >
-                  {currentReserves?.dailyChange
-                    ? `${currentReserves.dailyChange >= 0 ? '+' : ''}${formatUSD(
-                        currentReserves.dailyChange
+                  {currentReserves && currentReserves.dailyVariation !== null
+                    ? `${currentReserves.dailyVariation >= 0 ? '+' : ''}${formatUSD(
+                        currentReserves.dailyVariation
                       )}`
                     : '-'}
                 </span>
@@ -187,7 +187,7 @@ export default function ReservesPage() {
                 <Banknote className="h-5 w-5 text-yellow-500" />
               </div>
               <p className="text-2xl font-bold text-white">
-                {currentReserves ? formatUSD(currentReserves.bankDeposits) : '-'}
+                {currentReserves ? formatUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0) : '-'}
               </p>
               <p className="text-xs text-gray-500 mt-2">{translate('publicUsdDeposits')}</p>
             </CardContent>
@@ -231,7 +231,7 @@ export default function ReservesPage() {
                       100
                     }%`,
                     width: `${
-                      (currentReserves.bankDeposits / currentReserves.grossReserves) * 100
+                      (((currentReserves.bankDeposits ?? currentReserves.bankReserves) ?? 0) / currentReserves.grossReserves) * 100
                     }%`,
                   }}
                 />
@@ -261,7 +261,7 @@ export default function ReservesPage() {
                   <div>
                     <p className="text-xs text-gray-400">{translate('bankReserves')}</p>
                     <p className="text-sm text-white">
-                      {formatFullUSD(currentReserves.bankDeposits)}
+                      {formatFullUSD(currentReserves.bankDeposits ?? currentReserves.bankReserves ?? 0)}
                     </p>
                   </div>
                 </div>
@@ -313,7 +313,7 @@ export default function ReservesPage() {
               yKey="reservasBrutas"
               color="#10b981"
               height={300}
-              formatY={(v) => formatUSD(v)}
+              formatY={(v) => formatUSD(Number(v))}
               gradientId="reservesGradient"
             />
           ) : (
