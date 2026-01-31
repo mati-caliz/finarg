@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Bell, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useStore';
@@ -22,17 +23,15 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div suppressHydrationWarning>
-            {mounted && <ThemeToggle />}
-          </div>
+          <ThemeToggle />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
           </Button>
 
-          {isAuthenticated ? (
+          {mounted && isAuthenticated ? (
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground hidden sm:inline">
-                {user?.nombre}
+                {user?.name}
               </span>
               <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="h-5 w-5" />
@@ -40,7 +39,7 @@ export function Navbar() {
             </div>
           ) : (
             <Button variant="outline" size="sm" asChild>
-              <a href="/login">Iniciar Sesion</a>
+              <Link href="/login">Iniciar Sesion</Link>
             </Button>
           )}
         </div>
