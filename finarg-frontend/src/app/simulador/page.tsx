@@ -102,7 +102,7 @@ export default function SimulatorPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   {translate('amountToInvest')}
                 </label>
                 <div className="relative">
@@ -123,7 +123,7 @@ export default function SimulatorPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
                   {translate('investmentType')}
                 </label>
                 <div className="space-y-2">
@@ -136,12 +136,12 @@ export default function SimulatorPage() {
                         onClick={() => handleInputChange('investmentType', type.value)}
                         className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
                           formData.investmentType === type.value
-                            ? 'border-primary bg-primary/10'
-                            : 'border-gray-700 bg-gray-800/50 hover:border-gray-600'
+                            ? 'border-primary bg-primary/10 text-foreground'
+                            : 'border-border bg-muted/50 hover:border-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-gray-600 text-foreground'
                         }`}
                       >
-                        <Icon className={`h-5 w-5 ${type.color}`} />
-                        <span className="text-sm text-white">{type.label}</span>
+                        <Icon className={`h-5 w-5 shrink-0 ${type.color}`} />
+                        <span className="text-sm font-medium">{type.label}</span>
                       </button>
                     );
                   })}
@@ -149,7 +149,7 @@ export default function SimulatorPage() {
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
                   <Calendar className="h-4 w-4" />
                   {translate('term')}
                 </label>
@@ -176,7 +176,7 @@ export default function SimulatorPage() {
                   onChange={(e) => handleInputChange('reinvest', e.target.checked)}
                   className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary"
                 />
-                <label htmlFor="reinvest" className="text-sm text-gray-300">
+                <label htmlFor="reinvest" className="text-sm text-muted-foreground">
                   {translate('reinvestInterest')}
                 </label>
               </div>
