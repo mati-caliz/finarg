@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Bell, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/useStore';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -15,6 +22,9 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div suppressHydrationWarning>
+            {mounted && <ThemeToggle />}
+          </div>
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
           </Button>
