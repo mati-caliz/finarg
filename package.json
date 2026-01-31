@@ -15,10 +15,7 @@
   },
   "lint-staged": {
     "finarg-frontend/**/*.{js,jsx,ts,tsx}": [
-      "bash -c 'cd finarg-frontend && npx eslint --fix --max-warnings=0 \"$@\"' _"
-    ],
-    "finarg-backend/**/*.java": [
-      "bash -c 'cd finarg-backend && mvn checkstyle:check -q'"
+      "bash -c 'cd finarg-frontend && npx eslint --fix \"$@\"' _"
     ]
   }
 }

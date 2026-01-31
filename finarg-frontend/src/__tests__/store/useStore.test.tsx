@@ -1,79 +1,87 @@
 import { act, renderHook } from '@testing-library/react';
-import { useStore } from '@/store/useStore';
+import { useAuthStore } from '@/store/useStore';
 
-describe('useStore', () => {
+describe('useAuthStore', () => {
   beforeEach(() => {
-    // Reset store before each test
-    const { result } = renderHook(() => useStore());
+    const { result } = renderHook(() => useAuthStore());
     act(() => {
-      result.current.setUser(null);
+      result.current.logout();
     });
   });
 
   it('initializes with default values', () => {
-    const { result } = renderHook(() => useStore());
+    const { result } = renderHook(() => useAuthStore());
     
     expect(result.current.user).toBeNull();
+    expect(result.current.accessToken).toBeNull();
+    expect(result.current.isAuthenticated).toBe(false);
   });
 
-  it('sets user correctly', () => {
-    const { result } = renderHook(() => useStore());
+  it('sets auth correctly', () => {
+    const { result } = renderHook(() => useAuthStore());
     
     const testUser = {
       id: 1,
-      nombre: 'Test User',
+      name: 'Test User',
       email: 'test@example.com',
-      emailVerificado: true,
+      emailVerified: true,
     };
+    const testToken = 'test-token-123';
 
     act(() => {
-      result.current.setUser(testUser);
+      result.current.setAuth(testUser, testToken);
     });
 
     expect(result.current.user).toEqual(testUser);
+    expect(result.current.accessToken).toBe(testToken);
+    expect(result.current.isAuthenticated).toBe(true);
   });
 
-  it('clears user correctly', () => {
-    const { result } = renderHook(() => useStore());
+  it('logs out correctly', () => {
+    const { result } = renderHook(() => useAuthStore());
     
     const testUser = {
       id: 1,
-      nombre: 'Test User',
+      name: 'Test User',
       email: 'test@example.com',
-      emailVerificado: true,
+      emailVerified: true,
     };
+    const testToken = 'test-token-123';
 
     act(() => {
-      result.current.setUser(testUser);
+      result.current.setAuth(testUser, testToken);
     });
 
-    expect(result.current.user).toEqual(testUser);
+    expect(result.current.isAuthenticated).toBe(true);
 
     act(() => {
-      result.current.setUser(null);
+      result.current.logout();
     });
 
     expect(result.current.user).toBeNull();
+    expect(result.current.accessToken).toBeNull();
+    expect(result.current.isAuthenticated).toBe(false);
   });
 
   it('persists state across multiple hook calls', () => {
-    const { result: result1 } = renderHook(() => useStore());
+    const { result: result1 } = renderHook(() => useAuthStore());
     
     const testUser = {
       id: 1,
-      nombre: 'Test User',
+      name: 'Test User',
       email: 'test@example.com',
-      emailVerificado: true,
+      emailVerified: true,
     };
+    const testToken = 'test-token-123';
 
     act(() => {
-      result1.current.setUser(testUser);
+      result1.current.setAuth(testUser, testToken);
     });
 
-    // Create a new hook instance
-    const { result: result2 } = renderHook(() => useStore());
+    const { result: result2 } = renderHook(() => useAuthStore());
     
-    // Should have the same user
     expect(result2.current.user).toEqual(testUser);
+    expect(result2.current.accessToken).toBe(testToken);
+    expect(result2.current.isAuthenticated).toBe(true);
   });
 });

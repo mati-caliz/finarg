@@ -3,7 +3,6 @@ package com.finarg.client;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.finarg.model.dto.InflationDTO;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,11 +15,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ArgentinaDatosClient {
 
-    @Qualifier("argentinaDatosWebClient")
     private final WebClient webClient;
+
+    public ArgentinaDatosClient(@Qualifier("argentinaDatosWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     public List<InflationDTO> getMonthlyInflation(int limit) {
         try {
@@ -72,21 +73,6 @@ public class ArgentinaDatosClient {
         }
     }
 
-    public BigDecimal getCountryRisk() {
-        try {
-            CountryRiskResponse response = webClient.get()
-                    .uri("/finanzas/indices/riesgo-pais/ultimo")
-                    .retrieve()
-                    .bodyToMono(CountryRiskResponse.class)
-                    .block();
-
-            return response != null ? BigDecimal.valueOf(response.getValor()) : BigDecimal.ZERO;
-        } catch (Exception e) {
-            log.error("Error fetching country risk: {}", e.getMessage());
-            return BigDecimal.ZERO;
-        }
-    }
-
     public List<TasaPlazoFijoResponse> getFixedTermRates() {
         try {
             List<TasaPlazoFijoResponse> responses = webClient.get()
@@ -99,26 +85,6 @@ public class ArgentinaDatosClient {
             return responses != null ? responses : List.of();
         } catch (Exception e) {
             log.error("Error fetching fixed term rates: {}", e.getMessage());
-            return List.of();
-        }
-    }
-
-    public List<UvaResponse> getUva(int limit) {
-        try {
-            List<UvaResponse> responses = webClient.get()
-                    .uri("/finanzas/indices/uva")
-                    .retrieve()
-                    .bodyToFlux(UvaResponse.class)
-                    .collectList()
-                    .block();
-
-            if (responses == null) {
-                return List.of();
-            }
-
-            return responses.stream().limit(limit).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Error fetching UVA: {}", e.getMessage());
             return List.of();
         }
     }
@@ -137,12 +103,6 @@ public class ArgentinaDatosClient {
     }
 
     @Data
-    public static class CountryRiskResponse {
-        private int valor;
-        private String fecha;
-    }
-
-    @Data
     public static class TasaPlazoFijoResponse {
         private String entidad;
         private String logo;
@@ -152,9 +112,4 @@ public class ArgentinaDatosClient {
         private BigDecimal tnaNoClientes;
     }
 
-    @Data
-    public static class UvaResponse {
-        private String fecha;
-        private BigDecimal valor;
-    }
 }
