@@ -1,7 +1,7 @@
-const CACHE_NAME = 'finarg-v1';
-const STATIC_CACHE = 'finarg-static-v1';
-const DYNAMIC_CACHE = 'finarg-dynamic-v1';
-const API_CACHE = 'finarg-api-v1';
+const CACHE_NAME = 'finarg-v2';
+const STATIC_CACHE = 'finarg-static-v2';
+const DYNAMIC_CACHE = 'finarg-dynamic-v2';
+const API_CACHE = 'finarg-api-v2';
 
 // Archivos estáticos para cachear
 const STATIC_ASSETS = [
@@ -140,14 +140,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets - cache first
+  // Static assets - cache first (except scripts which use network-first to avoid HMR issues)
   if (
     request.destination === 'image' ||
     request.destination === 'font' ||
-    request.destination === 'style' ||
-    request.destination === 'script'
+    request.destination === 'style'
   ) {
     event.respondWith(cacheStrategies.cacheFirst(request));
+    return;
+  }
+
+  // Scripts use network-first to avoid caching corrupted HMR modules
+  if (request.destination === 'script') {
+    event.respondWith(cacheStrategies.networkFirst(request));
     return;
   }
 
