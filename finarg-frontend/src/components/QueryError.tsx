@@ -3,6 +3,7 @@
 import { AlertCircle, RefreshCw, WifiOff, ServerCrash, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface QueryErrorProps {
   error: Error | null;
@@ -11,54 +12,78 @@ interface QueryErrorProps {
   compact?: boolean;
 }
 
+interface AxiosError extends Error {
+  response?: { status?: number };
+}
+
 export function QueryError({ error, onRetry, title, compact = false }: QueryErrorProps) {
-  // Determine error type
-  const isNetworkError = error?.message?.includes('Network') || 
-                         error?.message?.includes('fetch') ||
-                         error?.name === 'TypeError';
-  
-  const isTimeoutError = error?.message?.includes('timeout') || 
-                         error?.message?.includes('Timeout');
-  
-  const isServerError = error?.message?.includes('500') || 
-                        error?.message?.includes('502') ||
-                        error?.message?.includes('503');
+  const { translate } = useTranslation();
+
+  const status = (error as AxiosError)?.response?.status;
+  const isUnauthorized = status === 401;
+
+  const isNetworkError = !isUnauthorized && (
+    error?.message?.includes('Network') ||
+    error?.message?.includes('fetch') ||
+    error?.name === 'TypeError'
+  );
+
+  const isTimeoutError = !isUnauthorized && (
+    error?.message?.includes('timeout') ||
+    error?.message?.includes('Timeout')
+  );
+
+  const isServerError = !isUnauthorized && (
+    error?.message?.includes('500') ||
+    error?.message?.includes('502') ||
+    error?.message?.includes('503')
+  );
 
   const getErrorConfig = () => {
-    if (isNetworkError) {
+    if (isUnauthorized) {
       return {
-        icon: WifiOff,
-        title: title || 'Sin conexión',
-        message: 'No se pudo conectar con el servidor. Verificá tu conexión a internet.',
-        color: 'text-yellow-500',
-        bgColor: 'bg-yellow-500/10',
-      };
-    }
-    
-    if (isTimeoutError) {
-      return {
-        icon: Clock,
-        title: title || 'Tiempo agotado',
-        message: 'La solicitud tardó demasiado. Intentá nuevamente.',
-        color: 'text-orange-500',
-        bgColor: 'bg-orange-500/10',
-      };
-    }
-    
-    if (isServerError) {
-      return {
-        icon: ServerCrash,
-        title: title || 'Error del servidor',
-        message: 'El servidor no está disponible. Intentá más tarde.',
+        icon: AlertCircle,
+        title: title || translate('errorTitle'),
+        message: translate('errorUnauthorized'),
         color: 'text-red-500',
         bgColor: 'bg-red-500/10',
       };
     }
-    
+
+    if (isNetworkError) {
+      return {
+        icon: WifiOff,
+        title: title || translate('errorNoConnection'),
+        message: translate('errorNetwork'),
+        color: 'text-yellow-500',
+        bgColor: 'bg-yellow-500/10',
+      };
+    }
+
+    if (isTimeoutError) {
+      return {
+        icon: Clock,
+        title: title || translate('errorTimeOutTitle'),
+        message: translate('errorTimeout'),
+        color: 'text-orange-500',
+        bgColor: 'bg-orange-500/10',
+      };
+    }
+
+    if (isServerError) {
+      return {
+        icon: ServerCrash,
+        title: title || translate('errorServerTitle'),
+        message: translate('errorServer'),
+        color: 'text-red-500',
+        bgColor: 'bg-red-500/10',
+      };
+    }
+
     return {
       icon: AlertCircle,
-      title: title || 'Error',
-      message: 'Ocurrió un error inesperado. Intentá nuevamente.',
+      title: title || translate('errorTitle'),
+      message: translate('errorGeneric'),
       color: 'text-red-500',
       bgColor: 'bg-red-500/10',
     };
@@ -66,6 +91,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
 
   const config = getErrorConfig();
   const Icon = config.icon;
+
+  const devErrorMessage = isUnauthorized ? translate('errorUnauthorized') : error?.message;
 
   if (compact) {
     return (
@@ -92,17 +119,17 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">{config.title}</h3>
         <p className="text-gray-400 text-sm mb-4">{config.message}</p>
-        
+
         {process.env.NODE_ENV === 'development' && error && (
           <div className="mb-4 p-3 bg-gray-800/50 rounded-lg text-left overflow-auto max-h-24">
-            <p className="text-xs font-mono text-gray-500">{error.message}</p>
+            <p className="text-xs font-mono text-gray-500">{devErrorMessage}</p>
           </div>
         )}
-        
+
         {onRetry && (
           <Button onClick={onRetry} variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
-            Reintentar
+            {translate('retry')}
           </Button>
         )}
       </CardContent>

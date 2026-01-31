@@ -14,23 +14,29 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/useStore';
 import { getCountryConfig } from '@/config/countries';
 import { formatCurrencySimple } from '@/lib/utils';
-
-const PERIODS = [
-  { value: '7', label: '7 days' },
-  { value: '30', label: '30 days' },
-  { value: '90', label: '3 months' },
-  { value: '180', label: '6 months' },
-  { value: '365', label: '1 year' },
-];
+import { useTranslation } from '@/hooks/useTranslation';
+import { TranslationKey } from '@/i18n/translations';
 
 export default function QuotesPage() {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryConfig = getCountryConfig(selectedCountry);
+  const { translate } = useTranslation();
   
   const currencyTypes = useMemo(() => 
-    countryConfig.currencyTypes.map(t => ({ value: t.code, label: t.name })),
-    [countryConfig]
+    countryConfig.currencyTypes.map(tType => ({ 
+      value: tType.code, 
+      label: translate(tType.code as TranslationKey)
+    })),
+    [countryConfig, translate]
   );
+  
+  const periods = useMemo(() => [
+    { value: '7', label: translate('days7') },
+    { value: '30', label: translate('days30') },
+    { value: '90', label: translate('months3') },
+    { value: '180', label: translate('months6') },
+    { value: '365', label: translate('year1') },
+  ], [translate]);
   
   const [selectedType, setSelectedType] = useState(currencyTypes[0]?.value || '');
   const [period, setPeriod] = useState('30');
@@ -79,16 +85,16 @@ export default function QuotesPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            {countryConfig.flag} Quotes - {countryConfig.name}
+            {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
           </h1>
           <p className="text-gray-400 text-sm mt-1">
-            All quotes in real-time
+            {translate('allQuotesRealTime')}
           </p>
         </div>
         <QueryError
           error={error as Error}
           onRetry={() => refetch()}
-          title="Error loading quotes"
+          title={translate('errorLoadingQuotes')}
         />
       </div>
     );
@@ -99,10 +105,10 @@ export default function QuotesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            {countryConfig.flag} Quotes - {countryConfig.name}
+            {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
           </h1>
           <p className="text-gray-400 text-sm mt-1">
-            All quotes in real-time ({countryConfig.localCurrency}/USD)
+            {translate('allQuotesRealTime')} ({countryConfig.localCurrency}/USD)
           </p>
         </div>
         <Button
@@ -112,7 +118,7 @@ export default function QuotesPage() {
           className="flex items-center gap-2"
         >
           <RefreshCw className="h-4 w-4" />
-          Refresh
+          {translate('refresh')}
         </Button>
       </div>
 
@@ -131,9 +137,9 @@ export default function QuotesPage() {
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-sm text-gray-400">{quote.name}</p>
+                    <p className="text-sm text-gray-400">{translate(quote.type as TranslationKey)}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Spread: {formatCurrencySimple(quote.spread, selectedCountry)}
+                      {translate('spread')}: {formatCurrencySimple(quote.spread, selectedCountry)}
                     </p>
                   </div>
                   <div
@@ -151,13 +157,13 @@ export default function QuotesPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-xs text-gray-500">Buy</p>
+                    <p className="text-xs text-gray-500">{translate('buy')}</p>
                     <p className="text-lg font-semibold text-white">
                       {formatCurrencySimple(quote.buy, selectedCountry)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Sell</p>
+                    <p className="text-xs text-gray-500">{translate('sell')}</p>
                     <p className="text-lg font-semibold text-white">
                       {formatCurrencySimple(quote.sell, selectedCountry)}
                     </p>
@@ -176,10 +182,10 @@ export default function QuotesPage() {
         <CardHeader className="pb-2">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">
-              History - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
+              {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
             </CardTitle>
             <div className="flex flex-wrap gap-2">
-              {PERIODS.map((p) => (
+              {periods.map((p) => (
                 <Button
                   key={p.value}
                   variant={period === p.value ? 'default' : 'outline'}
@@ -216,7 +222,7 @@ export default function QuotesPage() {
             />
           ) : (
             <div className="h-[300px] flex items-center justify-center text-gray-500">
-              No historical data available
+              {translate('noHistoricalData')}
             </div>
           )}
         </CardContent>
@@ -224,7 +230,7 @@ export default function QuotesPage() {
 
       <Card className="bg-card">
         <CardHeader>
-          <CardTitle className="text-lg">Quotes Comparison</CardTitle>
+          <CardTitle className="text-lg">{translate('quotesComparison')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -244,11 +250,11 @@ export default function QuotesPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-800">
-                    <th className="text-left py-3 px-4 text-gray-400 font-medium">Type</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">Buy</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">Sell</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">Spread</th>
-                    <th className="text-right py-3 px-4 text-gray-400 font-medium">Variation</th>
+                    <th className="text-left py-3 px-4 text-gray-400 font-medium">{translate('type')}</th>
+                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('buy')}</th>
+                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('sell')}</th>
+                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('spread')}</th>
+                    <th className="text-right py-3 px-4 text-gray-400 font-medium">{translate('variation')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -258,7 +264,7 @@ export default function QuotesPage() {
                       className="border-b border-gray-800/50 hover:bg-gray-800/30"
                     >
                       <td className="py-3 px-4">
-                        <span className="font-medium text-white">{quote.name}</span>
+                        <span className="font-medium text-white">{translate(quote.type as TranslationKey)}</span>
                       </td>
                       <td className="text-right py-3 px-4 text-white">
                         {formatCurrencySimple(quote.buy, selectedCountry)}

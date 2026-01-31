@@ -18,24 +18,10 @@ import {
   Coins,
   Bitcoin,
 } from 'lucide-react';
-
-const INVESTMENT_TYPES = [
-  { value: 'PLAZO_FIJO', label: 'Fixed Term Deposit', icon: Building, color: 'text-blue-500' },
-  { value: 'PLAZO_FIJO_UVA', label: 'UVA Fixed Term', icon: TrendingUp, color: 'text-green-500' },
-  { value: 'FCI_MONEY_MARKET', label: 'Money Market Fund', icon: PiggyBank, color: 'text-purple-500' },
-  { value: 'CAUCION_BURSATIL', label: 'Stock Exchange Repo', icon: Coins, color: 'text-yellow-500' },
-  { value: 'STABLECOIN', label: 'Stablecoin DeFi', icon: Bitcoin, color: 'text-orange-500' },
-];
-
-const TERMS = [
-  { value: 30, label: '30 days' },
-  { value: 60, label: '60 days' },
-  { value: 90, label: '90 days' },
-  { value: 180, label: '180 days' },
-  { value: 365, label: '1 year' },
-];
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SimulatorPage() {
+  const { translate } = useTranslation();
   const [formData, setFormData] = useState<SimulationRequest>({
     initialAmount: 1000000,
     investmentType: 'PLAZO_FIJO',
@@ -44,6 +30,22 @@ export default function SimulatorPage() {
   });
 
   const [result, setResult] = useState<SimulationResponse | null>(null);
+
+  const INVESTMENT_TYPES = [
+    { value: 'PLAZO_FIJO', label: translate('fixedTerm'), icon: Building, color: 'text-blue-500' },
+    { value: 'PLAZO_FIJO_UVA', label: translate('fixedTermUva'), icon: TrendingUp, color: 'text-green-500' },
+    { value: 'FCI_MONEY_MARKET', label: translate('moneyMarket'), icon: PiggyBank, color: 'text-purple-500' },
+    { value: 'CAUCION_BURSATIL', label: translate('repos'), icon: Coins, color: 'text-yellow-500' },
+    { value: 'STABLECOIN', label: translate('stablecoin'), icon: Bitcoin, color: 'text-orange-500' },
+  ];
+
+  const TERMS = [
+    { value: 30, label: translate('days30') },
+    { value: 60, label: `60 ${translate('days7').replace('7 ', '')}` },
+    { value: 90, label: translate('months3') },
+    { value: 180, label: translate('months6') },
+    { value: 365, label: translate('year1') },
+  ];
 
   useQuery({
     queryKey: ['rates'],
@@ -82,29 +84,26 @@ export default function SimulatorPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Investment Simulator</h1>
+        <h1 className="text-2xl font-bold text-white">{translate('investmentSimulator')}</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Compare returns from different financial instruments
+          {translate('simulatorDesc')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Form */}
         <Card className="bg-card lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Configure Simulation
+              {translate('configureSimulation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Initial amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Amount to Invest
+                  {translate('amountToInvest')}
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -123,10 +122,9 @@ export default function SimulatorPage() {
                 </p>
               </div>
 
-              {/* Investment type */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Investment Type
+                  {translate('investmentType')}
                 </label>
                 <div className="space-y-2">
                   {INVESTMENT_TYPES.map((type) => {
@@ -150,11 +148,10 @@ export default function SimulatorPage() {
                 </div>
               </div>
 
-              {/* Term */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
                   <Calendar className="h-4 w-4" />
-                  Term
+                  {translate('term')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {TERMS.map((term) => (
@@ -171,7 +168,6 @@ export default function SimulatorPage() {
                 </div>
               </div>
 
-              {/* Reinvest */}
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -181,7 +177,7 @@ export default function SimulatorPage() {
                   className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-primary focus:ring-primary"
                 />
                 <label htmlFor="reinvest" className="text-sm text-gray-300">
-                  Reinvest interest (compound interest)
+                  {translate('reinvestInterest')}
                 </label>
               </div>
 
@@ -193,25 +189,23 @@ export default function SimulatorPage() {
                 {simulateMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Simulating...
+                    {translate('simulating')}
                   </>
                 ) : (
-                  'Simulate Investment'
+                  translate('simulateInvestment')
                 )}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Results */}
         <div className="lg:col-span-2 space-y-6">
           {result ? (
             <>
-              {/* Main KPIs */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Final Amount</p>
+                    <p className="text-xs text-gray-400">{translate('finalAmount')}</p>
                     <p className="text-xl font-bold text-white mt-1">
                       {formatCurrency(result.finalAmount)}
                     </p>
@@ -219,7 +213,7 @@ export default function SimulatorPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">ARS Profit</p>
+                    <p className="text-xs text-gray-400">{translate('arsProfit')}</p>
                     <p className="text-xl font-bold text-green-500 mt-1">
                       +{formatCurrency(result.profitARS)}
                     </p>
@@ -227,7 +221,7 @@ export default function SimulatorPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Nominal Return</p>
+                    <p className="text-xs text-gray-400">{translate('nominalReturn')}</p>
                     <p className="text-xl font-bold text-primary mt-1">
                       {formatPercent(result.nominalReturn)}
                     </p>
@@ -235,7 +229,7 @@ export default function SimulatorPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Real Return</p>
+                    <p className="text-xs text-gray-400">{translate('realReturn')}</p>
                     <p
                       className={`text-xl font-bold mt-1 ${
                         result.realReturn >= 0 ? 'text-green-500' : 'text-red-500'
@@ -248,33 +242,32 @@ export default function SimulatorPage() {
                 </Card>
               </div>
 
-              {/* Details and rates */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Simulation Details</CardTitle>
+                  <CardTitle className="text-lg">{translate('simulationDetails')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-3 bg-gray-800/50 rounded-lg">
                       <p className="text-xs text-gray-400">TNA</p>
                       <p className="text-lg font-semibold text-white">
-                        {formatPercent(result.rateTNA)}
+                        {formatPercent(result.nominalAnnualRate)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
                       <p className="text-xs text-gray-400">TEA</p>
                       <p className="text-lg font-semibold text-white">
-                        {formatPercent(result.rateTEA)}
+                        {formatPercent(result.effectiveAnnualRate)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">USD Profit (estimated)</p>
+                      <p className="text-xs text-gray-400">{translate('usdProfitEst')}</p>
                       <p className="text-lg font-semibold text-green-500">
                         {formatUSD(result.profitUSD)}
                       </p>
                     </div>
                     <div className="p-3 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">USD Return</p>
+                      <p className="text-xs text-gray-400">{translate('usdReturn')}</p>
                       <p
                         className={`text-lg font-semibold ${
                           result.dollarReturn >= 0 ? 'text-green-500' : 'text-red-500'
@@ -288,16 +281,15 @@ export default function SimulatorPage() {
                 </CardContent>
               </Card>
 
-              {/* Projection chart */}
               {result.projection && result.projection.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Capital Projection</CardTitle>
+                    <CardTitle className="text-lg">{translate('capitalProjection')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <LineChart
                       data={result.projection.map((p) => ({
-                        mes: `Month ${p.month}`,
+                        mes: `${translate('monthly').slice(0, 3)} ${p.month}`, // Hacky shortening
                         capital: p.accumulatedCapital,
                         rendimientoReal: p.realReturn,
                       }))}
@@ -305,28 +297,27 @@ export default function SimulatorPage() {
                       yKey={['capital']}
                       colors={['#10b981']}
                       height={250}
-                      formatY={(v) => `$${(v / 1000000).toFixed(2)}M`}
+                      formatY={(v) => `$${(Number(v) / 1000000).toFixed(2)}M`}
                     />
                   </CardContent>
                 </Card>
               )}
 
-              {/* Monthly projection table */}
               {result.projection && result.projection.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Monthly Projection</CardTitle>
+                    <CardTitle className="text-lg">{translate('monthlyProjection')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">Month</th>
-                            <th className="text-right py-2 text-gray-400">Capital</th>
-                            <th className="text-right py-2 text-gray-400">Interest</th>
-                            <th className="text-right py-2 text-gray-400">Est. Inflation</th>
-                            <th className="text-right py-2 text-gray-400">Real Return</th>
+                            <th className="text-left py-2 text-gray-400">{translate('monthly')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('capital')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('interest')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('estInflation')}</th>
+                            <th className="text-right py-2 text-gray-400">{translate('realReturn')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -364,10 +355,10 @@ export default function SimulatorPage() {
               <CardContent className="text-center">
                 <TrendingUp className="h-16 w-16 text-gray-700 mx-auto mb-4" />
                 <p className="text-gray-500">
-                  Configure the parameters and simulate your investment
+                  {translate('simulatorPlaceholder')}
                 </p>
                 <p className="text-gray-600 text-sm mt-2">
-                  Compare fixed terms, funds, stablecoins and more
+                  {translate('simulatorPlaceholderDesc')}
                 </p>
               </CardContent>
             </Card>

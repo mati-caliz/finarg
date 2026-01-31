@@ -122,14 +122,12 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {/* Header */}
           <div className="flex gap-4 pb-2 border-b border-gray-800">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20 ml-auto" />
             <Skeleton className="h-4 w-20" />
             <Skeleton className="h-4 w-16" />
           </div>
-          {/* Rows */}
           {Array.from({ length: rows }).map((_, i) => (
             <div key={i} className="flex gap-4 py-2">
               <Skeleton className="h-4 w-24" />
@@ -206,7 +204,6 @@ export function FormSkeleton() {
 export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
@@ -215,10 +212,8 @@ export function DashboardSkeleton() {
         <Skeleton className="h-9 w-24" />
       </div>
 
-      {/* KPIs */}
       <KpiCardsGridSkeleton count={4} />
 
-      {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ChartSkeleton height={300} />
@@ -228,7 +223,6 @@ export function DashboardSkeleton() {
         </div>
       </div>
 
-      {/* Cards grid */}
       <DolarCardsGridSkeleton count={4} />
     </div>
   );

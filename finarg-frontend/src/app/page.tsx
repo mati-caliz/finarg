@@ -12,8 +12,10 @@ import { Loader2, AlertTriangle, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useAppStore } from '@/store/useStore';
 import { getCountryConfig } from '@/config/countries';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function DashboardPage() {
+  const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryConfig = getCountryConfig(selectedCountry);
   
@@ -36,9 +38,9 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold">{translate('dashboard')}</h1>
         <p className="text-muted-foreground">
-          {countryConfig.flag} Financial market summary - {countryConfig.name}
+          {countryConfig.flag} {translate('marketSummary')} - {translate(selectedCountry)}
         </p>
       </div>
 
@@ -47,7 +49,7 @@ export default function DashboardPage() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-yellow-500">
               <AlertTriangle className="h-4 w-4" />
-              Arbitrage Opportunities Detected
+              {translate('arbitrageDetected')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -83,7 +85,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Monthly Inflation
+                {translate('monthlyInflation')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -93,7 +95,7 @@ export default function DashboardPage() {
                     {inflation?.value?.toFixed(1) || '0'}%
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Latest available month
+                    {translate('last12Months')}
                   </p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-red-500/50" />
@@ -102,7 +104,7 @@ export default function DashboardPage() {
                 href="/inflacion"
                 className="text-sm text-primary hover:underline mt-4 inline-block"
               >
-                View history and adjust values
+                {translate('viewHistory')}
               </Link>
             </CardContent>
           </Card>
@@ -111,7 +113,7 @@ export default function DashboardPage() {
 
       {quotes && quotes.length > 4 && (
         <div>
-          <h2 className="text-lg font-semibold mb-4">Other Quotes</h2>
+          <h2 className="text-lg font-semibold mb-4">{translate('otherQuotes')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {quotes.slice(4).map((quote) => (
               <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
@@ -125,9 +127,9 @@ export default function DashboardPage() {
           <Link href="/ganancias">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
-                <p className="font-medium">Income Tax Calculator</p>
+                <p className="font-medium">{translate('incomeTaxCalculator')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Calculate your income tax
+                  {translate('incomeTaxSubtitle')}
                 </p>
               </CardContent>
             </Card>
@@ -138,9 +140,9 @@ export default function DashboardPage() {
           <Link href="/simulador">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
-                <p className="font-medium">Investment Simulator</p>
+                <p className="font-medium">{translate('investmentSimulator')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Compare returns
+                  {translate('compareReturns')}
                 </p>
               </CardContent>
             </Card>
@@ -151,9 +153,9 @@ export default function DashboardPage() {
           <Link href="/inflacion">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
-                <p className="font-medium">Inflation Adjustment</p>
+                <p className="font-medium">{translate('adjustmentCalculator')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Update historical values
+                  {translate('updateValues')}
                 </p>
               </CardContent>
             </Card>
@@ -164,9 +166,9 @@ export default function DashboardPage() {
           <Link href="/cauciones">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
-                <p className="font-medium">Repo Optimizer</p>
+                <p className="font-medium">{translate('repoOptimizer')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Maximize your returns
+                  {translate('maximizeReturns')}
                 </p>
               </CardContent>
             </Card>

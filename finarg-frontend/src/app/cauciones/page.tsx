@@ -17,6 +17,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface RepoResult {
   initialAmount: number;
@@ -38,18 +39,19 @@ interface RepoResult {
   recommendations: string[];
 }
 
-const TERMS = [
-  { value: 1, label: '1 day' },
-  { value: 7, label: '7 days' },
-  { value: 14, label: '14 days' },
-  { value: 30, label: '30 days' },
-  { value: 60, label: '60 days' },
-];
-
 export default function ReposPage() {
+  const { translate } = useTranslation();
   const [amount, setAmount] = useState<number>(1000000);
   const [termDays, setTermDays] = useState<number>(7);
   const [result, setResult] = useState<RepoResult | null>(null);
+
+  const TERMS = [
+    { value: 1, label: `1 ${translate('days7').replace('7 ', '')}`.replace('s', '') }, // Hacky but simple for 'day' vs 'days'
+    { value: 7, label: translate('days7') },
+    { value: 14, label: `14 ${translate('days7').replace('7 ', '')}` },
+    { value: 30, label: translate('days30') },
+    { value: 60, label: `60 ${translate('days7').replace('7 ', '')}` },
+  ];
 
   const optimizeMutation = useMutation({
     mutationFn: async () => {
@@ -73,29 +75,26 @@ export default function ReposPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Repo Optimizer</h1>
+        <h1 className="text-2xl font-bold text-white">{translate('repoOptimizer')}</h1>
         <p className="text-gray-400 text-sm mt-1">
-          Find the best stock exchange repo strategy for your capital
+          {translate('repoDescription')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Form */}
         <Card className="bg-card lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Coins className="h-5 w-5 text-primary" />
-              Configure Repo
+              {translate('configureRepo')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Amount */}
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Amount to Invest
+                  {translate('amountToInvest')}
                 </label>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
@@ -110,11 +109,10 @@ export default function ReposPage() {
                 <p className="text-xs text-gray-500 mt-1">{formatCurrency(amount)}</p>
               </div>
 
-              {/* Term */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
                   <Calendar className="h-4 w-4" />
-                  Term
+                  {translate('term')}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {TERMS.map((term) => (
@@ -139,38 +137,33 @@ export default function ReposPage() {
                 {optimizeMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Optimizing...
+                    {translate('optimizing')}
                   </>
                 ) : (
                   <>
                     <Calculator className="mr-2 h-4 w-4" />
-                    Optimize Repo
+                    {translate('optimizeRepo')}
                   </>
                 )}
               </Button>
             </form>
 
-            {/* Info about repos */}
             <div className="mt-6 p-4 bg-gray-800/30 rounded-lg">
-              <h4 className="text-sm font-medium text-white mb-2">What is a repo?</h4>
+              <h4 className="text-sm font-medium text-white mb-2">{translate('whatIsRepo')}</h4>
               <p className="text-xs text-gray-400">
-                A stock exchange repo is a short-term loan where your money is guaranteed
-                by securities. It is a fixed income option with daily liquidity and
-                competitive rates.
+                {translate('repoInfo')}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Results */}
         <div className="lg:col-span-2 space-y-6">
           {result ? (
             <>
-              {/* Main KPIs */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Final Amount</p>
+                    <p className="text-xs text-gray-400">{translate('finalAmount')}</p>
                     <p className="text-xl font-bold text-white mt-1">
                       {formatCurrency(result.finalAmount)}
                     </p>
@@ -178,7 +171,7 @@ export default function ReposPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">Gross Profit</p>
+                    <p className="text-xs text-gray-400">{translate('grossProfit')}</p>
                     <p className="text-xl font-bold text-green-500 mt-1">
                       +{formatCurrency(result.profitARS)}
                     </p>
@@ -202,24 +195,23 @@ export default function ReposPage() {
                 </Card>
               </div>
 
-              {/* Detail */}
               <Card className="bg-card">
                 <CardHeader>
-                  <CardTitle className="text-lg">Operation Detail</CardTitle>
+                  <CardTitle className="text-lg">{translate('operationDetail')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-3">
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Initial Amount</span>
+                        <span className="text-gray-400">{translate('amountToInvest')}</span>
                         <span className="text-white">{formatCurrency(result.initialAmount)}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Term</span>
-                        <span className="text-white">{result.termDays} days</span>
+                        <span className="text-gray-400">{translate('term')}</span>
+                        <span className="text-white">{result.termDays} {translate('days7').replace('7 ', '')}</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Total Return</span>
+                        <span className="text-gray-400">{translate('grossProfit')}</span>
                         <span className="text-green-500">
                           +{formatPercent(result.totalReturn)}
                         </span>
@@ -227,19 +219,19 @@ export default function ReposPage() {
                     </div>
                     <div className="space-y-3">
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Est. Commission</span>
+                        <span className="text-gray-400">{translate('estCommission')}</span>
                         <span className="text-red-500">
                           -{formatCurrency(result.estimatedCommission)}
                         </span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">Net Return</span>
+                        <span className="text-gray-400">{translate('netReturn')}</span>
                         <span className="text-green-500">
                           {formatPercent(result.netReturn)}
                         </span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-white font-medium">Final Amount</span>
+                        <span className="text-white font-medium">{translate('finalAmount')}</span>
                         <span className="text-primary font-bold">
                           {formatCurrency(result.finalAmount)}
                         </span>
@@ -247,13 +239,12 @@ export default function ReposPage() {
                     </div>
                   </div>
 
-                  {/* Optimal strategy */}
                   {result.optimalStrategy && (
                     <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
                       <div className="flex items-start gap-3">
                         <TrendingUp className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <div>
-                          <p className="text-sm font-medium text-primary">Optimal Strategy</p>
+                          <p className="text-sm font-medium text-primary">{translate('optimalStrategy')}</p>
                           <p className="text-sm text-gray-300 mt-1">{result.optimalStrategy}</p>
                         </div>
                       </div>
@@ -262,11 +253,10 @@ export default function ReposPage() {
                 </CardContent>
               </Card>
 
-              {/* Term comparison */}
               {result.comparison && result.comparison.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg">Term Comparison</CardTitle>
+                    <CardTitle className="text-lg">{translate('termComparison')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <LineChart
@@ -286,9 +276,9 @@ export default function ReposPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">Term</th>
+                            <th className="text-left py-2 text-gray-400">{translate('term')}</th>
                             <th className="text-right py-2 text-gray-400">TNA</th>
-                            <th className="text-right py-2 text-gray-400">Final Amount</th>
+                            <th className="text-right py-2 text-gray-400">{translate('finalAmount')}</th>
                             <th className="text-right py-2 text-gray-400">Return</th>
                           </tr>
                         </thead>
@@ -301,7 +291,7 @@ export default function ReposPage() {
                               }`}
                             >
                               <td className="py-2 text-white">
-                                {comp.term} days
+                                {comp.term} {translate('days7').replace('7 ', '')}
                                 {comp.term === result.termDays && (
                                   <span className="ml-2 text-xs text-primary">(selected)</span>
                                 )}
@@ -324,13 +314,12 @@ export default function ReposPage() {
                 </Card>
               )}
 
-              {/* Recommendations */}
               {result.recommendations && result.recommendations.length > 0 && (
                 <Card className="bg-card">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
                       <CheckCircle className="h-5 w-5 text-green-500" />
-                      Recommendations
+                      {translate('recommendations')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -350,9 +339,9 @@ export default function ReposPage() {
             <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
               <CardContent className="text-center">
                 <Coins className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-                <p className="text-gray-500">Configure the parameters to optimize your repo</p>
+                <p className="text-gray-500">{translate('repoPlaceholder')}</p>
                 <p className="text-gray-600 text-sm mt-2">
-                  Compare rates and terms to maximize your return
+                  {translate('repoPlaceholderDesc')}
                 </p>
               </CardContent>
             </Card>
@@ -360,17 +349,14 @@ export default function ReposPage() {
         </div>
       </div>
 
-      {/* Disclaimer */}
       <Card className="bg-yellow-500/5 border-yellow-500/20">
         <CardContent className="p-4">
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-yellow-500 font-medium mb-1">Important information</p>
+              <p className="text-yellow-500 font-medium mb-1">{translate('importantInfo')}</p>
               <p className="text-gray-400">
-                Repo rates are indicative and may vary according to market conditions
-                and your broker. Estimated commissions are approximate and depend on the
-                intermediary. Always verify the conditions before trading.
+                {translate('repoDisclaimer')}
               </p>
             </div>
           </div>

@@ -107,7 +107,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[calc(100vh-120px)] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo/Brand */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <TrendingUp className="h-10 w-10 text-primary" />
