@@ -9,12 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AuthResponse } from '@/types';
-import { useStore } from '@/store/useStore';
+import { useAuthStore } from '@/store/useStore';
 import { Mail, Lock, User, Loader2, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const setUser = useStore((state) => state.setUser);
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -31,7 +31,7 @@ export default function RegisterPage() {
     onSuccess: (data) => {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
-      setUser(data.user);
+      setAuth(data.user, data.accessToken);
       router.push('/');
     },
     onError: (error: Error & { response?: { data?: { message?: string } } }) => {
