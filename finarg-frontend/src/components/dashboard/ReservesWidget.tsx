@@ -61,7 +61,7 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
             </div>
             <div className="flex justify-between">
               <span>Bank Reserves</span>
-              <span>-{formatNumber(reserves.bankReserves, 0)} M</span>
+              <span>-{formatNumber(reserves.bankDeposits ?? reserves.bankReserves ?? 0, 0)} M</span>
             </div>
           </div>
         </div>

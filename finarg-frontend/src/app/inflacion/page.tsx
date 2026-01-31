@@ -44,9 +44,9 @@ export default function InflationPage() {
   });
 
   useQuery({
-    queryKey: ['inflation-yearly'],
+    queryKey: ['inflation-year-over-year'],
     queryFn: async () => {
-      const response = await inflationApi.getYearly();
+      const response = await inflationApi.getYearOverYear();
       return response.data;
     },
   });
@@ -69,7 +69,7 @@ export default function InflationPage() {
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
 
-  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+  const formatPercent = (value: number | string) => `${Number(value).toFixed(2)}%`;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -88,22 +88,22 @@ export default function InflationPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-card">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-400">{translate('monthlyInflation')}</p>
-                <p className="text-2xl font-bold text-white mt-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-muted-foreground">{translate('monthlyInflation')}</p>
+                <p className="text-2xl font-bold text-foreground mt-1 min-h-[2rem] flex items-center">
                   {currentInflation ? formatPercent(currentInflation.value) : '-'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
                   {currentInflation?.date
                     ? new Date(currentInflation.date).toLocaleDateString('es-AR', {
                         month: 'long',
                         year: 'numeric',
                       })
-                    : '-'}
+                    : ''}
                 </p>
               </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
+              <div className="p-3 bg-primary/10 rounded-lg shrink-0">
                 <TrendingUp className="h-6 w-6 text-primary" />
               </div>
             </div>
@@ -112,15 +112,17 @@ export default function InflationPage() {
 
         <Card className="bg-card">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-400">{translate('yearOverYear')}</p>
-                <p className="text-2xl font-bold text-red-500 mt-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-muted-foreground">{translate('yearOverYear')}</p>
+                <p className="text-2xl font-bold text-red-500 mt-1 min-h-[2rem] flex items-center">
                   {currentInflation?.yearOverYear ? formatPercent(currentInflation.yearOverYear) : '-'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">{translate('last12Months')}</p>
+                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
+                  {translate('last12Months')}
+                </p>
               </div>
-              <div className="p-3 bg-red-500/10 rounded-lg">
+              <div className="p-3 bg-red-500/10 rounded-lg shrink-0">
                 <BarChart3 className="h-6 w-6 text-red-500" />
               </div>
             </div>
@@ -129,19 +131,19 @@ export default function InflationPage() {
 
         <Card className="bg-card">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-400">{translate('yearToDate')}</p>
-                <p className="text-2xl font-bold text-yellow-500 mt-1">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-muted-foreground">{translate('yearToDate')}</p>
+                <p className="text-2xl font-bold text-yellow-500 mt-1 min-h-[2rem] flex items-center">
                   {currentInflation?.yearToDate
                     ? formatPercent(currentInflation.yearToDate)
                     : '-'}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
                   {translate('sinceJan')} {new Date().getFullYear()}
                 </p>
               </div>
-              <div className="p-3 bg-yellow-500/10 rounded-lg">
+              <div className="p-3 bg-yellow-500/10 rounded-lg shrink-0">
                 <Calendar className="h-6 w-6 text-yellow-500" />
               </div>
             </div>
@@ -228,7 +230,7 @@ export default function InflationPage() {
                   <div className="flex justify-between">
                     <span className="text-gray-400 text-sm">{translate('cumulativeInflation')}</span>
                     <span className="text-red-500">
-                      +{formatPercent(adjustmentResult.cumulativeInflation)}
+                      +{formatPercent(adjustmentResult.accumulatedInflation)}
                     </span>
                   </div>
                   <div className="pt-3 border-t border-gray-700">
@@ -264,7 +266,7 @@ export default function InflationPage() {
                   yKey="valor"
                   color="#10b981"
                   height={250}
-                  formatY={(v) => `${v.toFixed(1)}%`}
+                  formatY={(v) => `${Number(v).toFixed(1)}%`}
                 />
               ) : (
                 <div className="h-[250px] flex items-center justify-center text-gray-500">

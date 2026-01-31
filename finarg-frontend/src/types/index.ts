@@ -41,7 +41,8 @@ export interface Reserves {
   grossReserves: number;
   netReserves: number;
   chinaSwap: number;
-  bankReserves: number;
+  bankReserves?: number;
+  bankDeposits?: number;
   governmentDeposits: number;
   date: string;
   dailyVariation: number;
