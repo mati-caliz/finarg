@@ -82,6 +82,8 @@ export const authApi = {
     api.post('/auth/login', { email, password }),
   register: (email: string, password: string, name: string) =>
     api.post('/auth/register', { email, password, name }),
+  loginWithGoogle: (idToken: string) =>
+    api.post('/auth/google', { idToken }),
   refresh: (refreshToken: string) =>
     api.post('/auth/refresh', refreshToken),
 };

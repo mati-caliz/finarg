@@ -2,6 +2,7 @@ package com.finarg.controller;
 
 import com.finarg.model.dto.AuthRequestDTO;
 import com.finarg.model.dto.AuthResponseDTO;
+import com.finarg.model.dto.GoogleAuthRequestDTO;
 import com.finarg.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,12 @@ public class AuthController {
     @Operation(summary = "Iniciar sesion")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/google")
+    @Operation(summary = "Iniciar sesion con Google")
+    public ResponseEntity<AuthResponseDTO> loginWithGoogle(@Valid @RequestBody GoogleAuthRequestDTO request) {
+        return ResponseEntity.ok(authService.loginWithGoogle(request.getIdToken()));
     }
 
     @PostMapping("/refresh")

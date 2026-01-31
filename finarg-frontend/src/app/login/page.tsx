@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { GoogleLogin } from '@react-oauth/google';
 import { authApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,28 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     loginMutation.mutate();
+  };
+
+  const googleLoginMutation = useMutation({
+    mutationFn: async (idToken: string) => {
+      const response = await authApi.loginWithGoogle(idToken);
+      return response.data as AuthResponse;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+      setAuth(data.user, data.accessToken);
+      router.push('/');
+    },
+    onError: (err: Error & { response?: { data?: { message?: string } } }) => {
+      setError(err.response?.data?.message || 'Error al iniciar sesión con Google.');
+    },
+  });
+
+  const handleGoogleSuccess = (credential: string | undefined) => {
+    if (!credential) {return;}
+    setError(null);
+    googleLoginMutation.mutate(credential);
   };
 
   return (
@@ -117,6 +140,42 @@ export default function LoginPage() {
                   'Iniciar Sesión'
                 )}
               </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">o</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+                  <GoogleLogin
+                    onSuccess={(res) => handleGoogleSuccess(res?.credential)}
+                    onError={() => setError('Error al iniciar sesión con Google.')}
+                    useOneTap={false}
+                    theme="filled_black"
+                    size="large"
+                    text="continue_with"
+                  />
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full max-w-[240px]"
+                      disabled
+                    >
+                      Continuar con Google
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Para habilitar: agregá NEXT_PUBLIC_GOOGLE_CLIENT_ID en .env.local (ver README)
+                    </p>
+                  </>
+                )}
+              </div>
             </form>
 
             <div className="mt-6 text-center">

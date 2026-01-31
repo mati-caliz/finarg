@@ -69,9 +69,11 @@ Para detener los servicios:
 docker-compose down
 ```
 
-### 4. Configurar variables de entorno (opcional)
+### 4. Configurar variables de entorno
 
-El backend puede configurarse con variables de entorno:
+**Frontend** (`finarg-frontend/.env.local`): copiá `finarg-frontend/.env.example` y completá los valores. Ver [Login con Google](#login-con-google) si querés habilitar el login con Google.
+
+**Backend**: podés exportar variables o usar `finarg-backend/.env` (si usás algo como `dotenv`). Copiá `finarg-backend/.env.example` como referencia.
 
 ```bash
 # JWT (usa un valor por defecto si no se configura)
@@ -80,6 +82,9 @@ export JWT_SECRET=tu-secret-key-super-segura
 # Email (opcional, solo si necesitas enviar emails)
 export MAIL_USERNAME=tu-email@gmail.com
 export MAIL_PASSWORD=tu-password-de-app
+
+# Google OAuth (ver sección Login con Google)
+export GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
 ```
 
 ### 5. Iniciar el Backend
@@ -158,6 +163,55 @@ finarg/
 ├── docker-compose.yml    # Servicios PostgreSQL y Redis
 └── package.json          # Scripts raíz del monorepo
 ```
+
+## Login con Google
+
+Para habilitar "Iniciar sesión con Google" en login y registro hay que crear credenciales en Google Cloud y configurar frontend y backend con el mismo **Client ID**.
+
+### 1. Crear credenciales en Google Cloud
+
+1. Entrá a [Google Cloud Console](https://console.cloud.google.com/).
+2. Creá un proyecto nuevo o elegí uno existente.
+3. En **APIs y servicios** → **Pantalla de consentimiento de OAuth**:
+   - Tipo de usuario: **Externo** (o Interno si es solo para tu organización).
+   - Completá nombre de la app, email de asistencia y dominios si los tenés.
+4. En **APIs y servicios** → **Credenciales** → **Crear credenciales** → **ID de cliente de OAuth 2.0**:
+   - Tipo de aplicación: **Aplicación web**.
+   - Nombre: por ejemplo "FinArg Web".
+   - En **Orígenes de JavaScript autorizados** agregá:
+     - `http://localhost:3000` (desarrollo)
+     - Tu dominio en producción (ej. `https://tu-dominio.com`).
+   - En **URIs de redirección autorizados** no hace falta agregar nada para el flujo con popup que usa esta app.
+5. Crear. Copiá el **ID de cliente** (termina en `.apps.googleusercontent.com`).
+
+### 2. Configurar el frontend
+
+En `finarg-frontend/.env.local` (crealo a partir de `.env.example`):
+
+```env
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
+```
+
+Sin este valor el botón "Continuar con Google" no se muestra.
+
+### 3. Configurar el backend
+
+Exportá la misma variable antes de levantar el backend, o configurala en tu entorno:
+
+```bash
+export GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
+cd finarg-backend
+mvn spring-boot:run
+```
+
+El backend usa este Client ID para verificar el token que envía el frontend al endpoint `POST /api/v1/auth/google`. Tiene que ser el **mismo** Client ID que en el frontend.
+
+### 4. Probar
+
+1. Reiniciá frontend y backend después de cambiar variables.
+2. En la app, entrá a Login o Registro.
+3. Deberías ver "o" y el botón "Continuar con Google".
+4. Al hacer clic se abre el popup de Google; al elegir una cuenta, la app inicia sesión o crea el usuario y devuelve los JWT como en el login normal.
 
 ## APIs Externas Integradas
 
