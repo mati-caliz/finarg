@@ -101,6 +101,9 @@ external:
       timeout: 10000
     datos-gob-ar:
       base-url: https://apis.datos.gob.ar/series/api
+      timeout: 60000
+    bcra:
+      base-url: https://api.bcra.gob.ar
       timeout: 15000
     colombia:
       base-url: https://www.datos.gov.co/api

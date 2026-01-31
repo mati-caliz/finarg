@@ -1,5 +1,6 @@
 package com.finarg.service;
 
+import com.finarg.client.BcraClient;
 import com.finarg.client.DatosGobArClient;
 import com.finarg.config.ReservesConfig;
 import com.finarg.model.dto.ReserveLiabilityDTO;
@@ -13,7 +14,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -21,7 +24,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservesService {
 
+    private static final BigDecimal SCALE_THRESHOLD = new BigDecimal("100000");
+
     private final DatosGobArClient datosGobArClient;
+    private final BcraClient bcraClient;
     private final ReservesConfig reservesConfig;
 
     @Cacheable(value = "reserves", key = "'current_' + #country")
@@ -31,10 +37,14 @@ public class ReservesService {
         ReservesConfig.CountryReservesConfig countryConfig = reservesConfig.getCountries()
                 .getOrDefault(country, new ReservesConfig.CountryReservesConfig());
 
-        List<ReserveLiabilityDTO> liabilitiesBCRA = mapLiabilities(
-                countryConfig.getMethodologies().getOrDefault("bcra", new ReservesConfig.MethodologyConfig()));
-        List<ReserveLiabilityDTO> liabilitiesFMI = mapLiabilities(
-                countryConfig.getMethodologies().getOrDefault("fmi", new ReservesConfig.MethodologyConfig()));
+        Map<String, BigDecimal> apiOverrides = "ar".equals(country) ? fetchApiLiabilities() : Map.of();
+
+        List<ReserveLiabilityDTO> liabilitiesBCRA = mapLiabilitiesWithOverrides(
+                countryConfig.getMethodologies().getOrDefault("bcra", new ReservesConfig.MethodologyConfig()),
+                apiOverrides);
+        List<ReserveLiabilityDTO> liabilitiesFMI = mapLiabilitiesWithOverrides(
+                countryConfig.getMethodologies().getOrDefault("fmi", new ReservesConfig.MethodologyConfig()),
+                apiOverrides);
 
         List<ReserveLiabilityDTO> allLiabilities = new ArrayList<>(liabilitiesBCRA);
         liabilitiesFMI.stream()
@@ -112,21 +122,53 @@ public class ReservesService {
                 .build();
     }
 
-    private List<ReserveLiabilityDTO> mapLiabilities(ReservesConfig.MethodologyConfig methodology) {
+    private Map<String, BigDecimal> fetchApiLiabilities() {
+        Map<String, BigDecimal> overrides = new HashMap<>();
+        BigDecimal encajes = bcraClient.getDepositosEntidadesMonedaExtranjera();
+        if (encajes != null) {
+            overrides.put("bank_deposits", encajes.setScale(0, RoundingMode.HALF_UP));
+        }
+        DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
+        if (datosGob != null) {
+            BigDecimal pasivosLetras = scaleIfNeeded(datosGob.getPasivosLetrasUsd());
+            overrides.put("leliq_pases", pasivosLetras.setScale(0, RoundingMode.HALF_UP));
+            overrides.put("gov_deposits", datosGob.getDepositosGobiernoUsd().setScale(0, RoundingMode.HALF_UP));
+        }
+        return overrides;
+    }
+
+    private static BigDecimal scaleIfNeeded(BigDecimal value) {
+        if (value == null || value.compareTo(SCALE_THRESHOLD) <= 0) {
+            return value != null ? value : BigDecimal.ZERO;
+        }
+        return value.divide(BigDecimal.valueOf(1000), 0, RoundingMode.HALF_UP);
+    }
+
+    private List<ReserveLiabilityDTO> mapLiabilitiesWithOverrides(
+            ReservesConfig.MethodologyConfig methodology,
+            Map<String, BigDecimal> overrides) {
         if (methodology == null || methodology.getLiabilities() == null) {
             return List.of();
         }
         return methodology.getLiabilities().stream()
-                .map(l -> ReserveLiabilityDTO.builder()
-                        .id(l.getId())
-                        .name(l.getName())
-                        .amount(l.getAmount() != null ? l.getAmount() : BigDecimal.ZERO)
-                        .build())
+                .map(l -> {
+                    BigDecimal amount = overrides.containsKey(l.getId())
+                            ? overrides.get(l.getId())
+                            : (l.getAmount() != null ? l.getAmount() : BigDecimal.ZERO);
+                    return ReserveLiabilityDTO.builder()
+                            .id(l.getId())
+                            .name(l.getName())
+                            .amount(amount)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
+    private static final int MAX_HISTORY_DAYS = 3650;
+
     @Cacheable(value = "reserves", key = "'history_' + #days")
     public List<DatosGobArClient.SeriesDataPoint> getHistory(int days) {
-        return datosGobArClient.getBCRAReserves(days);
+        int limit = Math.min(days, MAX_HISTORY_DAYS);
+        return datosGobArClient.getBCRAReserves(limit);
     }
 }
