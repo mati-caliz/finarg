@@ -52,6 +52,44 @@ jwt:
 app:
   google:
     client-id: ${GOOGLE_CLIENT_ID:}
+  reserves:
+    countries:
+      ar:
+        methodologies:
+          bcra:
+            liabilities:
+              - id: china_swap
+                name: Swap China
+                amount: 18291
+              - id: usa_swap
+                name: Swap EE.UU.
+                amount: 2500
+              - id: bank_deposits
+                name: Encajes Bancarios
+                amount: 10000
+              - id: other_bcra
+                name: Otros pasivos BCRA
+                amount: 6976
+          fmi:
+            liabilities:
+              - id: china_swap
+                name: Swap China
+                amount: 18291
+              - id: usa_swap
+                name: Swap EE.UU.
+                amount: 2500
+              - id: bank_deposits
+                name: Encajes Bancarios
+                amount: 10000
+              - id: gov_deposits
+                name: Depósitos del Gobierno
+                amount: 3000
+              - id: leliq_pases
+                name: LELIQs y pases (USD)
+                amount: 8000
+              - id: other_fmi
+                name: Otros pasivos metodología FMI
+                amount: 14776
 
 external:
   apis:

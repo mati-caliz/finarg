@@ -1,13 +1,16 @@
 package com.finarg;
 
+import com.finarg.config.ReservesConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableCaching
 @EnableScheduling
+@EnableConfigurationProperties(ReservesConfig.class)
 public class FinArgApplication {
 
     public static void main(String[] args) {

@@ -23,9 +23,10 @@ public class ReservesController {
     private final ReservesService reservesService;
 
     @GetMapping
-    @Operation(summary = "Get current BCRA reserves")
-    public ResponseEntity<ReservesDTO> getReserves() {
-        return ResponseEntity.ok(reservesService.getCurrentReserves());
+    @Operation(summary = "Get current reserves by country")
+    public ResponseEntity<ReservesDTO> getReserves(
+            @RequestParam(defaultValue = "ar") String country) {
+        return ResponseEntity.ok(reservesService.getCurrentReserves(country));
     }
 
     @GetMapping("/history")

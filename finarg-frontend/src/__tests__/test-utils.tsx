@@ -58,13 +58,31 @@ export const mockGap = (overrides = {}) => ({
 });
 
 export const mockReserves = (overrides = {}) => ({
-  grossReserves: 28000000000,
-  netReserves: 5000000000,
-  chinaSwap: 18000000000,
-  bankReserves: 10000000000,
-  governmentDeposits: 2000000000,
+  grossReserves: 41200,
+  netReserves: 2900,
+  netReservesBCRA: 2900,
+  netReservesFMI: -14100,
+  liabilities: [
+    { id: 'china_swap', name: 'Swap China', amount: 18291 },
+    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
+    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
+  ],
+  liabilitiesBCRA: [
+    { id: 'china_swap', name: 'Swap China', amount: 18291 },
+    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
+    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
+    { id: 'other_bcra', name: 'Otros pasivos BCRA', amount: 6976 },
+  ],
+  liabilitiesFMI: [
+    { id: 'china_swap', name: 'Swap China', amount: 18291 },
+    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
+    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
+    { id: 'gov_deposits', name: 'Depósitos del Gobierno', amount: 3000 },
+    { id: 'leliq_pases', name: 'LELIQs y pases (USD)', amount: 8000 },
+    { id: 'other_fmi', name: 'Otros pasivos metodología FMI', amount: 14776 },
+  ],
   date: new Date().toISOString(),
-  dailyVariation: 100000000,
+  dailyVariation: 100,
   trend: 'UP',
   ...overrides,
 });

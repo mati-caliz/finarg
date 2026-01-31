@@ -20,6 +20,8 @@ interface AreaChartProps {
   formatY?: (value: string | number) => string;
   showGrid?: boolean;
   gradientId?: string;
+  yDomain?: [number, number];
+  xAxisInterval?: number | 'preserveStart' | 'preserveEnd' | 'preserveStartEnd';
 }
 
 export function AreaChart({
@@ -32,6 +34,8 @@ export function AreaChart({
   formatY,
   showGrid = true,
   gradientId = 'colorValue',
+  yDomain,
+  xAxisInterval = 'preserveStartEnd',
 }: AreaChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -49,8 +53,10 @@ export function AreaChart({
           fontSize={12}
           tickFormatter={formatX}
           tick={{ fill: '#888' }}
+          interval={xAxisInterval}
         />
         <YAxis
+          domain={yDomain ?? ['auto', 'auto']}
           stroke="#888"
           fontSize={12}
           tickFormatter={formatY}

@@ -55,7 +55,7 @@ export const inflationApi = {
 };
 
 export const reservesApi = {
-  getCurrent: () => api.get('/reserves'),
+  getCurrent: (country: string = 'ar') => api.get('/reserves', { params: { country } }),
   getHistory: (days: number = 30) => api.get('/reserves/history', { params: { days } }),
 };
 

@@ -2,7 +2,7 @@
 
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatNumber } from '@/lib/utils';
+import { formatReservesUSD } from '@/lib/utils';
 import { Reserves } from '@/types';
 
 interface ReservesWidgetProps {
@@ -25,10 +25,10 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
       <CardContent>
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground">Gross</p>
+            <p className="text-xs text-muted-foreground">Gross (millones USD)</p>
             <div className="flex items-end justify-between">
               <p className="text-2xl font-bold">
-                USD {formatNumber(reserves.grossReserves, 0)} M
+                {formatReservesUSD(reserves.grossReserves)}
               </p>
               <div
                 className={`flex items-center gap-1 text-sm ${
@@ -42,33 +42,56 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
                 ) : (
                   <Minus className="h-4 w-4" />
                 )}
-                <span>{variation > 0 ? '+' : ''}{formatNumber(variation, 0)}</span>
+                <span>{variation > 0 ? '+' : ''}{variation.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border">
-            <p className="text-xs text-muted-foreground">Net (estimated)</p>
-            <p className="text-xl font-semibold text-yellow-500">
-              USD {formatNumber(reserves.netReserves, 0)} M
-            </p>
+          <div className="pt-2 border-t border-border space-y-2">
+            {reserves.netReservesBCRA !== undefined && reserves.netReservesBCRA !== null && (
+              <div>
+                <p className="text-xs text-muted-foreground">Net (BCRA)</p>
+                <p className="text-lg font-semibold text-green-500">
+                  {formatReservesUSD(reserves.netReservesBCRA)}
+                </p>
+              </div>
+            )}
+            {reserves.netReservesFMI !== undefined && reserves.netReservesFMI !== null && (
+              <div>
+                <p className="text-xs text-muted-foreground">Net (FMI)</p>
+                <p
+                  className={`text-lg font-semibold ${
+                    reserves.netReservesFMI < 0 ? 'text-red-500' : 'text-amber-600'
+                  }`}
+                >
+                  {reserves.netReservesFMI < 0 ? '−' : ''}
+                  {formatReservesUSD(Math.abs(reserves.netReservesFMI))}
+                </p>
+              </div>
+            )}
+            {(reserves.netReservesBCRA === undefined || reserves.netReservesBCRA === null) &&
+              (reserves.netReservesFMI === undefined || reserves.netReservesFMI === null) && (
+              <div>
+                <p className="text-xs text-muted-foreground">Net (estimated)</p>
+                <p className="text-lg font-semibold text-green-500">
+                  {formatReservesUSD(reserves.netReserves)}
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className="pt-2 border-t border-border text-xs text-muted-foreground">
-            <div className="flex justify-between">
-              <span>China Swap</span>
-              <span>-{formatNumber(reserves.chinaSwap, 0)} M</span>
+          {reserves.liabilities && reserves.liabilities.length > 0 && (
+            <div className="pt-2 border-t border-border text-xs text-muted-foreground space-y-1">
+              {reserves.liabilities.map((liability) => (
+                <div key={liability.id} className="flex justify-between">
+                  <span>{liability.name}</span>
+                  <span>-{formatReservesUSD(liability.amount)}</span>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between">
-              <span>Bank Reserves</span>
-              <span>-{formatNumber(reserves.bankDeposits ?? reserves.bankReserves ?? 0, 0)} M</span>
-            </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
   );
 }
-
-export { ReservesWidget as ReservasWidget };
-export type { ReservesWidgetProps as ReservasWidgetProps };
