@@ -19,13 +19,13 @@ import { TranslationKey } from '@/i18n/translations';
 
 const AR_CURRENCY_GROUPS = {
   usd: ['oficial', 'blue', 'bolsa', 'contadoconliqui', 'tarjeta', 'mayorista', 'cripto'],
-  eur: ['eur_oficial', 'eur_blue'],
-  brl: ['brl_oficial'],
-  clp: ['clp_oficial', 'clp_blue'],
-  uyu: ['uyu_oficial', 'uyu_blue'],
-  pyg: ['pyg_oficial'],
-  bob: ['bob_oficial'],
-  cny: ['cny_oficial'],
+  eur: ['eur_oficial', 'eur_blue', 'eur_tarjeta'],
+  brl: ['brl_oficial', 'brl_blue', 'brl_tarjeta'],
+  clp: ['clp_oficial', 'clp_blue', 'clp_tarjeta'],
+  uyu: ['uyu_oficial', 'uyu_blue', 'uyu_tarjeta'],
+  pyg: ['pyg_oficial', 'pyg_blue', 'pyg_tarjeta'],
+  bob: ['bob_oficial', 'bob_blue', 'bob_tarjeta'],
+  cny: ['cny_oficial', 'cny_blue', 'cny_tarjeta'],
 } as const;
 
 type BaseCurrency = keyof typeof AR_CURRENCY_GROUPS;
@@ -158,11 +158,11 @@ export default function QuotesPage() {
         { key: 'usd' as BaseCurrency, labelKey: 'currencyDollar' as TranslationKey },
         { key: 'eur' as BaseCurrency, labelKey: 'currencyEuro' as TranslationKey },
         { key: 'brl' as BaseCurrency, labelKey: 'currencyReal' as TranslationKey },
+        { key: 'cny' as BaseCurrency, labelKey: 'currencyCny' as TranslationKey },
         { key: 'clp' as BaseCurrency, labelKey: 'currencyClp' as TranslationKey },
         { key: 'uyu' as BaseCurrency, labelKey: 'currencyUyu' as TranslationKey },
         { key: 'pyg' as BaseCurrency, labelKey: 'currencyPyg' as TranslationKey },
         { key: 'bob' as BaseCurrency, labelKey: 'currencyBob' as TranslationKey },
-        { key: 'cny' as BaseCurrency, labelKey: 'currencyCny' as TranslationKey },
       ] as const)
     : null;
 

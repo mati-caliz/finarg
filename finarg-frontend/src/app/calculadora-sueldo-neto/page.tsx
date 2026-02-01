@@ -10,6 +10,7 @@ import { BarChart } from '@/components/charts';
 import { IncomeTaxRequest, IncomeTaxResponse } from '@/types';
 import { Calculator, DollarSign, Users, Home, GraduationCap, Loader2, Shield, UserX, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { TranslationKey } from '@/i18n/translations';
 
 export default function IncomeTaxPage() {
   const { translate } = useTranslation();
@@ -32,7 +33,7 @@ export default function IncomeTaxPage() {
   const [result, setResult] = useState<IncomeTaxResponse | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
-  const faqItems: { questionKey: string; answerKey: string }[] = [
+  const faqItems: { questionKey: TranslationKey; answerKey: TranslationKey }[] = [
     { questionKey: 'faqNetVsGrossQuestion', answerKey: 'faqNetVsGrossAnswer' },
     { questionKey: 'faqWhatIsIncomeTaxQuestion', answerKey: 'faqWhatIsIncomeTaxAnswer' },
     { questionKey: 'faqWhatAreDeductionsQuestion', answerKey: 'faqWhatAreDeductionsAnswer' },

@@ -64,9 +64,7 @@ public class ArgentinaQuoteClient implements QuoteClient {
             CotizacionApiResponse uyuOficial = null;
             if (cotizaciones != null) {
                 for (CotizacionApiResponse c : cotizaciones) {
-                    if ("BRL".equalsIgnoreCase(c.getMoneda())) {
-                        result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_BRL_OFICIAL, "Real"));
-                    } else if ("CLP".equalsIgnoreCase(c.getMoneda())) {
+                    if ("CLP".equalsIgnoreCase(c.getMoneda())) {
                         clpOficial = c;
                         result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_CLP_OFICIAL, "Peso Chileno"));
                     } else if ("UYU".equalsIgnoreCase(c.getMoneda())) {
@@ -82,8 +80,14 @@ public class ArgentinaQuoteClient implements QuoteClient {
             DolarApiResponse dollarOficial = dollarResponses != null
                     ? dollarResponses.stream().filter(d -> "oficial".equalsIgnoreCase(d.getCasa())).findFirst().orElse(null)
                     : null;
+            DolarApiResponse dollarTarjeta = dollarResponses != null
+                    ? dollarResponses.stream().filter(d -> "tarjeta".equalsIgnoreCase(d.getCasa())).findFirst().orElse(null)
+                    : null;
             addDerivedBlueQuotes(result, dollarBlue, dollarOficial, clpOficial, uyuOficial);
             addCrossOficialQuotes(result, dollarOficial);
+            addCrossBlueQuotes(result, dollarBlue);
+            addCrossTarjetaQuotes(result, dollarTarjeta);
+            addDerivedTarjetaQuotes(result, dollarOficial, dollarTarjeta, clpOficial, uyuOficial);
 
             ambitoClient.getEuroOficialQuote().ifPresent(result::add);
             ambitoClient.getEuroBlueQuote().ifPresent(result::add);
@@ -105,21 +109,24 @@ public class ArgentinaQuoteClient implements QuoteClient {
         if (type == CurrencyType.AR_CLP_BLUE || type == CurrencyType.AR_UYU_BLUE) {
             return computeDerivedBlueQuote(type);
         }
-        if (type == CurrencyType.AR_PYG_OFICIAL || type == CurrencyType.AR_BOB_OFICIAL
-                || type == CurrencyType.AR_CNY_OFICIAL) {
+        if (type == CurrencyType.AR_CLP_TARJETA || type == CurrencyType.AR_UYU_TARJETA) {
+            return computeDerivedTarjetaQuote(type);
+        }
+        if (type == CurrencyType.AR_BRL_OFICIAL || type == CurrencyType.AR_BRL_BLUE || type == CurrencyType.AR_BRL_TARJETA
+                || type == CurrencyType.AR_PYG_OFICIAL || type == CurrencyType.AR_PYG_BLUE || type == CurrencyType.AR_PYG_TARJETA
+                || type == CurrencyType.AR_BOB_OFICIAL || type == CurrencyType.AR_BOB_BLUE || type == CurrencyType.AR_BOB_TARJETA
+                || type == CurrencyType.AR_CNY_OFICIAL || type == CurrencyType.AR_CNY_BLUE || type == CurrencyType.AR_CNY_TARJETA
+                || type == CurrencyType.AR_EUR_TARJETA) {
             List<QuoteDTO> all = getAllQuotes();
             return all.stream().filter(q -> q.getType() == type).findFirst().orElse(null);
         }
-        if (type == CurrencyType.AR_BRL_OFICIAL || type == CurrencyType.AR_CLP_OFICIAL
-                || type == CurrencyType.AR_UYU_OFICIAL) {
+        if (type == CurrencyType.AR_CLP_OFICIAL || type == CurrencyType.AR_UYU_OFICIAL) {
             String moneda = switch (type) {
-                case AR_BRL_OFICIAL -> "brl";
                 case AR_CLP_OFICIAL -> "clp";
                 case AR_UYU_OFICIAL -> "uyu";
                 default -> "usd";
             };
             String name = switch (type) {
-                case AR_BRL_OFICIAL -> "Real";
                 case AR_CLP_OFICIAL -> "Peso Chileno";
                 case AR_UYU_OFICIAL -> "Peso Uruguayo";
                 default -> "USD";
@@ -216,6 +223,41 @@ public class ArgentinaQuoteClient implements QuoteClient {
         }
     }
 
+    private QuoteDTO computeDerivedTarjetaQuote(CurrencyType type) {
+        try {
+            List<DolarApiResponse> dollarResponses = webClient.get()
+                    .uri("/dolares")
+                    .retrieve()
+                    .bodyToFlux(DolarApiResponse.class)
+                    .collectList()
+                    .block();
+            List<CotizacionApiResponse> cotizaciones = webClient.get()
+                    .uri("/cotizaciones")
+                    .retrieve()
+                    .bodyToFlux(CotizacionApiResponse.class)
+                    .collectList()
+                    .block();
+            DolarApiResponse dollarTarjeta = dollarResponses != null
+                    ? dollarResponses.stream().filter(d -> "tarjeta".equalsIgnoreCase(d.getCasa())).findFirst().orElse(null)
+                    : null;
+            DolarApiResponse dollarOficial = dollarResponses != null
+                    ? dollarResponses.stream().filter(d -> "oficial".equalsIgnoreCase(d.getCasa())).findFirst().orElse(null)
+                    : null;
+            CotizacionApiResponse clpOficial = cotizaciones != null
+                    ? cotizaciones.stream().filter(c -> "CLP".equalsIgnoreCase(c.getMoneda())).findFirst().orElse(null)
+                    : null;
+            CotizacionApiResponse uyuOficial = cotizaciones != null
+                    ? cotizaciones.stream().filter(c -> "UYU".equalsIgnoreCase(c.getMoneda())).findFirst().orElse(null)
+                    : null;
+            java.util.List<QuoteDTO> temp = new java.util.ArrayList<>();
+            addDerivedTarjetaQuotes(temp, dollarOficial, dollarTarjeta, clpOficial, uyuOficial);
+            return temp.stream().filter(q -> q.getType() == type).findFirst().orElse(null);
+        } catch (Exception e) {
+            log.error("Error computing derived tarjeta quote {}: {}", type, e.getMessage());
+            return null;
+        }
+    }
+
     private void addCrossOficialQuotes(java.util.List<QuoteDTO> result, DolarApiResponse dollarOficial) {
         if (dollarOficial == null) {
             return;
@@ -227,41 +269,134 @@ public class ArgentinaQuoteClient implements QuoteClient {
         }
 
         exchangerateApiClient.getUsdRates().ifPresent(rates -> {
-            addCrossQuote(result, dollarOficial, rates, "PYG", CurrencyType.AR_PYG_OFICIAL, "Guaraní Paraguayo");
-            addCrossQuote(result, dollarOficial, rates, "BOB", CurrencyType.AR_BOB_OFICIAL, "Boliviano");
-            addCrossQuote(result, dollarOficial, rates, "CNY", CurrencyType.AR_CNY_OFICIAL, "Yuan");
+            addCrossQuote(result, dollarOficial, rates, "BRL", CurrencyType.AR_BRL_OFICIAL, "Real", " Oficial");
+            addCrossQuote(result, dollarOficial, rates, "PYG", CurrencyType.AR_PYG_OFICIAL, "Guaraní Paraguayo", " Oficial");
+            addCrossQuote(result, dollarOficial, rates, "BOB", CurrencyType.AR_BOB_OFICIAL, "Boliviano", " Oficial");
+            addCrossQuote(result, dollarOficial, rates, "CNY", CurrencyType.AR_CNY_OFICIAL, "Yuan", " Oficial");
         });
+    }
+
+    private void addCrossBlueQuotes(java.util.List<QuoteDTO> result, DolarApiResponse dollarBlue) {
+        if (dollarBlue == null) {
+            return;
+        }
+        exchangerateApiClient.getUsdRates().ifPresent(rates -> {
+            addCrossQuote(result, dollarBlue, rates, "BRL", CurrencyType.AR_BRL_BLUE, "Real", " Blue");
+            addCrossQuote(result, dollarBlue, rates, "PYG", CurrencyType.AR_PYG_BLUE, "Guaraní Paraguayo", " Blue");
+            addCrossQuote(result, dollarBlue, rates, "BOB", CurrencyType.AR_BOB_BLUE, "Boliviano", " Blue");
+            addCrossQuote(result, dollarBlue, rates, "CNY", CurrencyType.AR_CNY_BLUE, "Yuan", " Blue");
+        });
+    }
+
+    private void addCrossTarjetaQuotes(java.util.List<QuoteDTO> result, DolarApiResponse dollarTarjeta) {
+        if (dollarTarjeta == null) {
+            return;
+        }
+        exchangerateApiClient.getUsdRates().ifPresent(rates -> {
+            addCrossQuote(result, dollarTarjeta, rates, "EUR", CurrencyType.AR_EUR_TARJETA, "Euro", " Tarjeta");
+            addCrossQuote(result, dollarTarjeta, rates, "BRL", CurrencyType.AR_BRL_TARJETA, "Real", " Tarjeta");
+            addCrossQuote(result, dollarTarjeta, rates, "PYG", CurrencyType.AR_PYG_TARJETA, "Guaraní Paraguayo", " Tarjeta");
+            addCrossQuote(result, dollarTarjeta, rates, "BOB", CurrencyType.AR_BOB_TARJETA, "Boliviano", " Tarjeta");
+            addCrossQuote(result, dollarTarjeta, rates, "CNY", CurrencyType.AR_CNY_TARJETA, "Yuan", " Tarjeta");
+        });
+    }
+
+    private void addDerivedTarjetaQuotes(
+            java.util.List<QuoteDTO> result,
+            DolarApiResponse dollarOficial,
+            DolarApiResponse dollarTarjeta,
+            CotizacionApiResponse clpOficial,
+            CotizacionApiResponse uyuOficial) {
+        if (dollarOficial == null || dollarTarjeta == null) {
+            return;
+        }
+        BigDecimal tarjetaSell = dollarTarjeta.getVenta() != null ? dollarTarjeta.getVenta() : BigDecimal.ZERO;
+        BigDecimal tarjetaBuy = dollarTarjeta.getCompra() != null ? dollarTarjeta.getCompra() : BigDecimal.ZERO;
+        BigDecimal oficialSell = dollarOficial.getVenta() != null ? dollarOficial.getVenta() : BigDecimal.ONE;
+        BigDecimal oficialBuy = dollarOficial.getCompra() != null ? dollarOficial.getCompra() : BigDecimal.ONE;
+
+        LocalDateTime lastUpdate = LocalDateTime.now();
+        if (dollarTarjeta.getFechaActualizacion() != null) {
+            try {
+                lastUpdate = ZonedDateTime.parse(dollarTarjeta.getFechaActualizacion()).toLocalDateTime();
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (clpOficial != null) {
+            BigDecimal clpOficialSell = clpOficial.getVenta() != null ? clpOficial.getVenta() : BigDecimal.ZERO;
+            BigDecimal clpOficialBuy = clpOficial.getCompra() != null ? clpOficial.getCompra() : BigDecimal.ZERO;
+            if (clpOficialSell.compareTo(BigDecimal.ZERO) > 0 && clpOficialBuy.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal usdPerClp = oficialSell.divide(clpOficialSell, 6, RoundingMode.HALF_UP);
+                BigDecimal clpTarjetaSell = tarjetaSell.divide(usdPerClp, 4, RoundingMode.HALF_UP);
+                usdPerClp = oficialBuy.divide(clpOficialBuy, 6, RoundingMode.HALF_UP);
+                BigDecimal clpTarjetaBuy = tarjetaBuy.divide(usdPerClp, 4, RoundingMode.HALF_UP);
+                result.add(QuoteDTO.builder()
+                        .type(CurrencyType.AR_CLP_TARJETA)
+                        .country(Country.ARGENTINA)
+                        .name("Peso Chileno Tarjeta")
+                        .buy(clpTarjetaBuy)
+                        .sell(clpTarjetaSell)
+                        .spread(clpTarjetaSell.subtract(clpTarjetaBuy))
+                        .variation(BigDecimal.ZERO)
+                        .lastUpdate(lastUpdate)
+                        .build());
+            }
+        }
+
+        if (uyuOficial != null) {
+            BigDecimal uyuOficialSell = uyuOficial.getVenta() != null ? uyuOficial.getVenta() : BigDecimal.ZERO;
+            BigDecimal uyuOficialBuy = uyuOficial.getCompra() != null ? uyuOficial.getCompra() : BigDecimal.ZERO;
+            if (uyuOficialSell.compareTo(BigDecimal.ZERO) > 0 && uyuOficialBuy.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal usdPerUyu = oficialSell.divide(uyuOficialSell, 6, RoundingMode.HALF_UP);
+                BigDecimal uyuTarjetaSell = tarjetaSell.divide(usdPerUyu, 4, RoundingMode.HALF_UP);
+                usdPerUyu = oficialBuy.divide(uyuOficialBuy, 6, RoundingMode.HALF_UP);
+                BigDecimal uyuTarjetaBuy = tarjetaBuy.divide(usdPerUyu, 4, RoundingMode.HALF_UP);
+                result.add(QuoteDTO.builder()
+                        .type(CurrencyType.AR_UYU_TARJETA)
+                        .country(Country.ARGENTINA)
+                        .name("Peso Uruguayo Tarjeta")
+                        .buy(uyuTarjetaBuy)
+                        .sell(uyuTarjetaSell)
+                        .spread(uyuTarjetaSell.subtract(uyuTarjetaBuy))
+                        .variation(BigDecimal.ZERO)
+                        .lastUpdate(lastUpdate)
+                        .build());
+            }
+        }
     }
 
     private void addCrossQuote(
             java.util.List<QuoteDTO> result,
-            DolarApiResponse dollarOficial,
+            DolarApiResponse dollarResponse,
             java.util.Map<String, BigDecimal> usdRates,
             String currencyCode,
             CurrencyType type,
-            String name) {
-        BigDecimal usdPerCurrency = usdRates.get(currencyCode);
-        if (usdPerCurrency == null || usdPerCurrency.compareTo(BigDecimal.ZERO) <= 0) {
+            String name,
+            String nameSuffix) {
+        BigDecimal unitsOfXPerOneUsd = usdRates.get(currencyCode);
+        if (unitsOfXPerOneUsd == null || unitsOfXPerOneUsd.compareTo(BigDecimal.ZERO) <= 0) {
             return;
         }
-        BigDecimal oficialSell = dollarOficial.getVenta() != null ? dollarOficial.getVenta() : BigDecimal.ZERO;
-        BigDecimal oficialBuy = dollarOficial.getCompra() != null ? dollarOficial.getCompra() : BigDecimal.ZERO;
-        BigDecimal arsPerCurrencySell = oficialSell.divide(usdPerCurrency, 6, RoundingMode.HALF_UP);
-        BigDecimal arsPerCurrencyBuy = oficialBuy.divide(usdPerCurrency, 6, RoundingMode.HALF_UP);
+        BigDecimal usdPerUnitX = BigDecimal.ONE.divide(unitsOfXPerOneUsd, 10, RoundingMode.HALF_UP);
+        BigDecimal precioDolarSell = dollarResponse.getVenta() != null ? dollarResponse.getVenta() : BigDecimal.ZERO;
+        BigDecimal precioDolarBuy = dollarResponse.getCompra() != null ? dollarResponse.getCompra() : BigDecimal.ZERO;
+        BigDecimal valorArsSell = usdPerUnitX.multiply(precioDolarSell).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal valorArsBuy = usdPerUnitX.multiply(precioDolarBuy).setScale(4, RoundingMode.HALF_UP);
         LocalDateTime lastUpdate = LocalDateTime.now();
-        if (dollarOficial.getFechaActualizacion() != null) {
+        if (dollarResponse.getFechaActualizacion() != null) {
             try {
-                lastUpdate = ZonedDateTime.parse(dollarOficial.getFechaActualizacion()).toLocalDateTime();
+                lastUpdate = ZonedDateTime.parse(dollarResponse.getFechaActualizacion()).toLocalDateTime();
             } catch (Exception ignored) {
             }
         }
         result.add(QuoteDTO.builder()
                 .type(type)
                 .country(Country.ARGENTINA)
-                .name(name + " Oficial")
-                .buy(arsPerCurrencyBuy)
-                .sell(arsPerCurrencySell)
-                .spread(arsPerCurrencySell.subtract(arsPerCurrencyBuy))
+                .name(name + nameSuffix)
+                .buy(valorArsBuy)
+                .sell(valorArsSell)
+                .spread(valorArsSell.subtract(valorArsBuy))
                 .variation(BigDecimal.ZERO)
                 .lastUpdate(lastUpdate)
                 .build());
