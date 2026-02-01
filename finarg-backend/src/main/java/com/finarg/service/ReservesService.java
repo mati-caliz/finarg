@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservesService {
 
-    // TODO: implementar una forma de obtener solo los datos hardcodeados de reservas netas (sin overrides de APIs externas)
-
     private final DatosGobArClient datosGobArClient;
     private final BcraClient bcraClient;
     private final ReservesConfig reservesConfig;

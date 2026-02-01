@@ -13,14 +13,13 @@ import {
   PiggyBank,
   Menu,
   X,
-  ChevronDown,
   BarChart2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useStore';
 import { Button } from '@/components/ui/button';
-import { COUNTRIES_LIST, getCountryConfig, CountryCode } from '@/config/countries';
-import { useState, useRef, useEffect } from 'react';
+import { getCountryConfig } from '@/config/countries';
+import { useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TranslationKey } from '@/i18n/translations';
 
@@ -37,56 +36,23 @@ const baseNavigation = [
 ];
 
 function CountrySelector() {
-  const { selectedCountry, setSelectedCountry } = useAppStore();
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const countryConfig = getCountryConfig(selectedCountry);
+  const { setSelectedCountry } = useAppStore();
+  const countryConfig = getCountryConfig('ar');
   const { translate } = useTranslation();
 
   useEffect(() => {
-    if (!isOpen) {return;}
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
+    setSelectedCountry('ar');
+  }, [setSelectedCountry]);
 
   return (
-    <div className="relative" ref={containerRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-lg">{countryConfig.flag}</span>
-          <span>{translate(countryConfig.code as TranslationKey)}</span>
-        </span>
-        <ChevronDown className={cn("h-4 w-4 transition-transform", isOpen && "rotate-180")} />
-      </button>
-      
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-lg z-50">
-          {COUNTRIES_LIST.map((country) => (
-            <button
-              key={country.code}
-              onClick={() => {
-                setSelectedCountry(country.code as CountryCode);
-                setIsOpen(false);
-              }}
-              className={cn(
-                "flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-muted transition-colors first:rounded-t-lg last:rounded-b-lg",
-                selectedCountry === country.code && "bg-primary/10 text-primary"
-              )}
-            >
-              <span className="text-lg">{country.flag}</span>
-              <span>{translate(country.code as TranslationKey)}</span>
-            </button>
-          ))}
-        </div>
-      )}
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-muted">
+        <span className="text-lg">{countryConfig.flag}</span>
+        <span>{translate(countryConfig.code as TranslationKey)}</span>
+      </div>
+      <p className="text-xs text-muted-foreground px-1">
+        {translate('otherCountriesComingSoon')}
+      </p>
     </div>
   );
 }

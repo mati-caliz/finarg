@@ -1,5 +1,6 @@
 package com.finarg.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -12,6 +13,16 @@ public enum CurrencyType {
     AR_CARD("tarjeta", "Card", Country.ARGENTINA),
     AR_WHOLESALE("mayorista", "Wholesale", Country.ARGENTINA),
     AR_CRYPTO("cripto", "Crypto", Country.ARGENTINA),
+    AR_EUR_OFICIAL("eur_oficial", "Euro Oficial", Country.ARGENTINA),
+    AR_EUR_BLUE("eur_blue", "Euro Blue", Country.ARGENTINA),
+    AR_BRL_OFICIAL("brl_oficial", "Real Oficial", Country.ARGENTINA),
+    AR_CLP_OFICIAL("clp_oficial", "Peso Chileno Oficial", Country.ARGENTINA),
+    AR_CLP_BLUE("clp_blue", "Peso Chileno Blue", Country.ARGENTINA),
+    AR_UYU_OFICIAL("uyu_oficial", "Peso Uruguayo Oficial", Country.ARGENTINA),
+    AR_UYU_BLUE("uyu_blue", "Peso Uruguayo Blue", Country.ARGENTINA),
+    AR_PYG_OFICIAL("pyg_oficial", "Guaraní Paraguayo Oficial", Country.ARGENTINA),
+    AR_BOB_OFICIAL("bob_oficial", "Boliviano Oficial", Country.ARGENTINA),
+    AR_CNY_OFICIAL("cny_oficial", "Yuan Oficial", Country.ARGENTINA),
 
     // Colombia
     CO_TRM("trm", "TRM (Representative Rate)", Country.COLOMBIA),
@@ -34,6 +45,7 @@ public enum CurrencyType {
     UY_BILL("billete", "Bill", Country.URUGUAY),
     UY_EBROU("ebrou", "eBROU", Country.URUGUAY);
 
+    @JsonValue
     private final String code;
     private final String name;
     private final Country country;

@@ -58,7 +58,6 @@ public class RatesService {
                 .toList();
     }
 
-    // TODO: Integrar más billeteras virtuales desde la API (explorar otros endpoints de api.argentinadatos.com)
     @Cacheable(value = "rates", key = "'wallets_' + #country + '_v5'")
     public List<RateDTO> getWalletRates(Country country) {
         if (country != Country.ARGENTINA) {

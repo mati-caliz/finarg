@@ -17,19 +17,48 @@ import { formatCurrencySimple } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TranslationKey } from '@/i18n/translations';
 
+const AR_CURRENCY_GROUPS = {
+  usd: ['oficial', 'blue', 'bolsa', 'contadoconliqui', 'tarjeta', 'mayorista', 'cripto'],
+  eur: ['eur_oficial', 'eur_blue'],
+  brl: ['brl_oficial'],
+  clp: ['clp_oficial', 'clp_blue'],
+  uyu: ['uyu_oficial', 'uyu_blue'],
+  pyg: ['pyg_oficial'],
+  bob: ['bob_oficial'],
+  cny: ['cny_oficial'],
+} as const;
+
+type BaseCurrency = keyof typeof AR_CURRENCY_GROUPS;
+
 export default function QuotesPage() {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
-  
-  const currencyTypes = useMemo(() => 
-    countryConfig.currencyTypes.map(tType => ({ 
-      value: tType.code, 
-      label: translate(tType.code as TranslationKey)
-    })),
-    [countryConfig, translate]
-  );
-  
+  const hasCurrencyGroups = selectedCountry === 'ar';
+
+  const [selectedBaseCurrency, setSelectedBaseCurrency] = useState<BaseCurrency>('usd');
+
+  const currencyTypes = useMemo(() => {
+    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
+    const types = hasCurrencyGroups
+      ? countryConfig.currencyTypes.filter((t) => allowed.includes(t.code))
+      : countryConfig.currencyTypes;
+    return types.map((tType) => ({
+      value: tType.code,
+      label: translate(tType.code as TranslationKey),
+    }));
+  }, [countryConfig, selectedBaseCurrency, hasCurrencyGroups, translate]);
+
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [period, setPeriod] = useState('30');
+
+  useEffect(() => {
+    const first = currencyTypes[0]?.value;
+    if (first) {
+      setSelectedType((prev) => (prev && currencyTypes.some((t) => t.value === prev) ? prev : first));
+    }
+  }, [currencyTypes]);
+
   const periods = useMemo(() => [
     { value: '7', label: translate('days7') },
     { value: '30', label: translate('days30') },
@@ -42,9 +71,6 @@ export default function QuotesPage() {
     { value: '3650', label: translate('year10') },
     { value: '5500', label: translate('max') },
   ], [translate]);
-  
-  const [selectedType, setSelectedType] = useState(currencyTypes[0]?.value || '');
-  const [period, setPeriod] = useState('30');
 
   const QUOTES_REFETCH_MS = 180000;
 
@@ -63,6 +89,14 @@ export default function QuotesPage() {
     },
     refetchInterval: QUOTES_REFETCH_MS,
   });
+
+  const filteredQuotes = useMemo(() => {
+    if (!quotes) {return undefined;}
+    if (!hasCurrencyGroups) {return quotes;}
+    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
+    const typeSet = new Set(allowed);
+    return quotes.filter((q) => typeSet.has(q.type));
+  }, [quotes, hasCurrencyGroups, selectedBaseCurrency]);
 
   const [, setTick] = useState(0);
   useEffect(() => {
@@ -83,6 +117,7 @@ export default function QuotesPage() {
   } = useQuery({
     queryKey: ['history', selectedCountry, selectedType, period],
     queryFn: async () => {
+      if (!selectedType) {return [];}
       const to = new Date().toISOString().split('T')[0];
       const from = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000)
         .toISOString()
@@ -118,6 +153,19 @@ export default function QuotesPage() {
     );
   }
 
+  const baseCurrencyButtons = hasCurrencyGroups
+    ? ([
+        { key: 'usd' as BaseCurrency, labelKey: 'currencyDollar' as TranslationKey },
+        { key: 'eur' as BaseCurrency, labelKey: 'currencyEuro' as TranslationKey },
+        { key: 'brl' as BaseCurrency, labelKey: 'currencyReal' as TranslationKey },
+        { key: 'clp' as BaseCurrency, labelKey: 'currencyClp' as TranslationKey },
+        { key: 'uyu' as BaseCurrency, labelKey: 'currencyUyu' as TranslationKey },
+        { key: 'pyg' as BaseCurrency, labelKey: 'currencyPyg' as TranslationKey },
+        { key: 'bob' as BaseCurrency, labelKey: 'currencyBob' as TranslationKey },
+        { key: 'cny' as BaseCurrency, labelKey: 'currencyCny' as TranslationKey },
+      ] as const)
+    : null;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -126,7 +174,7 @@ export default function QuotesPage() {
             {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {translate('allQuotesRealTime')} ({countryConfig.localCurrency}/USD)
+            {translate('allQuotesRealTime')}
           </p>
           <p className="text-muted-foreground text-xs mt-1">
             {translate('quotesUpdateNote')}
@@ -149,13 +197,27 @@ export default function QuotesPage() {
             </div>
           )}
         </div>
+        {baseCurrencyButtons && (
+          <div className="flex gap-2 shrink-0">
+            {baseCurrencyButtons.map(({ key, labelKey }) => (
+              <Button
+                key={key}
+                variant={selectedBaseCurrency === key ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedBaseCurrency(key)}
+              >
+                {translate(labelKey)}
+              </Button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading ? (
           Array.from({ length: currencyTypes.length || 4 }).map((_, i) => <DolarCardSkeleton key={i} />)
         ) : (
-          quotes?.map((quote) => (
+          filteredQuotes?.map((quote) => (
             <Card
               key={quote.type}
               className={`bg-card cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
@@ -227,18 +289,20 @@ export default function QuotesPage() {
               ))}
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-              {currencyTypes.map((t) => (
-                <Button
-                  key={t.value}
-                  variant={selectedType === t.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setSelectedType(t.value)}
-                >
-                  {t.label}
-                </Button>
-              ))}
-            </div>
+            {currencyTypes.length > 1 && (
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                {currencyTypes.map((t) => (
+                  <Button
+                    key={t.value}
+                    variant={selectedType === t.value ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedType(t.value)}
+                  >
+                    {t.label}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -303,7 +367,7 @@ export default function QuotesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {quotes?.map((quote) => (
+                  {filteredQuotes?.map((quote) => (
                     <tr
                       key={quote.type}
                       className="border-b border-border/50 hover:bg-muted/50"

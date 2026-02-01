@@ -134,9 +134,17 @@ public class QuoteService {
     @Cacheable(value = "history", key = "#type.name() + '_' + #from + '_' + #to")
     public List<QuoteHistory> getHistory(CurrencyType type, LocalDate from, LocalDate to) {
         if (type.getCountry() == Country.ARGENTINA) {
-            List<QuoteHistory> external = argentinaDatosClient.getDollarHistory(type.getCode(), from, to);
-            if (!external.isEmpty()) {
-                return external;
+            if (type == CurrencyType.AR_EUR_OFICIAL || type == CurrencyType.AR_BRL_OFICIAL
+                    || type == CurrencyType.AR_CLP_OFICIAL || type == CurrencyType.AR_UYU_OFICIAL) {
+                List<QuoteHistory> external = argentinaDatosClient.getCurrencyHistory(type.getCode(), from, to);
+                if (!external.isEmpty()) {
+                    return external;
+                }
+            } else {
+                List<QuoteHistory> external = argentinaDatosClient.getDollarHistory(type.getCode(), from, to);
+                if (!external.isEmpty()) {
+                    return external;
+                }
             }
         }
         return quoteHistoryRepository.findByTypeAndDateBetweenOrderByDateAsc(type, from, to);
