@@ -173,3 +173,11 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface ExchangeBands {
+  floor: number;
+  ceiling: number;
+  middle: number;
+  crawlingPegMonthly: number;
+  lastUpdate: string;
+  notes?: string;
+}

@@ -91,6 +91,10 @@ export const reposApi = {
     api.post('/repos/optimize', null, { params: { amount, termDays } }),
 };
 
+export const exchangeBandsApi = {
+  getCurrent: () => api.get('/exchange-bands'),
+};
+
 export const authApi = {
   login: (email: string, password: string) =>
     api.post('/auth/login', { email, password }),
