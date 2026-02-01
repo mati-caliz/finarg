@@ -20,8 +20,8 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-datos.base-url}")
     private String argentinaDatosBaseUrl;
 
-    @Value("${external.apis.bluelytics.base-url:https://api.bluelytics.com.ar/v2}")
-    private String bluelyticsBaseUrl;
+    @Value("${external.apis.ambito.base-url:https://mercados.ambito.com}")
+    private String ambitoBaseUrl;
 
     @Value("${external.apis.exchangerate.base-url:https://open.er-api.com/v6}")
     private String exchangerateBaseUrl;
@@ -74,10 +74,10 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean("bluelyticsWebClient")
-    public WebClient bluelyticsWebClient() {
+    @Bean("ambitoWebClient")
+    public WebClient ambitoWebClient() {
         return WebClient.builder()
-                .baseUrl(bluelyticsBaseUrl)
+                .baseUrl(ambitoBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();

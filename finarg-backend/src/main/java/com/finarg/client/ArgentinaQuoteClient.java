@@ -21,15 +21,15 @@ import java.util.List;
 public class ArgentinaQuoteClient implements QuoteClient {
 
     private final WebClient webClient;
-    private final BluelyticsClient bluelyticsClient;
+    private final AmbitoClient ambitoClient;
     private final ExchangerateApiClient exchangerateApiClient;
 
     public ArgentinaQuoteClient(
             @Qualifier("dolarApiWebClient") WebClient webClient,
-            BluelyticsClient bluelyticsClient,
+            AmbitoClient ambitoClient,
             ExchangerateApiClient exchangerateApiClient) {
         this.webClient = webClient;
-        this.bluelyticsClient = bluelyticsClient;
+        this.ambitoClient = ambitoClient;
         this.exchangerateApiClient = exchangerateApiClient;
     }
 
@@ -64,9 +64,7 @@ public class ArgentinaQuoteClient implements QuoteClient {
             CotizacionApiResponse uyuOficial = null;
             if (cotizaciones != null) {
                 for (CotizacionApiResponse c : cotizaciones) {
-                    if ("EUR".equalsIgnoreCase(c.getMoneda())) {
-                        result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_EUR_OFICIAL, "Euro"));
-                    } else if ("BRL".equalsIgnoreCase(c.getMoneda())) {
+                    if ("BRL".equalsIgnoreCase(c.getMoneda())) {
                         result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_BRL_OFICIAL, "Real"));
                     } else if ("CLP".equalsIgnoreCase(c.getMoneda())) {
                         clpOficial = c;
@@ -87,7 +85,8 @@ public class ArgentinaQuoteClient implements QuoteClient {
             addDerivedBlueQuotes(result, dollarBlue, dollarOficial, clpOficial, uyuOficial);
             addCrossOficialQuotes(result, dollarOficial);
 
-            bluelyticsClient.getEuroBlueQuote().ifPresent(result::add);
+            ambitoClient.getEuroOficialQuote().ifPresent(result::add);
+            ambitoClient.getEuroBlueQuote().ifPresent(result::add);
         } catch (Exception e) {
             log.error("Error fetching quotes from DolarAPI: {}", e.getMessage());
         }
@@ -96,8 +95,12 @@ public class ArgentinaQuoteClient implements QuoteClient {
 
     @Override
     public QuoteDTO getQuote(CurrencyType type) {
+        if (type == CurrencyType.AR_EUR_OFICIAL) {
+            return ambitoClient.getEuroOficialQuote()
+                    .orElseGet(this::fetchEuroOficialFromDolarApi);
+        }
         if (type == CurrencyType.AR_EUR_BLUE) {
-            return bluelyticsClient.getEuroBlueQuote().orElse(null);
+            return ambitoClient.getEuroBlueQuote().orElse(null);
         }
         if (type == CurrencyType.AR_CLP_BLUE || type == CurrencyType.AR_UYU_BLUE) {
             return computeDerivedBlueQuote(type);
@@ -107,17 +110,15 @@ public class ArgentinaQuoteClient implements QuoteClient {
             List<QuoteDTO> all = getAllQuotes();
             return all.stream().filter(q -> q.getType() == type).findFirst().orElse(null);
         }
-        if (type == CurrencyType.AR_EUR_OFICIAL || type == CurrencyType.AR_BRL_OFICIAL
-                || type == CurrencyType.AR_CLP_OFICIAL || type == CurrencyType.AR_UYU_OFICIAL) {
+        if (type == CurrencyType.AR_BRL_OFICIAL || type == CurrencyType.AR_CLP_OFICIAL
+                || type == CurrencyType.AR_UYU_OFICIAL) {
             String moneda = switch (type) {
-                case AR_EUR_OFICIAL -> "eur";
                 case AR_BRL_OFICIAL -> "brl";
                 case AR_CLP_OFICIAL -> "clp";
                 case AR_UYU_OFICIAL -> "uyu";
                 default -> "usd";
             };
             String name = switch (type) {
-                case AR_EUR_OFICIAL -> "Euro";
                 case AR_BRL_OFICIAL -> "Real";
                 case AR_CLP_OFICIAL -> "Peso Chileno";
                 case AR_UYU_OFICIAL -> "Peso Uruguayo";
@@ -328,6 +329,20 @@ public class ArgentinaQuoteClient implements QuoteClient {
                         .lastUpdate(lastUpdate)
                         .build());
             }
+        }
+    }
+
+    private QuoteDTO fetchEuroOficialFromDolarApi() {
+        try {
+            CotizacionApiResponse response = webClient.get()
+                    .uri("/cotizaciones/eur")
+                    .retrieve()
+                    .bodyToMono(CotizacionApiResponse.class)
+                    .block();
+            return response != null ? mapCotizacionToQuoteDTO(response, CurrencyType.AR_EUR_OFICIAL, "Euro Oficial") : null;
+        } catch (Exception e) {
+            log.error("Error fetching Euro Oficial from DolarAPI: {}", e.getMessage());
+            return null;
         }
     }
 

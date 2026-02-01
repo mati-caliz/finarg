@@ -272,6 +272,20 @@ netstat -ano | findstr :8080
 # Matar el proceso o cambiar el puerto en application.yml
 ```
 
+### Limpiar caché de Redis
+
+Si las cotizaciones muestran valores desactualizados o incorrectos, limpiar la caché de Redis:
+
+```bash
+docker exec finarg-redis redis-cli FLUSHDB
+```
+
+También podés forzar el refresh desde la API:
+
+```bash
+curl -X POST http://localhost:8080/api/quotes/refresh
+```
+
 ### Problemas con Maven
 
 Limpiar y recompilar:
