@@ -20,7 +20,7 @@
   "dir": "ltr",
   "shortcuts": [
     { "name": "Cotizaciones", "short_name": "Dólar", "description": "Ver cotizaciones del dólar", "url": "/cotizaciones" },
-    { "name": "Calculadora Ganancias", "short_name": "Ganancias", "description": "Calcular impuesto a las ganancias", "url": "/ganancias" },
+    { "name": "Calculadora Sueldo Neto", "short_name": "Sueldo Neto", "description": "Calcular sueldo neto y desglose de descuentos", "url": "/calculadora-sueldo-neto" },
     { "name": "Simulador", "short_name": "Simular", "description": "Simular inversiones", "url": "/simulador" }
   ],
   "related_applications": [],

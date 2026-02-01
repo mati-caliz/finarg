@@ -61,6 +61,7 @@ public class RedisConfig {
         cacheConfigurations.put("historico", defaultConfig.entryTtl(Duration.ofHours(6)));
         cacheConfigurations.put("history", defaultConfig.entryTtl(Duration.ofHours(6)));
         cacheConfigurations.put("rates", defaultConfig.entryTtl(Duration.ofHours(1)));
+        cacheConfigurations.put("indicators", defaultConfig.entryTtl(Duration.ofHours(1)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)

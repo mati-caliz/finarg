@@ -72,6 +72,11 @@ export const simulatorApi = {
   getRates: () => api.get('/simulator/rates'),
 };
 
+export const indicatorsApi = {
+  getSocial: (country: string = 'ar') =>
+    api.get('/indicators/social', { params: { country } }),
+};
+
 export const ratesApi = {
   getFixedTerm: (country: string = 'ar') =>
     api.get('/rates/fixed-term', { params: { country } }),

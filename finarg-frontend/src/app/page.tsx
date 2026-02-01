@@ -4,6 +4,7 @@ import { useQuotes, useGap } from '@/hooks/useQuotes';
 import { useReserves } from '@/hooks/useReserves';
 import { useArbitrage } from '@/hooks/useArbitrage';
 import { useCurrentInflation } from '@/hooks/useInflation';
+import { useSocialIndicators } from '@/hooks/useSocialIndicators';
 import { QuoteCard } from '@/components/dashboard/QuoteCard';
 import { GapGauge } from '@/components/dashboard/GapGauge';
 import { ReservesWidget } from '@/components/dashboard/ReservesWidget';
@@ -24,6 +25,7 @@ export default function DashboardPage() {
   const { data: reserves, isLoading: loadingReserves } = useReserves(selectedCountry);
   const { data: arbitrage } = useArbitrage();
   const { data: inflation } = useCurrentInflation();
+  const { data: socialIndicators } = useSocialIndicators(selectedCountry);
 
   const viableOpportunities = arbitrage?.filter((a) => a.viable) || [];
 
@@ -78,7 +80,70 @@ export default function DashboardPage() {
         {countryConfig.features.gap && gap && <GapGauge gap={gap} />}
 
         {selectedCountry === 'ar' && reserves && (
-          <ReservesWidget reserves={reserves} label={countryConfig.reservesLabel} />
+          <ReservesWidget
+            reserves={reserves}
+            label={countryConfig.reservesLabelKey ? translate(countryConfig.reservesLabelKey) : countryConfig.reservesLabel}
+          />
+        )}
+
+        {selectedCountry === 'ar' && socialIndicators && (socialIndicators.minimumSalary !== undefined && socialIndicators.minimumSalary !== null || socialIndicators.minimumPension !== undefined && socialIndicators.minimumPension !== null || socialIndicators.canastaBasicaTotal !== undefined && socialIndicators.canastaBasicaTotal !== null || socialIndicators.uva !== undefined && socialIndicators.uva !== null || socialIndicators.cer !== undefined && socialIndicators.cer !== null) && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {translate('socialIndicators')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3">
+                {socialIndicators.minimumSalary !== undefined && socialIndicators.minimumSalary !== null && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">{translate('minimumSalary')}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(socialIndicators.minimumSalary)}
+                    </p>
+                  </div>
+                )}
+                {socialIndicators.minimumPension !== undefined && socialIndicators.minimumPension !== null && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">{translate('minimumPension')}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(socialIndicators.minimumPension)}
+                    </p>
+                  </div>
+                )}
+                {socialIndicators.canastaBasicaTotal !== undefined && socialIndicators.canastaBasicaTotal !== null && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">{translate('canastaBasicaTotal')}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(socialIndicators.canastaBasicaTotal)}
+                    </p>
+                  </div>
+                )}
+                {socialIndicators.uva !== undefined && socialIndicators.uva !== null && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">{translate('uva')}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 }).format(socialIndicators.uva)}
+                    </p>
+                  </div>
+                )}
+                {socialIndicators.cer !== undefined && socialIndicators.cer !== null && (
+                  <div>
+                    <p className="text-xs text-muted-foreground">{translate('cer')}</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      {socialIndicators.cer.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <Link
+                href="/calculadora-sueldo-neto"
+                className="text-sm text-primary hover:underline mt-4 inline-block"
+              >
+                {translate('incomeTaxCalculator')}
+              </Link>
+            </CardContent>
+          </Card>
         )}
 
         {countryConfig.features.inflation && (
@@ -124,7 +189,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {countryConfig.features.incomeTax && (
-          <Link href="/ganancias">
+          <Link href="/calculadora-sueldo-neto">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
                 <p className="font-medium">{translate('incomeTaxCalculator')}</p>

@@ -288,6 +288,11 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
+## TODOs / Mejoras futuras
+
+- **Seguridad**: Revisar y reforzar medidas de seguridad (headers, CORS, rate limiting, validación de inputs, etc.).
+- **Build / optimización**: Evaluar si vale la pena usar webpack (Next.js ya lo usa por defecto) y minificar el código de forma explícita o adicional.
+
 ## Licencia
 
 Privado

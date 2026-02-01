@@ -117,6 +117,10 @@ external:
     bcra:
       base-url: https://api.bcra.gob.ar
       timeout: 15000
+      series:
+        encajes: 4
+        uva: 7913
+        cer: 3540
     colombia:
       base-url: https://www.datos.gov.co/api
       timeout: 10000

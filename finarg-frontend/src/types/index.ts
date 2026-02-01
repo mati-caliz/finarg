@@ -59,19 +59,24 @@ export interface Reserves {
 
 export interface IncomeTaxRequest {
   grossMonthlySalary: number;
-  employeeType: 'EMPLOYEE' | 'SELF_EMPLOYED';
+  isRetired?: boolean;
   healthInsurance?: number;
   retirement?: number;
   union?: number;
+  unionDuesPercent?: number;
   hasSpouse: boolean;
   childrenCount: number;
+  childrenWithDisabilitiesCount?: number;
   housingRent?: number;
   domesticService?: number;
   educationExpenses?: number;
+  lifeInsurance?: number;
 }
 
 export interface IncomeTaxResponse {
+  grossMonthlySalary?: number;
   grossAnnualSalary: number;
+  monthlyLegalDeductions?: number;
   totalDeductions: number;
   taxableNetIncome: number;
   annualTax: number;
@@ -93,6 +98,22 @@ export interface IncomeTaxResponse {
     taxableBase: number;
     bracketTax: number;
   }[];
+  deductionBreakdown?: {
+    retirement: number;
+    healthInsurance: number;
+    law19032: number;
+    unionDues: number;
+    incomeTax: number;
+    total: number;
+  };
+}
+
+export interface SocialIndicators {
+  minimumSalary?: number;
+  minimumPension?: number;
+  canastaBasicaTotal?: number;
+  uva?: number;
+  cer?: number;
 }
 
 export interface Arbitrage {

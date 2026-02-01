@@ -205,13 +205,13 @@ export default function RatesPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex min-w-0 flex-1 gap-3">
-                            <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted/50 p-1.5">
+                            <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-muted/50 p-1.5">
                               {row.logo ? (
                                 <>
                                   <img
                                     src={row.logo}
                                     alt=""
-                                    className="rate-logo-img h-full w-full object-contain"
+                                    className="rate-logo-img max-h-full max-w-full shrink-0 object-contain object-center"
                                     loading="lazy"
                                     onError={(e) => {
                                       e.currentTarget.style.display = 'none';
@@ -330,13 +330,13 @@ export default function RatesPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex min-w-0 flex-1 gap-3">
-                            <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border/50 bg-muted/50 p-1.5">
+                            <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-muted/50 p-1.5">
                               {row.logo ? (
                                 <>
                                   <img
                                     src={row.logo}
                                     alt=""
-                                    className="rate-logo-img h-full w-full object-contain"
+                                    className="rate-logo-img max-h-full max-w-full shrink-0 object-contain object-center"
                                     loading="lazy"
                                     onError={(e) => {
                                       e.currentTarget.style.display = 'none';

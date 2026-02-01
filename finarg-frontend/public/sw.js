@@ -7,7 +7,7 @@ const API_CACHE = 'finarg-api-v2';
 const STATIC_ASSETS = [
   '/',
   '/cotizaciones',
-  '/ganancias',
+  '/calculadora-sueldo-neto',
   '/simulador',
   '/arbitraje',
   '/inflacion',

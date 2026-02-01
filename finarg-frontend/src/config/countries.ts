@@ -1,3 +1,5 @@
+import type { TranslationKey } from '@/i18n/translations';
+
 export type CountryCode = 'ar' | 'co' | 'br' | 'cl' | 'uy';
 
 export interface CountryConfig {
@@ -26,6 +28,7 @@ export interface CountryConfig {
     isParallel: boolean;
   }[];
   reservesLabel?: string;
+  reservesLabelKey?: TranslationKey;
 }
 
 export const COUNTRIES: Record<CountryCode, CountryConfig> = {
@@ -58,6 +61,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       { code: 'cripto', name: 'Crypto', isOfficial: false, isParallel: false },
     ],
     reservesLabel: 'BCRA Reserves',
+    reservesLabelKey: 'bcraReserves',
   },
   co: {
     code: 'co',
@@ -84,6 +88,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       { code: 'cripto', name: 'Crypto P2P', isOfficial: false, isParallel: false },
     ],
     reservesLabel: 'BanRep Reserves',
+    reservesLabelKey: 'banrepReserves',
   },
   br: {
     code: 'br',
@@ -111,6 +116,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       { code: 'paralelo', name: 'Parallel', isOfficial: false, isParallel: true },
     ],
     reservesLabel: 'BCB Reserves',
+    reservesLabelKey: 'bcbReserves',
   },
   cl: {
     code: 'cl',
@@ -137,6 +143,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       { code: 'cripto', name: 'Crypto P2P', isOfficial: false, isParallel: false },
     ],
     reservesLabel: 'BCCh Reserves',
+    reservesLabelKey: 'bcchReserves',
   },
   uy: {
     code: 'uy',
@@ -163,6 +170,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       { code: 'ebrou', name: 'eBROU', isOfficial: false, isParallel: false },
     ],
     reservesLabel: 'BCU Reserves',
+    reservesLabelKey: 'bcuReserves',
   },
 };
 

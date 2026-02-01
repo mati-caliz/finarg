@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -22,7 +23,21 @@ import java.util.UUID;
 public class RatesService {
 
     private static final String ROW_SEPARATOR_LABEL = "Otros bancos que informan";
-    private static final String WALLET_ICONS_BASE = "https://icons.com.ar/icons/bancos-apps/";
+    private static final String FAVICON_API = "https://www.google.com/s2/favicons?domain=%s&sz=128";
+    private static final Map<String, String> WALLET_DOMAINS = Map.ofEntries(
+            Map.entry("BELO", "belo.app"),
+            Map.entry("BNA", "bna.com.ar"),
+            Map.entry("BRUBANK", "brubank.com"),
+            Map.entry("CARREFOUR BANCO", "carrefour.com.ar"),
+            Map.entry("CRESIUM", "cresium.com.ar"),
+            Map.entry("FIWIND", "fiwind.com"),
+            Map.entry("MONTEMAR PAY", "montemar.com.ar"),
+            Map.entry("NARANJA X", "naranjax.com"),
+            Map.entry("SUPERVIELLE", "supervielle.com.ar"),
+            Map.entry("UALA", "uala.com.ar"),
+            Map.entry("UALA PLUS 1", "uala.com.ar"),
+            Map.entry("UALA PLUS 2", "uala.com.ar")
+    );
 
     private final ArgentinaDatosClient argentinaDatosClient;
 
@@ -44,7 +59,7 @@ public class RatesService {
     }
 
     // TODO: Integrar más billeteras virtuales desde la API (explorar otros endpoints de api.argentinadatos.com)
-    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v4'")
+    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v5'")
     public List<RateDTO> getWalletRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -88,7 +103,11 @@ public class RatesService {
 
     private static String walletLogoUrl(String fund) {
         if (fund == null || fund.isBlank()) return null;
-        String slug = fund.toUpperCase().trim()
+        String domain = WALLET_DOMAINS.get(fund.toUpperCase().trim());
+        if (domain != null) {
+            return String.format(FAVICON_API, domain);
+        }
+        String baseName = fund.toUpperCase().trim()
                 .replaceAll("\\s+PLUS\\s+\\d+", "")
                 .replaceAll("\\s+BANCO\\b", "")
                 .replaceAll("\\s+X\\b", "X")
@@ -96,8 +115,8 @@ public class RatesService {
                 .replaceAll("\\s+", "")
                 .toLowerCase()
                 .replaceAll("[^a-z0-9]", "");
-        if (slug.isEmpty()) return null;
-        return WALLET_ICONS_BASE + slug + ".svg";
+        if (baseName.isEmpty()) return null;
+        return String.format(FAVICON_API, baseName + ".com.ar");
     }
 
     private boolean hasValidTna(FixedTermRateResponse r) {

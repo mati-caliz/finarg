@@ -21,6 +21,9 @@ public class DatosGobArClient {
     }
 
     private static final String RESERVES_SERIES_ID = "92.2_RESERVAS_IRES_0_0_32_40";
+    private static final String MINIMUM_SALARY_SERIES_ID = "57.1_SMVMM_0_M_34";
+    private static final String MINIMUM_PENSION_SERIES_ID = "58.1_MP_0_M_24";
+    private static final String CANASTA_BASICA_TOTAL_SERIES_ID = "444.1_CANASTA_batotGBA_0_0_26_47";
     private static final String PASIVOS_LETRAS_USD_ID = "92.2_PASIVOS_MORES_0_0_33_100";
     private static final String DEPOSITOS_GOBIERNO_ID = "92.2_OTROS_DEPORNO_0_0_24_42";
     private static final String POSICION_NETA_PASES_ID = "92.2_POSICION_NSES_0_0_19_25";
@@ -28,6 +31,42 @@ public class DatosGobArClient {
 
     public List<SeriesDataPoint> getBCRAReserves(int limit) {
         return fetchSeries(limit);
+    }
+
+    public BigDecimal getLatestMinimumSalary() {
+        return fetchLatestValue(MINIMUM_SALARY_SERIES_ID);
+    }
+
+    public BigDecimal getLatestMinimumPension() {
+        return fetchLatestValue(MINIMUM_PENSION_SERIES_ID);
+    }
+
+    public BigDecimal getLatestCanastaBasicaTotal() {
+        return fetchLatestValue(CANASTA_BASICA_TOTAL_SERIES_ID);
+    }
+
+    private BigDecimal fetchLatestValue(String seriesId) {
+        try {
+            SeriesApiResponse response = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/series/")
+                            .queryParam("ids", seriesId)
+                            .queryParam("limit", 1)
+                            .queryParam("sort", "desc")
+                            .queryParam("format", "json")
+                            .build())
+                    .retrieve()
+                    .bodyToMono(SeriesApiResponse.class)
+                    .block();
+
+            if (response == null || response.getData() == null || response.getData().isEmpty()) {
+                return null;
+            }
+            return toBigDecimal(response.getData().get(0), 1);
+        } catch (Exception e) {
+            log.error("Error fetching series {} from datos.gob.ar: {}", seriesId, e.getMessage());
+            return null;
+        }
     }
 
     public BCRALiabilitiesData fetchBCRALiabilities() {

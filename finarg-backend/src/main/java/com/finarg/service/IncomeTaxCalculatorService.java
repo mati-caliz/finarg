@@ -14,37 +14,51 @@ import java.util.List;
 @Service
 public class IncomeTaxCalculatorService {
 
-    private static final BigDecimal ANNUAL_MINIMUM_EXEMPTION = new BigDecimal("3091035");
-    private static final BigDecimal SPECIAL_DEDUCTION_4TH = new BigDecimal("14837448");
-    private static final BigDecimal SPOUSE_ALLOWANCE = new BigDecimal("2911135");
-    private static final BigDecimal CHILD_ALLOWANCE = new BigDecimal("1468096");
-    
+    private static final BigDecimal ANNUAL_MINIMUM_EXEMPTION = new BigDecimal("4211886.94");
+    private static final BigDecimal SPECIAL_DEDUCTION_4TH = new BigDecimal("20217057.35");
+    private static final BigDecimal SPOUSE_ALLOWANCE = new BigDecimal("3966752.72");
+    private static final BigDecimal CHILD_ALLOWANCE = new BigDecimal("2000447.87");
+    private static final BigDecimal CHILD_DISABILITY_ALLOWANCE = new BigDecimal("4000895.74");
+    private static final BigDecimal LIFE_INSURANCE_ANNUAL_CAP = new BigDecimal("573817.13");
+
     private static final List<TaxBracketScale> SCALES = List.of(
-            new TaxBracketScale(BigDecimal.ZERO, new BigDecimal("1193521"), new BigDecimal("5")),
-            new TaxBracketScale(new BigDecimal("1193521"), new BigDecimal("2387043"), new BigDecimal("9")),
-            new TaxBracketScale(new BigDecimal("2387043"), new BigDecimal("3580564"), new BigDecimal("12")),
-            new TaxBracketScale(new BigDecimal("3580564"), new BigDecimal("5371347"), new BigDecimal("15")),
-            new TaxBracketScale(new BigDecimal("5371347"), new BigDecimal("10742695"), new BigDecimal("19")),
-            new TaxBracketScale(new BigDecimal("10742695"), new BigDecimal("16114042"), new BigDecimal("23")),
-            new TaxBracketScale(new BigDecimal("16114042"), new BigDecimal("24171563"), new BigDecimal("27")),
-            new TaxBracketScale(new BigDecimal("24171563"), new BigDecimal("48343127"), new BigDecimal("31")),
-            new TaxBracketScale(new BigDecimal("48343127"), new BigDecimal("999999999999"), new BigDecimal("35"))
+            new TaxBracketScale(BigDecimal.ZERO, new BigDecimal("1749901.45"), new BigDecimal("5")),
+            new TaxBracketScale(new BigDecimal("1749901.45"), new BigDecimal("3499802.89"), new BigDecimal("9")),
+            new TaxBracketScale(new BigDecimal("3499802.89"), new BigDecimal("5249704.34"), new BigDecimal("12")),
+            new TaxBracketScale(new BigDecimal("5249704.34"), new BigDecimal("7874556.52"), new BigDecimal("15")),
+            new TaxBracketScale(new BigDecimal("7874556.52"), new BigDecimal("15749113.04"), new BigDecimal("19")),
+            new TaxBracketScale(new BigDecimal("15749113.04"), new BigDecimal("23623669.56"), new BigDecimal("23")),
+            new TaxBracketScale(new BigDecimal("23623669.56"), new BigDecimal("35435504.34"), new BigDecimal("27")),
+            new TaxBracketScale(new BigDecimal("35435504.34"), new BigDecimal("53153256.52"), new BigDecimal("31")),
+            new TaxBracketScale(new BigDecimal("53153256.52"), new BigDecimal("999999999999"), new BigDecimal("35"))
     );
 
     public IncomeTaxResponseDTO calculate(IncomeTaxRequestDTO request) {
         log.info("Calculating income tax for salary: {}", request.getGrossMonthlySalary());
 
         BigDecimal grossAnnualSalary = request.getGrossMonthlySalary().multiply(BigDecimal.valueOf(13));
-        
-        BigDecimal retirement = calculateRetirement(request.getRetirement(), grossAnnualSalary);
-        BigDecimal healthInsurance = calculateHealthInsurance(request.getHealthInsurance(), grossAnnualSalary);
-        BigDecimal unionDues = calculateUnionDues(request.getUnionDues());
+
+        BigDecimal retirement = request.isRetired()
+                ? BigDecimal.ZERO
+                : calculateRetirement(request.getRetirement(), grossAnnualSalary);
+        BigDecimal healthInsurance = request.isRetired()
+                ? BigDecimal.ZERO
+                : calculateHealthInsurance(request.getHealthInsurance(), grossAnnualSalary);
+        BigDecimal law19032 = request.isRetired()
+                ? BigDecimal.ZERO
+                : grossAnnualSalary.multiply(new BigDecimal("0.03"));
+        BigDecimal unionDues = calculateUnionDues(
+                request.getUnionDues(), request.getUnionDuesPercent(), grossAnnualSalary);
 
         BigDecimal familyAllowances = BigDecimal.ZERO;
         if (request.isHasSpouse()) {
             familyAllowances = familyAllowances.add(SPOUSE_ALLOWANCE);
         }
-        familyAllowances = familyAllowances.add(CHILD_ALLOWANCE.multiply(BigDecimal.valueOf(request.getNumberOfChildren())));
+        int disabledCount = Math.min(
+                Math.max(0, request.getChildrenWithDisabilitiesCount()), request.getNumberOfChildren());
+        int regularChildren = Math.max(0, request.getNumberOfChildren() - disabledCount);
+        familyAllowances = familyAllowances.add(CHILD_ALLOWANCE.multiply(BigDecimal.valueOf(regularChildren)));
+        familyAllowances = familyAllowances.add(CHILD_DISABILITY_ALLOWANCE.multiply(BigDecimal.valueOf(disabledCount)));
 
         BigDecimal personalDeductions = BigDecimal.ZERO;
         if (request.getHousingRent() != null) {
@@ -64,8 +78,12 @@ public class IncomeTaxCalculatorService {
                     request.getEducationExpenses().multiply(BigDecimal.valueOf(12)).min(maxEducation)
             );
         }
+        if (request.getLifeInsurance() != null && request.getLifeInsurance().compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal annualLife = request.getLifeInsurance().multiply(BigDecimal.valueOf(12));
+            personalDeductions = personalDeductions.add(annualLife.min(LIFE_INSURANCE_ANNUAL_CAP));
+        }
 
-        BigDecimal totalLegalDeductions = retirement.add(healthInsurance).add(unionDues);
+        BigDecimal totalLegalDeductions = retirement.add(healthInsurance).add(law19032).add(unionDues);
         BigDecimal legalNetIncome = grossAnnualSalary.subtract(totalLegalDeductions);
 
         BigDecimal totalAllowedDeductions = ANNUAL_MINIMUM_EXEMPTION
@@ -115,9 +133,22 @@ public class IncomeTaxCalculatorService {
                 .subtract(monthlyTax);
 
         BigDecimal effectiveRate = calculateEffectiveRate(grossAnnualSalary, totalTax);
+        BigDecimal monthlyLegal = totalLegalDeductions.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP);
+        BigDecimal div12 = BigDecimal.valueOf(12);
+
+        IncomeTaxResponseDTO.DeductionBreakdown breakdownDeductions = IncomeTaxResponseDTO.DeductionBreakdown.builder()
+                .retirement(retirement.divide(div12, 2, RoundingMode.HALF_UP))
+                .healthInsurance(healthInsurance.divide(div12, 2, RoundingMode.HALF_UP))
+                .law19032(law19032.divide(div12, 2, RoundingMode.HALF_UP))
+                .unionDues(unionDues.divide(div12, 2, RoundingMode.HALF_UP))
+                .incomeTax(monthlyTax)
+                .total(monthlyLegal.add(monthlyTax))
+                .build();
 
         return IncomeTaxResponseDTO.builder()
+                .grossMonthlySalary(request.getGrossMonthlySalary().setScale(2, RoundingMode.HALF_UP))
                 .grossAnnualSalary(grossAnnualSalary.setScale(2, RoundingMode.HALF_UP))
+                .monthlyLegalDeductions(monthlyLegal)
                 .totalDeductions(totalLegalDeductions.add(totalAllowedDeductions).setScale(2, RoundingMode.HALF_UP))
                 .taxableIncome(taxableIncome.setScale(2, RoundingMode.HALF_UP))
                 .annualTax(totalTax.setScale(2, RoundingMode.HALF_UP))
@@ -131,6 +162,7 @@ public class IncomeTaxCalculatorService {
                         .personalDeductions(personalDeductions)
                         .totalAllowedDeductions(totalAllowedDeductions)
                         .build())
+                .deductionBreakdown(breakdownDeductions)
                 .taxBrackets(breakdown)
                 .build();
     }
@@ -151,7 +183,10 @@ public class IncomeTaxCalculatorService {
         return grossAnnualSalary.multiply(new BigDecimal("0.03"));
     }
 
-    private BigDecimal calculateUnionDues(BigDecimal unionDues) {
+    private BigDecimal calculateUnionDues(BigDecimal unionDues, BigDecimal unionDuesPercent, BigDecimal grossAnnualSalary) {
+        if (unionDuesPercent != null && unionDuesPercent.compareTo(BigDecimal.ZERO) > 0) {
+            return grossAnnualSalary.multiply(unionDuesPercent).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        }
         if (unionDues != null) {
             return unionDues.multiply(BigDecimal.valueOf(12));
         }
