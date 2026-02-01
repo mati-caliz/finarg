@@ -1,5 +1,5 @@
-'use client';
+"use client";
 
-export * from './useInflation';
+export * from "./useInflation";
 
-export { useInflacionActual, useInflacionMensual, useAjustarInflacion } from './useInflation';
+export { useInflacionActual, useInflacionMensual, useAjustarInflacion } from "./useInflation";

@@ -1,5 +1,5 @@
-'use client';
+"use client";
 
-export * from './useQuotes';
+export * from "./useQuotes";
 
-export { useCotizaciones, useCotizacion, useBrecha } from './useQuotes';
+export { useCotizaciones, useCotizacion, useBrecha } from "./useQuotes";

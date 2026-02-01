@@ -34,10 +34,5 @@
       "version": "detect"
     }
   },
-  "ignorePatterns": [
-    "node_modules/",
-    ".next/",
-    "out/",
-    "coverage/"
-  ]
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "coverage/"]
 }

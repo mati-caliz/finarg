@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { GoogleLogin } from '@react-oauth/google';
-import { authApi } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { AuthResponse } from '@/types';
-import { useAuthStore } from '@/store/useStore';
-import { Mail, Lock, Loader2, TrendingUp, AlertCircle } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { authApi } from "@/lib/api";
+import { useAuthStore } from "@/store/useStore";
+import type { AuthResponse } from "@/types";
+import { GoogleLogin } from "@react-oauth/google";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircle, Loader2, Lock, Mail, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -28,14 +28,14 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
-      router.push('/');
+      router.push("/");
     },
     onError: (error: Error & { response?: { data?: { message?: string } } }) => {
       setError(
-        error.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.'
+        error.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales.",
       );
     },
   });
@@ -52,18 +52,20 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
-      router.push('/');
+      router.push("/");
     },
     onError: (err: Error & { response?: { data?: { message?: string } } }) => {
-      setError(err.response?.data?.message || 'Error al iniciar sesión con Google.');
+      setError(err.response?.data?.message || "Error al iniciar sesión con Google.");
     },
   });
 
   const handleGoogleSuccess = (credential: string | undefined) => {
-    if (!credential) {return;}
+    if (!credential) {
+      return;
+    }
     setError(null);
     googleLoginMutation.mutate(credential);
   };
@@ -93,37 +95,39 @@ export default function LoginPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email
+                  <div className="relative mt-1">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="tu@email.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="email"
-                    placeholder="tu@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                   Contraseña
+                  <div className="relative mt-1">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
               </div>
 
               <Button
@@ -137,7 +141,7 @@ export default function LoginPage() {
                     Iniciando sesión...
                   </>
                 ) : (
-                  'Iniciar Sesión'
+                  "Iniciar Sesión"
                 )}
               </Button>
 
@@ -154,7 +158,7 @@ export default function LoginPage() {
                 {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
                   <GoogleLogin
                     onSuccess={(res) => handleGoogleSuccess(res?.credential)}
-                    onError={() => setError('Error al iniciar sesión con Google.')}
+                    onError={() => setError("Error al iniciar sesión con Google.")}
                     useOneTap={false}
                     theme="filled_black"
                     size="large"
@@ -180,7 +184,7 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
-                ¿No tenés cuenta?{' '}
+                ¿No tenés cuenta?{" "}
                 <Link href="/register" className="text-primary hover:underline">
                   Registrate
                 </Link>

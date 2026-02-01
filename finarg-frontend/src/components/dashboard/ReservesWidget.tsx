@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatReservesUSD } from '@/lib/utils';
-import { Reserves } from '@/types';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/useTranslation";
+import { formatReservesUSD } from "@/lib/utils";
+import type { Reserves } from "@/types";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 interface ReservesWidgetProps {
   reserves: Reserves;
@@ -21,20 +21,22 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          {label || translate('bcraReserves')}
+          {label || translate("bcraReserves")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground">{translate('grossMillionsUsd')}</p>
+            <p className="text-xs text-muted-foreground">{translate("grossMillionsUsd")}</p>
             <div className="flex items-end justify-between">
-              <p className="text-2xl font-bold">
-                {formatReservesUSD(reserves.grossReserves)}
-              </p>
+              <p className="text-2xl font-bold">{formatReservesUSD(reserves.grossReserves)}</p>
               <div
                 className={`flex items-center gap-1 text-sm ${
-                  isPositive ? 'text-green-500' : isNegative ? 'text-red-500' : 'text-muted-foreground'
+                  isPositive
+                    ? "text-green-500"
+                    : isNegative
+                      ? "text-red-500"
+                      : "text-muted-foreground"
                 }`}
               >
                 {isPositive ? (
@@ -44,7 +46,10 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
                 ) : (
                   <Minus className="h-4 w-4" />
                 )}
-                <span>{variation > 0 ? '+' : ''}{variation.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</span>
+                <span>
+                  {variation > 0 ? "+" : ""}
+                  {variation.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                </span>
               </div>
             </div>
           </div>
@@ -52,7 +57,7 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
           <div className="pt-2 border-t border-border space-y-2">
             {reserves.netReservesBCRA !== undefined && reserves.netReservesBCRA !== null && (
               <div>
-                <p className="text-xs text-muted-foreground">{translate('netBcra')}</p>
+                <p className="text-xs text-muted-foreground">{translate("netBcra")}</p>
                 <p className="text-lg font-semibold text-green-500">
                   {formatReservesUSD(reserves.netReservesBCRA)}
                 </p>
@@ -60,26 +65,26 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
             )}
             {reserves.netReservesFMI !== undefined && reserves.netReservesFMI !== null && (
               <div>
-                <p className="text-xs text-muted-foreground">{translate('netFmi')}</p>
+                <p className="text-xs text-muted-foreground">{translate("netFmi")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesFMI < 0 ? 'text-red-500' : 'text-amber-600'
+                    reserves.netReservesFMI < 0 ? "text-red-500" : "text-amber-600"
                   }`}
                 >
-                  {reserves.netReservesFMI < 0 ? '−' : ''}
+                  {reserves.netReservesFMI < 0 ? "−" : ""}
                   {formatReservesUSD(Math.abs(reserves.netReservesFMI))}
                 </p>
               </div>
             )}
             {(reserves.netReservesBCRA === undefined || reserves.netReservesBCRA === null) &&
               (reserves.netReservesFMI === undefined || reserves.netReservesFMI === null) && (
-              <div>
-                <p className="text-xs text-muted-foreground">{translate('netEstimated')}</p>
-                <p className="text-lg font-semibold text-green-500">
-                  {formatReservesUSD(reserves.netReserves)}
-                </p>
-              </div>
-            )}
+                <div>
+                  <p className="text-xs text-muted-foreground">{translate("netEstimated")}</p>
+                  <p className="text-lg font-semibold text-green-500">
+                    {formatReservesUSD(reserves.netReserves)}
+                  </p>
+                </div>
+              )}
           </div>
 
           {reserves.liabilities && reserves.liabilities.length > 0 && (
