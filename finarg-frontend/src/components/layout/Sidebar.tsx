@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   BarChart2,
+  Gauge,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useStore';
@@ -26,6 +27,7 @@ import { TranslationKey } from '@/i18n/translations';
 const baseNavigation = [
   { key: 'dashboard' as TranslationKey, href: '/', icon: LayoutDashboard, feature: null },
   { key: 'quotes' as TranslationKey, href: '/cotizaciones', icon: DollarSign, feature: 'quotes' as const },
+  { key: 'exchangeBands' as TranslationKey, href: '/bandas-cambiarias', icon: Gauge, feature: 'quotes' as const },
   { key: 'inflation' as TranslationKey, href: '/inflacion', icon: Percent, feature: 'inflation' as const },
   { key: 'reserves' as TranslationKey, href: '/reservas-bcra', icon: Landmark, feature: 'reserves' as const },
   { key: 'ratesComparator' as TranslationKey, href: '/comparador-tasas', icon: BarChart2, feature: 'rates' as const },

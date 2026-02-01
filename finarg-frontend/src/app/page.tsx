@@ -8,6 +8,7 @@ import { useSocialIndicators } from '@/hooks/useSocialIndicators';
 import { QuoteCard } from '@/components/dashboard/QuoteCard';
 import { GapGauge } from '@/components/dashboard/GapGauge';
 import { ReservesWidget } from '@/components/dashboard/ReservesWidget';
+import { BandsWidget } from '@/components/dashboard/BandsWidget';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, AlertTriangle, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
@@ -79,6 +80,10 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {countryConfig.features.gap && gap && <GapGauge gap={gap} />}
+
+        {selectedCountry === 'ar' && (
+          <BandsWidget oficialQuote={quotes?.find((q) => q.type === 'oficial')} />
+        )}
 
         {selectedCountry === 'ar' && reserves && (
           <ReservesWidget
