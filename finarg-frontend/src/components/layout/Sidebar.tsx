@@ -27,7 +27,7 @@ import { TranslationKey } from '@/i18n/translations';
 const baseNavigation = [
   { key: 'dashboard' as TranslationKey, href: '/', icon: LayoutDashboard, feature: null },
   { key: 'quotes' as TranslationKey, href: '/cotizaciones', icon: DollarSign, feature: 'quotes' as const },
-  { key: 'incomeTaxCalculator' as TranslationKey, href: '/ganancias', icon: Calculator, feature: 'incomeTax' as const },
+  { key: 'incomeTaxCalculator' as TranslationKey, href: '/calculadora-sueldo-neto', icon: Calculator, feature: 'incomeTax' as const },
   { key: 'simulator' as TranslationKey, href: '/simulador', icon: TrendingUp, feature: 'simulator' as const },
   { key: 'arbitrage' as TranslationKey, href: '/arbitraje', icon: ArrowLeftRight, feature: 'arbitrage' as const },
   { key: 'inflation' as TranslationKey, href: '/inflacion', icon: Percent, feature: 'inflation' as const },

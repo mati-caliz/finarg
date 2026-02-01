@@ -5,6 +5,11 @@ const nextConfig = {
   images: {
     domains: ['www.bcra.gob.ar'],
   },
+  async redirects() {
+    return [
+      { source: '/ganancias', destination: '/calculadora-sueldo-neto', permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       {

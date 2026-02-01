@@ -8,25 +8,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { BarChart } from '@/components/charts';
 import { IncomeTaxRequest, IncomeTaxResponse } from '@/types';
-import { Calculator, DollarSign, Users, Home, GraduationCap, Loader2 } from 'lucide-react';
+import { Calculator, DollarSign, Users, Home, GraduationCap, Loader2, Shield, UserX, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function IncomeTaxPage() {
   const { translate } = useTranslation();
   const [formData, setFormData] = useState<IncomeTaxRequest>({
     grossMonthlySalary: 0,
-    employeeType: 'EMPLOYEE',
+    isRetired: false,
     hasSpouse: false,
     childrenCount: 0,
+    childrenWithDisabilitiesCount: 0,
     healthInsurance: undefined,
     retirement: undefined,
     union: undefined,
+    unionDuesPercent: undefined,
     housingRent: undefined,
     domesticService: undefined,
     educationExpenses: undefined,
+    lifeInsurance: undefined,
   });
 
   const [result, setResult] = useState<IncomeTaxResponse | null>(null);
+  const [faqOpen, setFaqOpen] = useState(false);
 
   const calculateMutation = useMutation({
     mutationFn: async (data: IncomeTaxRequest) => {
@@ -47,8 +51,13 @@ export default function IncomeTaxPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value);
+  const formatCurrency = (value: number | undefined | null) => {
+    const n = Number(value);
+    if (!Number.isFinite(n)) {
+      return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(0);
+    }
+    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(n);
+  };
 
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
@@ -90,29 +99,48 @@ export default function IncomeTaxPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    {translate('employeeType')}
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant={
-                        formData.employeeType === 'EMPLOYEE' ? 'default' : 'outline'
-                      }
-                      onClick={() => handleInputChange('employeeType', 'EMPLOYEE')}
-                      className="w-full"
-                    >
-                      {translate('employee')}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={formData.employeeType === 'SELF_EMPLOYED' ? 'default' : 'outline'}
-                      onClick={() => handleInputChange('employeeType', 'SELF_EMPLOYED')}
-                      className="w-full"
-                    >
-                      {translate('selfEmployed')}
-                    </Button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                      <UserX className="h-4 w-4 text-muted-foreground" />
+                      {translate('isRetired')}
+                    </label>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={formData.isRetired ? 'default' : 'outline'}
+                        onClick={() => handleInputChange('isRetired', true)}
+                      >
+                        {translate('yes')}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={!formData.isRetired ? 'default' : 'outline'}
+                        onClick={() => handleInputChange('isRetired', false)}
+                      >
+                        {translate('no')}
+                      </Button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">{translate('unionDuesPercent')}</label>
+                    <div className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.1"
+                        placeholder="0"
+                        value={formData.unionDuesPercent ?? ''}
+                        onChange={(e) =>
+                          handleInputChange('unionDuesPercent', parseFloat(e.target.value) || undefined)
+                        }
+                        className="w-24"
+                      />
+                      <span className="text-sm text-muted-foreground">%</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -153,6 +181,18 @@ export default function IncomeTaxPage() {
                       value={formData.childrenCount}
                       onChange={(e) =>
                         handleInputChange('childrenCount', parseInt(e.target.value) || 0)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-muted-foreground mb-1">{translate('childrenWithDisabilities')}</label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max={formData.childrenCount}
+                      value={formData.childrenWithDisabilitiesCount ?? 0}
+                      onChange={(e) =>
+                        handleInputChange('childrenWithDisabilitiesCount', parseInt(e.target.value) || 0)
                       }
                     />
                   </div>
@@ -208,6 +248,20 @@ export default function IncomeTaxPage() {
                     }
                   />
                 </div>
+                <div>
+                  <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                    <Shield className="h-3 w-3" />
+                    {translate('lifeInsurance')}
+                  </label>
+                  <Input
+                    type="number"
+                    placeholder="0"
+                    value={formData.lifeInsurance ?? ''}
+                    onChange={(e) =>
+                      handleInputChange('lifeInsurance', parseFloat(e.target.value) || undefined)
+                    }
+                  />
+                </div>
               </div>
 
               <Button
@@ -236,53 +290,91 @@ export default function IncomeTaxPage() {
                   <CardTitle className="text-lg">{translate('calculationResult')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">{translate('annualGrossSalary')}</p>
-                      <p className="text-xl font-bold text-foreground">
-                        {formatCurrency(result.grossAnnualSalary)}
-                      </p>
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center p-4 rounded-lg bg-green-500/20 border border-green-500/30 mb-4">
+                      <span className="font-medium text-foreground">{translate('monthlyNetSalary')}</span>
+                      <span className="text-2xl font-bold text-green-600 dark:text-green-400">
+                        {formatCurrency(result.monthlyNetSalary)}
+                      </span>
                     </div>
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">{translate('totalDeductions')}</p>
-                      <p className="text-xl font-bold text-green-500">
-                        {formatCurrency(result.totalDeductions)}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-muted/50 rounded-lg">
-                      <p className="text-xs text-muted-foreground">{translate('taxableNetIncome')}</p>
-                      <p className="text-xl font-bold text-foreground">
-                        {formatCurrency(result.taxableNetIncome)}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
-                      <p className="text-xs text-muted-foreground">{translate('annualTax')}</p>
-                      <p className="text-xl font-bold text-red-500">
-                        {formatCurrency(result.annualTax)}
-                      </p>
-                    </div>
+                    {result.deductionBreakdown ? (
+                      <>
+                        <p className="text-sm font-medium text-muted-foreground mb-2">
+                          {translate('deductionBreakdownTitle')}
+                        </p>
+                        <div className="space-y-0 divide-y divide-border rounded-lg border border-border">
+                          {[
+                            { key: 'retirement', label: translate('retirement'), value: result.deductionBreakdown.retirement },
+                            { key: 'healthInsurance', label: translate('healthInsurance'), value: result.deductionBreakdown.healthInsurance },
+                            { key: 'law19032', label: translate('law19032'), value: result.deductionBreakdown.law19032 },
+                            { key: 'unionDues', label: translate('unionDues'), value: result.deductionBreakdown.unionDues },
+                            { key: 'incomeTax', label: translate('incomeTaxLabel'), value: result.deductionBreakdown.incomeTax },
+                          ].map(({ key, label, value }) => (
+                            <div key={key} className="flex justify-between py-3 px-4">
+                              <span className="text-muted-foreground">{label}</span>
+                              <span className="font-medium text-red-500 dark:text-red-400">
+                                {formatCurrency(value ?? 0)}
+                              </span>
+                            </div>
+                          ))}
+                          <div className="flex justify-between py-3 px-4 font-medium bg-muted/30">
+                            <span className="text-foreground">{translate('totalDeductionsLabel')}</span>
+                            <span className="text-red-500 dark:text-red-400">
+                              {formatCurrency(result.deductionBreakdown.total ?? 0)}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="space-y-2 text-sm p-4 bg-muted/30 rounded-lg">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{translate('grossMonthlySalary')}</span>
+                          <span className="font-medium">{formatCurrency(result.grossMonthlySalary ?? formData.grossMonthlySalary)}</span>
+                        </div>
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>− {translate('monthlyLegalDeductions')}</span>
+                          <span>{formatCurrency(result.monthlyLegalDeductions ?? 0)}</span>
+                        </div>
+                        <div className="flex justify-between text-muted-foreground">
+                          <span>− {translate('monthlyTax')}</span>
+                          <span>{formatCurrency(result.monthlyTax)}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-xs text-muted-foreground">{translate('monthlyTax')}</p>
-                        <p className="text-2xl font-bold text-primary">
-                          {formatCurrency(result.monthlyTax)}
+                  <div className="mt-8 pt-6 border-t border-border">
+                    <p className="text-sm font-medium text-muted-foreground mb-4">{translate('annualSummary')}</p>
+                    {(result.annualTax === 0 && (result.taxableNetIncome ?? 0) <= 0) && (
+                      <p className="text-sm text-green-600 dark:text-green-400 mb-4">
+                        {translate('noTaxOwed')}
+                      </p>
+                    )}
+                    <div className="grid grid-cols-2 gap-5">
+                      <div className="p-5 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">{translate('annualGrossSalary')}</p>
+                        <p className="text-lg font-bold text-foreground">
+                          {formatCurrency(result.grossAnnualSalary)}
                         </p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">{translate('effectiveRate')}</p>
-                        <p className="text-2xl font-bold text-primary">
+                      <div className="p-5 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">{translate('taxableNetIncome')}</p>
+                        <p className="text-lg font-bold text-foreground">
+                          {formatCurrency(result.taxableNetIncome)}
+                        </p>
+                      </div>
+                      <div className="p-5 bg-destructive/10 rounded-lg border border-destructive/20">
+                        <p className="text-xs text-muted-foreground mb-1">{translate('annualTax')}</p>
+                        <p className="text-lg font-bold text-red-500 dark:text-red-400">
+                          {formatCurrency(result.annualTax)}
+                        </p>
+                      </div>
+                      <div className="p-5 bg-muted/50 rounded-lg">
+                        <p className="text-xs text-muted-foreground mb-1">{translate('effectiveRate')}</p>
+                        <p className="text-lg font-bold text-primary">
                           {formatPercent(result.effectiveRate)}
                         </p>
                       </div>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-border">
-                      <p className="text-xs text-muted-foreground">{translate('monthlyNetSalary')}</p>
-                      <p className="text-xl font-bold text-green-500">
-                        {formatCurrency(result.monthlyNetSalary)}
-                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -291,6 +383,7 @@ export default function IncomeTaxPage() {
               <Card className="bg-card">
                 <CardHeader>
                   <CardTitle className="text-lg">{translate('deductionsDetail')}</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-1">{translate('deductionsAnnualNote')}</p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -396,6 +489,27 @@ export default function IncomeTaxPage() {
           )}
         </div>
       </div>
+
+      <Card className="bg-muted/30 border-muted overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setFaqOpen(!faqOpen)}
+          className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-muted/50 transition-colors"
+        >
+          <span className="flex items-center gap-2 font-medium text-foreground text-left">
+            <HelpCircle className="h-5 w-5 text-primary shrink-0" />
+            {translate('faqNetVsGrossQuestion')}
+          </span>
+          {faqOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground shrink-0" /> : <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />}
+        </button>
+        {faqOpen && (
+          <div className="px-5 pb-5 pt-5 border-t border-border/50">
+            <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
+              {translate('faqNetVsGrossAnswer')}
+            </p>
+          </div>
+        )}
+      </Card>
     </div>
   );
 }
