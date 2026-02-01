@@ -88,8 +88,8 @@ export default function DashboardPage() {
         )}
 
         {selectedCountry === 'ar' && socialIndicators && (socialIndicators.minimumSalary !== undefined && socialIndicators.minimumSalary !== null || socialIndicators.minimumPension !== undefined && socialIndicators.minimumPension !== null || socialIndicators.canastaBasicaTotal !== undefined && socialIndicators.canastaBasicaTotal !== null || socialIndicators.uva !== undefined && socialIndicators.uva !== null || socialIndicators.cer !== undefined && socialIndicators.cer !== null) && (
-          <div className="flex flex-col gap-4">
-            <Card>
+          <div className="flex flex-col gap-4 h-full min-h-0">
+            <Card className="shrink-0">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {translate('socialIndicators')}
@@ -147,13 +147,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
             {countryConfig.features.inflation && (
-              <Card>
-                <CardHeader className="pb-2">
+              <Card className="flex-1 flex flex-col min-h-0">
+                <CardHeader className="pb-2 shrink-0">
                   <CardTitle className="text-sm font-medium text-muted-foreground">
                     {translate('monthlyInflation')}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 flex flex-col pt-0 pb-6">
                   <div className="flex items-end justify-between">
                     <div>
                       <p className="text-3xl font-bold text-red-500">

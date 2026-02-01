@@ -158,6 +158,7 @@ logging:
     com.finarg: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%15.15t] [%X{requestId}] %-40.40logger{39} : %m%n"
 
