@@ -1,14 +1,21 @@
-import { render, screen } from '@testing-library/react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { render, screen } from "@testing-library/react";
 
-describe('Card', () => {
-  it('renders Card correctly', () => {
+describe("Card", () => {
+  it("renders Card correctly", () => {
     render(<Card data-testid="card">Card content</Card>);
-    expect(screen.getByTestId('card')).toBeInTheDocument();
+    expect(screen.getByTestId("card")).toBeInTheDocument();
     expect(screen.getByText(/card content/i)).toBeInTheDocument();
   });
 
-  it('renders with all subcomponents', () => {
+  it("renders with all subcomponents", () => {
     render(
       <Card data-testid="card">
         <CardHeader>
@@ -17,7 +24,7 @@ describe('Card', () => {
         </CardHeader>
         <CardContent>Main Content</CardContent>
         <CardFooter>Footer Content</CardFooter>
-      </Card>
+      </Card>,
     );
 
     expect(screen.getByText(/test title/i)).toBeInTheDocument();
@@ -26,55 +33,59 @@ describe('Card', () => {
     expect(screen.getByText(/footer content/i)).toBeInTheDocument();
   });
 
-  it('applies custom className to Card', () => {
-    render(<Card className="custom-card" data-testid="card">Content</Card>);
-    expect(screen.getByTestId('card')).toHaveClass('custom-card');
+  it("applies custom className to Card", () => {
+    render(
+      <Card className="custom-card" data-testid="card">
+        Content
+      </Card>,
+    );
+    expect(screen.getByTestId("card")).toHaveClass("custom-card");
   });
 
-  it('applies custom className to CardHeader', () => {
+  it("applies custom className to CardHeader", () => {
     render(
       <Card>
         <CardHeader className="custom-header" data-testid="header">
           Header
         </CardHeader>
-      </Card>
+      </Card>,
     );
-    expect(screen.getByTestId('header')).toHaveClass('custom-header');
+    expect(screen.getByTestId("header")).toHaveClass("custom-header");
   });
 
-  it('applies custom className to CardContent', () => {
+  it("applies custom className to CardContent", () => {
     render(
       <Card>
         <CardContent className="custom-content" data-testid="content">
           Content
         </CardContent>
-      </Card>
+      </Card>,
     );
-    expect(screen.getByTestId('content')).toHaveClass('custom-content');
+    expect(screen.getByTestId("content")).toHaveClass("custom-content");
   });
 
-  it('applies custom className to CardFooter', () => {
+  it("applies custom className to CardFooter", () => {
     render(
       <Card>
         <CardFooter className="custom-footer" data-testid="footer">
           Footer
         </CardFooter>
-      </Card>
+      </Card>,
     );
-    expect(screen.getByTestId('footer')).toHaveClass('custom-footer');
+    expect(screen.getByTestId("footer")).toHaveClass("custom-footer");
   });
 
-  it('has proper semantic structure', () => {
+  it("has proper semantic structure", () => {
     render(
       <Card>
         <CardHeader>
           <CardTitle>Title</CardTitle>
         </CardHeader>
         <CardContent>Content</CardContent>
-      </Card>
+      </Card>,
     );
 
     // CardTitle should render as h3 by default
-    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent('Title');
+    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Title");
   });
 });

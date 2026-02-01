@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { useEffect, useState } from 'react';
-import { User } from '@/types';
-import { CountryCode } from '@/config/countries';
+import type { CountryCode } from "@/config/countries";
+import type { User } from "@/types";
+import { useEffect, useState } from "react";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AuthState {
   user: User | null;
@@ -18,15 +18,13 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       isAuthenticated: false,
-      setAuth: (user, accessToken) =>
-        set({ user, accessToken, isAuthenticated: true }),
-      logout: () =>
-        set({ user: null, accessToken: null, isAuthenticated: false }),
+      setAuth: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
+      logout: () => set({ user: null, accessToken: null, isAuthenticated: false }),
     }),
     {
-      name: 'auth-storage',
-    }
-  )
+      name: "auth-storage",
+    },
+  ),
 );
 
 interface AppState {
@@ -47,21 +45,24 @@ export const useAppStore = create<AppState>()(
       sidebarOpen: true,
       toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      selectedCountry: 'ar' as CountryCode,
+      selectedCountry: "ar" as CountryCode,
       setSelectedCountry: (country) => set({ selectedCountry: country, selectedPais: country }),
-      selectedPais: 'ar' as CountryCode,
+      selectedPais: "ar" as CountryCode,
       setSelectedPais: (pais) => set({ selectedPais: pais, selectedCountry: pais }),
       _hasHydrated: false,
       setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
-      name: 'app-storage',
-      partialize: (state) => ({ selectedCountry: state.selectedCountry, selectedPais: state.selectedPais }),
+      name: "app-storage",
+      partialize: (state) => ({
+        selectedCountry: state.selectedCountry,
+        selectedPais: state.selectedPais,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },
-    }
-  )
+    },
+  ),
 );
 
 export function useHydration() {

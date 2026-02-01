@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Skeleton, SkeletonText } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
 
 // Skeleton para DolarCard
 export function DolarCardSkeleton() {
@@ -33,7 +33,7 @@ export function DolarCardSkeleton() {
 export function DolarCardsGridSkeleton({ count = 7 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: count }, (_, i) => i).map((i) => (
         <DolarCardSkeleton key={i} />
       ))}
     </div>
@@ -128,7 +128,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
             <Skeleton className="h-4 w-20" />
             <Skeleton className="h-4 w-16" />
           </div>
-          {Array.from({ length: rows }).map((_, i) => (
+          {Array.from({ length: rows }, (_, i) => i).map((i) => (
             <div key={i} className="flex gap-4 py-2">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-20 ml-auto" />
@@ -163,7 +163,7 @@ export function KpiCardSkeleton() {
 export function KpiCardsGridSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {Array.from({ length: count }).map((_, i) => (
+      {Array.from({ length: count }, (_, i) => i).map((i) => (
         <KpiCardSkeleton key={i} />
       ))}
     </div>
@@ -271,7 +271,7 @@ export function CalculadoraPageSkeleton() {
 export function ArbitrajeListSkeleton() {
   return (
     <div className="space-y-4">
-      {Array.from({ length: 3 }).map((_, i) => (
+      {Array.from({ length: 3 }, (_, i) => i).map((i) => (
         <Card key={i} className="bg-card">
           <CardHeader className="pb-2">
             <div className="flex justify-between">

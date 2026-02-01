@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 import {
-  ComposedChart,
-  Line,
   Area,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
+} from "recharts";
 
 interface LineChartProps {
   data: Record<string, string | number>[];
@@ -29,7 +29,7 @@ export function LineChart({
   data,
   xKey,
   yKey,
-  colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+  colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"],
   height = 300,
   formatX,
   formatY,
@@ -42,7 +42,9 @@ export function LineChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 20, left: 10, bottom: 8 }}>
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />}
+        {showGrid && (
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+        )}
         <defs>
           {yKeys.map((key, index) => {
             const color = colors[index % colors.length];
@@ -60,34 +62,38 @@ export function LineChart({
           stroke="hsl(var(--muted-foreground))"
           fontSize={11}
           tickFormatter={formatX}
-          tick={{ fill: 'hsl(var(--muted-foreground))' }}
-          axisLine={{ stroke: 'hsl(var(--border))' }}
+          tick={{ fill: "hsl(var(--muted-foreground))" }}
+          axisLine={{ stroke: "hsl(var(--border))" }}
           tickLine={false}
         />
         <YAxis
           stroke="hsl(var(--muted-foreground))"
           fontSize={11}
           tickFormatter={formatY}
-          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          tick={{ fill: "hsl(var(--muted-foreground))" }}
           width={72}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border))',
-            borderRadius: '8px',
+            backgroundColor: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderRadius: "8px",
           }}
-          labelStyle={{ color: 'hsl(var(--foreground))' }}
-          itemStyle={{ color: 'hsl(var(--foreground))' }}
-          formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString('es-AR')]}
+          labelStyle={{ color: "hsl(var(--foreground))" }}
+          itemStyle={{ color: "hsl(var(--foreground))" }}
+          formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
           content={({ active, payload, label }) => {
-            if (!active || !payload || payload.length === 0) {return null;}
+            if (!active || !payload || payload.length === 0) {
+              return null;
+            }
             const seen = new Set<string>();
             const uniquePayload = payload.filter((p) => {
               const key = p.dataKey as string;
-              if (seen.has(key)) {return false;}
+              if (seen.has(key)) {
+                return false;
+              }
               seen.add(key);
               return true;
             });
@@ -96,36 +102,30 @@ export function LineChart({
               <div
                 className="rounded-lg border px-3 py-2 shadow-lg"
                 style={{
-                  backgroundColor: 'hsl(var(--card))',
-                  borderColor: 'hsl(var(--border))',
+                  backgroundColor: "hsl(var(--card))",
+                  borderColor: "hsl(var(--border))",
                 }}
               >
-                <p className="mb-2 font-medium" style={{ color: 'hsl(var(--foreground))' }}>
+                <p className="mb-2 font-medium" style={{ color: "hsl(var(--foreground))" }}>
                   {displayLabel}
                 </p>
                 {uniquePayload.map((entry) => {
                   const key = entry.dataKey as string;
                   const label = legendLabels?.[key] ?? entry.name ?? key;
                   return (
-                  <div key={String(key)} className="flex justify-between gap-4 text-sm">
-                    <span style={{ color: 'hsl(var(--muted-foreground))' }}>
-                      {label}:
-                    </span>
-                    <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>
-                      {formatY ? formatY(Number(entry.value)) : String(entry.value)}
-                    </span>
-                  </div>
-                );
+                    <div key={String(key)} className="flex justify-between gap-4 text-sm">
+                      <span style={{ color: "hsl(var(--muted-foreground))" }}>{label}:</span>
+                      <span className="font-medium" style={{ color: "hsl(var(--foreground))" }}>
+                        {formatY ? formatY(Number(entry.value)) : String(entry.value)}
+                      </span>
+                    </div>
+                  );
                 })}
               </div>
             );
           }}
         />
-        {showLegend && (
-          <Legend
-            formatter={(value) => legendLabels?.[value] ?? value}
-          />
-        )}
+        {showLegend && <Legend formatter={(value) => legendLabels?.[value] ?? value} />}
         {yKeys.map((key, index) => {
           const gradientId = `gradient-${key}-${index}`;
           return (
@@ -155,7 +155,7 @@ export function LineChart({
               activeDot={{
                 r: 6,
                 fill: lineColor,
-                stroke: 'hsl(var(--card))',
+                stroke: "hsl(var(--card))",
                 strokeWidth: 2,
               }}
             />

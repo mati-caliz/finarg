@@ -1,34 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ratesApi } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import {
-  Wallet,
-  Landmark,
-  AlertCircle,
-  ExternalLink,
-} from 'lucide-react';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAppStore } from '@/store/useStore';
-import { QueryError } from '@/components/QueryError';
-import { Skeleton } from '@/components/ui/skeleton';
+import { QueryError } from "@/components/QueryError";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "@/hooks/useTranslation";
+import { ratesApi } from "@/lib/api";
+import { useAppStore } from "@/store/useStore";
+import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, ExternalLink, Landmark, Wallet } from "lucide-react";
+import { useState } from "react";
 
-type TabType = 'wallets' | 'banks';
+type TabType = "wallets" | "banks";
 
 function extractDomainFromFaviconUrl(url: string): string | null {
   const domainMatch = url.match(/[?&]domain=([^&]+)/);
   if (domainMatch) {
     return domainMatch[1];
   }
-  
+
   const urlMatch = url.match(/[?&]url=https?:\/\/([^&/]+)/);
   if (urlMatch) {
     return urlMatch[1];
   }
-  
+
   return null;
 }
 
@@ -52,21 +47,28 @@ interface RateDTO {
 export default function RatesPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
-  const [activeTab, setActiveTab] = useState<TabType>('wallets');
+  const [activeTab, setActiveTab] = useState<TabType>("wallets");
 
-  const formatPercent = (value: number) =>
-    `${Number(value).toFixed(1)}%`;
+  const formatPercent = (value: number) => `${Number(value).toFixed(1)}%`;
 
   const formatDate = (dateStr: string | undefined) => {
-    if (!dateStr) {return null;}
-    const [y, m, d] = dateStr.split('-');
+    if (!dateStr) {
+      return null;
+    }
+    const [y, m, d] = dateStr.split("-");
     return d && m && y ? `${d}/${m}/${y}` : dateStr;
   };
 
   const formatLimit = (limit: number | undefined) => {
-    if (limit === undefined || limit === null || limit <= 0) {return null;}
-    if (limit >= 1_000_000) {return `$${(limit / 1_000_000).toFixed(0)} M`;}
-    if (limit >= 1_000) {return `$${(limit / 1_000).toFixed(0)} K`;}
+    if (limit === undefined || limit === null || limit <= 0) {
+      return null;
+    }
+    if (limit >= 1_000_000) {
+      return `$${(limit / 1_000_000).toFixed(0)} M`;
+    }
+    if (limit >= 1_000) {
+      return `$${(limit / 1_000).toFixed(0)} K`;
+    }
     return `$${limit}`;
   };
 
@@ -77,12 +79,12 @@ export default function RatesPage() {
     error: banksErrorData,
     refetch: refetchBanks,
   } = useQuery({
-    queryKey: ['rates', 'fixed-term', selectedCountry],
+    queryKey: ["rates", "fixed-term", selectedCountry],
     queryFn: async () => {
       const res = await ratesApi.getFixedTerm(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
     },
-    enabled: selectedCountry === 'ar',
+    enabled: selectedCountry === "ar",
   });
 
   const {
@@ -92,39 +94,31 @@ export default function RatesPage() {
     error: walletsErrorData,
     refetch: refetchWallets,
   } = useQuery({
-    queryKey: ['rates', 'wallets', selectedCountry],
+    queryKey: ["rates", "wallets", selectedCountry],
     queryFn: async () => {
       const res = await ratesApi.getWallets(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
     },
-    enabled: selectedCountry === 'ar',
+    enabled: selectedCountry === "ar",
   });
 
-  const showWallets = selectedCountry === 'ar';
-  const showBanks = selectedCountry === 'ar';
+  const showWallets = selectedCountry === "ar";
+  const showBanks = selectedCountry === "ar";
 
-  const maxBankTna = bankRates.length > 0
-    ? Math.max(...bankRates.map((r) => r.tna))
-    : 0;
-  const maxWalletTna = walletRates.length > 0
-    ? Math.max(...walletRates.map((r) => r.tna))
-    : 0;
+  const maxBankTna = bankRates.length > 0 ? Math.max(...bankRates.map((r) => r.tna)) : 0;
+  const maxWalletTna = walletRates.length > 0 ? Math.max(...walletRates.map((r) => r.tna)) : 0;
 
   if (!showWallets && !showBanks) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{translate('ratesComparator')}</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {translate('ratesComparatorDesc')}
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">{translate("ratesComparator")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{translate("ratesComparatorDesc")}</p>
         </div>
         <Card className="bg-card">
           <CardContent className="p-12 text-center">
             <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <p className="text-muted-foreground">
-              {translate('ratesNotAvailableCountry')}
-            </p>
+            <p className="text-muted-foreground">{translate("ratesNotAvailableCountry")}</p>
           </CardContent>
         </Card>
       </div>
@@ -135,56 +129,50 @@ export default function RatesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{translate('ratesComparator')}</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            {translate('ratesComparatorDesc')}
-          </p>
-          <p className="text-muted-foreground text-xs mt-1">
-            {translate('ratesUpdateNote')}
-          </p>
+          <h1 className="text-2xl font-bold text-foreground">{translate("ratesComparator")}</h1>
+          <p className="text-muted-foreground text-sm mt-1">{translate("ratesComparatorDesc")}</p>
+          <p className="text-muted-foreground text-xs mt-1">{translate("ratesUpdateNote")}</p>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
         {showWallets && (
           <Button
-            variant={activeTab === 'wallets' ? 'default' : 'outline'}
+            variant={activeTab === "wallets" ? "default" : "outline"}
             size="sm"
-            onClick={() => setActiveTab('wallets')}
+            onClick={() => setActiveTab("wallets")}
             className="flex items-center gap-2"
           >
             <Wallet className="h-4 w-4" />
-            {translate('walletRates')}
+            {translate("walletRates")}
           </Button>
         )}
         {showBanks && (
           <Button
-            variant={activeTab === 'banks' ? 'default' : 'outline'}
+            variant={activeTab === "banks" ? "default" : "outline"}
             size="sm"
-            onClick={() => setActiveTab('banks')}
+            onClick={() => setActiveTab("banks")}
             className="flex items-center gap-2"
           >
             <Landmark className="h-4 w-4" />
-            {translate('fixedTermRates')}
+            {translate("fixedTermRates")}
           </Button>
         )}
       </div>
 
-      {activeTab === 'wallets' && showWallets && (
+      {activeTab === "wallets" && showWallets && (
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Wallet className="h-5 w-5 text-primary" />
-              {translate('walletTnaRates')}
+              {translate("walletTnaRates")}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {translate('walletRatesDisclaimer')}
-            </p>
+            <p className="text-sm text-muted-foreground">{translate("walletRatesDisclaimer")}</p>
           </CardHeader>
           <CardContent>
             {walletsLoading ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: 6 }, (_, i) => i).map((i) => (
                   <Skeleton key={i} className="h-32 w-full rounded-lg" />
                 ))}
               </div>
@@ -196,7 +184,7 @@ export default function RatesPage() {
               />
             ) : walletRates.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
-                {translate('noWalletRates')}
+                {translate("noWalletRates")}
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -207,7 +195,7 @@ export default function RatesPage() {
                     <Card
                       key={row.id}
                       className={`overflow-hidden transition-colors ${
-                        isHighest ? 'border-primary/50 bg-primary/5' : ''
+                        isHighest ? "border-primary/50 bg-primary/5" : ""
                       }`}
                     >
                       <CardContent className="p-4">
@@ -223,15 +211,16 @@ export default function RatesPage() {
                                     loading="lazy"
                                     onError={(e) => {
                                       const img = e.currentTarget;
-                                      const domain = extractDomainFromFaviconUrl(row.logo ?? '');
+                                      const domain = extractDomainFromFaviconUrl(row.logo ?? "");
                                       if (domain && !img.dataset.triedFallback) {
-                                        img.dataset.triedFallback = 'true';
+                                        img.dataset.triedFallback = "true";
                                         img.src = getFallbackLogoUrl(domain);
                                       } else {
-                                        img.style.display = 'none';
+                                        img.style.display = "none";
                                         const fallback = img.nextElementSibling;
                                         if (fallback instanceof HTMLElement) {
-                                          fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                          fallback.className =
+                                            "rate-logo-fallback flex h-full w-full items-center justify-center";
                                         }
                                       }
                                     }}
@@ -246,12 +235,10 @@ export default function RatesPage() {
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-semibold text-foreground">
-                                  {row.name}
-                                </span>
+                                <span className="font-semibold text-foreground">{row.name}</span>
                                 {isHighest && (
                                   <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-normal text-primary">
-                                    {translate('highest')}
+                                    {translate("highest")}
                                   </span>
                                 )}
                               </div>
@@ -264,15 +251,15 @@ export default function RatesPage() {
                               )}
                               <div className="mt-2 flex flex-wrap gap-1">
                                 <span className="rounded border border-border px-2 py-0.5 text-xs">
-                                  {translate('wallet')}
+                                  {translate("wallet")}
                                 </span>
                                 {limitStr ? (
                                   <span className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground">
-                                    {translate('limitLabel')}: {limitStr}
+                                    {translate("limitLabel")}: {limitStr}
                                   </span>
                                 ) : (
                                   <span className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground">
-                                    {translate('noLimit')}
+                                    {translate("noLimit")}
                                   </span>
                                 )}
                               </div>
@@ -280,7 +267,7 @@ export default function RatesPage() {
                           </div>
                           <div className="flex shrink-0 flex-col items-end">
                             <span className="text-2xl font-bold text-primary">
-                              {row.tna > 0 ? formatPercent(row.tna) : '-'}
+                              {row.tna > 0 ? formatPercent(row.tna) : "-"}
                             </span>
                             <span className="text-xs text-muted-foreground">TNA</span>
                             {row.tea !== undefined && row.tea !== null && (
@@ -290,7 +277,7 @@ export default function RatesPage() {
                             )}
                             {row.date && (
                               <div className="mt-1 text-xs text-muted-foreground text-right leading-tight">
-                                <span className="block">{translate('tnaValidSince')}</span>
+                                <span className="block">{translate("tnaValidSince")}</span>
                                 <span className="block">{formatDate(row.date)}</span>
                               </div>
                             )}
@@ -306,33 +293,27 @@ export default function RatesPage() {
         </Card>
       )}
 
-      {activeTab === 'banks' && showBanks && (
+      {activeTab === "banks" && showBanks && (
         <Card className="bg-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Landmark className="h-5 w-5 text-primary" />
-              {translate('fixedTermBankRates')}
+              {translate("fixedTermBankRates")}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {translate('fixedTermRatesDisclaimer')}
-            </p>
+            <p className="text-sm text-muted-foreground">{translate("fixedTermRatesDisclaimer")}</p>
           </CardHeader>
           <CardContent>
             {banksLoading ? (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, i) => (
+                {Array.from({ length: 6 }, (_, i) => i).map((i) => (
                   <Skeleton key={i} className="h-32 w-full rounded-lg" />
                 ))}
               </div>
             ) : banksError ? (
-              <QueryError
-                error={banksErrorData as Error}
-                onRetry={() => refetchBanks()}
-                compact
-              />
+              <QueryError error={banksErrorData as Error} onRetry={() => refetchBanks()} compact />
             ) : bankRates.length === 0 ? (
               <div className="py-12 text-center text-muted-foreground">
-                {translate('noBankRates')}
+                {translate("noBankRates")}
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -342,7 +323,7 @@ export default function RatesPage() {
                     <Card
                       key={row.id}
                       className={`overflow-hidden transition-colors ${
-                        isHighest ? 'border-primary/50 bg-primary/5' : ''
+                        isHighest ? "border-primary/50 bg-primary/5" : ""
                       }`}
                     >
                       <CardContent className="p-4">
@@ -358,15 +339,16 @@ export default function RatesPage() {
                                     loading="lazy"
                                     onError={(e) => {
                                       const img = e.currentTarget;
-                                      const domain = extractDomainFromFaviconUrl(row.logo ?? '');
+                                      const domain = extractDomainFromFaviconUrl(row.logo ?? "");
                                       if (domain && !img.dataset.triedFallback) {
-                                        img.dataset.triedFallback = 'true';
+                                        img.dataset.triedFallback = "true";
                                         img.src = getFallbackLogoUrl(domain);
                                       } else {
-                                        img.style.display = 'none';
+                                        img.style.display = "none";
                                         const fallback = img.nextElementSibling;
                                         if (fallback instanceof HTMLElement) {
-                                          fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                          fallback.className =
+                                            "rate-logo-fallback flex h-full w-full items-center justify-center";
                                         }
                                       }
                                     }}
@@ -381,18 +363,16 @@ export default function RatesPage() {
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <span className="font-semibold text-foreground">
-                                  {row.name}
-                                </span>
+                                <span className="font-semibold text-foreground">{row.name}</span>
                                 {isHighest && (
                                   <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-normal text-primary">
-                                    {translate('highest')}
+                                    {translate("highest")}
                                   </span>
                                 )}
                               </div>
                               <div className="mt-2 flex flex-wrap gap-1">
                                 <span className="rounded border border-border px-2 py-0.5 text-xs">
-                                  {row.term ?? '30 días'}
+                                  {row.term ?? "30 días"}
                                 </span>
                               </div>
                               {row.link && (
@@ -403,7 +383,7 @@ export default function RatesPage() {
                                   className="mt-2 inline-flex items-center gap-1 text-xs text-primary hover:underline"
                                 >
                                   <ExternalLink className="h-3 w-3" />
-                                  {translate('seeMore')}
+                                  {translate("seeMore")}
                                 </a>
                               )}
                             </div>
@@ -435,10 +415,8 @@ export default function RatesPage() {
           <div className="flex gap-3">
             <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="text-yellow-500 font-medium mb-1">{translate('importantInfo')}</p>
-              <p className="text-muted-foreground">
-                {translate('ratesDisclaimer')}
-              </p>
+              <p className="text-yellow-500 font-medium mb-1">{translate("importantInfo")}</p>
+              <p className="text-muted-foreground">{translate("ratesDisclaimer")}</p>
             </div>
           </div>
         </CardContent>

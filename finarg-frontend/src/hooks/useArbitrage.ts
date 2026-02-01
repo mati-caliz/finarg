@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { arbitrageApi } from '@/lib/api';
-import { Arbitrage } from '@/types';
+import { arbitrageApi } from "@/lib/api";
+import type { Arbitrage } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
 export function useArbitrage() {
   return useQuery<Arbitrage[]>({
-    queryKey: ['arbitrage'],
+    queryKey: ["arbitrage"],
     queryFn: async () => {
       const response = await arbitrageApi.getOpportunities();
       return response.data;

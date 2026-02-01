@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertTriangle, Home, RefreshCw } from "lucide-react";
+import type React from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
   children: ReactNode;
@@ -33,11 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo });
-    
+
     // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('ErrorBoundary caught an error:', error);
-      console.error('Component stack:', errorInfo.componentStack);
+    if (process.env.NODE_ENV === "development") {
+      console.error("ErrorBoundary caught an error:", error);
+      console.error("Component stack:", errorInfo.componentStack);
     }
 
     // Call custom error handler if provided
@@ -60,7 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   handleGoHome = (): void => {
-    window.location.href = '/';
+    window.location.href = "/";
   };
 
   render(): ReactNode {
@@ -82,31 +83,22 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-gray-400 text-center text-sm">
-                Ha ocurrido un error inesperado. Podés intentar recargar la página o volver al inicio.
+                Ha ocurrido un error inesperado. Podés intentar recargar la página o volver al
+                inicio.
               </p>
-              
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+
+              {process.env.NODE_ENV === "development" && this.state.error && (
                 <div className="p-3 bg-gray-800/50 rounded-lg overflow-auto max-h-32">
-                  <p className="text-xs font-mono text-red-400">
-                    {this.state.error.message}
-                  </p>
+                  <p className="text-xs font-mono text-red-400">{this.state.error.message}</p>
                 </div>
               )}
 
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button
-                  onClick={this.handleReset}
-                  variant="outline"
-                  className="flex-1"
-                >
+                <Button onClick={this.handleReset} variant="outline" className="flex-1">
                   <RefreshCw className="mr-2 h-4 w-4" />
                   Reintentar
                 </Button>
-                <Button
-                  onClick={this.handleGoHome}
-                  variant="default"
-                  className="flex-1"
-                >
+                <Button onClick={this.handleGoHome} variant="default" className="flex-1">
                   <Home className="mr-2 h-4 w-4" />
                   Ir al inicio
                 </Button>
@@ -124,15 +116,15 @@ export class ErrorBoundary extends Component<Props, State> {
 // HOC for wrapping components with error boundary
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  fallback?: ReactNode
+  fallback?: ReactNode,
 ): React.FC<P> {
   const WithErrorBoundary: React.FC<P> = (props) => (
     <ErrorBoundary fallback={fallback}>
       <WrappedComponent {...props} />
     </ErrorBoundary>
   );
-  
-  WithErrorBoundary.displayName = `WithErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-  
+
+  WithErrorBoundary.displayName = `WithErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || "Component"})`;
+
   return WithErrorBoundary;
 }
