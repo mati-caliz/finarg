@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { quotesApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LineChart } from '@/components/charts';
 import { Quote } from '@/types';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, X } from 'lucide-react';
 import { QueryError } from '@/components/QueryError';
 import { DolarCardSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,6 +23,7 @@ const AR_CURRENCY_GROUPS = {
   brl: ['brl_oficial', 'brl_blue', 'brl_tarjeta'],
   clp: ['clp_oficial', 'clp_blue', 'clp_tarjeta'],
   uyu: ['uyu_oficial', 'uyu_blue', 'uyu_tarjeta'],
+  cop: ['cop_oficial', 'cop_blue', 'cop_tarjeta'],
   pyg: ['pyg_oficial', 'pyg_blue', 'pyg_tarjeta'],
   bob: ['bob_oficial', 'bob_blue', 'bob_tarjeta'],
   cny: ['cny_oficial', 'cny_blue', 'cny_tarjeta'],
@@ -55,15 +56,38 @@ export default function QuotesPage() {
     }));
   }, [countryConfig, selectedBaseCurrency, hasCurrencyGroups, translate]);
 
-  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [activeCard, setActiveCard] = useState<string | null>(null);
   const [period, setPeriod] = useState('30');
 
+  const allowedTypeCodes = useMemo(() => {
+    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
+    const types = hasCurrencyGroups
+      ? countryConfig.currencyTypes.filter((t) => allowed.includes(t.code))
+      : countryConfig.currencyTypes;
+    return new Set(types.map((t) => t.code));
+  }, [selectedBaseCurrency, hasCurrencyGroups, countryConfig.currencyTypes]);
+
+  const chartableTypeCodes = useMemo(() => {
+    return Array.from(allowedTypeCodes).filter((code) => hasChartHistory(code));
+  }, [allowedTypeCodes]);
+
   useEffect(() => {
-    const first = currencyTypes[0]?.value;
-    if (first) {
-      setSelectedType((prev) => (prev && currencyTypes.some((t) => t.value === prev) ? prev : first));
-    }
-  }, [currencyTypes]);
+    setSelectedTypes((prev) => {
+      const kept = prev.filter((t) => allowedTypeCodes.has(t));
+      if (kept.length > 0) {
+        return kept;
+      }
+      const first = chartableTypeCodes[0];
+      return first !== undefined ? [first] : [];
+    });
+    setActiveCard((prev) => {
+      if (prev !== null && allowedTypeCodes.has(prev)) {
+        return prev;
+      }
+      return chartableTypeCodes[0] ?? null;
+    });
+  }, [allowedTypeCodes, chartableTypeCodes]);
 
   const periods = useMemo(() => [
     { value: '7', label: translate('days7') },
@@ -118,24 +142,24 @@ export default function QuotesPage() {
     ? Math.min(100, ((Date.now() - dataUpdatedAt) / QUOTES_REFETCH_MS) * 100)
     : 0;
 
-  const {
-    data: history,
-    isLoading: historyLoading,
-    isError: historyError,
-    error: historyErrorData,
-    refetch: refetchHistory,
-  } = useQuery({
-    queryKey: ['history', selectedCountry, selectedType, period],
-    queryFn: async () => {
-      if (!selectedType) {return [];}
-      const to = new Date().toISOString().split('T')[0];
-      const from = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split('T')[0];
-      const response = await quotesApi.getHistory(selectedType, from, to, selectedCountry);
-      return response.data;
-    },
-    enabled: !!selectedType && (!hasCurrencyGroups || hasChartHistory(selectedType)),
+  const chartableSelectedTypes = useMemo(
+    () => selectedTypes.filter((t) => !hasCurrencyGroups || hasChartHistory(t)),
+    [selectedTypes, hasCurrencyGroups]
+  );
+
+  const historyQueries = useQueries({
+    queries: chartableSelectedTypes.map((type) => ({
+      queryKey: ['history', selectedCountry, type, period],
+      queryFn: async () => {
+        const to = new Date().toISOString().split('T')[0];
+        const from = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split('T')[0];
+        const response = await quotesApi.getHistory(type, from, to, selectedCountry);
+        return response.data as { date: string; buy: number; sell: number }[];
+      },
+      enabled: true,
+    })),
   });
 
   const formatDate = (value: string | number) => {
@@ -171,6 +195,7 @@ export default function QuotesPage() {
         { key: 'cny' as BaseCurrency, labelKey: 'currencyCny' as TranslationKey },
         { key: 'clp' as BaseCurrency, labelKey: 'currencyClp' as TranslationKey },
         { key: 'uyu' as BaseCurrency, labelKey: 'currencyUyu' as TranslationKey },
+        { key: 'cop' as BaseCurrency, labelKey: 'currencyCop' as TranslationKey },
         { key: 'pyg' as BaseCurrency, labelKey: 'currencyPyg' as TranslationKey },
         { key: 'bob' as BaseCurrency, labelKey: 'currencyBob' as TranslationKey },
       ] as const)
@@ -231,9 +256,14 @@ export default function QuotesPage() {
             <Card
               key={quote.type}
               className={`bg-card cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
-                selectedType === quote.type ? 'ring-2 ring-primary' : ''
+                activeCard === quote.type ? 'ring-2 ring-primary' : ''
               }`}
-              onClick={() => setSelectedType(quote.type)}
+              onClick={() => {
+                setActiveCard(quote.type);
+                setSelectedTypes((prev) =>
+                  prev.includes(quote.type) ? prev : [...prev, quote.type]
+                );
+              }}
             >
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-3">
@@ -279,35 +309,38 @@ export default function QuotesPage() {
         )}
       </div>
 
-      {(!hasCurrencyGroups || (selectedType !== null && hasChartHistory(selectedType))) && (
+      {(!hasCurrencyGroups || chartableSelectedTypes.length > 0) && (
         <Card className="bg-card">
           <CardHeader className="pb-2">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">
-                  {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
-                </CardTitle>
+                <CardTitle className="text-lg">{translate('history')}</CardTitle>
                 <div className="flex flex-wrap gap-2">
                   {periods.map((p) => (
-                  <Button
-                    key={p.value}
-                    variant={period === p.value ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setPeriod(p.value)}
-                  >
-                    {p.label}
-                  </Button>
-                ))}
+                    <Button
+                      key={p.value}
+                      variant={period === p.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setPeriod(p.value)}
+                    >
+                      {p.label}
+                    </Button>
+                  ))}
                 </div>
               </div>
-              {currencyTypes.filter((t) => hasChartHistory(t.value)).length > 1 && (
+              {hasCurrencyGroups && currencyTypes.filter((t) => hasChartHistory(t.value)).length > 1 && (
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
                   {currencyTypes.filter((t) => hasChartHistory(t.value)).map((t) => (
                     <Button
                       key={t.value}
-                      variant={selectedType === t.value ? 'default' : 'outline'}
+                      variant={selectedTypes.includes(t.value) ? 'default' : 'outline'}
                       size="sm"
-                      onClick={() => setSelectedType(t.value)}
+                      onClick={() => {
+                        setActiveCard(t.value);
+                        setSelectedTypes((prev) =>
+                          prev.includes(t.value) ? prev : [...prev, t.value]
+                        );
+                      }}
                     >
                       {t.label}
                     </Button>
@@ -316,35 +349,64 @@ export default function QuotesPage() {
               )}
             </div>
           </CardHeader>
-          <CardContent>
-            {historyLoading ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <Skeleton className="w-full h-full" />
-              </div>
-            ) : historyError ? (
-              <QueryError
-                error={historyErrorData as Error}
-                onRetry={() => refetchHistory()}
-                compact
-              />
-            ) : history && history.length > 0 ? (
-              <LineChart
-                data={history}
-                xKey="date"
-                yKey={['buy', 'sell']}
-                colors={['#3b82f6', '#10b981']}
-                height={320}
-                formatX={formatDate}
-                formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
-                showLegend
-                showGrid={false}
-                legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
-              />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                {translate('noHistoricalData')}
-              </div>
-            )}
+          <CardContent className="space-y-8">
+            {chartableSelectedTypes.map((type, i) => {
+              const q = historyQueries[i];
+              const label = currencyTypes.find((t) => t.value === type)?.label ?? type;
+              const history = q?.data;
+              const isLoading = q?.isLoading ?? false;
+              const isError = q?.isError ?? false;
+              const err = q?.error;
+              const refetchOne = q?.refetch;
+              return (
+                <div key={type}>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTypes((prev) => prev.filter((t) => t !== type));
+                        setActiveCard((prev) => (prev === type ? null : prev));
+                      }}
+                      aria-label={translate('remove')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {isLoading ? (
+                    <div className="h-[300px] flex items-center justify-center">
+                      <Skeleton className="w-full h-full" />
+                    </div>
+                  ) : isError && err ? (
+                    <QueryError
+                      error={err as Error}
+                      onRetry={() => refetchOne?.()}
+                      compact
+                    />
+                  ) : history && history.length > 0 ? (
+                    <LineChart
+                      data={history}
+                      xKey="date"
+                      yKey={['buy', 'sell']}
+                      colors={['#3b82f6', '#10b981']}
+                      height={320}
+                      formatX={formatDate}
+                      formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
+                      showLegend
+                      showGrid={false}
+                      legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
+                    />
+                  ) : (
+                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                      {translate('noHistoricalData')}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
       )}

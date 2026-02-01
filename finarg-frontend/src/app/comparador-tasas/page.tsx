@@ -18,6 +18,24 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 type TabType = 'wallets' | 'banks';
 
+function extractDomainFromFaviconUrl(url: string): string | null {
+  const domainMatch = url.match(/[?&]domain=([^&]+)/);
+  if (domainMatch) {
+    return domainMatch[1];
+  }
+  
+  const urlMatch = url.match(/[?&]url=https?:\/\/([^&/]+)/);
+  if (urlMatch) {
+    return urlMatch[1];
+  }
+  
+  return null;
+}
+
+function getFallbackLogoUrl(domain: string): string {
+  return `https://icon.horse/icon/${domain}`;
+}
+
 interface RateDTO {
   id: string;
   name: string;
@@ -204,10 +222,17 @@ export default function RatesPage() {
                                     className="rate-logo-img max-h-full max-w-full shrink-0 object-contain object-center"
                                     loading="lazy"
                                     onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                      const fallback = e.currentTarget.nextElementSibling;
-                                      if (fallback instanceof HTMLElement) {
-                                        fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                      const img = e.currentTarget;
+                                      const domain = extractDomainFromFaviconUrl(row.logo ?? '');
+                                      if (domain && !img.dataset.triedFallback) {
+                                        img.dataset.triedFallback = 'true';
+                                        img.src = getFallbackLogoUrl(domain);
+                                      } else {
+                                        img.style.display = 'none';
+                                        const fallback = img.nextElementSibling;
+                                        if (fallback instanceof HTMLElement) {
+                                          fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                        }
                                       }
                                     }}
                                   />
@@ -332,10 +357,17 @@ export default function RatesPage() {
                                     className="rate-logo-img max-h-full max-w-full shrink-0 object-contain object-center"
                                     loading="lazy"
                                     onError={(e) => {
-                                      e.currentTarget.style.display = 'none';
-                                      const fallback = e.currentTarget.nextElementSibling;
-                                      if (fallback instanceof HTMLElement) {
-                                        fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                      const img = e.currentTarget;
+                                      const domain = extractDomainFromFaviconUrl(row.logo ?? '');
+                                      if (domain && !img.dataset.triedFallback) {
+                                        img.dataset.triedFallback = 'true';
+                                        img.src = getFallbackLogoUrl(domain);
+                                      } else {
+                                        img.style.display = 'none';
+                                        const fallback = img.nextElementSibling;
+                                        if (fallback instanceof HTMLElement) {
+                                          fallback.className = 'rate-logo-fallback flex h-full w-full items-center justify-center';
+                                        }
                                       }
                                     }}
                                   />
