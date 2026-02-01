@@ -9,6 +9,8 @@ const nextConfig = {
     return [
       { source: '/ganancias', destination: '/calculadora-sueldo-neto', permanent: true },
       { source: '/simulador', destination: '/simulador-de-inversiones', permanent: true },
+      { source: '/reservas', destination: '/reservas-bcra', permanent: true },
+      { source: '/tasas', destination: '/comparador-tasas', permanent: true },
     ];
   },
   async rewrites() {
