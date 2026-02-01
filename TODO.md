@@ -9,6 +9,3 @@
 - [ ] **Integrar más billeteras virtuales**: Explorar otros endpoints de api.argentinadatos.com para incluir más billeteras en el comparador de tasas. *(RatesService.java)*
 
 - [ ] **Reservas netas sin APIs externas**: Implementar una forma de obtener solo los datos hardcodeados de reservas netas (sin overrides de APIs externas). *(ReservesService.java)*
-
-- [ ] **Mejorar logging**: Implementar un sistema de logging más robusto para facilitar el debugging y monitoreo en desarrollo y producción.
-

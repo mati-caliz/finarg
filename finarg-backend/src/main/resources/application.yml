@@ -102,6 +102,10 @@ app:
               - id: other_fmi
                 name: Otros pasivos metodología FMI
                 amount: 17260
+  logging:
+    request:
+      enabled: true
+      include-query-string: false
 
 external:
   apis:
@@ -154,6 +158,8 @@ logging:
     com.finarg: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%15.15t] [%X{requestId}] %-40.40logger{39} : %m%n"
 
 springdoc:
   api-docs:

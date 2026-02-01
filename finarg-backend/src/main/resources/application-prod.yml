@@ -1,0 +1,19 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: INFO
+    com.finarg: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  file:
+    name: ${LOG_FILE:${LOG_PATH:./logs}/application.log}
+
+app:
+  logging:
+    request:
+      enabled: true
+      include-query-string: false
