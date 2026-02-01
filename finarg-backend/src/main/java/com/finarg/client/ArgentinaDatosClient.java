@@ -137,6 +137,61 @@ public class ArgentinaDatosClient {
         private BigDecimal value;
     }
 
+    public List<QuoteHistory> getCurrencyHistory(String currencyCode, LocalDate from, LocalDate to) {
+        record Mapping(String moneda, CurrencyType type) {}
+        Mapping m = switch (currencyCode) {
+            case "eur_oficial" -> new Mapping("EUR", CurrencyType.AR_EUR_OFICIAL);
+            case "brl_oficial" -> new Mapping("BRL", CurrencyType.AR_BRL_OFICIAL);
+            case "clp_oficial" -> new Mapping("CLP", CurrencyType.AR_CLP_OFICIAL);
+            case "uyu_oficial" -> new Mapping("UYU", CurrencyType.AR_UYU_OFICIAL);
+            default -> null;
+        };
+        if (m == null) {
+            return List.of();
+        }
+        CurrencyType type = m.type();
+        String moneda = m.moneda();
+        try {
+            List<CotizacionHistoryResponse> responses = webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/cotizaciones")
+                            .build())
+                    .retrieve()
+                    .bodyToFlux(CotizacionHistoryResponse.class)
+                    .collectList()
+                    .block();
+            if (responses == null || responses.isEmpty()) {
+                return List.of();
+            }
+            return responses.stream()
+                    .filter(r -> moneda.equalsIgnoreCase(r.getMoneda()))
+                    .filter(r -> {
+                        LocalDate d = LocalDate.parse(r.getFecha());
+                        return !d.isBefore(from) && !d.isAfter(to);
+                    })
+                    .sorted(java.util.Comparator.comparing(CotizacionHistoryResponse::getFecha))
+                    .map(r -> QuoteHistory.builder()
+                            .type(type)
+                            .country(Country.ARGENTINA)
+                            .date(LocalDate.parse(r.getFecha()))
+                            .buy(r.getCompra() != null ? r.getCompra() : BigDecimal.ZERO)
+                            .sell(r.getVenta() != null ? r.getVenta() : BigDecimal.ZERO)
+                            .build())
+                    .toList();
+        } catch (Exception e) {
+            log.error("Error fetching {} history from ArgentinaDatos: {}", moneda, e.getMessage());
+            return List.of();
+        }
+    }
+
+    @Data
+    public static class CotizacionHistoryResponse {
+        private String moneda;
+        private BigDecimal compra;
+        private BigDecimal venta;
+        private String fecha;
+    }
+
     public List<QuoteHistory> getDollarHistory(String exchangeType, LocalDate from, LocalDate to) {
         if (!isValidArgentinaExchange(exchangeType)) {
             return List.of();

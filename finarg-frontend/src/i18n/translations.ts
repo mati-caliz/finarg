@@ -176,7 +176,15 @@ export const translations = {
     updateValues: 'Actualizar valores históricos',
 
     // Quotes Page
-    allQuotesRealTime: 'Todas las cotizaciones en tiempo real',
+    allQuotesRealTime: 'Cotizaciones en tiempo real',
+    currencyDollar: 'Dólar',
+    currencyEuro: 'Euro',
+    currencyReal: 'Real',
+    currencyClp: 'Peso Chileno',
+    currencyUyu: 'Peso Uruguayo',
+    currencyPyg: 'Guaraní',
+    currencyBob: 'Boliviano',
+    currencyCny: 'Yuan',
     refresh: 'Actualizar',
     spread: 'Spread',
     buy: 'Compra',
@@ -214,6 +222,16 @@ export const translations = {
     tarjeta: 'Tarjeta',
     mayorista: 'Mayorista',
     cripto: 'Cripto',
+    eur_oficial: 'Euro Oficial',
+    eur_blue: 'Euro Blue',
+    brl_oficial: 'Real Oficial',
+    clp_oficial: 'Peso Chileno',
+    clp_blue: 'Peso Chileno Blue',
+    uyu_oficial: 'Peso Uruguayo',
+    uyu_blue: 'Peso Uruguayo Blue',
+    pyg_oficial: 'Guaraní Paraguayo',
+    bob_oficial: 'Boliviano',
+    cny_oficial: 'Yuan',
     AR_OFFICIAL: 'Oficial',
     AR_BLUE: 'Blue',
     AR_MEP: 'MEP/Bolsa',
@@ -221,6 +239,8 @@ export const translations = {
     AR_CARD: 'Tarjeta',
     AR_WHOLESALE: 'Mayorista',
     AR_CRYPTO: 'Cripto',
+    AR_EUR_OFICIAL: 'Euro Oficial',
+    AR_BRL_OFICIAL: 'Real Oficial',
     trm: 'TRM',
     casas: 'Casas de Cambio',
     ptax: 'PTAX (BCB)',
@@ -338,6 +358,7 @@ export const translations = {
 
     // App
     footerVersion: 'FinLatam v2.0.0',
+    otherCountriesComingSoon: 'Otros países próximamente',
 
     errorGeneric: 'Ocurrió un error inesperado. Intentá nuevamente.',
     errorUnauthorized: 'Sesión expirada o no autorizado. Iniciá sesión nuevamente.',
@@ -616,6 +637,7 @@ export const translations = {
 
     // App
     footerVersion: 'FinLatam v2.0.0',
+    otherCountriesComingSoon: 'Outros países em breve',
 
     errorGeneric: 'Ocorreu um erro inesperado. Tente novamente.',
     errorUnauthorized: 'Sessão expirada ou não autorizado. Faça login novamente.',
@@ -804,6 +826,14 @@ export const translations = {
 
     // Quotes Page
     allQuotesRealTime: 'All quotes in real-time',
+    currencyDollar: 'Dollar',
+    currencyEuro: 'Euro',
+    currencyReal: 'Real',
+    currencyClp: 'Chilean Peso',
+    currencyUyu: 'Uruguayan Peso',
+    currencyPyg: 'Guaraní',
+    currencyBob: 'Boliviano',
+    currencyCny: 'Yuan',
     refresh: 'Refresh',
     spread: 'Spread',
     buy: 'Buy',
@@ -848,6 +878,18 @@ export const translations = {
     AR_CARD: 'Card',
     AR_WHOLESALE: 'Wholesale',
     AR_CRYPTO: 'Crypto',
+    eur_oficial: 'Euro Official',
+    eur_blue: 'Euro Blue',
+    brl_oficial: 'Real Official',
+    clp_oficial: 'Chilean Peso',
+    clp_blue: 'Chilean Peso Blue',
+    uyu_oficial: 'Uruguayan Peso',
+    uyu_blue: 'Uruguayan Peso Blue',
+    pyg_oficial: 'Paraguayan Guaraní',
+    bob_oficial: 'Bolivian Boliviano',
+    cny_oficial: 'Chinese Yuan',
+    AR_EUR_OFICIAL: 'Euro Official',
+    AR_BRL_OFICIAL: 'Real Official',
     trm: 'TRM',
     casas: 'Exchange Houses',
     ptax: 'PTAX (BCB)',
@@ -965,6 +1007,7 @@ export const translations = {
 
     // App
     footerVersion: 'FinLatam v2.0.0',
+    otherCountriesComingSoon: 'Other countries coming soon',
 
     errorGeneric: 'An unexpected error occurred. Please try again.',
     errorUnauthorized: 'Session expired or unauthorized. Please log in again.',

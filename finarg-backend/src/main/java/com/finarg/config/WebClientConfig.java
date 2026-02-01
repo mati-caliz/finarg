@@ -20,6 +20,12 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-datos.base-url}")
     private String argentinaDatosBaseUrl;
 
+    @Value("${external.apis.bluelytics.base-url:https://api.bluelytics.com.ar/v2}")
+    private String bluelyticsBaseUrl;
+
+    @Value("${external.apis.exchangerate.base-url:https://open.er-api.com/v6}")
+    private String exchangerateBaseUrl;
+
     @Value("${external.apis.datos-gob-ar.base-url}")
     private String datosGobArBaseUrl;
 
@@ -54,6 +60,24 @@ public class WebClientConfig {
     public WebClient dolarApiWebClient() {
         return WebClient.builder()
                 .baseUrl(dolarApiBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean("exchangerateWebClient")
+    public WebClient exchangerateWebClient() {
+        return WebClient.builder()
+                .baseUrl(exchangerateBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean("bluelyticsWebClient")
+    public WebClient bluelyticsWebClient() {
+        return WebClient.builder()
+                .baseUrl(bluelyticsBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
