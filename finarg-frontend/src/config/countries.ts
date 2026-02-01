@@ -17,6 +17,7 @@ export interface CountryConfig {
     arbitrage: boolean;
     simulator: boolean;
     repos: boolean;
+    rates: boolean;
   };
   currencyTypes: {
     code: string;
@@ -45,6 +46,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       arbitrage: true,
       simulator: true,
       repos: true,
+      rates: true,
     },
     currencyTypes: [
       { code: 'oficial', name: 'Official', isOfficial: true, isParallel: false },
@@ -74,6 +76,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       arbitrage: false,
       simulator: true,
       repos: false,
+      rates: false,
     },
     currencyTypes: [
       { code: 'trm', name: 'TRM', isOfficial: true, isParallel: false },
@@ -99,6 +102,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       arbitrage: false,
       simulator: true,
       repos: false,
+      rates: false,
     },
     currencyTypes: [
       { code: 'ptax', name: 'PTAX (BCB)', isOfficial: true, isParallel: false },
@@ -125,6 +129,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       arbitrage: false,
       simulator: true,
       repos: false,
+      rates: false,
     },
     currencyTypes: [
       { code: 'observado', name: 'Observed (BCCh)', isOfficial: true, isParallel: false },
@@ -150,6 +155,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       arbitrage: false,
       simulator: true,
       repos: false,
+      rates: false,
     },
     currencyTypes: [
       { code: 'interbancario', name: 'Interbank', isOfficial: true, isParallel: false },

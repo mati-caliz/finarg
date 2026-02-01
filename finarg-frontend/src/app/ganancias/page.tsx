@@ -55,8 +55,8 @@ export default function IncomeTaxPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{translate('incomeTaxTitle')}</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">{translate('incomeTaxTitle')}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           {translate('incomeTaxSubtitle')}
         </p>
       </div>
@@ -73,11 +73,11 @@ export default function IncomeTaxPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {translate('grossMonthlySalary')}
                   </label>
                   <div className="relative">
-                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type="number"
                       placeholder="0"
@@ -91,7 +91,7 @@ export default function IncomeTaxPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     {translate('employeeType')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -118,13 +118,13 @@ export default function IncomeTaxPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                  <Users className="h-4 w-4" />
+                <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Users className="h-4 w-4 text-muted-foreground" />
                   {translate('familyDependents')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">{translate('spouse')}</label>
+                    <label className="block text-xs text-muted-foreground mb-1">{translate('spouse')}</label>
                     <div className="flex gap-2">
                       <Button
                         type="button"
@@ -145,7 +145,7 @@ export default function IncomeTaxPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">{translate('numberOfChildren')}</label>
+                    <label className="block text-xs text-muted-foreground mb-1">{translate('numberOfChildren')}</label>
                     <Input
                       type="number"
                       min="0"
@@ -160,13 +160,13 @@ export default function IncomeTaxPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                  <Home className="h-4 w-4" />
+                <h3 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Home className="h-4 w-4 text-muted-foreground" />
                   {translate('optionalDeductions')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">{translate('housingRent')}</label>
+                    <label className="block text-xs text-muted-foreground mb-1">{translate('housingRent')}</label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -180,7 +180,7 @@ export default function IncomeTaxPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">{translate('domesticService')}</label>
+                    <label className="block text-xs text-muted-foreground mb-1">{translate('domesticService')}</label>
                     <Input
                       type="number"
                       placeholder="0"
@@ -195,7 +195,7 @@ export default function IncomeTaxPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="flex items-center gap-1 text-xs text-gray-400 mb-1">
+                  <label className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                     <GraduationCap className="h-3 w-3" />
                     {translate('educationalExpenses')}
                   </label>
@@ -237,26 +237,26 @@ export default function IncomeTaxPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">{translate('annualGrossSalary')}</p>
-                      <p className="text-xl font-bold text-white">
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">{translate('annualGrossSalary')}</p>
+                      <p className="text-xl font-bold text-foreground">
                         {formatCurrency(result.grossAnnualSalary)}
                       </p>
                     </div>
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">{translate('totalDeductions')}</p>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">{translate('totalDeductions')}</p>
                       <p className="text-xl font-bold text-green-500">
                         {formatCurrency(result.totalDeductions)}
                       </p>
                     </div>
-                    <div className="p-4 bg-gray-800/50 rounded-lg">
-                      <p className="text-xs text-gray-400">{translate('taxableNetIncome')}</p>
-                      <p className="text-xl font-bold text-white">
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <p className="text-xs text-muted-foreground">{translate('taxableNetIncome')}</p>
+                      <p className="text-xl font-bold text-foreground">
                         {formatCurrency(result.taxableNetIncome)}
                       </p>
                     </div>
-                    <div className="p-4 bg-red-900/30 rounded-lg border border-red-800">
-                      <p className="text-xs text-gray-400">{translate('annualTax')}</p>
+                    <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
+                      <p className="text-xs text-muted-foreground">{translate('annualTax')}</p>
                       <p className="text-xl font-bold text-red-500">
                         {formatCurrency(result.annualTax)}
                       </p>
@@ -266,20 +266,20 @@ export default function IncomeTaxPage() {
                   <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-xs text-gray-400">{translate('monthlyTax')}</p>
+                        <p className="text-xs text-muted-foreground">{translate('monthlyTax')}</p>
                         <p className="text-2xl font-bold text-primary">
                           {formatCurrency(result.monthlyTax)}
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-400">{translate('effectiveRate')}</p>
+                        <p className="text-xs text-muted-foreground">{translate('effectiveRate')}</p>
                         <p className="text-2xl font-bold text-primary">
                           {formatPercent(result.effectiveRate)}
                         </p>
                       </div>
                     </div>
-                    <div className="mt-3 pt-3 border-t border-gray-700">
-                      <p className="text-xs text-gray-400">{translate('monthlyNetSalary')}</p>
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-xs text-muted-foreground">{translate('monthlyNetSalary')}</p>
                       <p className="text-xl font-bold text-green-500">
                         {formatCurrency(result.monthlyNetSalary)}
                       </p>
@@ -294,32 +294,32 @@ export default function IncomeTaxPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">{translate('nonTaxableMinimum')}</span>
-                      <span className="text-white">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">{translate('nonTaxableMinimum')}</span>
+                      <span className="text-foreground">
                         {formatCurrency(result.calculationDetails.nonTaxableMinimum)}
                       </span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">{translate('specialDeduction')}</span>
-                      <span className="text-white">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">{translate('specialDeduction')}</span>
+                      <span className="text-foreground">
                         {formatCurrency(result.calculationDetails.specialDeduction)}
                       </span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">{translate('familyDependents')}</span>
-                      <span className="text-white">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">{translate('familyDependents')}</span>
+                      <span className="text-foreground">
                         {formatCurrency(result.calculationDetails.familyCharges)}
                       </span>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-gray-800">
-                      <span className="text-gray-400">{translate('personalDeductions')}</span>
-                      <span className="text-white">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">{translate('personalDeductions')}</span>
+                      <span className="text-foreground">
                         {formatCurrency(result.calculationDetails.personalDeductions)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 font-bold">
-                      <span className="text-white">{translate('totalAllowedDeductions')}</span>
+                      <span className="text-foreground">{translate('totalAllowedDeductions')}</span>
                       <span className="text-green-500">
                         {formatCurrency(result.calculationDetails.totalAllowedDeductions)}
                       </span>
@@ -349,27 +349,27 @@ export default function IncomeTaxPage() {
                     <div className="mt-4 overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">{translate('bracket')}</th>
-                            <th className="text-right py-2 text-gray-400">{translate('from')}</th>
-                            <th className="text-right py-2 text-gray-400">{translate('to')}</th>
-                            <th className="text-right py-2 text-gray-400">{translate('rate')}</th>
-                            <th className="text-right py-2 text-gray-400">{translate('taxBase')}</th>
-                            <th className="text-right py-2 text-gray-400">{translate('tax')}</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 text-muted-foreground">{translate('bracket')}</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('from')}</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('to')}</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('rate')}</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('taxBase')}</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('tax')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {result.bracketBreakdown.map((bracket) => (
-                            <tr key={bracket.bracket} className="border-b border-gray-800/50">
-                              <td className="py-2 text-white">{bracket.bracket}</td>
-                              <td className="text-right py-2 text-gray-400">
+                            <tr key={bracket.bracket} className="border-b border-border/50">
+                              <td className="py-2 text-foreground">{bracket.bracket}</td>
+                              <td className="text-right py-2 text-muted-foreground">
                                 {formatCurrency(bracket.from)}
                               </td>
-                              <td className="text-right py-2 text-gray-400">
+                              <td className="text-right py-2 text-muted-foreground">
                                 {formatCurrency(bracket.to)}
                               </td>
                               <td className="text-right py-2 text-primary">{bracket.rate}%</td>
-                              <td className="text-right py-2 text-white">
+                              <td className="text-right py-2 text-foreground">
                                 {formatCurrency(bracket.taxableBase)}
                               </td>
                               <td className="text-right py-2 text-red-500">
@@ -387,8 +387,8 @@ export default function IncomeTaxPage() {
           ) : (
             <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
               <CardContent className="text-center">
-                <Calculator className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-                <p className="text-gray-500">
+                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
                   {translate('completeFormMessage')}
                 </p>
               </CardContent>

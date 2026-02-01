@@ -27,16 +27,64 @@ public class InflationService {
         return argentinaDatosClient.getMonthlyInflation(limit);
     }
 
-    @Cacheable(value = "inflation", key = "'current'")
+    @Cacheable(value = "inflation", key = "'current'", unless = "#result == null || #result.value == null || #result.value.signum() == 0")
     public InflationDTO getCurrentInflation() {
-        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(1);
+        log.info("Fetching current inflation (not from cache)");
+        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(13);
+        
         if (inflations.isEmpty()) {
+            log.warn("No inflation data available from API - returning empty result");
             return InflationDTO.builder()
-                    .date(LocalDate.now())
+                    .date(LocalDate.now().minusMonths(1))
                     .value(BigDecimal.ZERO)
                     .build();
         }
-        return inflations.get(0);
+        
+        InflationDTO latest = inflations.get(0);
+        log.info("Got latest inflation: date={}, value={}", latest.getDate(), latest.getValue());
+        
+        if (inflations.size() >= 12) {
+            BigDecimal yearOverYear = calculateYearOverYear(inflations);
+            latest.setYearOverYear(yearOverYear);
+            log.info("Calculated year-over-year inflation: {}%", yearOverYear);
+        }
+        
+        BigDecimal ytd = calculateYearToDate(inflations);
+        latest.setYearToDate(ytd);
+        log.info("Calculated year-to-date inflation: {}%", ytd);
+        
+        return latest;
+    }
+    
+    private BigDecimal calculateYearOverYear(List<InflationDTO> inflations) {
+        BigDecimal accumulated = BigDecimal.ONE;
+        int count = 0;
+        for (InflationDTO inf : inflations) {
+            if (count >= 12) break;
+            BigDecimal factor = BigDecimal.ONE.add(
+                    inf.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
+            );
+            accumulated = accumulated.multiply(factor);
+            count++;
+        }
+        return accumulated.subtract(BigDecimal.ONE)
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(1, RoundingMode.HALF_UP);
+    }
+    
+    private BigDecimal calculateYearToDate(List<InflationDTO> inflations) {
+        int currentYear = LocalDate.now().getYear();
+        BigDecimal accumulated = BigDecimal.ONE;
+        for (InflationDTO inf : inflations) {
+            if (inf.getDate().getYear() != currentYear) break;
+            BigDecimal factor = BigDecimal.ONE.add(
+                    inf.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
+            );
+            accumulated = accumulated.multiply(factor);
+        }
+        return accumulated.subtract(BigDecimal.ONE)
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(1, RoundingMode.HALF_UP);
     }
 
     @Cacheable(value = "inflation", key = "'year_over_year'")

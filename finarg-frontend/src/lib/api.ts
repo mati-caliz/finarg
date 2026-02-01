@@ -41,8 +41,8 @@ export const quotesApi = {
   getByCountryAndType: (country: CountryCode, type: string) => api.get(`/${country}/quotes/${type}`),
   getGap: () => api.get('/quotes/gap'),
   getGapByCountry: (country: CountryCode) => api.get(`/${country}/quotes/gap`),
-  getHistory: (type: string, from: string, to: string) =>
-    api.get(`/quotes/history/${type}`, { params: { country: 'ar', from, to } }),
+  getHistory: (type: string, from: string, to: string, country: CountryCode = 'ar') =>
+    api.get(`/quotes/history/${type}`, { params: { country, from, to } }),
   getCountries: () => api.get('/countries'),
 };
 
@@ -70,6 +70,13 @@ export const arbitrageApi = {
 export const simulatorApi = {
   simulate: (data: SimulationRequest) => api.post('/simulator/returns', data),
   getRates: () => api.get('/simulator/rates'),
+};
+
+export const ratesApi = {
+  getFixedTerm: (country: string = 'ar') =>
+    api.get('/rates/fixed-term', { params: { country } }),
+  getWallets: (country: string = 'ar') =>
+    api.get('/rates/wallets', { params: { country } }),
 };
 
 export const reposApi = {

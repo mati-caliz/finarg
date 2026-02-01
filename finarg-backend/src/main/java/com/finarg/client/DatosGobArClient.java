@@ -54,13 +54,14 @@ public class DatosGobArClient {
             }
 
             List<Object> row = response.getData().get(0);
-            BigDecimal pasivosLetrasUsd = toBigDecimal(row, 1);
+            BigDecimal pasivosLetrasPesos = toBigDecimal(row, 1);
             BigDecimal depositosGovPesos = toBigDecimal(row, 2);
             BigDecimal posicionPasesPesos = toBigDecimal(row, 3);
             BigDecimal tipoCambio = toBigDecimal(row, 4);
             if (tipoCambio.compareTo(BigDecimal.ZERO) <= 0) {
                 return null;
             }
+            BigDecimal pasivosLetrasUsd = pasivosLetrasPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
             BigDecimal depositosGovUsd = depositosGovPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
             BigDecimal posicionPasesUsd = posicionPasesPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
             return new BCRALiabilitiesData(pasivosLetrasUsd, depositosGovUsd, posicionPasesUsd);

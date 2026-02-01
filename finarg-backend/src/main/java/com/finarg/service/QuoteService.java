@@ -1,5 +1,6 @@
 package com.finarg.service;
 
+import com.finarg.client.ArgentinaDatosClient;
 import com.finarg.client.QuoteClient;
 import com.finarg.client.QuoteClientFactory;
 import com.finarg.model.dto.GapDTO;
@@ -29,6 +30,7 @@ public class QuoteService {
 
     private final QuoteClientFactory quoteClientFactory;
     private final QuoteHistoryRepository quoteHistoryRepository;
+    private final ArgentinaDatosClient argentinaDatosClient;
 
     @Cacheable(value = "quotes", key = "'all_' + #country.code")
     public List<QuoteDTO> getAllQuotes(Country country) {
@@ -129,8 +131,14 @@ public class QuoteService {
         };
     }
 
-    @Cacheable(value = "history", key = "#type.code + '_' + #from + '_' + #to")
+    @Cacheable(value = "history", key = "#type.name() + '_' + #from + '_' + #to")
     public List<QuoteHistory> getHistory(CurrencyType type, LocalDate from, LocalDate to) {
+        if (type.getCountry() == Country.ARGENTINA) {
+            List<QuoteHistory> external = argentinaDatosClient.getDollarHistory(type.getCode(), from, to);
+            if (!external.isEmpty()) {
+                return external;
+            }
+        }
         return quoteHistoryRepository.findByTypeAndDateBetweenOrderByDateAsc(type, from, to);
     }
 

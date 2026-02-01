@@ -50,6 +50,11 @@ public enum CurrencyType {
                 return type;
             }
         }
+        for (CurrencyType type : values()) {
+            if (type.name().equalsIgnoreCase(code) && type.country == country) {
+                return type;
+            }
+        }
         throw new IllegalArgumentException("Currency type not found: " + code + " for " + country);
     }
 

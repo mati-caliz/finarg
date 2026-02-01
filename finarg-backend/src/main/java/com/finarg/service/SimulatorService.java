@@ -98,10 +98,10 @@ public class SimulatorService {
 
     private BigDecimal getRealFixedTermRate() {
         try {
-            List<ArgentinaDatosClient.TasaPlazoFijoResponse> rates = argentinaDatosClient.getFixedTermRates();
+            List<ArgentinaDatosClient.FixedTermRateResponse> rates = argentinaDatosClient.getFixedTermRates();
             if (!rates.isEmpty()) {
                 return rates.stream()
-                        .map(ArgentinaDatosClient.TasaPlazoFijoResponse::getTnaClientes)
+                        .map(ArgentinaDatosClient.FixedTermRateResponse::getTnaClients)
                         .filter(Objects::nonNull)
                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                         .divide(BigDecimal.valueOf(rates.size()), 2, RoundingMode.HALF_UP)

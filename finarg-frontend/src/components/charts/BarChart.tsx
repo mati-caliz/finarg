@@ -63,6 +63,7 @@ export function BarChart({
             borderRadius: '8px',
           }}
           labelStyle={{ color: '#fff' }}
+          itemStyle={{ color: '#fff' }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString('es-AR')]}
         />
         <Bar dataKey={yKey} radius={[4, 4, 0, 0]}>
