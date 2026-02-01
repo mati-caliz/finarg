@@ -111,8 +111,8 @@ external:
     argentina-datos:
       base-url: https://api.argentinadatos.com/v1
       timeout: 10000
-    bluelytics:
-      base-url: https://api.bluelytics.com.ar/v2
+    ambito:
+      base-url: https://mercados.ambito.com
       timeout: 10000
     exchangerate:
       base-url: https://open.er-api.com/v6
