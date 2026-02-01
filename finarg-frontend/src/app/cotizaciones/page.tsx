@@ -13,7 +13,7 @@ import { DolarCardSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAppStore } from '@/store/useStore';
 import { getCountryConfig } from '@/config/countries';
-import { formatCurrencySimple } from '@/lib/utils';
+import { formatCurrencySimple, sortQuotesByVariant } from '@/lib/utils';
 import { useTranslation } from '@/hooks/useTranslation';
 import { TranslationKey } from '@/i18n/translations';
 
@@ -27,6 +27,12 @@ const AR_CURRENCY_GROUPS = {
   bob: ['bob_oficial', 'bob_blue', 'bob_tarjeta'],
   cny: ['cny_oficial', 'cny_blue', 'cny_tarjeta'],
 } as const;
+
+const AR_CHART_TYPES = new Set(AR_CURRENCY_GROUPS.usd);
+
+function hasChartHistory(type: string): boolean {
+  return AR_CHART_TYPES.has(type) || type.endsWith('_oficial');
+}
 
 type BaseCurrency = keyof typeof AR_CURRENCY_GROUPS;
 
@@ -92,10 +98,14 @@ export default function QuotesPage() {
 
   const filteredQuotes = useMemo(() => {
     if (!quotes) {return undefined;}
-    if (!hasCurrencyGroups) {return quotes;}
-    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
-    const typeSet = new Set(allowed);
-    return quotes.filter((q) => typeSet.has(q.type));
+    const list = !hasCurrencyGroups
+      ? quotes
+      : (() => {
+          const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
+          const typeSet = new Set(allowed);
+          return quotes.filter((q) => typeSet.has(q.type));
+        })();
+    return sortQuotesByVariant(list);
   }, [quotes, hasCurrencyGroups, selectedBaseCurrency]);
 
   const [, setTick] = useState(0);
@@ -125,7 +135,7 @@ export default function QuotesPage() {
       const response = await quotesApi.getHistory(selectedType, from, to, selectedCountry);
       return response.data;
     },
-    enabled: !!selectedType,
+    enabled: !!selectedType && (!hasCurrencyGroups || hasChartHistory(selectedType)),
   });
 
   const formatDate = (value: string | number) => {
@@ -269,73 +279,75 @@ export default function QuotesPage() {
         )}
       </div>
 
-      <Card className="bg-card">
-        <CardHeader className="pb-2">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <CardTitle className="text-lg">
-                {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
-              </CardTitle>
-              <div className="flex flex-wrap gap-2">
-                {periods.map((p) => (
-                <Button
-                  key={p.value}
-                  variant={period === p.value ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setPeriod(p.value)}
-                >
-                  {p.label}
-                </Button>
-              ))}
-              </div>
-            </div>
-            {currencyTypes.length > 1 && (
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
-                {currencyTypes.map((t) => (
+      {(!hasCurrencyGroups || (selectedType !== null && hasChartHistory(selectedType))) && (
+        <Card className="bg-card">
+          <CardHeader className="pb-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <CardTitle className="text-lg">
+                  {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
+                </CardTitle>
+                <div className="flex flex-wrap gap-2">
+                  {periods.map((p) => (
                   <Button
-                    key={t.value}
-                    variant={selectedType === t.value ? 'default' : 'outline'}
+                    key={p.value}
+                    variant={period === p.value ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setSelectedType(t.value)}
+                    onClick={() => setPeriod(p.value)}
                   >
-                    {t.label}
+                    {p.label}
                   </Button>
                 ))}
+                </div>
+              </div>
+              {currencyTypes.filter((t) => hasChartHistory(t.value)).length > 1 && (
+                <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+                  {currencyTypes.filter((t) => hasChartHistory(t.value)).map((t) => (
+                    <Button
+                      key={t.value}
+                      variant={selectedType === t.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedType(t.value)}
+                    >
+                      {t.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {historyLoading ? (
+              <div className="h-[300px] flex items-center justify-center">
+                <Skeleton className="w-full h-full" />
+              </div>
+            ) : historyError ? (
+              <QueryError
+                error={historyErrorData as Error}
+                onRetry={() => refetchHistory()}
+                compact
+              />
+            ) : history && history.length > 0 ? (
+              <LineChart
+                data={history}
+                xKey="date"
+                yKey={['buy', 'sell']}
+                colors={['#3b82f6', '#10b981']}
+                height={320}
+                formatX={formatDate}
+                formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
+                showLegend
+                showGrid={false}
+                legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
+              />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                {translate('noHistoricalData')}
               </div>
             )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {historyLoading ? (
-            <div className="h-[300px] flex items-center justify-center">
-              <Skeleton className="w-full h-full" />
-            </div>
-          ) : historyError ? (
-            <QueryError
-              error={historyErrorData as Error}
-              onRetry={() => refetchHistory()}
-              compact
-            />
-          ) : history && history.length > 0 ? (
-            <LineChart
-              data={history}
-              xKey="date"
-              yKey={['buy', 'sell']}
-              colors={['#3b82f6', '#10b981']}
-              height={320}
-              formatX={formatDate}
-              formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
-              showLegend
-              showGrid={false}
-              legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
-            />
-          ) : (
-            <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-              {translate('noHistoricalData')}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-card">
         <CardHeader>

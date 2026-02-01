@@ -14,6 +14,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/store/useStore';
 import { getCountryConfig } from '@/config/countries';
 import { useTranslation } from '@/hooks/useTranslation';
+import { sortQuotesByVariant } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { translate } = useTranslation();
@@ -71,7 +72,7 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {quotes?.slice(0, 4).map((quote) => (
+        {sortQuotesByVariant(quotes ?? []).slice(0, 4).map((quote) => (
           <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
         ))}
       </div>
@@ -210,7 +211,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-lg font-semibold mb-4">{translate('otherQuotes')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {quotes.slice(4).map((quote) => (
+            {sortQuotesByVariant(quotes).slice(4).map((quote) => (
               <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
             ))}
           </div>

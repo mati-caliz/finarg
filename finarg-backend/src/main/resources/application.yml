@@ -144,8 +144,6 @@ external:
       timeout: 15000
 
 scheduler:
-  cotizaciones:
-    cron: "0 */5 * * * *"
   arbitraje:
     cron: "0 */10 * * * *"
   enabled: true

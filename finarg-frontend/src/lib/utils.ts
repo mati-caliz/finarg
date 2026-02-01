@@ -56,3 +56,20 @@ export function getGapClass(level: string): string {
       return 'text-gray-500';
   }
 }
+
+function quoteVariantOrder(type: string): number {
+  if (type === 'oficial' || type.endsWith('_oficial')) {
+    return 0;
+  }
+  if (type === 'blue' || type.endsWith('_blue')) {
+    return 1;
+  }
+  if (type === 'tarjeta' || type.endsWith('_tarjeta')) {
+    return 2;
+  }
+  return 3;
+}
+
+export function sortQuotesByVariant<T extends { type: string }>(quotes: T[]): T[] {
+  return [...quotes].sort((a, b) => quoteVariantOrder(a.type) - quoteVariantOrder(b.type));
+}

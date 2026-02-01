@@ -22,11 +22,11 @@ export default function ReservesPage() {
     { value: 30, label: translate('days30') },
     { value: 90, label: translate('months3') },
     { value: 180, label: translate('months6') },
-    { value: 365, label: translate('years1') },
-    { value: 1095, label: translate('years3') },
-    { value: 1825, label: translate('years5') },
-    { value: 3650, label: translate('years10') },
-    { value: 5475, label: translate('years15') },
+    { value: 365, label: translate('year1') },
+    { value: 1095, label: translate('year3') },
+    { value: 1825, label: translate('year5') },
+    { value: 3650, label: translate('year10') },
+    { value: 5475, label: translate('year15') },
     { value: 7000, label: translate('max') },
   ];
 

@@ -135,12 +135,14 @@ public class QuoteService {
     public List<QuoteHistory> getHistory(CurrencyType type, LocalDate from, LocalDate to) {
         if (type.getCountry() == Country.ARGENTINA) {
             if (type == CurrencyType.AR_EUR_OFICIAL || type == CurrencyType.AR_BRL_OFICIAL
-                    || type == CurrencyType.AR_CLP_OFICIAL || type == CurrencyType.AR_UYU_OFICIAL) {
+                    || type == CurrencyType.AR_CLP_OFICIAL || type == CurrencyType.AR_UYU_OFICIAL
+                    || type == CurrencyType.AR_CNY_OFICIAL || type == CurrencyType.AR_PYG_OFICIAL
+                    || type == CurrencyType.AR_BOB_OFICIAL) {
                 List<QuoteHistory> external = argentinaDatosClient.getCurrencyHistory(type.getCode(), from, to);
                 if (!external.isEmpty()) {
                     return external;
                 }
-            } else {
+            } else if (isArgentinaDollarExchange(type)) {
                 List<QuoteHistory> external = argentinaDatosClient.getDollarHistory(type.getCode(), from, to);
                 if (!external.isEmpty()) {
                     return external;
@@ -150,23 +152,15 @@ public class QuoteService {
         return quoteHistoryRepository.findByTypeAndDateBetweenOrderByDateAsc(type, from, to);
     }
 
+    private static boolean isArgentinaDollarExchange(CurrencyType type) {
+        return type == CurrencyType.AR_OFFICIAL || type == CurrencyType.AR_BLUE
+                || type == CurrencyType.AR_MEP || type == CurrencyType.AR_CCL
+                || type == CurrencyType.AR_WHOLESALE || type == CurrencyType.AR_CARD
+                || type == CurrencyType.AR_CRYPTO;
+    }
+
     @CacheEvict(value = "quotes", allEntries = true)
     public void refreshCache() {
         log.info("Quotes cache cleared");
-    }
-
-    public void saveQuoteHistory(QuoteDTO quote) {
-        LocalDate today = LocalDate.now();
-        if (!quoteHistoryRepository.existsByTypeAndDate(quote.getType(), today)) {
-            QuoteHistory history = QuoteHistory.builder()
-                    .type(quote.getType())
-                    .country(quote.getCountry())
-                    .date(today)
-                    .buy(quote.getBuy())
-                    .sell(quote.getSell())
-                    .build();
-            quoteHistoryRepository.save(history);
-            log.info("Saved quote history: {} - {} - {}", quote.getCountry(), quote.getType(), today);
-        }
     }
 }
