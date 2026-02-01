@@ -44,6 +44,12 @@ public class WebClientConfig {
     @Value("${external.apis.uruguay.base-url:https://www.bcu.gub.uy/api}")
     private String uruguayApiBaseUrl;
 
+    @Value("${external.apis.wikidata.base-url:https://query.wikidata.org}")
+    private String wikidataBaseUrl;
+
+    @Value("${external.apis.wikidata.timeout:15000}")
+    private int wikidataTimeout;
+
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
         return WebClient.builder()
@@ -126,6 +132,18 @@ public class WebClientConfig {
                 .baseUrl(uruguayApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean("wikidataWebClient")
+    public WebClient wikidataWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(wikidataTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(wikidataBaseUrl)
+                .defaultHeader(HttpHeaders.ACCEPT, "application/sparql-results+json, application/json")
+                .defaultHeader("User-Agent", "Finarg/1.0 (https://finarg.app)")
                 .build();
     }
 }

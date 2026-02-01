@@ -24,7 +24,48 @@ public class InflationService {
     @Cacheable(value = "inflation", key = "'monthly_' + #limit")
     public List<InflationDTO> getMonthlyInflation(int limit) {
         log.info("Fetching monthly inflation, limit: {}", limit);
-        return argentinaDatosClient.getMonthlyInflation(limit);
+        int fetchLimit = limit + 12;
+        List<InflationDTO> list = argentinaDatosClient.getMonthlyInflation(fetchLimit);
+        if (list == null || list.isEmpty()) {
+            return list;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            if (i + 12 <= list.size()) {
+                BigDecimal yoy = calculateYearOverYear(list.subList(i, i + 12));
+                list.get(i).setYearOverYear(yoy);
+            }
+            BigDecimal ytd = calculateYearToDateForMonth(list, i);
+            list.get(i).setYearToDate(ytd);
+        }
+        int returnSize = Math.min(limit, list.size());
+        return list.subList(0, returnSize);
+    }
+
+    private BigDecimal calculateYearToDateForMonth(List<InflationDTO> list, int index) {
+        LocalDate targetDate = list.get(index).getDate();
+        if (targetDate == null) {
+            return BigDecimal.ZERO.setScale(1, RoundingMode.HALF_UP);
+        }
+        int year = targetDate.getYear();
+        BigDecimal accumulated = BigDecimal.ONE;
+        for (InflationDTO inf : list) {
+            if (inf.getDate() == null || inf.getDate().getYear() != year) {
+                continue;
+            }
+            if (inf.getDate().isAfter(targetDate)) {
+                continue;
+            }
+            if (inf.getValue() == null) {
+                continue;
+            }
+            BigDecimal factor = BigDecimal.ONE.add(
+                    inf.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
+            );
+            accumulated = accumulated.multiply(factor);
+        }
+        return accumulated.subtract(BigDecimal.ONE)
+                .multiply(BigDecimal.valueOf(100))
+                .setScale(1, RoundingMode.HALF_UP);
     }
 
     @Cacheable(value = "inflation", key = "'current'", unless = "#result == null || #result.value == null || #result.value.signum() == 0")

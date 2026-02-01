@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { quotesApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LineChart } from '@/components/charts';
 import { Quote } from '@/types';
-import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { QueryError } from '@/components/QueryError';
 import { DolarCardSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -46,20 +46,33 @@ export default function QuotesPage() {
   const [selectedType, setSelectedType] = useState(currencyTypes[0]?.value || '');
   const [period, setPeriod] = useState('30');
 
+  const QUOTES_REFETCH_MS = 180000;
+
   const {
     data: quotes,
     isLoading,
     isError,
     error,
     refetch,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ['quotes', selectedCountry],
     queryFn: async () => {
       const response = await quotesApi.getAllByCountry(selectedCountry);
       return response.data as Quote[];
     },
-    refetchInterval: 60000,
+    refetchInterval: QUOTES_REFETCH_MS,
   });
+
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const updateProgress = dataUpdatedAt
+    ? Math.min(100, ((Date.now() - dataUpdatedAt) / QUOTES_REFETCH_MS) * 100)
+    : 0;
 
   const {
     data: history,
@@ -115,16 +128,27 @@ export default function QuotesPage() {
           <p className="text-muted-foreground text-sm mt-1">
             {translate('allQuotesRealTime')} ({countryConfig.localCurrency}/USD)
           </p>
+          <p className="text-muted-foreground text-xs mt-1">
+            {translate('quotesUpdateNote')}
+          </p>
+          {!isLoading && dataUpdatedAt !== null && (
+            <div className="mt-2 w-full max-w-xs">
+              <div
+                className="h-1.5 w-full rounded-full bg-muted overflow-hidden"
+                role="progressbar"
+                aria-valuenow={Math.round(updateProgress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={translate('quotesNextUpdateLabel')}
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-linear"
+                  style={{ width: `${updateProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          {translate('refresh')}
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

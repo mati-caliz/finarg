@@ -8,6 +8,7 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/ganancias', destination: '/calculadora-sueldo-neto', permanent: true },
+      { source: '/simulador', destination: '/simulador-de-inversiones', permanent: true },
     ];
   },
   async rewrites() {

@@ -30,7 +30,14 @@ export default function IncomeTaxPage() {
   });
 
   const [result, setResult] = useState<IncomeTaxResponse | null>(null);
-  const [faqOpen, setFaqOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const faqItems: { questionKey: string; answerKey: string }[] = [
+    { questionKey: 'faqNetVsGrossQuestion', answerKey: 'faqNetVsGrossAnswer' },
+    { questionKey: 'faqWhatIsIncomeTaxQuestion', answerKey: 'faqWhatIsIncomeTaxAnswer' },
+    { questionKey: 'faqWhatAreDeductionsQuestion', answerKey: 'faqWhatAreDeductionsAnswer' },
+    { questionKey: 'faqValuesDisclaimerQuestion', answerKey: 'faqValuesDisclaimerAnswer' },
+  ];
 
   const calculateMutation = useMutation({
     mutationFn: async (data: IncomeTaxRequest) => {
@@ -383,38 +390,38 @@ export default function IncomeTaxPage() {
               <Card className="bg-card">
                 <CardHeader>
                   <CardTitle className="text-lg">{translate('deductionsDetail')}</CardTitle>
-                  <p className="text-xs text-muted-foreground mt-1">{translate('deductionsAnnualNote')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{translate('deductionsMonthlyNote')}</p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between py-2 border-b border-border">
                       <span className="text-muted-foreground">{translate('nonTaxableMinimum')}</span>
                       <span className="text-foreground">
-                        {formatCurrency(result.calculationDetails.nonTaxableMinimum)}
+                        {formatCurrency((result.calculationDetails.nonTaxableMinimum ?? 0) / 12)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border">
                       <span className="text-muted-foreground">{translate('specialDeduction')}</span>
                       <span className="text-foreground">
-                        {formatCurrency(result.calculationDetails.specialDeduction)}
+                        {formatCurrency((result.calculationDetails.specialDeduction ?? 0) / 12)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border">
                       <span className="text-muted-foreground">{translate('familyDependents')}</span>
                       <span className="text-foreground">
-                        {formatCurrency(result.calculationDetails.familyCharges)}
+                        {formatCurrency((result.calculationDetails.familyCharges ?? 0) / 12)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border">
                       <span className="text-muted-foreground">{translate('personalDeductions')}</span>
                       <span className="text-foreground">
-                        {formatCurrency(result.calculationDetails.personalDeductions)}
+                        {formatCurrency((result.calculationDetails.personalDeductions ?? 0) / 12)}
                       </span>
                     </div>
                     <div className="flex justify-between py-2 font-bold">
                       <span className="text-foreground">{translate('totalAllowedDeductions')}</span>
                       <span className="text-green-500">
-                        {formatCurrency(result.calculationDetails.totalAllowedDeductions)}
+                        {formatCurrency((result.calculationDetails.totalAllowedDeductions ?? 0) / 12)}
                       </span>
                     </div>
                   </div>
@@ -490,26 +497,34 @@ export default function IncomeTaxPage() {
         </div>
       </div>
 
-      <Card className="bg-muted/30 border-muted overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setFaqOpen(!faqOpen)}
-          className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-muted/50 transition-colors"
-        >
-          <span className="flex items-center gap-2 font-medium text-foreground text-left">
-            <HelpCircle className="h-5 w-5 text-primary shrink-0" />
-            {translate('faqNetVsGrossQuestion')}
-          </span>
-          {faqOpen ? <ChevronUp className="h-5 w-5 text-muted-foreground shrink-0" /> : <ChevronDown className="h-5 w-5 text-muted-foreground shrink-0" />}
-        </button>
-        {faqOpen && (
-          <div className="px-5 pb-5 pt-5 border-t border-border/50">
-            <p className="text-sm text-muted-foreground leading-6 max-w-2xl">
-              {translate('faqNetVsGrossAnswer')}
-            </p>
-          </div>
-        )}
-      </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {faqItems.map((item, index) => (
+          <Card key={item.questionKey} className="bg-muted/30 border-muted overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+              className="w-full flex items-center justify-between gap-2 p-3 text-left hover:bg-muted/50 transition-colors"
+            >
+              <span className="flex items-center gap-2 text-sm font-medium text-foreground text-left">
+                <HelpCircle className="h-4 w-4 text-primary shrink-0" />
+                {translate(item.questionKey)}
+              </span>
+              {openFaqIndex === index ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
+              )}
+            </button>
+            {openFaqIndex === index && (
+              <div className="px-3 pb-3 pt-0 border-t border-border/50">
+                <p className="text-xs text-muted-foreground leading-5">
+                  {translate(item.answerKey)}
+                </p>
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

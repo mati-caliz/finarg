@@ -27,13 +27,13 @@ import { TranslationKey } from '@/i18n/translations';
 const baseNavigation = [
   { key: 'dashboard' as TranslationKey, href: '/', icon: LayoutDashboard, feature: null },
   { key: 'quotes' as TranslationKey, href: '/cotizaciones', icon: DollarSign, feature: 'quotes' as const },
-  { key: 'incomeTaxCalculator' as TranslationKey, href: '/calculadora-sueldo-neto', icon: Calculator, feature: 'incomeTax' as const },
-  { key: 'simulator' as TranslationKey, href: '/simulador', icon: TrendingUp, feature: 'simulator' as const },
-  { key: 'arbitrage' as TranslationKey, href: '/arbitraje', icon: ArrowLeftRight, feature: 'arbitrage' as const },
   { key: 'inflation' as TranslationKey, href: '/inflacion', icon: Percent, feature: 'inflation' as const },
   { key: 'reserves' as TranslationKey, href: '/reservas', icon: Landmark, feature: 'reserves' as const },
-  { key: 'repos' as TranslationKey, href: '/cauciones', icon: PiggyBank, feature: 'repos' as const },
   { key: 'ratesComparator' as TranslationKey, href: '/tasas', icon: BarChart2, feature: 'rates' as const },
+  { key: 'incomeTaxCalculator' as TranslationKey, href: '/calculadora-sueldo-neto', icon: Calculator, feature: 'incomeTax' as const },
+  { key: 'investmentSimulator' as TranslationKey, href: '/simulador-de-inversiones', icon: TrendingUp, feature: 'simulator' as const },
+  { key: 'arbitrage' as TranslationKey, href: '/arbitraje', icon: ArrowLeftRight, feature: 'arbitrage' as const },
+  { key: 'repos' as TranslationKey, href: '/cauciones', icon: PiggyBank, feature: 'repos' as const },
 ];
 
 function CountrySelector() {

@@ -133,6 +133,9 @@ external:
     uruguay:
       base-url: https://www.bcu.gub.uy/api
       timeout: 10000
+    wikidata:
+      base-url: https://query.wikidata.org
+      timeout: 15000
 
 scheduler:
   cotizaciones:

@@ -16,7 +16,7 @@ export function useQuotes(country?: CountryCode) {
       const response = await quotesApi.getAllByCountry(countryToUse);
       return response.data;
     },
-    refetchInterval: 60000,
+    refetchInterval: 180000,
   });
 }
 
@@ -44,7 +44,7 @@ export function useGap(country?: CountryCode) {
       const response = await quotesApi.getGapByCountry(countryToUse);
       return response.data;
     },
-    refetchInterval: 60000,
+    refetchInterval: 180000,
   });
 }
 

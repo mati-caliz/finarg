@@ -50,6 +50,8 @@ export const inflationApi = {
   getCurrent: () => api.get('/inflation/current'),
   getMonthly: (months: number = 12) => api.get('/inflation/monthly', { params: { months } }),
   getYearOverYear: () => api.get('/inflation/year-over-year'),
+  getGovernments: (country: string = 'ar') =>
+    api.get('/inflation/governments', { params: { country } }),
   adjust: (amount: number, fromDate: string, toDate: string) =>
     api.post('/inflation/adjust', null, { params: { amount, fromDate, toDate } }),
 };
