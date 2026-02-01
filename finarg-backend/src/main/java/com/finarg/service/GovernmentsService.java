@@ -6,11 +6,12 @@ import com.finarg.model.dto.GovernmentDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,21 +60,28 @@ public class GovernmentsService {
                 ORDER BY ASC(?start)
                 """.formatted(positionQid);
 
-            String encodedQuery = URLEncoder.encode(query.trim(), StandardCharsets.UTF_8);
-            String responseBody = wikidataWebClient.get()
-                    .uri("/sparql?query={query}&format=json", encodedQuery)
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            formData.add("query", query.trim());
+            formData.add("format", "json");
+
+            String responseBody = wikidataWebClient.post()
+                    .uri("/sparql")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .accept(MediaType.parseMediaType("application/sparql-results+json"))
+                    .bodyValue(formData)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
 
             if (responseBody == null || responseBody.isBlank()) {
-                return List.of();
+                return getFallbackGovernments(country);
             }
 
-            return parseSparqlResponse(responseBody);
+            List<GovernmentDTO> parsed = parseSparqlResponse(responseBody);
+            return parsed.isEmpty() ? getFallbackGovernments(country) : parsed;
         } catch (Exception e) {
             log.error("Error fetching governments from Wikidata for country {}: {}", country, e.getMessage());
-            return List.of();
+            return getFallbackGovernments(country);
         }
     }
 
@@ -123,6 +131,22 @@ public class GovernmentsService {
         if (node.isMissingNode()) return null;
         JsonNode value = node.path("value");
         return value.isMissingNode() ? null : value.asText();
+    }
+
+    private List<GovernmentDTO> getFallbackGovernments(String country) {
+        if (!"ar".equalsIgnoreCase(country)) {
+            return List.of();
+        }
+        return List.of(
+                GovernmentDTO.builder().startDate("1989-07-08").endDate("1999-12-10").label("Menem").color("#3b82f6").build(),
+                GovernmentDTO.builder().startDate("1999-12-10").endDate("2001-12-21").label("De la Rúa").color("#10b981").build(),
+                GovernmentDTO.builder().startDate("2002-01-02").endDate("2003-05-25").label("Duhalde").color("#f59e0b").build(),
+                GovernmentDTO.builder().startDate("2003-05-25").endDate("2007-12-10").label("Kirchner").color("#ef4444").build(),
+                GovernmentDTO.builder().startDate("2007-12-10").endDate("2015-12-10").label("Fernández").color("#8b5cf6").build(),
+                GovernmentDTO.builder().startDate("2015-12-10").endDate("2019-12-10").label("Macri").color("#06b6d4").build(),
+                GovernmentDTO.builder().startDate("2019-12-10").endDate("2023-12-10").label("Fernández").color("#a855f7").build(),
+                GovernmentDTO.builder().startDate("2023-12-10").endDate("2099-12-31").label("Milei").color("#6b7280").build()
+        );
     }
 
     private String shortenLabel(String fullLabel) {
