@@ -1,7 +1,9 @@
 package com.finarg.controller;
 
+import com.finarg.model.dto.GovernmentDTO;
 import com.finarg.model.dto.InflationAdjustmentDTO;
 import com.finarg.model.dto.InflationDTO;
+import com.finarg.service.GovernmentsService;
 import com.finarg.service.InflationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,6 +27,7 @@ import java.util.List;
 public class InflationController {
 
     private final InflationService inflationService;
+    private final GovernmentsService governmentsService;
 
     @GetMapping("/current")
     @Operation(summary = "Get current month inflation")
@@ -52,5 +55,12 @@ public class InflationController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         return ResponseEntity.ok(inflationService.adjustForInflation(amount, fromDate, toDate));
+    }
+
+    @GetMapping("/governments")
+    @Operation(summary = "Get government periods for chart visualization")
+    public ResponseEntity<List<GovernmentDTO>> getGovernments(
+            @RequestParam(defaultValue = "ar") String country) {
+        return ResponseEntity.ok(governmentsService.getGovernments(country));
     }
 }

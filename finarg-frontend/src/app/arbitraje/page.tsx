@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { arbitrageApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Arbitrage } from '@/types';
 import {
   ArrowRightLeft,
@@ -36,8 +35,6 @@ export default function ArbitragePage() {
   const {
     data: opportunities,
     isLoading,
-    refetch,
-    dataUpdatedAt,
   } = useQuery({
     queryKey: ['arbitrage'],
     queryFn: async () => {
@@ -61,21 +58,9 @@ export default function ArbitragePage() {
           <p className="text-muted-foreground text-sm mt-1">
             {translate('arbitrageDesc')}
           </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <p className="text-xs text-muted-foreground">
-            Updated:{' '}
-            {dataUpdatedAt ? new Date(dataUpdatedAt).toLocaleTimeString('es-AR') : '-'}
+          <p className="text-muted-foreground text-xs mt-1">
+            {translate('arbitrageUpdateNote')}
           </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            {translate('refresh')}
-          </Button>
         </div>
       </div>
 

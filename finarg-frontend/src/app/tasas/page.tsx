@@ -9,7 +9,6 @@ import {
   Wallet,
   Landmark,
   AlertCircle,
-  RefreshCw,
   ExternalLink,
 } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -122,19 +121,10 @@ export default function RatesPage() {
           <p className="text-muted-foreground text-sm mt-1">
             {translate('ratesComparatorDesc')}
           </p>
+          <p className="text-muted-foreground text-xs mt-1">
+            {translate('ratesUpdateNote')}
+          </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            refetchBanks();
-            refetchWallets();
-          }}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          {translate('refresh')}
-        </Button>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -241,9 +231,11 @@ export default function RatesPage() {
                                 )}
                               </div>
                               {row.product && (
-                                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground" title={row.product}>
-                                  {row.product}
-                                </p>
+                                <div className="mt-1 max-h-20 overflow-y-auto overscroll-contain">
+                                  <p className="text-xs text-muted-foreground leading-relaxed pr-1">
+                                    {row.product}
+                                  </p>
+                                </div>
                               )}
                               <div className="mt-2 flex flex-wrap gap-1">
                                 <span className="rounded border border-border px-2 py-0.5 text-xs">
@@ -272,9 +264,10 @@ export default function RatesPage() {
                               </span>
                             )}
                             {row.date && (
-                              <span className="mt-1 text-xs text-muted-foreground">
-                                {translate('tnaValidSince')} {formatDate(row.date)}
-                              </span>
+                              <div className="mt-1 text-xs text-muted-foreground text-right leading-tight">
+                                <span className="block">{translate('tnaValidSince')}</span>
+                                <span className="block">{formatDate(row.date)}</span>
+                              </div>
                             )}
                           </div>
                         </div>

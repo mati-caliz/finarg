@@ -1,7 +1,8 @@
 package com.finarg.service;
 
-import com.finarg.client.ArgentinaDatosClient;
+import com.finarg.model.dto.InflationDTO;
 import com.finarg.model.dto.QuoteDTO;
+import com.finarg.model.dto.RateDTO;
 import com.finarg.model.dto.SimulationRequestDTO;
 import com.finarg.model.dto.SimulationResponseDTO;
 import com.finarg.model.enums.Country;
@@ -15,21 +16,21 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SimulatorService {
 
-    private final ArgentinaDatosClient argentinaDatosClient;
     private final QuoteService quoteService;
     private final InflationService inflationService;
+    private final RatesService ratesService;
 
     private static final BigDecimal DEFAULT_FIXED_TERM_RATE = new BigDecimal("35");
     private static final BigDecimal MONEY_MARKET_RATE = new BigDecimal("32");
     private static final BigDecimal REPO_RATE = new BigDecimal("30");
     private static final BigDecimal STABLECOIN_RATE = new BigDecimal("5");
+    private static final BigDecimal DEFAULT_MONTHLY_INFLATION = new BigDecimal("2");
 
     public SimulationResponseDTO simulate(SimulationRequestDTO request) {
         log.info("Simulating return: {} - {} - {} days", 
@@ -46,8 +47,15 @@ public class SimulatorService {
 
         BigDecimal finalAmount = request.getInitialAmount().add(nominalReturn);
 
-        QuoteDTO blueQuote = quoteService.getQuote(Country.ARGENTINA, CurrencyType.AR_BLUE);
-        BigDecimal dollarRate = blueQuote != null ? blueQuote.getSell() : new BigDecimal("1000");
+        BigDecimal dollarRate = new BigDecimal("1000");
+        try {
+            QuoteDTO blueQuote = quoteService.getQuote(Country.ARGENTINA, CurrencyType.AR_BLUE);
+            if (blueQuote != null && blueQuote.getSell() != null && blueQuote.getSell().compareTo(BigDecimal.ZERO) > 0) {
+                dollarRate = blueQuote.getSell();
+            }
+        } catch (Exception e) {
+            log.warn("Could not get dollar quote for simulation, using default: {}", e.getMessage());
+        }
 
         BigDecimal initialAmountUSD = request.getInitialAmount()
                 .divide(dollarRate, 2, RoundingMode.HALF_UP);
@@ -98,25 +106,33 @@ public class SimulatorService {
 
     private BigDecimal getRealFixedTermRate() {
         try {
-            List<ArgentinaDatosClient.FixedTermRateResponse> rates = argentinaDatosClient.getFixedTermRates();
-            if (!rates.isEmpty()) {
-                return rates.stream()
-                        .map(ArgentinaDatosClient.FixedTermRateResponse::getTnaClients)
-                        .filter(Objects::nonNull)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add)
-                        .divide(BigDecimal.valueOf(rates.size()), 2, RoundingMode.HALF_UP)
-                        .multiply(BigDecimal.valueOf(100));
+            List<RateDTO> rates = ratesService.getFixedTermRates(Country.ARGENTINA);
+            if (rates != null && !rates.isEmpty() && rates.get(0).getTna() != null
+                    && rates.get(0).getTna().compareTo(BigDecimal.ZERO) > 0) {
+                return rates.get(0).getTna().setScale(2, RoundingMode.HALF_UP);
             }
         } catch (Exception e) {
-            log.warn("Error getting real fixed term rate, using default");
+            log.warn("Error getting fixed term rate from rates comparator, using default: {}", e.getMessage());
         }
         return DEFAULT_FIXED_TERM_RATE;
     }
 
     private BigDecimal getUVARate() {
-        return inflationService.getCurrentInflation().getValue()
-                .multiply(BigDecimal.valueOf(12))
+        BigDecimal monthlyInflation = getMonthlyInflationSafe();
+        return monthlyInflation.multiply(BigDecimal.valueOf(12))
                 .add(new BigDecimal("1"));
+    }
+
+    private BigDecimal getMonthlyInflationSafe() {
+        try {
+            InflationDTO dto = inflationService.getCurrentInflation();
+            if (dto != null && dto.getValue() != null) {
+                return dto.getValue();
+            }
+        } catch (Exception e) {
+            log.warn("Could not get inflation, using default: {}", e.getMessage());
+        }
+        return DEFAULT_MONTHLY_INFLATION;
     }
 
     private BigDecimal calculateEffectiveAnnualRate(BigDecimal nominalAnnualRate) {
@@ -132,7 +148,7 @@ public class SimulatorService {
     }
 
     private BigDecimal estimateInflation(int days) {
-        BigDecimal monthlyInflation = inflationService.getCurrentInflation().getValue();
+        BigDecimal monthlyInflation = getMonthlyInflationSafe();
         return monthlyInflation.multiply(BigDecimal.valueOf(days))
                 .divide(BigDecimal.valueOf(30), 2, RoundingMode.HALF_UP);
     }
@@ -152,7 +168,7 @@ public class SimulatorService {
                 capital = capital.add(monthlyInterest);
             }
 
-            BigDecimal monthlyInflation = inflationService.getCurrentInflation().getValue();
+            BigDecimal monthlyInflation = getMonthlyInflationSafe();
             BigDecimal realReturn = nominalAnnualRate.divide(BigDecimal.valueOf(12), 2, RoundingMode.HALF_UP)
                     .subtract(monthlyInflation);
 

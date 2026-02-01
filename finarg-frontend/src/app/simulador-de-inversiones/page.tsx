@@ -23,8 +23,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 export default function SimulatorPage() {
   const { translate } = useTranslation();
   const [formData, setFormData] = useState<SimulationRequest>({
-    initialAmount: 1000000,
-    investmentType: 'PLAZO_FIJO',
+    initialAmount: 0,
+    investmentType: 'FIXED_TERM',
     termDays: 30,
     reinvest: true,
   });
@@ -32,11 +32,11 @@ export default function SimulatorPage() {
   const [result, setResult] = useState<SimulationResponse | null>(null);
 
   const INVESTMENT_TYPES = [
-    { value: 'PLAZO_FIJO', label: translate('fixedTerm'), icon: Building, color: 'text-blue-500' },
-    { value: 'PLAZO_FIJO_UVA', label: translate('fixedTermUva'), icon: TrendingUp, color: 'text-green-500' },
-    { value: 'FCI_MONEY_MARKET', label: translate('moneyMarket'), icon: PiggyBank, color: 'text-purple-500' },
-    { value: 'CAUCION_BURSATIL', label: translate('repos'), icon: Coins, color: 'text-yellow-500' },
-    { value: 'STABLECOIN', label: translate('stablecoin'), icon: Bitcoin, color: 'text-orange-500' },
+    { value: 'FIXED_TERM', label: translate('fixedTerm'), icon: Building, color: 'text-blue-500' },
+    { value: 'FIXED_TERM_UVA', label: translate('fixedTermUva'), icon: TrendingUp, color: 'text-green-500' },
+    { value: 'MONEY_MARKET_FUND', label: translate('moneyMarket'), icon: PiggyBank, color: 'text-purple-500' },
+    { value: 'REPO', label: translate('repos'), icon: Coins, color: 'text-yellow-500' },
+    { value: 'STABLECOIN_DAI', label: translate('stablecoin'), icon: Bitcoin, color: 'text-orange-500' },
   ];
 
   const TERMS = [
@@ -117,9 +117,11 @@ export default function SimulatorPage() {
                     className="pl-10"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formatCurrency(formData.initialAmount)}
-                </p>
+                {formData.initialAmount > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatCurrency(formData.initialAmount)}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -289,7 +291,7 @@ export default function SimulatorPage() {
                   <CardContent>
                     <LineChart
                       data={result.projection.map((p) => ({
-                        mes: `${translate('monthly').slice(0, 3)} ${p.month}`, // Hacky shortening
+                        mes: `${translate('monthly').slice(0, 3)} ${p.month}`,
                         capital: p.accumulatedCapital,
                         rendimientoReal: p.realReturn,
                       }))}

@@ -21,7 +21,7 @@
   "shortcuts": [
     { "name": "Cotizaciones", "short_name": "Dólar", "description": "Ver cotizaciones del dólar", "url": "/cotizaciones" },
     { "name": "Calculadora Sueldo Neto", "short_name": "Sueldo Neto", "description": "Calcular sueldo neto y desglose de descuentos", "url": "/calculadora-sueldo-neto" },
-    { "name": "Simulador", "short_name": "Simular", "description": "Simular inversiones", "url": "/simulador" }
+    { "name": "Simulador de Inversiones", "short_name": "Simulador", "description": "Simular inversiones y comparar rendimientos", "url": "/simulador-de-inversiones" }
   ],
   "related_applications": [],
   "prefer_related_applications": false

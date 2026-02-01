@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
   '/',
   '/cotizaciones',
   '/calculadora-sueldo-neto',
-  '/simulador',
+  '/simulador-de-inversiones',
   '/arbitraje',
   '/inflacion',
   '/reservas',

@@ -202,7 +202,7 @@ export default function DashboardPage() {
         )}
 
         {countryConfig.features.simulator && (
-          <Link href="/simulador">
+          <Link href="/simulador-de-inversiones">
             <Card className="hover:border-primary/50 transition-colors cursor-pointer">
               <CardContent className="pt-6">
                 <p className="font-medium">{translate('investmentSimulator')}</p>

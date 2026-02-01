@@ -37,7 +37,6 @@ export default function ReservesPage() {
   const {
     data: currentReserves,
     isLoading,
-    refetch,
   } = useQuery({
     queryKey: ['reserves', 'ar'],
     queryFn: async () => {
@@ -95,16 +94,10 @@ export default function ReservesPage() {
           <p className="text-muted-foreground text-sm mt-1">
             {translate('bcraReservesDesc')} · {translate('reservesInMillions')}
           </p>
+          <p className="text-muted-foreground text-xs mt-1">
+            {translate('reservesUpdateNote')}
+          </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => refetch()}
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          {translate('refresh')}
-        </Button>
       </div>
 
       {isLoading ? (

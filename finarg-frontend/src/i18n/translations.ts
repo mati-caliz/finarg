@@ -1,7 +1,7 @@
 export const translations = {
   es: {
     // Navigation
-    dashboard: 'Panel',
+    dashboard: 'Dashboard',
     quotes: 'Cotizaciones',
     incomeTaxCalculator: 'Calculadora de Ganancias',
     simulator: 'Simulador',
@@ -62,6 +62,7 @@ export const translations = {
     ratesNotAvailableCountry: 'El comparador de tasas está disponible solo para Argentina por ahora.',
     noWalletRates: 'No hay datos de billeteras disponibles. Las tasas se obtienen automáticamente de fuentes oficiales.',
     noBankRates: 'No hay datos de plazos fijos disponibles. Las tasas se obtienen automáticamente del BCRA.',
+    ratesUpdateNote: 'Las tasas se actualizan según la fuente (BCRA y API de billeteras).',
 
     // Reservas
     bcraReservesTitle: 'Reservas BCRA',
@@ -89,16 +90,17 @@ export const translations = {
     reservesDataSource: 'Reservas brutas: datos.gob.ar. Pasivos (swaps, encajes): configuración estimada según BCRA.',
     subtractedFromNet: 'Se restan de las netas',
     publicUsdDeposits: 'Depósitos USD del público',
+    reservesUpdateNote: 'Los datos se actualizan cada 5 minutos aproximadamente.',
     
     // Inflacion
     inflationTitle: 'Inflación Argentina',
     inflationDesc: 'Datos del IPC y calculadora de ajuste por inflación',
     monthlyInflation: 'Inflación Mensual',
-    yearOverYear: 'Interanual',
-    yearToDate: 'Acumulada Año',
+    yearOverYear: 'Inflación Interanual',
+    yearToDate: 'Inflación Anual Acumulada',
     last12Months: 'Últimos 12 meses',
     sinceJan: 'Desde enero',
-    adjustmentCalculator: 'Calculadora de Ajuste',
+    adjustmentCalculator: 'Calculadora de Ajuste por Inflación',
     originalAmount: 'Monto Original',
     startDate: 'Fecha de Inicio',
     endDate: 'Fecha de Fin',
@@ -107,10 +109,14 @@ export const translations = {
     cumulativeInflation: 'Inflación Acumulada',
     adjustedAmount: 'Monto Ajustado',
     maintainPurchasingPower: 'Para mantener el mismo poder adquisitivo',
-    monthlyEvolution: 'Evolución Mensual',
+    monthlyEvolution: 'Inflación Mensual - Evolución',
+    yearOverYearEvolution: 'Inflación Interanual - Evolución',
     monthlyData: 'Datos Mensuales',
     period: 'Período',
     monthly: 'Mensual',
+    months: 'meses',
+    year: 'año',
+    years: 'años',
     
     // Arbitraje
     arbitrageDetector: 'Detector de Arbitraje',
@@ -126,6 +132,7 @@ export const translations = {
     arbitrageDisclaimer: 'Las oportunidades de arbitraje son estimaciones basadas en cotizaciones públicas. Los spreads reales pueden variar debido a comisiones, tiempos de transferencia y disponibilidad de divisas. Verificá siempre las condiciones antes de operar. Esta información no constituye asesoramiento financiero.',
     profitPer1k: 'Ganancia por USD 1.000',
     stepsToExecute: 'Pasos para ejecutar:',
+    arbitrageUpdateNote: 'Los datos se actualizan cada 30 segundos automáticamente.',
     
     // Simulador
     investmentSimulator: 'Simulador de Inversiones',
@@ -180,6 +187,8 @@ export const translations = {
     variation: 'Variación',
     noHistoricalData: 'No hay datos históricos disponibles',
     errorLoadingQuotes: 'Error al cargar cotizaciones',
+    quotesUpdateNote: 'Los datos se actualizan cada 3 minutos.',
+    quotesNextUpdateLabel: 'Progreso hasta la próxima actualización',
     days7: '7 días',
     days30: '30 días',
     months3: '3 meses',
@@ -189,6 +198,7 @@ export const translations = {
     year3: '3 años',
     year5: '5 años',
     year10: '10 años',
+    year20: '20 años',
     years1: '1Y',
     years3: '3Y',
     years5: '5Y',
@@ -279,7 +289,8 @@ export const translations = {
     effectiveRate: 'Alícuota Efectiva',
     monthlyNetSalary: 'Sueldo Neto Mensual (después de impuestos)',
     deductionsDetail: 'Detalle de Deducciones',
-    deductionsAnnualNote: 'Valores anuales según ARCA 2025.',
+    deductionsAnnualNote: 'Valores anuales',
+    deductionsMonthlyNote: 'Valores mensuales',
     nonTaxableMinimum: 'Mínimo No Imponible',
     specialDeduction: 'Deducción Especial',
     personalDeductions: 'Deducciones Personales',
@@ -294,6 +305,12 @@ export const translations = {
     completeFormMessage: 'Completá el formulario para ver el resultado del cálculo',
     faqNetVsGrossQuestion: '¿Qué es el sueldo neto y cómo se diferencia del bruto?',
     faqNetVsGrossAnswer: 'Bruto: lo que figura en el recibo antes de descuentos. Neto: lo que cobrás en mano (bruto menos aportes y ganancias). Esta calculadora te muestra el desglose de cada descuento.',
+    faqWhatIsIncomeTaxQuestion: '¿Qué es el impuesto a las Ganancias?',
+    faqWhatIsIncomeTaxAnswer: 'Es el tributo sobre los ingresos de las personas. Se calcula por escalas según la normativa (ARCA). La calculadora aplica las alícuotas vigentes.',
+    faqWhatAreDeductionsQuestion: '¿Qué son el mínimo no imponible y las deducciones?',
+    faqWhatAreDeductionsAnswer: 'Son montos que se restan de tu ganancia anual antes de calcular el impuesto: mínimo no imponible, deducción especial, cargas de familia y deducciones personales (alquiler, educación, etc.).',
+    faqValuesDisclaimerQuestion: '¿Los resultados son exactos?',
+    faqValuesDisclaimerAnswer: 'Es una estimación según normativa vigente. Para tu caso particular conviene consultar con un contador.',
     
     // Reserves Labels
     bcraReserves: 'Reservas BCRA',
@@ -335,7 +352,7 @@ export const translations = {
   },
   pt: {
     // Navigation
-    dashboard: 'Painel',
+    dashboard: 'Dashboard',
     quotes: 'Cotações',
     incomeTaxCalculator: 'Calculadora de Imposto de Renda',
     simulator: 'Simulador',
@@ -422,16 +439,17 @@ export const translations = {
     reservesDataSource: 'Reservas brutas: datos.gob.ar. Passivos (swaps, depósitos): configuração estimada conforme BCRA.',
     subtractedFromNet: 'Subtraído do líquido',
     publicUsdDeposits: 'Depósitos públicos em USD',
+    reservesUpdateNote: 'Os dados são atualizados aproximadamente a cada 5 minutos.',
     
     // Inflacion
     inflationTitle: 'Inflação Argentina',
     inflationDesc: 'Dados do IPC e calculadora de ajuste de inflação',
     monthlyInflation: 'Inflação Mensal',
-    yearOverYear: 'Anual',
-    yearToDate: 'Acumulado no Ano',
+    yearOverYear: 'Inflação Interanual',
+    yearToDate: 'Inflação Anual Acumulada',
     last12Months: 'Últimos 12 meses',
     sinceJan: 'Desde janeiro',
-    adjustmentCalculator: 'Calculadora de Ajuste',
+    adjustmentCalculator: 'Calculadora de Ajuste de inflação',
     originalAmount: 'Valor Original',
     startDate: 'Data de Início',
     endDate: 'Data de Término',
@@ -440,10 +458,14 @@ export const translations = {
     cumulativeInflation: 'Inflação Acumulada',
     adjustedAmount: 'Valor Ajustado',
     maintainPurchasingPower: 'Para manter o mesmo poder de compra',
-    monthlyEvolution: 'Evolução Mensual',
+    monthlyEvolution: 'Inflação Mensal - Evolução',
+    yearOverYearEvolution: 'Inflação Interanual - Evolução',
     monthlyData: 'Dados Mensais',
     period: 'Período',
     monthly: 'Mensal',
+    months: 'meses',
+    year: 'ano',
+    years: 'anos',
     
     // Arbitraje
     arbitrageDetector: 'Detector de Arbitragem',
@@ -459,6 +481,7 @@ export const translations = {
     arbitrageDisclaimer: 'As oportunidades de arbitragem são estimativas baseadas em cotações públicas. Os spreads reais podem variar devido a comissões, tempos de transferência e disponibilidade de moeda. Verifique sempre as condições antes de negociar. Esta informação não constitui aconselhamento financeiro.',
     profitPer1k: 'Lucro por USD 1.000',
     stepsToExecute: 'Passos para executar:',
+    arbitrageUpdateNote: 'Os dados são atualizados automaticamente a cada 30 segundos.',
     
     // Simulador
     investmentSimulator: 'Simulador de Investimentos',
@@ -544,7 +567,8 @@ export const translations = {
     effectiveRate: 'Alíquota Efetiva',
     monthlyNetSalary: 'Salário Líquido Mensal (após impostos)',
     deductionsDetail: 'Detalhe das Deduções',
-    deductionsAnnualNote: 'Valores anuais conforme ARCA 2025.',
+    deductionsAnnualNote: 'Valores anuais',
+    deductionsMonthlyNote: 'Valores mensais',
     nonTaxableMinimum: 'Mínimo Não Tributável',
     specialDeduction: 'Dedução Especial',
     personalDeductions: 'Deduções Pessoais',
@@ -559,7 +583,13 @@ export const translations = {
     completeFormMessage: 'Preencha o formulário para ver o resultado do cálculo',
     faqNetVsGrossQuestion: 'O que é o salário líquido e como difere do bruto?',
     faqNetVsGrossAnswer: 'O salário bruto é o valor total antes de qualquer desconto. O salário líquido é o que você efetivamente recebe: o bruto menos os aportes obrigatórios (aposentadoria, saúde, etc.) e menos o imposto de renda, se aplicável. Esta calculadora mostra o detalhamento de cada desconto.',
-
+    faqWhatIsIncomeTaxQuestion: 'O que é o imposto de renda?',
+    faqWhatIsIncomeTaxAnswer: 'É o tributo sobre a renda das pessoas. É calculado por faixas conforme a normativa (ARCA). A calculadora aplica as alíquotas vigentes.',
+    faqWhatAreDeductionsQuestion: 'O que são o mínimo não tributável e as deduções?',
+    faqWhatAreDeductionsAnswer: 'São valores que se subtraem da sua renda anual antes de calcular o imposto: mínimo não tributável, dedução especial, cargas de família e deduções pessoais (aluguel, educação, etc.).',
+    faqValuesDisclaimerQuestion: 'Os resultados são exatos?',
+    faqValuesDisclaimerAnswer: 'É uma estimativa conforme a normativa vigente. Para o seu caso, consulte um contador.',
+    
     // Reserves Labels
     bcraReserves: 'Reservas BCRA',
     banrepReserves: 'Reservas BanRep',
@@ -687,16 +717,17 @@ export const translations = {
     reservesDataSource: 'Gross reserves: datos.gob.ar. Liabilities (swaps, deposits): estimated config from BCRA data.',
     subtractedFromNet: 'Subtracted from net',
     publicUsdDeposits: 'Public USD deposits',
+    reservesUpdateNote: 'Data is updated approximately every 5 minutes.',
     
     // Inflacion
     inflationTitle: 'Argentina Inflation',
     inflationDesc: 'CPI data and inflation adjustment calculator',
     monthlyInflation: 'Monthly Inflation',
-    yearOverYear: 'Year-over-Year',
-    yearToDate: 'Year-to-Date',
+    yearOverYear: 'Year-over-Year Inflation',
+    yearToDate: 'Year-to-Date Inflation',
     last12Months: 'Last 12 months',
     sinceJan: 'Since January',
-    adjustmentCalculator: 'Adjustment Calculator',
+    adjustmentCalculator: 'Inflation Adjustment Calculator',
     originalAmount: 'Original Amount',
     startDate: 'Start Date',
     endDate: 'End Date',
@@ -705,10 +736,14 @@ export const translations = {
     cumulativeInflation: 'Cumulative Inflation',
     adjustedAmount: 'Adjusted Amount',
     maintainPurchasingPower: 'To maintain the same purchasing power',
-    monthlyEvolution: 'Monthly Evolution',
+    monthlyEvolution: 'Monthly Inflation - Evolution',
+    yearOverYearEvolution: 'Year-over-Year Inflation - Evolution',
     monthlyData: 'Monthly Data',
     period: 'Period',
     monthly: 'Monthly',
+    months: 'months',
+    year: 'year',
+    years: 'years',
     
     // Arbitraje
     arbitrageDetector: 'Arbitrage Detector',
@@ -724,6 +759,7 @@ export const translations = {
     arbitrageDisclaimer: 'Arbitrage opportunities are estimates based on public quotes. Actual spreads may vary due to commissions, transfer times, and currency availability. Always verify conditions before trading. This information does not constitute financial advice.',
     profitPer1k: 'Profit per USD 1,000',
     stepsToExecute: 'Steps to execute:',
+    arbitrageUpdateNote: 'Data is updated automatically every 30 seconds.',
     
     // Simulator
     investmentSimulator: 'Investment Simulator',
@@ -778,6 +814,8 @@ export const translations = {
     variation: 'Variation',
     noHistoricalData: 'No historical data available',
     errorLoadingQuotes: 'Error loading quotes',
+    quotesUpdateNote: 'Data is updated every 3 minutes.',
+    quotesNextUpdateLabel: 'Progress until next update',
     days7: '7 days',
     days30: '30 days',
     months3: '3 months',
@@ -787,6 +825,7 @@ export const translations = {
     year3: '3 years',
     year5: '5 years',
     year10: '10 years',
+    year20: '20 years',
     years1: '1Y',
     years3: '3Y',
     years5: '5Y',
@@ -877,7 +916,8 @@ export const translations = {
     effectiveRate: 'Effective Rate',
     monthlyNetSalary: 'Monthly Net Salary (after tax)',
     deductionsDetail: 'Deductions Detail',
-    deductionsAnnualNote: 'Annual values per ARCA 2025.',
+    deductionsAnnualNote: 'Annual values',
+    deductionsMonthlyNote: 'Monthly values',
     nonTaxableMinimum: 'Non-Taxable Minimum',
     specialDeduction: 'Special Deduction',
     personalDeductions: 'Personal Deductions',
@@ -892,7 +932,13 @@ export const translations = {
     completeFormMessage: 'Complete the form to see the calculation result',
     faqNetVsGrossQuestion: 'What is net salary and how does it differ from gross?',
     faqNetVsGrossAnswer: 'Gross salary is the total amount before any deductions. Net salary is what you actually take home: gross minus mandatory contributions (retirement, health insurance, union dues, etc.) and minus income tax, if applicable. This calculator shows the breakdown of each deduction.',
-
+    faqWhatIsIncomeTaxQuestion: 'What is income tax?',
+    faqWhatIsIncomeTaxAnswer: 'It is the tax on personal income. It is calculated by brackets according to regulations (ARCA). The calculator applies current rates.',
+    faqWhatAreDeductionsQuestion: 'What are the non-taxable minimum and deductions?',
+    faqWhatAreDeductionsAnswer: 'Amounts subtracted from your annual income before calculating tax: non-taxable minimum, special deduction, family charges and personal deductions (rent, education, etc.).',
+    faqValuesDisclaimerQuestion: 'Are the results exact?',
+    faqValuesDisclaimerAnswer: 'It is an estimate under current regulations. For your specific case, consult an accountant.',
+    
     // Reserves Labels
     bcraReserves: 'BCRA Reserves',
     banrepReserves: 'BanRep Reserves',

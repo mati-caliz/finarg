@@ -9,7 +9,15 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  ReferenceLine,
 } from 'recharts';
+
+interface ReferenceLine {
+  x?: string | number;
+  label?: string;
+  stroke?: string;
+  strokeDasharray?: string;
+}
 
 interface BarChartProps {
   data: Record<string, string | number>[];
@@ -23,6 +31,8 @@ interface BarChartProps {
   colorByValue?: boolean;
   positiveColor?: string;
   negativeColor?: string;
+  referenceLines?: ReferenceLine[];
+  getBarColor?: (entry: Record<string, string | number>, index: number) => string;
 }
 
 export function BarChart({
@@ -37,6 +47,8 @@ export function BarChart({
   colorByValue = false,
   positiveColor = '#10b981',
   negativeColor = '#ef4444',
+  referenceLines = [],
+  getBarColor,
 }: BarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -66,15 +78,33 @@ export function BarChart({
           itemStyle={{ color: '#fff' }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString('es-AR')]}
         />
+        {referenceLines.map((line, index) => (
+          <ReferenceLine
+            key={index}
+            x={line.x}
+            stroke={line.stroke || '#888'}
+            strokeDasharray={line.strokeDasharray || '3 3'}
+            label={{
+              value: line.label,
+              position: 'top',
+              fill: '#888',
+              fontSize: 10,
+            }}
+          />
+        ))}
         <Bar dataKey={yKey} radius={[4, 4, 0, 0]}>
-          {colorByValue
+          {getBarColor
             ? data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={Number(entry[yKey]) >= 0 ? positiveColor : negativeColor}
-                />
+                <Cell key={`cell-${index}`} fill={getBarColor(entry, index)} />
               ))
-            : data.map((_, index) => <Cell key={`cell-${index}`} fill={color} />)}
+            : colorByValue
+              ? data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={Number(entry[yKey]) >= 0 ? positiveColor : negativeColor}
+                  />
+                ))
+              : data.map((_, index) => <Cell key={`cell-${index}`} fill={color} />)}
         </Bar>
       </RechartsBarChart>
     </ResponsiveContainer>
