@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-interface ReferenceLine {
+interface ReferenceLineConfig {
   x?: string | number;
   label?: string;
   stroke?: string;
@@ -31,7 +31,7 @@ interface BarChartProps {
   colorByValue?: boolean;
   positiveColor?: string;
   negativeColor?: string;
-  referenceLines?: ReferenceLine[];
+  referenceLines?: ReferenceLineConfig[];
   getBarColor?: (entry: Record<string, string | number>, index: number) => string;
 }
 
