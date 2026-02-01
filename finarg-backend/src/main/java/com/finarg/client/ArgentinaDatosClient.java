@@ -144,6 +144,9 @@ public class ArgentinaDatosClient {
             case "brl_oficial" -> new Mapping("BRL", CurrencyType.AR_BRL_OFICIAL);
             case "clp_oficial" -> new Mapping("CLP", CurrencyType.AR_CLP_OFICIAL);
             case "uyu_oficial" -> new Mapping("UYU", CurrencyType.AR_UYU_OFICIAL);
+            case "cny_oficial" -> new Mapping("CNY", CurrencyType.AR_CNY_OFICIAL);
+            case "pyg_oficial" -> new Mapping("PYG", CurrencyType.AR_PYG_OFICIAL);
+            case "bob_oficial" -> new Mapping("BOB", CurrencyType.AR_BOB_OFICIAL);
             default -> null;
         };
         if (m == null) {
