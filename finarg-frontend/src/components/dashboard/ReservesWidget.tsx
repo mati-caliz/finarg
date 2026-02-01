@@ -4,13 +4,15 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatReservesUSD } from '@/lib/utils';
 import { Reserves } from '@/types';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface ReservesWidgetProps {
   reserves: Reserves;
   label?: string;
 }
 
-export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWidgetProps) {
+export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
+  const { translate } = useTranslation();
   const variation = reserves.dailyVariation || 0;
   const isPositive = variation > 0;
   const isNegative = variation < 0;
@@ -19,13 +21,13 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          {label}
+          {label || translate('bcraReserves')}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div>
-            <p className="text-xs text-muted-foreground">Gross (millones USD)</p>
+            <p className="text-xs text-muted-foreground">{translate('grossMillionsUsd')}</p>
             <div className="flex items-end justify-between">
               <p className="text-2xl font-bold">
                 {formatReservesUSD(reserves.grossReserves)}
@@ -50,7 +52,7 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
           <div className="pt-2 border-t border-border space-y-2">
             {reserves.netReservesBCRA !== undefined && reserves.netReservesBCRA !== null && (
               <div>
-                <p className="text-xs text-muted-foreground">Net (BCRA)</p>
+                <p className="text-xs text-muted-foreground">{translate('netBcra')}</p>
                 <p className="text-lg font-semibold text-green-500">
                   {formatReservesUSD(reserves.netReservesBCRA)}
                 </p>
@@ -58,7 +60,7 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
             )}
             {reserves.netReservesFMI !== undefined && reserves.netReservesFMI !== null && (
               <div>
-                <p className="text-xs text-muted-foreground">Net (FMI)</p>
+                <p className="text-xs text-muted-foreground">{translate('netFmi')}</p>
                 <p
                   className={`text-lg font-semibold ${
                     reserves.netReservesFMI < 0 ? 'text-red-500' : 'text-amber-600'
@@ -72,7 +74,7 @@ export function ReservesWidget({ reserves, label = 'BCRA Reserves' }: ReservesWi
             {(reserves.netReservesBCRA === undefined || reserves.netReservesBCRA === null) &&
               (reserves.netReservesFMI === undefined || reserves.netReservesFMI === null) && (
               <div>
-                <p className="text-xs text-muted-foreground">Net (estimated)</p>
+                <p className="text-xs text-muted-foreground">{translate('netEstimated')}</p>
                 <p className="text-lg font-semibold text-green-500">
                   {formatReservesUSD(reserves.netReserves)}
                 </p>

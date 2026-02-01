@@ -6,6 +6,8 @@ import { formatCurrencySimple } from '@/lib/utils';
 import { Quote } from '@/types';
 import { useAppStore } from '@/store/useStore';
 import { CountryCode } from '@/config/countries';
+import { useTranslation } from '@/hooks/useTranslation';
+import { TranslationKey } from '@/i18n/translations';
 
 export interface QuoteCardProps {
   quote: Quote;
@@ -13,6 +15,7 @@ export interface QuoteCardProps {
 }
 
 export function QuoteCard({ quote, country }: QuoteCardProps) {
+  const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryToUse = country || (quote.country as CountryCode) || selectedCountry;
   
@@ -20,11 +23,14 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
   const isPositive = variation > 0;
   const isNegative = variation < 0;
 
+  const translated = translate(quote.type as TranslationKey);
+  const displayName = translated === quote.type ? quote.name : translated;
+
   return (
     <Card className="hover:border-primary/50 transition-colors">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          {quote.name}
+          {displayName}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -32,7 +38,7 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
           <div>
             <p className="text-2xl font-bold">{formatCurrencySimple(quote.sell, countryToUse)}</p>
             <p className="text-xs text-muted-foreground">
-              Buy: {formatCurrencySimple(quote.buy, countryToUse)}
+              {translate('buy')}: {formatCurrencySimple(quote.buy, countryToUse)}
             </p>
           </div>
           <div
@@ -51,7 +57,7 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
           </div>
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
-          Spread: {formatCurrencySimple(quote.spread, countryToUse)}
+          {translate('spread')}: {formatCurrencySimple(quote.spread, countryToUse)}
         </div>
       </CardContent>
     </Card>

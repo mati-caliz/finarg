@@ -70,6 +70,7 @@ export function AreaChart({
             borderRadius: '8px',
           }}
           labelStyle={{ color: '#fff' }}
+          itemStyle={{ color: '#fff' }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString('es-AR')]}
         />
         <Area

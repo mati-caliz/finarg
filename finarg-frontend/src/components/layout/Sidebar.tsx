@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  BarChart2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/useStore';
@@ -32,6 +33,7 @@ const baseNavigation = [
   { key: 'inflation' as TranslationKey, href: '/inflacion', icon: Percent, feature: 'inflation' as const },
   { key: 'reserves' as TranslationKey, href: '/reservas', icon: Landmark, feature: 'reserves' as const },
   { key: 'repos' as TranslationKey, href: '/cauciones', icon: PiggyBank, feature: 'repos' as const },
+  { key: 'ratesComparator' as TranslationKey, href: '/tasas', icon: BarChart2, feature: 'rates' as const },
 ];
 
 function CountrySelector() {

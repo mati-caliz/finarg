@@ -55,10 +55,17 @@ public class WebClientConfig {
 
     @Bean("argentinaDatosWebClient")
     public WebClient argentinaDatosWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .followRedirect(true)
+                .responseTimeout(Duration.ofSeconds(30));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(argentinaDatosBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+                .defaultHeader("User-Agent", "Finarg/1.0")
+                .defaultHeader("Referer", "https://comparatasas.ar/")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
     }
 

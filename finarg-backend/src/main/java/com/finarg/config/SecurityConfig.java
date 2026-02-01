@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/api/v1/income-tax/**",
                                 "/api/v1/simulator/**",
                                 "/api/v1/repos/**",
+                                "/api/v1/rates/**",
                                 "/api/v1/countries",
                                 "/api-docs/**",
                                 "/swagger-ui/**",

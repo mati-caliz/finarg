@@ -76,8 +76,8 @@ export default function ReposPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{translate('repoOptimizer')}</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-foreground">{translate('repoOptimizer')}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
           {translate('repoDescription')}
         </p>
       </div>
@@ -93,11 +93,11 @@ export default function ReposPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   {translate('amountToInvest')}
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="number"
                     placeholder="1000000"
@@ -106,12 +106,12 @@ export default function ReposPage() {
                     className="pl-10"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{formatCurrency(amount)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{formatCurrency(amount)}</p>
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-300 mb-2">
-                  <Calendar className="h-4 w-4" />
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   {translate('term')}
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -148,9 +148,9 @@ export default function ReposPage() {
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-gray-800/30 rounded-lg">
-              <h4 className="text-sm font-medium text-white mb-2">{translate('whatIsRepo')}</h4>
-              <p className="text-xs text-gray-400">
+            <div className="mt-6 p-4 bg-muted/60 rounded-lg border border-border">
+              <h4 className="text-sm font-medium text-foreground mb-2">{translate('whatIsRepo')}</h4>
+              <p className="text-sm text-muted-foreground">
                 {translate('repoInfo')}
               </p>
             </div>
@@ -163,15 +163,15 @@ export default function ReposPage() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">{translate('finalAmount')}</p>
-                    <p className="text-xl font-bold text-white mt-1">
+                    <p className="text-xs text-muted-foreground">{translate('finalAmount')}</p>
+                    <p className="text-xl font-bold text-foreground mt-1">
                       {formatCurrency(result.finalAmount)}
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">{translate('grossProfit')}</p>
+                    <p className="text-xs text-muted-foreground">{translate('grossProfit')}</p>
                     <p className="text-xl font-bold text-green-500 mt-1">
                       +{formatCurrency(result.profitARS)}
                     </p>
@@ -179,7 +179,7 @@ export default function ReposPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">TNA</p>
+                    <p className="text-xs text-muted-foreground">TNA</p>
                     <p className="text-xl font-bold text-primary mt-1">
                       {formatPercent(result.rateTNA)}
                     </p>
@@ -187,7 +187,7 @@ export default function ReposPage() {
                 </Card>
                 <Card className="bg-card">
                   <CardContent className="p-4">
-                    <p className="text-xs text-gray-400">TEA</p>
+                    <p className="text-xs text-muted-foreground">TEA</p>
                     <p className="text-xl font-bold text-primary mt-1">
                       {formatPercent(result.rateTEA)}
                     </p>
@@ -202,36 +202,36 @@ export default function ReposPage() {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-3">
-                      <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">{translate('amountToInvest')}</span>
-                        <span className="text-white">{formatCurrency(result.initialAmount)}</span>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">{translate('amountToInvest')}</span>
+                        <span className="text-foreground">{formatCurrency(result.initialAmount)}</span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">{translate('term')}</span>
-                        <span className="text-white">{result.termDays} {translate('days7').replace('7 ', '')}</span>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">{translate('term')}</span>
+                        <span className="text-foreground">{result.termDays} {translate('days7').replace('7 ', '')}</span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">{translate('grossProfit')}</span>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">{translate('grossProfit')}</span>
                         <span className="text-green-500">
                           +{formatPercent(result.totalReturn)}
                         </span>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">{translate('estCommission')}</span>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">{translate('estCommission')}</span>
                         <span className="text-red-500">
                           -{formatCurrency(result.estimatedCommission)}
                         </span>
                       </div>
-                      <div className="flex justify-between py-2 border-b border-gray-800">
-                        <span className="text-gray-400">{translate('netReturn')}</span>
+                      <div className="flex justify-between py-2 border-b border-border">
+                        <span className="text-muted-foreground">{translate('netReturn')}</span>
                         <span className="text-green-500">
                           {formatPercent(result.netReturn)}
                         </span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-white font-medium">{translate('finalAmount')}</span>
+                        <span className="text-foreground font-medium">{translate('finalAmount')}</span>
                         <span className="text-primary font-bold">
                           {formatCurrency(result.finalAmount)}
                         </span>
@@ -245,7 +245,7 @@ export default function ReposPage() {
                         <TrendingUp className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                         <div>
                           <p className="text-sm font-medium text-primary">{translate('optimalStrategy')}</p>
-                          <p className="text-sm text-gray-300 mt-1">{result.optimalStrategy}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{result.optimalStrategy}</p>
                         </div>
                       </div>
                     </div>
@@ -275,22 +275,22 @@ export default function ReposPage() {
                     <div className="mt-4 overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-gray-800">
-                            <th className="text-left py-2 text-gray-400">{translate('term')}</th>
-                            <th className="text-right py-2 text-gray-400">TNA</th>
-                            <th className="text-right py-2 text-gray-400">{translate('finalAmount')}</th>
-                            <th className="text-right py-2 text-gray-400">Return</th>
+                          <tr className="border-b border-border">
+                            <th className="text-left py-2 text-muted-foreground">{translate('term')}</th>
+                            <th className="text-right py-2 text-muted-foreground">TNA</th>
+                            <th className="text-right py-2 text-muted-foreground">{translate('finalAmount')}</th>
+                            <th className="text-right py-2 text-muted-foreground">Return</th>
                           </tr>
                         </thead>
                         <tbody>
                           {result.comparison.map((comp) => (
                             <tr
                               key={comp.term}
-                              className={`border-b border-gray-800/50 ${
+                              className={`border-b border-border/50 ${
                                 comp.term === result.termDays ? 'bg-primary/5' : ''
                               }`}
                             >
-                              <td className="py-2 text-white">
+                              <td className="py-2 text-foreground">
                                 {comp.term} {translate('days7').replace('7 ', '')}
                                 {comp.term === result.termDays && (
                                   <span className="ml-2 text-xs text-primary">(selected)</span>
@@ -299,7 +299,7 @@ export default function ReposPage() {
                               <td className="text-right py-2 text-primary">
                                 {formatPercent(comp.rateTNA)}
                               </td>
-                              <td className="text-right py-2 text-white">
+                              <td className="text-right py-2 text-foreground">
                                 {formatCurrency(comp.finalAmount)}
                               </td>
                               <td className="text-right py-2 text-green-500">
@@ -325,7 +325,7 @@ export default function ReposPage() {
                   <CardContent>
                     <ul className="space-y-2">
                       {result.recommendations.map((rec, index) => (
-                        <li key={index} className="flex items-start gap-2 text-sm text-gray-300">
+                        <li key={index} className="flex items-start gap-2 text-sm text-foreground">
                           <span className="text-primary mt-1">•</span>
                           {rec}
                         </li>
@@ -338,9 +338,9 @@ export default function ReposPage() {
           ) : (
             <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
               <CardContent className="text-center">
-                <Coins className="h-16 w-16 text-gray-700 mx-auto mb-4" />
-                <p className="text-gray-500">{translate('repoPlaceholder')}</p>
-                <p className="text-gray-600 text-sm mt-2">
+                <Coins className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">{translate('repoPlaceholder')}</p>
+                <p className="text-muted-foreground text-sm mt-2">
                   {translate('repoPlaceholderDesc')}
                 </p>
               </CardContent>
@@ -355,7 +355,7 @@ export default function ReposPage() {
             <AlertCircle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="text-yellow-500 font-medium mb-1">{translate('importantInfo')}</p>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 {translate('repoDisclaimer')}
               </p>
             </div>

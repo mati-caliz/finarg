@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservesService {
 
-    private static final BigDecimal SCALE_THRESHOLD = new BigDecimal("100000");
+    // TODO: implementar una forma de obtener solo los datos hardcodeados de reservas netas (sin overrides de APIs externas)
 
     private final DatosGobArClient datosGobArClient;
     private final BcraClient bcraClient;
@@ -130,18 +130,10 @@ public class ReservesService {
         }
         DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
         if (datosGob != null) {
-            BigDecimal pasivosLetras = scaleIfNeeded(datosGob.getPasivosLetrasUsd());
-            overrides.put("leliq_pases", pasivosLetras.setScale(0, RoundingMode.HALF_UP));
+            overrides.put("leliq_pases", datosGob.getPasivosLetrasUsd().setScale(0, RoundingMode.HALF_UP));
             overrides.put("gov_deposits", datosGob.getDepositosGobiernoUsd().setScale(0, RoundingMode.HALF_UP));
         }
         return overrides;
-    }
-
-    private static BigDecimal scaleIfNeeded(BigDecimal value) {
-        if (value == null || value.compareTo(SCALE_THRESHOLD) <= 0) {
-            return value != null ? value : BigDecimal.ZERO;
-        }
-        return value.divide(BigDecimal.valueOf(1000), 0, RoundingMode.HALF_UP);
     }
 
     private List<ReserveLiabilityDTO> mapLiabilitiesWithOverrides(

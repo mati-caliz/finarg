@@ -60,36 +60,48 @@ app:
             liabilities:
               - id: china_swap
                 name: Swap China
-                amount: 18291
-              - id: usa_swap
-                name: Swap EE.UU.
-                amount: 2500
+                amount: 18000
               - id: bank_deposits
                 name: Encajes Bancarios
-                amount: 10000
+                amount: 15000
+              - id: bopreal
+                name: BOPREAL
+                amount: 2000
+              - id: sedesa
+                name: Sedesa (Seguros de depósitos)
+                amount: 2000
+              - id: repo
+                name: REPO
+                amount: 1000
               - id: other_bcra
                 name: Otros pasivos BCRA
-                amount: 6976
+                amount: 5260
           fmi:
             liabilities:
               - id: china_swap
                 name: Swap China
-                amount: 18291
-              - id: usa_swap
-                name: Swap EE.UU.
-                amount: 2500
+                amount: 18000
               - id: bank_deposits
                 name: Encajes Bancarios
-                amount: 10000
+                amount: 15000
+              - id: bopreal
+                name: BOPREAL
+                amount: 2000
+              - id: sedesa
+                name: Sedesa (Seguros de depósitos)
+                amount: 2000
+              - id: repo
+                name: REPO
+                amount: 1000
               - id: gov_deposits
                 name: Depósitos del Gobierno
                 amount: 3000
               - id: leliq_pases
                 name: LELIQs y pases (USD)
-                amount: 8000
+                amount: 2000
               - id: other_fmi
                 name: Otros pasivos metodología FMI
-                amount: 14776
+                amount: 17260
 
 external:
   apis:

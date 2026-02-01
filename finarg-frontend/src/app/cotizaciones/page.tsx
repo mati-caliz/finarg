@@ -36,6 +36,11 @@ export default function QuotesPage() {
     { value: '90', label: translate('months3') },
     { value: '180', label: translate('months6') },
     { value: '365', label: translate('year1') },
+    { value: '730', label: translate('year2') },
+    { value: '1095', label: translate('year3') },
+    { value: '1825', label: translate('year5') },
+    { value: '3650', label: translate('year10') },
+    { value: '5500', label: translate('max') },
   ], [translate]);
   
   const [selectedType, setSelectedType] = useState(currencyTypes[0]?.value || '');
@@ -69,7 +74,7 @@ export default function QuotesPage() {
       const from = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000)
         .toISOString()
         .split('T')[0];
-      const response = await quotesApi.getHistory(selectedType, from, to);
+      const response = await quotesApi.getHistory(selectedType, from, to, selectedCountry);
       return response.data;
     },
     enabled: !!selectedType,
@@ -180,12 +185,13 @@ export default function QuotesPage() {
 
       <Card className="bg-card">
         <CardHeader className="pb-2">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <CardTitle className="text-lg">
-              {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
-            </CardTitle>
-            <div className="flex flex-wrap gap-2">
-              {periods.map((p) => (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <CardTitle className="text-lg">
+                {translate('history')} - {currencyTypes.find((t) => t.value === selectedType)?.label || selectedType}
+              </CardTitle>
+              <div className="flex flex-wrap gap-2">
+                {periods.map((p) => (
                 <Button
                   key={p.value}
                   variant={period === p.value ? 'default' : 'outline'}
@@ -193,6 +199,19 @@ export default function QuotesPage() {
                   onClick={() => setPeriod(p.value)}
                 >
                   {p.label}
+                </Button>
+              ))}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-border">
+              {currencyTypes.map((t) => (
+                <Button
+                  key={t.value}
+                  variant={selectedType === t.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedType(t.value)}
+                >
+                  {t.label}
                 </Button>
               ))}
             </div>
@@ -215,10 +234,12 @@ export default function QuotesPage() {
               xKey="date"
               yKey={['buy', 'sell']}
               colors={['#3b82f6', '#10b981']}
-              height={300}
+              height={320}
               formatX={formatDate}
               formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
               showLegend
+              showGrid={false}
+              legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
             />
           ) : (
             <div className="h-[300px] flex items-center justify-center text-muted-foreground">
