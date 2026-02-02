@@ -35,6 +35,13 @@ public class RatesController {
         return ResponseEntity.ok(ratesService.getWalletRates(c));
     }
 
+    @GetMapping("/usd-accounts")
+    @Operation(summary = "Get USD remunerated accounts and yields")
+    public ResponseEntity<List<RateDTO>> getUsdAccountRates() {
+        Country c = mapCountry();
+        return ResponseEntity.ok(ratesService.getUsdAccountRates(c));
+    }
+
     private static Country mapCountry() {
         return Country.ARGENTINA;
     }
