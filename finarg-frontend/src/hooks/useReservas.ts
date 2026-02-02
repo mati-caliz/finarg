@@ -1,5 +1,5 @@
-'use client';
+"use client";
 
-export * from './useReserves';
+export * from "./useReserves";
 
-export { useReservas, useReservasHistorico } from './useReserves';
+export { useReservas, useReservasHistorico } from "./useReserves";

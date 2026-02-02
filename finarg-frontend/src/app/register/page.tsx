@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { GoogleLogin } from '@react-oauth/google';
-import { authApi } from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { AuthResponse } from '@/types';
-import { useAuthStore } from '@/store/useStore';
-import { Mail, Lock, User, Loader2, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { authApi } from "@/lib/api";
+import { useAuthStore } from "@/store/useStore";
+import type { AuthResponse } from "@/types";
+import { GoogleLogin } from "@react-oauth/google";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle, Loader2, Lock, Mail, TrendingUp, User } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    nombre: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -30,18 +30,21 @@ export default function RegisterPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
-      router.push('/');
+      router.push("/");
     },
     onError: (error: Error & { response?: { data?: { message?: string }; status?: number } }) => {
       const msg = error.response?.data?.message;
-      const isEmailTaken = error.response?.status === 409 || msg?.toLowerCase().includes('already registered') || msg?.toLowerCase().includes('ya está registrado');
+      const isEmailTaken =
+        error.response?.status === 409 ||
+        msg?.toLowerCase().includes("already registered") ||
+        msg?.toLowerCase().includes("ya está registrado");
       setError(
         isEmailTaken
-          ? 'Este email ya está registrado. Si tenés cuenta, iniciá sesión.'
-          : msg || 'Error al registrarse. Intentá nuevamente.'
+          ? "Este email ya está registrado. Si tenés cuenta, iniciá sesión."
+          : msg || "Error al registrarse. Intentá nuevamente.",
       );
     },
   });
@@ -51,12 +54,12 @@ export default function RegisterPage() {
     setError(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError("Las contraseñas no coinciden");
       return;
     }
 
     if (formData.password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+      setError("La contraseña debe tener al menos 8 caracteres");
       return;
     }
 
@@ -69,18 +72,20 @@ export default function RegisterPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
-      router.push('/');
+      router.push("/");
     },
     onError: (err: Error & { response?: { data?: { message?: string } } }) => {
-      setError(err.response?.data?.message || 'Error al registrarse con Google.');
+      setError(err.response?.data?.message || "Error al registrarse con Google.");
     },
   });
 
   const handleGoogleSuccess = (credential: string | undefined) => {
-    if (!credential) {return;}
+    if (!credential) {
+      return;
+    }
     setError(null);
     googleLoginMutation.mutate(credential);
   };
@@ -106,29 +111,29 @@ export default function RegisterPage() {
   const getStrengthColor = () => {
     const strength = passwordStrength();
     if (strength <= 1) {
-      return 'bg-red-500';
+      return "bg-red-500";
     }
     if (strength === 2) {
-      return 'bg-yellow-500';
+      return "bg-yellow-500";
     }
     if (strength === 3) {
-      return 'bg-blue-500';
+      return "bg-blue-500";
     }
-    return 'bg-green-500';
+    return "bg-green-500";
   };
 
   const getStrengthText = () => {
     const strength = passwordStrength();
     if (strength <= 1) {
-      return 'Débil';
+      return "Débil";
     }
     if (strength === 2) {
-      return 'Regular';
+      return "Regular";
     }
     if (strength === 3) {
-      return 'Buena';
+      return "Buena";
     }
-    return 'Fuerte';
+    return "Fuerte";
   };
 
   return (
@@ -154,7 +159,7 @@ export default function RegisterPage() {
                     <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
                     <p className="text-sm text-red-500">{error}</p>
                   </div>
-                  {error.includes('ya está registrado') && (
+                  {error.includes("ya está registrado") && (
                     <Link href="/login" className="text-sm text-primary hover:underline">
                       Ir a Iniciar sesión
                     </Link>
@@ -163,55 +168,58 @@ export default function RegisterPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-300 mb-2">
                   Nombre
+                  <div className="relative mt-1">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="nombre"
+                      type="text"
+                      placeholder="Tu nombre"
+                      value={formData.nombre}
+                      onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="text"
-                    placeholder="Tu nombre"
-                    value={formData.nombre}
-                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email
+                  <div className="relative mt-1">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="tu@email.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="email"
-                    placeholder="tu@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
                   Contraseña
+                  <div className="relative mt-1">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="pl-10"
+                      required
+                      minLength={8}
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="pl-10"
-                    required
-                    minLength={8}
-                  />
-                </div>
                 {formData.password && (
                   <div className="mt-2">
                     <div className="flex items-center gap-2">
@@ -224,15 +232,21 @@ export default function RegisterPage() {
                       <span className="text-xs text-gray-400">{getStrengthText()}</span>
                     </div>
                     <ul className="mt-2 space-y-1">
-                      <li className={`text-xs flex items-center gap-1 ${formData.password.length >= 8 ? 'text-green-500' : 'text-gray-500'}`}>
+                      <li
+                        className={`text-xs flex items-center gap-1 ${formData.password.length >= 8 ? "text-green-500" : "text-gray-500"}`}
+                      >
                         <CheckCircle className="h-3 w-3" />
                         Mínimo 8 caracteres
                       </li>
-                      <li className={`text-xs flex items-center gap-1 ${/[A-Z]/.test(formData.password) ? 'text-green-500' : 'text-gray-500'}`}>
+                      <li
+                        className={`text-xs flex items-center gap-1 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-gray-500"}`}
+                      >
                         <CheckCircle className="h-3 w-3" />
                         Una mayúscula
                       </li>
-                      <li className={`text-xs flex items-center gap-1 ${/[0-9]/.test(formData.password) ? 'text-green-500' : 'text-gray-500'}`}>
+                      <li
+                        className={`text-xs flex items-center gap-1 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-gray-500"}`}
+                      >
                         <CheckCircle className="h-3 w-3" />
                         Un número
                       </li>
@@ -242,20 +256,26 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  htmlFor="confirmPassword"
+                  className="block text-sm font-medium text-gray-300 mb-2"
+                >
                   Confirmar Contraseña
+                  <div className="relative mt-1">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={(e) =>
+                        setFormData({ ...formData, confirmPassword: e.target.value })
+                      }
+                      className="pl-10"
+                      required
+                    />
+                  </div>
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="pl-10"
-                    required
-                  />
-                </div>
                 {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                   <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
                 )}
@@ -278,7 +298,7 @@ export default function RegisterPage() {
                     Registrando...
                   </>
                 ) : (
-                  'Crear Cuenta'
+                  "Crear Cuenta"
                 )}
               </Button>
 
@@ -295,7 +315,7 @@ export default function RegisterPage() {
                 {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
                   <GoogleLogin
                     onSuccess={(res) => handleGoogleSuccess(res?.credential)}
-                    onError={() => setError('Error al registrarse con Google.')}
+                    onError={() => setError("Error al registrarse con Google.")}
                     useOneTap={false}
                     theme="filled_black"
                     size="large"
@@ -321,7 +341,7 @@ export default function RegisterPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-400">
-                ¿Ya tenés cuenta?{' '}
+                ¿Ya tenés cuenta?{" "}
                 <Link href="/login" className="text-primary hover:underline">
                   Iniciar sesión
                 </Link>
@@ -329,11 +349,11 @@ export default function RegisterPage() {
             </div>
 
             <p className="mt-4 text-xs text-gray-500 text-center">
-              Al registrarte, aceptás nuestros{' '}
+              Al registrarte, aceptás nuestros{" "}
               <Link href="/terms" className="text-gray-400 hover:underline">
                 Términos de Servicio
-              </Link>{' '}
-              y{' '}
+              </Link>{" "}
+              y{" "}
               <Link href="/privacy" className="text-gray-400 hover:underline">
                 Política de Privacidad
               </Link>

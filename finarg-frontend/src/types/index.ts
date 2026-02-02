@@ -1,4 +1,4 @@
-import { CountryCode } from '@/config/countries';
+import type { CountryCode } from "@/config/countries";
 
 export interface Quote {
   type: string;
@@ -16,7 +16,7 @@ export interface Gap {
   officialRate: number;
   parallelRate: number;
   gapPercentage: number;
-  level: 'LOW' | 'MEDIUM' | 'HIGH';
+  level: "LOW" | "MEDIUM" | "HIGH";
   trafficLightColor: string;
   description: string;
 }
@@ -173,3 +173,11 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface ExchangeBands {
+  floor: number;
+  ceiling: number;
+  middle: number;
+  crawlingPegMonthly: number;
+  lastUpdate: string;
+  notes?: string;
+}

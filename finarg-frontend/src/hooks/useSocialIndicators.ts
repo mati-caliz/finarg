@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { indicatorsApi } from '@/lib/api';
-import { SocialIndicators } from '@/types';
+import { indicatorsApi } from "@/lib/api";
+import type { SocialIndicators } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
-export function useSocialIndicators(country: string = 'ar') {
+export function useSocialIndicators(country = "ar") {
   return useQuery<SocialIndicators>({
-    queryKey: ['indicators', 'social', country],
+    queryKey: ["indicators", "social", country],
     queryFn: async () => {
       const response = await indicatorsApi.getSocial(country);
       return response.data;
     },
-    enabled: country === 'ar',
+    enabled: country === "ar",
     refetchInterval: 3600000,
   });
 }

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
-import { useState } from 'react';
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
+import { useState } from "react";
 
-const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   return (
@@ -36,9 +36,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
         disableTransitionOnChange
       >
         <QueryClientProvider client={queryClient}>
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
+          <ErrorBoundary>{children}</ErrorBoundary>
         </QueryClientProvider>
       </ThemeProvider>
     </GoogleOAuthProvider>

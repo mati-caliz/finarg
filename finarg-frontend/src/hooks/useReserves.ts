@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { reservesApi } from '@/lib/api';
-import { Reserves } from '@/types';
-import { CountryCode } from '@/config/countries';
+import type { CountryCode } from "@/config/countries";
+import { reservesApi } from "@/lib/api";
+import type { Reserves } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 
-export function useReserves(country: CountryCode = 'ar') {
+export function useReserves(country: CountryCode = "ar") {
   return useQuery<Reserves>({
-    queryKey: ['reserves', country],
+    queryKey: ["reserves", country],
     queryFn: async () => {
       const response = await reservesApi.getCurrent(country);
       return response.data;
     },
-    enabled: country === 'ar',
+    enabled: country === "ar",
     refetchInterval: 300000,
   });
 }
 
-export function useReservesHistory(days: number = 30) {
+export function useReservesHistory(days = 30) {
   return useQuery({
-    queryKey: ['reserves', 'history', days],
+    queryKey: ["reserves", "history", days],
     queryFn: async () => {
       const response = await reservesApi.getHistory(days);
       return response.data;

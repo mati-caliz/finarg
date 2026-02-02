@@ -1,5 +1,5 @@
-'use client';
+"use client";
 
-export * from './useArbitrage';
+export * from "./useArbitrage";
 
-export { useArbitraje } from './useArbitrage';
+export { useArbitraje } from "./useArbitrage";

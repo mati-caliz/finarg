@@ -1,7 +1,7 @@
-import { useAppStore } from '@/store/useStore';
-import { translations, TranslationKey, Language } from '@/i18n/translations';
+import { type Language, type TranslationKey, translations } from "@/i18n/translations";
+import { useAppStore } from "@/store/useStore";
 
-const VALID_COUNTRIES = ['ar', 'co', 'cl', 'uy', 'br'];
+const VALID_COUNTRIES = ["ar", "co", "cl", "uy", "br"];
 
 type TranslationDict = Record<TranslationKey, string>;
 
@@ -9,14 +9,14 @@ export const useTranslation = () => {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
 
   const getLanguage = (country: string | undefined): Language => {
-    const code = (country || 'ar').toString().toLowerCase();
+    const code = (country || "ar").toString().toLowerCase();
     if (!VALID_COUNTRIES.includes(code)) {
-      return 'es';
+      return "es";
     }
-    if (code === 'br') {
-      return 'pt';
+    if (code === "br") {
+      return "pt";
     }
-    return 'es';
+    return "es";
   };
 
   const language = getLanguage(selectedCountry);
