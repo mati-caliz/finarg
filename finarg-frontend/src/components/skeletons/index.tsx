@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Skeleton para DolarCard
 export function DolarCardSkeleton() {
@@ -263,37 +263,6 @@ export function CalculadoraPageSkeleton() {
           <ChartSkeleton height={200} />
         </div>
       </div>
-    </div>
-  );
-}
-
-// Skeleton para lista de arbitrajes
-export function ArbitrajeListSkeleton() {
-  return (
-    <div className="space-y-4">
-      {Array.from({ length: 3 }, (_, i) => i).map((i) => (
-        <Card key={i} className="bg-card">
-          <CardHeader className="pb-2">
-            <div className="flex justify-between">
-              <Skeleton className="h-5 w-48" />
-              <Skeleton className="h-5 w-20" />
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-gray-800/50 rounded-lg space-y-2">
-                <Skeleton className="h-3 w-20" />
-                <Skeleton className="h-6 w-24" />
-              </div>
-              <div className="p-3 bg-gray-800/50 rounded-lg space-y-2">
-                <Skeleton className="h-3 w-20" />
-                <Skeleton className="h-6 w-24" />
-              </div>
-            </div>
-            <SkeletonText lines={2} />
-          </CardContent>
-        </Card>
-      ))}
     </div>
   );
 }

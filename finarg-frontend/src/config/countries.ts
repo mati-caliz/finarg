@@ -16,7 +16,7 @@ export interface CountryConfig {
     inflation: boolean;
     reserves: boolean;
     incomeTax: boolean;
-    arbitrage: boolean;
+
     repos: boolean;
     rates: boolean;
     exchangeBands: boolean;
@@ -46,7 +46,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       inflation: true,
       reserves: true,
       incomeTax: true,
-      arbitrage: true,
+
       repos: true,
       rates: true,
       exchangeBands: true,
@@ -116,7 +116,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       inflation: true,
       reserves: false,
       incomeTax: false,
-      arbitrage: false,
+
       repos: false,
       rates: false,
       exchangeBands: false,
@@ -143,7 +143,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       inflation: true,
       reserves: false,
       incomeTax: false,
-      arbitrage: false,
+
       repos: false,
       rates: false,
       exchangeBands: false,
@@ -171,7 +171,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       inflation: true,
       reserves: false,
       incomeTax: false,
-      arbitrage: false,
+
       repos: false,
       rates: false,
       exchangeBands: false,
@@ -198,7 +198,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       inflation: true,
       reserves: false,
       incomeTax: false,
-      arbitrage: false,
+
       repos: false,
       rates: false,
       exchangeBands: false,

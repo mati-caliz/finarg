@@ -55,7 +55,6 @@ public class SecurityConfig {
                                 "/api/v1/uy/**",
                                 "/api/v1/inflation/**",
                                 "/api/v1/reserves/**",
-                                "/api/v1/arbitrage/**",
                                 "/api/v1/income-tax/**",
                                 "/api/v1/simulator/**",
                                 "/api/v1/repos/**",

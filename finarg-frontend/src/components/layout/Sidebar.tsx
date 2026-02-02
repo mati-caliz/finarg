@@ -7,7 +7,6 @@ import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
-  ArrowLeftRight,
   BarChart2,
   Calculator,
   DollarSign,
@@ -62,12 +61,6 @@ const baseNavigation = [
     feature: "incomeTax" as const,
   },
 
-  {
-    key: "arbitrage" as TranslationKey,
-    href: "/arbitraje",
-    icon: ArrowLeftRight,
-    feature: "arbitrage" as const,
-  },
   {
     key: "repos" as TranslationKey,
     href: "/cauciones",

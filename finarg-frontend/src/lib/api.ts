@@ -65,10 +65,6 @@ export const incomeTaxApi = {
   calculate: (data: IncomeTaxRequest) => api.post("/income-tax/calculate", data),
 };
 
-export const arbitrageApi = {
-  getOpportunities: () => api.get("/arbitrage/opportunities"),
-};
-
 export const exchangeBandsApi = {
   getCurrent: () => api.get("/exchange-bands"),
 };

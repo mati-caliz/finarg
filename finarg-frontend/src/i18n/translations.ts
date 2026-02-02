@@ -5,7 +5,6 @@ export const translations = {
     quotes: "Cotizaciones",
     incomeTaxCalculator: "Calculadora de Ganancias",
 
-    arbitrage: "Arbitraje",
     inflation: "Inflación",
     reserves: "Reservas",
     repos: "Cauciones",
@@ -130,24 +129,6 @@ export const translations = {
     year: "año",
     years: "años",
 
-    // Arbitraje
-    arbitrageDetector: "Detector de Arbitraje",
-    arbitrageDesc: "Oportunidades de ganancia entre diferentes cotizaciones del dólar",
-    totalOpportunities: "Oportunidades Totales",
-    viable: "Viables",
-    notViable: "No Viables",
-    viableOpportunities: "Oportunidades Viables",
-    monitoring: "Monitoreo (No Viables por ahora)",
-    noArbitrage: "Sin oportunidades de arbitraje",
-    arbitrageBalanced:
-      "Las cotizaciones están equilibradas. Verificaremos nuevamente en 30 segundos.",
-    arbitrageDisclaimerTitle: "Descargo de responsabilidad",
-    arbitrageDisclaimer:
-      "Las oportunidades de arbitraje son estimaciones basadas en cotizaciones públicas. Los spreads reales pueden variar debido a comisiones, tiempos de transferencia y disponibilidad de divisas. Verificá siempre las condiciones antes de operar. Esta información no constituye asesoramiento financiero.",
-    profitPer1k: "Ganancia por USD 1.000",
-    stepsToExecute: "Pasos para ejecutar:",
-    arbitrageUpdateNote: "Los datos se actualizan cada 30 segundos automáticamente.",
-
     // Dashboard
     marketSummary: "Resumen del mercado financiero",
     socialIndicators: "Indicadores sociales",
@@ -156,7 +137,6 @@ export const translations = {
     canastaBasicaTotal: "Canasta Básica Total (GBA)",
     uva: "UVA",
     cer: "CER",
-    arbitrageDetected: "Oportunidades de Arbitraje Detectadas",
     otherQuotes: "Otras Cotizaciones",
     viewHistory: "Ver historial y ajustar valores",
     maximizeReturns: "Maximizá tus rendimientos",
@@ -410,7 +390,6 @@ export const translations = {
     quotes: "Cotações",
     incomeTaxCalculator: "Calculadora de Imposto de Renda",
 
-    arbitrage: "Arbitragem",
     inflation: "Inflação",
     reserves: "Reservas",
     repos: "Títulos", // "Cauciones" is specific to Argentina, maybe "Títulos" or "Repos" is better. Keeping close to original meaning.
@@ -529,23 +508,6 @@ export const translations = {
     year: "ano",
     years: "anos",
 
-    // Arbitraje
-    arbitrageDetector: "Detector de Arbitragem",
-    arbitrageDesc: "Oportunidades de lucro entre diferentes cotações de dólar",
-    totalOpportunities: "Oportunidades Totais",
-    viable: "Viáveis",
-    notViable: "Não Viáveis",
-    viableOpportunities: "Oportunidades Viáveis",
-    monitoring: "Monitoramento (Atualmente Não Viável)",
-    noArbitrage: "Sem oportunidades de arbitragem",
-    arbitrageBalanced: "As cotações estão equilibradas. Verificaremos novamente em 30 segundos.",
-    arbitrageDisclaimerTitle: "Isenção de responsabilidade",
-    arbitrageDisclaimer:
-      "As oportunidades de arbitragem são estimativas baseadas em cotações públicas. Os spreads reais podem variar devido a comissões, tempos de transferência e disponibilidade de moeda. Verifique sempre as condições antes de negociar. Esta informação não constitui aconselhamento financeiro.",
-    profitPer1k: "Lucro por USD 1.000",
-    stepsToExecute: "Passos para executar:",
-    arbitrageUpdateNote: "Os dados são atualizados automaticamente a cada 30 segundos.",
-
     // Dashboard
     marketSummary: "Resumo do mercado financeiro",
     socialIndicators: "Indicadores sociais",
@@ -554,7 +516,6 @@ export const translations = {
     canastaBasicaTotal: "Cesta Básica Total (GBA)",
     uva: "UVA",
     cer: "CER",
-    arbitrageDetected: "Oportunidades de Arbitragem Detectadas",
     otherQuotes: "Outras Cotações",
     viewHistory: "Ver histórico e ajustar valores",
     maximizeReturns: "Maximize seus retornos",
@@ -700,7 +661,6 @@ export const translations = {
     quotes: "Quotes",
     incomeTaxCalculator: "Income Tax Calculator",
 
-    arbitrage: "Arbitrage",
     inflation: "Inflation",
     reserves: "Reserves",
     repos: "Repos",
