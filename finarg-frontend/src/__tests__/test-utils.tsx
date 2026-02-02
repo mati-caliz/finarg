@@ -134,41 +134,9 @@ export const mockIncomeTaxResponse = (overrides = {}) => ({
   ...overrides,
 });
 
-export const mockSimulationResponse = (overrides = {}) => ({
-  investmentType: "FIXED_TERM",
-  initialAmount: 1000000,
-  termDays: 30,
-  nominalAnnualRate: 110,
-  effectiveAnnualRate: 185.3,
-  nominalReturn: 9.04,
-  realReturn: -2.5,
-  finalAmount: 1090400,
-  profitARS: 90400,
-  profitUSD: 86,
-  dollarReturn: -5.2,
-  projection: [
-    {
-      month: 1,
-      accumulatedCapital: 1090400,
-      monthlyInterest: 90400,
-      estimatedInflation: 4.2,
-      realReturn: 4.84,
-    },
-    {
-      month: 2,
-      accumulatedCapital: 1188970,
-      monthlyInterest: 98570,
-      estimatedInflation: 4.0,
-      realReturn: 5.04,
-    },
-  ],
-  ...overrides,
-});
-
 export const mockCotizacion = mockQuote;
 export const mockBrecha = mockGap;
 export const mockReservas = mockReserves;
 export const mockInflacion = mockInflation;
 export const mockArbitraje = mockArbitrage;
 export const mockGananciasResponse = mockIncomeTaxResponse;
-export const mockSimulacionResponse = mockSimulationResponse;

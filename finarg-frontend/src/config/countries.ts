@@ -17,9 +17,9 @@ export interface CountryConfig {
     reserves: boolean;
     incomeTax: boolean;
     arbitrage: boolean;
-    simulator: boolean;
     repos: boolean;
     rates: boolean;
+    exchangeBands: boolean;
   };
   currencyTypes: {
     code: string;
@@ -47,9 +47,9 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       reserves: true,
       incomeTax: true,
       arbitrage: true,
-      simulator: true,
       repos: true,
       rates: true,
+      exchangeBands: true,
     },
     currencyTypes: [
       { code: "oficial", name: "Official", isOfficial: true, isParallel: false },
@@ -117,9 +117,9 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       reserves: false,
       incomeTax: false,
       arbitrage: false,
-      simulator: true,
       repos: false,
       rates: false,
+      exchangeBands: false,
     },
     currencyTypes: [
       { code: "trm", name: "TRM", isOfficial: true, isParallel: false },
@@ -144,9 +144,9 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       reserves: false,
       incomeTax: false,
       arbitrage: false,
-      simulator: true,
       repos: false,
       rates: false,
+      exchangeBands: false,
     },
     currencyTypes: [
       { code: "ptax", name: "PTAX (BCB)", isOfficial: true, isParallel: false },
@@ -172,9 +172,9 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       reserves: false,
       incomeTax: false,
       arbitrage: false,
-      simulator: true,
       repos: false,
       rates: false,
+      exchangeBands: false,
     },
     currencyTypes: [
       { code: "observado", name: "Observed (BCCh)", isOfficial: true, isParallel: false },
@@ -199,9 +199,9 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
       reserves: false,
       incomeTax: false,
       arbitrage: false,
-      simulator: true,
       repos: false,
       rates: false,
+      exchangeBands: false,
     },
     currencyTypes: [
       { code: "interbancario", name: "Interbank", isOfficial: true, isParallel: false },

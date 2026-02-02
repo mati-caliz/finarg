@@ -17,7 +17,6 @@ import {
   Menu,
   Percent,
   PiggyBank,
-  TrendingUp,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -62,12 +61,7 @@ const baseNavigation = [
     icon: Calculator,
     feature: "incomeTax" as const,
   },
-  {
-    key: "investmentSimulator" as TranslationKey,
-    href: "/simulador-de-inversiones",
-    icon: TrendingUp,
-    feature: "simulator" as const,
-  },
+
   {
     key: "arbitrage" as TranslationKey,
     href: "/arbitraje",
