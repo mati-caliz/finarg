@@ -23,13 +23,18 @@ const AR_CURRENCY_GROUPS = {
   brl: ['brl_oficial', 'brl_blue', 'brl_tarjeta'],
   clp: ['clp_oficial', 'clp_blue', 'clp_tarjeta'],
   uyu: ['uyu_oficial', 'uyu_blue', 'uyu_tarjeta'],
-  cop: ['cop_oficial', 'cop_blue', 'cop_tarjeta'],
   pyg: ['pyg_oficial', 'pyg_blue', 'pyg_tarjeta'],
   bob: ['bob_oficial', 'bob_blue', 'bob_tarjeta'],
   cny: ['cny_oficial', 'cny_blue', 'cny_tarjeta'],
 } as const;
 
-const AR_CHART_TYPES = new Set(AR_CURRENCY_GROUPS.usd);
+const AR_CHART_TYPES = new Set([
+  ...AR_CURRENCY_GROUPS.usd,
+  'eur_oficial',
+  'brl_oficial',
+  'clp_oficial',
+  'uyu_oficial',
+]);
 
 function hasChartHistory(type: string): boolean {
   return AR_CHART_TYPES.has(type) || type.endsWith('_oficial');
@@ -195,7 +200,6 @@ export default function QuotesPage() {
         { key: 'cny' as BaseCurrency, labelKey: 'currencyCny' as TranslationKey },
         { key: 'clp' as BaseCurrency, labelKey: 'currencyClp' as TranslationKey },
         { key: 'uyu' as BaseCurrency, labelKey: 'currencyUyu' as TranslationKey },
-        { key: 'cop' as BaseCurrency, labelKey: 'currencyCop' as TranslationKey },
         { key: 'pyg' as BaseCurrency, labelKey: 'currencyPyg' as TranslationKey },
         { key: 'bob' as BaseCurrency, labelKey: 'currencyBob' as TranslationKey },
       ] as const)
@@ -203,7 +207,7 @@ export default function QuotesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             {countryConfig.flag} {translate('quotes')} - {translate(countryConfig.code as TranslationKey)}
@@ -233,17 +237,31 @@ export default function QuotesPage() {
           )}
         </div>
         {baseCurrencyButtons && (
-          <div className="flex gap-2 shrink-0">
-            {baseCurrencyButtons.map(({ key, labelKey }) => (
-              <Button
-                key={key}
-                variant={selectedBaseCurrency === key ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedBaseCurrency(key)}
-              >
-                {translate(labelKey)}
-              </Button>
-            ))}
+          <div className="flex flex-col gap-2 shrink-0 items-center">
+            <div className="flex gap-2">
+              {baseCurrencyButtons.slice(0, 4).map(({ key, labelKey }) => (
+                <Button
+                  key={key}
+                  variant={selectedBaseCurrency === key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedBaseCurrency(key)}
+                >
+                  {translate(labelKey)}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              {baseCurrencyButtons.slice(4).map(({ key, labelKey }) => (
+                <Button
+                  key={key}
+                  variant={selectedBaseCurrency === key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedBaseCurrency(key)}
+                >
+                  {translate(labelKey)}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -309,7 +327,8 @@ export default function QuotesPage() {
         )}
       </div>
 
-      {(!hasCurrencyGroups || chartableSelectedTypes.length > 0) && (
+      {(!hasCurrencyGroups || (chartableTypeCodes.length > 0 && chartableSelectedTypes.length > 0)) && 
+       !['cny', 'pyg', 'bob'].includes(selectedBaseCurrency) && (
         <Card className="bg-card">
           <CardHeader className="pb-2">
             <div className="flex flex-col gap-4">
@@ -350,63 +369,69 @@ export default function QuotesPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-8">
-            {chartableSelectedTypes.map((type, i) => {
-              const q = historyQueries[i];
-              const label = currencyTypes.find((t) => t.value === type)?.label ?? type;
-              const history = q?.data;
-              const isLoading = q?.isLoading ?? false;
-              const isError = q?.isError ?? false;
-              const err = q?.error;
-              const refetchOne = q?.refetch;
-              return (
-                <div key={type}>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <p className="text-sm font-medium text-muted-foreground">{label}</p>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedTypes((prev) => prev.filter((t) => t !== type));
-                        setActiveCard((prev) => (prev === type ? null : prev));
-                      }}
-                      aria-label={translate('remove')}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+            {chartableSelectedTypes.length === 0 ? (
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                {translate('noHistoricalData')}
+              </div>
+            ) : (
+              chartableSelectedTypes.map((type, i) => {
+                const q = historyQueries[i];
+                const label = currencyTypes.find((t) => t.value === type)?.label ?? type;
+                const history = q?.data;
+                const isLoading = q?.isLoading ?? false;
+                const isError = q?.isError ?? false;
+                const err = q?.error;
+                const refetchOne = q?.refetch;
+                return (
+                  <div key={type}>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedTypes((prev) => prev.filter((t) => t !== type));
+                          setActiveCard((prev) => (prev === type ? null : prev));
+                        }}
+                        aria-label={translate('remove')}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {isLoading ? (
+                      <div className="h-[300px] flex items-center justify-center">
+                        <Skeleton className="w-full h-full" />
+                      </div>
+                    ) : isError && err ? (
+                      <QueryError
+                        error={err as Error}
+                        onRetry={() => refetchOne?.()}
+                        compact
+                      />
+                    ) : history && history.length > 0 ? (
+                      <LineChart
+                        data={history}
+                        xKey="date"
+                        yKey={['buy', 'sell']}
+                        colors={['#3b82f6', '#10b981']}
+                        height={320}
+                        formatX={formatDate}
+                        formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
+                        showLegend
+                        showGrid={false}
+                        legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
+                      />
+                    ) : (
+                      <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                        {translate('noHistoricalData')}
+                      </div>
+                    )}
                   </div>
-                  {isLoading ? (
-                    <div className="h-[300px] flex items-center justify-center">
-                      <Skeleton className="w-full h-full" />
-                    </div>
-                  ) : isError && err ? (
-                    <QueryError
-                      error={err as Error}
-                      onRetry={() => refetchOne?.()}
-                      compact
-                    />
-                  ) : history && history.length > 0 ? (
-                    <LineChart
-                      data={history}
-                      xKey="date"
-                      yKey={['buy', 'sell']}
-                      colors={['#3b82f6', '#10b981']}
-                      height={320}
-                      formatX={formatDate}
-                      formatY={(v) => `${countryConfig.currencySymbol}${v.toLocaleString(countryConfig.locale)}`}
-                      showLegend
-                      showGrid={false}
-                      legendLabels={{ buy: translate('buy'), sell: translate('sell') }}
-                    />
-                  ) : (
-                    <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                      {translate('noHistoricalData')}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </CardContent>
         </Card>
       )}

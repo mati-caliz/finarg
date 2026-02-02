@@ -122,6 +122,38 @@ public class ArgentinaDatosClient {
         }
     }
 
+    public List<UsdAccountResponse> getUsdAccounts() {
+        try {
+            List<UsdAccountResponse> responses = webClient.get()
+                    .uri("/finanzas/cuentas-remuneradas-usd/")
+                    .retrieve()
+                    .bodyToFlux(UsdAccountResponse.class)
+                    .collectList()
+                    .block();
+
+            return responses != null ? responses : List.of();
+        } catch (Exception e) {
+            log.error("Error fetching USD accounts: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    public List<YieldResponse> getYields() {
+        try {
+            List<YieldResponse> responses = webClient.get()
+                    .uri("/finanzas/rendimientos/")
+                    .retrieve()
+                    .bodyToFlux(YieldResponse.class)
+                    .collectList()
+                    .block();
+
+            return responses != null ? responses : List.of();
+        } catch (Exception e) {
+            log.error("Error fetching yields: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
     private InflationDTO mapToInflationDTO(InflationResponse response) {
         return InflationDTO.builder()
                 .date(LocalDate.parse(response.getDate()))
@@ -293,6 +325,38 @@ public class ArgentinaDatosClient {
         private String conditions;
         @JsonProperty("condicionesCorto")
         private String conditionsShort;
+    }
+
+    @Data
+    public static class UsdAccountResponse {
+        @JsonProperty("entidad")
+        private String entity;
+        @JsonProperty("tna")
+        private BigDecimal tna;
+        @JsonProperty("tea")
+        private BigDecimal tea;
+        @JsonProperty("tope")
+        private BigDecimal limit;
+        @JsonProperty("fecha")
+        private String date;
+        @JsonProperty("condiciones")
+        private String conditions;
+    }
+
+    @Data
+    public static class YieldResponse {
+        @JsonProperty("entidad")
+        private String entity;
+        @JsonProperty("tna")
+        private BigDecimal tna;
+        @JsonProperty("tea")
+        private BigDecimal tea;
+        @JsonProperty("tope")
+        private BigDecimal limit;
+        @JsonProperty("fecha")
+        private String date;
+        @JsonProperty("producto")
+        private String product;
     }
 
 }
