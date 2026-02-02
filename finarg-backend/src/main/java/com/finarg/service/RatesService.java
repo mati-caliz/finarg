@@ -74,6 +74,34 @@ public class RatesService {
                 .toList();
     }
 
+    @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v1'")
+    public List<RateDTO> getUsdAccountRates(Country country) {
+        if (country != Country.ARGENTINA) {
+            return List.of();
+        }
+        List<ArgentinaDatosClient.UsdAccountResponse> accounts = argentinaDatosClient.getUsdAccounts();
+        List<ArgentinaDatosClient.YieldResponse> yields = argentinaDatosClient.getYields();
+        
+        java.util.List<RateDTO> result = new java.util.ArrayList<>();
+        
+        if (accounts != null) {
+            accounts.stream()
+                    .filter(r -> r.getEntity() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
+                    .map(this::mapUsdAccountToRateDTO)
+                    .forEach(result::add);
+        }
+        
+        if (yields != null) {
+            yields.stream()
+                    .filter(r -> r.getEntity() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
+                    .map(this::mapYieldToRateDTO)
+                    .forEach(result::add);
+        }
+        
+        result.sort((a, b) -> b.getTna().compareTo(a.getTna()));
+        return result;
+    }
+
     private RateDTO mapFciToRateDTO(FciRateResponse r) {
         BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
         BigDecimal teaPct = r.getTea() != null
@@ -260,5 +288,45 @@ public class RatesService {
                 .replaceAll("[^a-z0-9]", "_")
                 .replaceAll("_+", "_")
                 .replaceAll("^_|_$", "");
+    }
+
+    private RateDTO mapUsdAccountToRateDTO(ArgentinaDatosClient.UsdAccountResponse r) {
+        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = r.getTea() != null
+                ? r.getTea().multiply(BigDecimal.valueOf(100))
+                : teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+        String entityName = formatFundName(r.getEntity());
+        return RateDTO.builder()
+                .id(sanitizeId(r.getEntity()))
+                .name(entityName)
+                .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
+                .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
+                .product(r.getConditions())
+                .term(null)
+                .date(r.getDate())
+                .limit(r.getLimit())
+                .logo(null)
+                .link(null)
+                .build();
+    }
+
+    private RateDTO mapYieldToRateDTO(ArgentinaDatosClient.YieldResponse r) {
+        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = r.getTea() != null
+                ? r.getTea().multiply(BigDecimal.valueOf(100))
+                : teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+        String entityName = formatFundName(r.getEntity());
+        return RateDTO.builder()
+                .id(sanitizeId(r.getEntity()))
+                .name(entityName)
+                .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
+                .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
+                .product(r.getProduct())
+                .term(null)
+                .date(r.getDate())
+                .limit(r.getLimit())
+                .logo(null)
+                .link(null)
+                .build();
     }
 }

@@ -72,9 +72,11 @@ export default function DashboardPage() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {sortQuotesByVariant(quotes ?? []).slice(0, 4).map((quote) => (
-          <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
-        ))}
+        {sortQuotesByVariant(quotes ?? [])
+          .filter((quote) => ['blue', 'oficial', 'tarjeta', 'bolsa'].includes(quote.type))
+          .map((quote) => (
+            <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
+          ))}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -207,11 +209,11 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {quotes && quotes.length > 4 && (
+      {quotes && quotes.filter((q) => !['blue', 'oficial', 'tarjeta', 'bolsa'].includes(q.type)).length > 0 && (
         <div>
           <h2 className="text-lg font-semibold mb-4">{translate('otherQuotes')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {sortQuotesByVariant(quotes).slice(4).map((quote) => (
+            {sortQuotesByVariant(quotes.filter((q) => !['blue', 'oficial', 'tarjeta', 'bolsa'].includes(q.type))).map((quote) => (
               <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
             ))}
           </div>

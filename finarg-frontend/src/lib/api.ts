@@ -84,6 +84,8 @@ export const ratesApi = {
     api.get('/rates/fixed-term', { params: { country } }),
   getWallets: (country: string = 'ar') =>
     api.get('/rates/wallets', { params: { country } }),
+  getUsdAccounts: (country: string = 'ar') =>
+    api.get('/rates/usd-accounts', { params: { country } }),
 };
 
 export const reposApi = {

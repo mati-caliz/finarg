@@ -16,7 +16,7 @@ import { useAppStore } from '@/store/useStore';
 import { QueryError } from '@/components/QueryError';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type TabType = 'wallets' | 'banks';
+type TabType = 'wallets' | 'banks' | 'usdAccounts';
 
 function extractDomainFromFaviconUrl(url: string): string | null {
   const domainMatch = url.match(/[?&]domain=([^&]+)/);
@@ -100,6 +100,21 @@ export default function RatesPage() {
     enabled: selectedCountry === 'ar',
   });
 
+  const {
+    data: usdAccountRates = [],
+    isLoading: usdAccountsLoading,
+    isError: usdAccountsError,
+    error: usdAccountsErrorData,
+    refetch: refetchUsdAccounts,
+  } = useQuery({
+    queryKey: ['rates', 'usd-accounts', selectedCountry],
+    queryFn: async () => {
+      const res = await ratesApi.getUsdAccounts(selectedCountry);
+      return (res.data as RateDTO[]) ?? [];
+    },
+    enabled: selectedCountry === 'ar',
+  });
+
   const showWallets = selectedCountry === 'ar';
   const showBanks = selectedCountry === 'ar';
 
@@ -108,6 +123,9 @@ export default function RatesPage() {
     : 0;
   const maxWalletTna = walletRates.length > 0
     ? Math.max(...walletRates.map((r) => r.tna))
+    : 0;
+  const maxUsdAccountTna = usdAccountRates.length > 0
+    ? Math.max(...usdAccountRates.map((r) => r.tna))
     : 0;
 
   if (!showWallets && !showBanks) {
@@ -166,6 +184,17 @@ export default function RatesPage() {
           >
             <Landmark className="h-4 w-4" />
             {translate('fixedTermRates')}
+          </Button>
+        )}
+        {showWallets && (
+          <Button
+            variant={activeTab === 'usdAccounts' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setActiveTab('usdAccounts')}
+            className="flex items-center gap-2"
+          >
+            <Wallet className="h-4 w-4" />
+            {translate('usdAccounts')}
           </Button>
         )}
       </div>
@@ -417,6 +446,114 @@ export default function RatesPage() {
                               <span className="mt-1 text-sm text-muted-foreground">
                                 TEA {formatPercent(row.tea)}
                               </span>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === 'usdAccounts' && showWallets && (
+        <Card className="bg-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Wallet className="h-5 w-5 text-primary" />
+              {translate('usdAccountsRates')}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {translate('usdAccountsDisclaimer')}
+            </p>
+          </CardHeader>
+          <CardContent>
+            {usdAccountsLoading ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} className="h-32 w-full rounded-lg" />
+                ))}
+              </div>
+            ) : usdAccountsError ? (
+              <QueryError
+                error={usdAccountsErrorData as Error}
+                onRetry={() => refetchUsdAccounts()}
+                compact
+              />
+            ) : usdAccountRates.length === 0 ? (
+              <div className="py-12 text-center text-muted-foreground">
+                No hay datos disponibles
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {usdAccountRates.map((row) => {
+                  const isHighest = row.tna >= maxUsdAccountTna && maxUsdAccountTna > 0;
+                  const limitStr = formatLimit(row.limit);
+                  return (
+                    <Card
+                      key={row.id}
+                      className={`overflow-hidden transition-colors ${
+                        isHighest ? 'border-primary/50 bg-primary/5' : ''
+                      }`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex min-w-0 flex-1 gap-3">
+                            <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-muted/50 p-1.5">
+                              <Wallet className="h-6 w-6 text-muted-foreground" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-semibold text-foreground">
+                                  {row.name}
+                                </span>
+                                {isHighest && (
+                                  <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-normal text-primary">
+                                    {translate('highest')}
+                                  </span>
+                                )}
+                              </div>
+                              {row.product && (
+                                <div className="mt-1 max-h-20 overflow-y-auto overscroll-contain">
+                                  <p className="text-xs text-muted-foreground leading-relaxed pr-1">
+                                    {row.product}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="mt-2 flex flex-wrap gap-1">
+                                <span className="rounded border border-border px-2 py-0.5 text-xs">
+                                  USD
+                                </span>
+                                {limitStr ? (
+                                  <span className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                                    {translate('limitLabel')}: {limitStr}
+                                  </span>
+                                ) : (
+                                  <span className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                                    {translate('noLimit')}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex shrink-0 flex-col items-end">
+                            <span className="text-2xl font-bold text-primary">
+                              {row.tna > 0 ? formatPercent(row.tna) : '-'}
+                            </span>
+                            <span className="text-xs text-muted-foreground">TNA</span>
+                            {row.tea !== undefined && row.tea !== null && (
+                              <span className="mt-1 text-sm text-muted-foreground">
+                                TEA {formatPercent(row.tea)}
+                              </span>
+                            )}
+                            {row.date && (
+                              <div className="mt-1 text-xs text-muted-foreground text-right leading-tight">
+                                <span className="block">{translate('tnaValidSince')}</span>
+                                <span className="block">{formatDate(row.date)}</span>
+                              </div>
                             )}
                           </div>
                         </div>
