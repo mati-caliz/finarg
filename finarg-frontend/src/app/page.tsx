@@ -6,7 +6,7 @@ import { QuoteCard } from "@/components/dashboard/QuoteCard";
 import { ReservesWidget } from "@/components/dashboard/ReservesWidget";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCountryConfig } from "@/config/countries";
-import { useArbitrage } from "@/hooks/useArbitrage";
+
 import { useCurrentInflation } from "@/hooks/useInflation";
 import { useGap, useQuotes } from "@/hooks/useQuotes";
 import { useReserves } from "@/hooks/useReserves";
@@ -14,7 +14,7 @@ import { useSocialIndicators } from "@/hooks/useSocialIndicators";
 import { useTranslation } from "@/hooks/useTranslation";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
-import { AlertTriangle, Loader2, TrendingUp } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -25,11 +25,9 @@ export default function DashboardPage() {
   const { data: quotes, isLoading: loadingQuotes } = useQuotes();
   const { data: gap, isLoading: loadingGap } = useGap();
   const { data: reserves, isLoading: loadingReserves } = useReserves(selectedCountry);
-  const { data: arbitrage } = useArbitrage();
+
   const { data: inflation } = useCurrentInflation();
   const { data: socialIndicators } = useSocialIndicators(selectedCountry);
-
-  const viableOpportunities = arbitrage?.filter((a) => a.viable) || [];
 
   if (loadingQuotes || loadingGap || (selectedCountry === "ar" && loadingReserves)) {
     return (
@@ -47,30 +45,6 @@ export default function DashboardPage() {
           {countryConfig.flag} {translate("marketSummary")} - {translate(selectedCountry)}
         </p>
       </div>
-
-      {countryConfig.features.arbitrage && viableOpportunities.length > 0 && (
-        <Card className="border-yellow-500/50 bg-yellow-500/10">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2 text-yellow-500">
-              <AlertTriangle className="h-4 w-4" />
-              {translate("arbitrageDetected")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {viableOpportunities.slice(0, 3).map((op) => (
-                <Link
-                  key={`${op.sourceType}-${op.targetType}`}
-                  href="/arbitraje"
-                  className="text-sm bg-yellow-500/20 px-3 py-1 rounded-full hover:bg-yellow-500/30 transition-colors"
-                >
-                  {op.description} ({op.spreadPercentage.toFixed(2)}%)
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {sortQuotesByVariant(quotes ?? [])

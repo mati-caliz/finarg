@@ -90,20 +90,6 @@ export const mockInflation = (overrides = {}) => ({
   ...overrides,
 });
 
-export const mockArbitrage = (overrides = {}) => ({
-  sourceType: "OFFICIAL",
-  targetType: "BLUE",
-  sourceRate: 900,
-  targetRate: 1050,
-  spreadPercentage: 16.67,
-  estimatedProfitPer1000USD: 166700,
-  description: "Buy official, sell blue",
-  steps: "1. Buy USD official 2. Sell in blue market",
-  viable: true,
-  risk: "MEDIUM",
-  ...overrides,
-});
-
 export const mockUser = (overrides = {}) => ({
   id: 1,
   name: "Test User",
@@ -138,5 +124,5 @@ export const mockCotizacion = mockQuote;
 export const mockBrecha = mockGap;
 export const mockReservas = mockReserves;
 export const mockInflacion = mockInflation;
-export const mockArbitraje = mockArbitrage;
+
 export const mockGananciasResponse = mockIncomeTaxResponse;

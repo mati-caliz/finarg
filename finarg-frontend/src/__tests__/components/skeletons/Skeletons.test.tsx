@@ -1,5 +1,4 @@
 import {
-  ArbitrajeListSkeleton,
   BrechaGaugeSkeleton,
   CalculadoraPageSkeleton,
   ChartSkeleton,
@@ -200,13 +199,6 @@ describe("Page Skeletons", () => {
     it("renders complete calculadora page skeleton", () => {
       render(<CalculadoraPageSkeleton />);
       expect(document.querySelector(".space-y-6")).toBeInTheDocument();
-    });
-  });
-
-  describe("ArbitrajeListSkeleton", () => {
-    it("renders list of arbitraje skeletons", () => {
-      const { container } = render(<ArbitrajeListSkeleton />);
-      expect(container.querySelectorAll(".bg-card").length).toBe(3);
     });
   });
 });
