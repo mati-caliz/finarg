@@ -264,17 +264,6 @@ export default function DashboardPage() {
             </Card>
           </Link>
         )}
-
-        {countryConfig.features.repos && (
-          <Link href="/cauciones">
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer">
-              <CardContent className="pt-6">
-                <p className="font-medium">{translate("repoOptimizer")}</p>
-                <p className="text-sm text-muted-foreground">{translate("maximizeReturns")}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        )}
       </div>
     </div>
   );
