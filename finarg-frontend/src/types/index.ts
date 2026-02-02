@@ -129,35 +129,6 @@ export interface Arbitrage {
   risk: string;
 }
 
-export interface SimulationRequest {
-  initialAmount: number;
-  investmentType: string;
-  termDays: number;
-  reinvest?: boolean;
-  customRate?: number;
-}
-
-export interface SimulationResponse {
-  investmentType: string;
-  initialAmount: number;
-  termDays: number;
-  nominalAnnualRate: number;
-  effectiveAnnualRate: number;
-  nominalReturn: number;
-  realReturn: number;
-  finalAmount: number;
-  profitARS: number;
-  profitUSD: number;
-  dollarReturn: number;
-  projection: {
-    month: number;
-    accumulatedCapital: number;
-    monthlyInterest: number;
-    estimatedInflation: number;
-    realReturn: number;
-  }[];
-}
-
 export interface User {
   id: number;
   name: string;

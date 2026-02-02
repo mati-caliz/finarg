@@ -58,7 +58,11 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
             {reserves.netReservesBCRA !== undefined && reserves.netReservesBCRA !== null && (
               <div>
                 <p className="text-xs text-muted-foreground">{translate("netBcra")}</p>
-                <p className="text-lg font-semibold text-green-500">
+                <p
+                  className={`text-lg font-semibold ${
+                    reserves.netReservesBCRA < 0 ? "text-red-500" : "text-green-500"
+                  }`}
+                >
                   {formatReservesUSD(reserves.netReservesBCRA)}
                 </p>
               </div>
@@ -80,7 +84,11 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
               (reserves.netReservesFMI === undefined || reserves.netReservesFMI === null) && (
                 <div>
                   <p className="text-xs text-muted-foreground">{translate("netEstimated")}</p>
-                  <p className="text-lg font-semibold text-green-500">
+                  <p
+                    className={`text-lg font-semibold ${
+                      reserves.netReserves < 0 ? "text-red-500" : "text-green-500"
+                    }`}
+                  >
                     {formatReservesUSD(reserves.netReserves)}
                   </p>
                 </div>
