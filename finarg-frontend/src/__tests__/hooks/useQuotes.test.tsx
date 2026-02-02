@@ -1,9 +1,9 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useQuotes } from '@/hooks/useQuotes';
-import { quotesApi } from '@/lib/api';
+import { useQuotes } from "@/hooks/useQuotes";
+import { quotesApi } from "@/lib/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { renderHook, waitFor } from "@testing-library/react";
 
-jest.mock('@/lib/api', () => ({
+jest.mock("@/lib/api", () => ({
   quotesApi: {
     getAll: jest.fn(),
     getAllByCountry: jest.fn(),
@@ -15,8 +15,8 @@ jest.mock('@/lib/api', () => ({
   },
 }));
 
-jest.mock('@/store/useStore', () => ({
-  useAppStore: jest.fn(() => 'ar'),
+jest.mock("@/store/useStore", () => ({
+  useAppStore: jest.fn(() => "ar"),
 }));
 
 const mockQuotesApi = quotesApi as jest.Mocked<typeof quotesApi>;
@@ -30,28 +30,44 @@ const createWrapper = () => {
       },
     },
   });
-  
+
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
-  Wrapper.displayName = 'QueryClientWrapper';
+  Wrapper.displayName = "QueryClientWrapper";
   return Wrapper;
 };
 
-describe('useQuotes', () => {
+describe("useQuotes", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('fetches quotes successfully', async () => {
+  it("fetches quotes successfully", async () => {
     const mockData = [
-      { type: 'BLUE', name: 'Dólar Blue', buy: 1000, sell: 1050, spread: 50, variation: 2.5, lastUpdate: new Date().toISOString() },
-      { type: 'OFFICIAL', name: 'Dólar Oficial', buy: 900, sell: 920, spread: 20, variation: 0.5, lastUpdate: new Date().toISOString() },
+      {
+        type: "BLUE",
+        name: "Dólar Blue",
+        buy: 1000,
+        sell: 1050,
+        spread: 50,
+        variation: 2.5,
+        lastUpdate: new Date().toISOString(),
+      },
+      {
+        type: "OFFICIAL",
+        name: "Dólar Oficial",
+        buy: 900,
+        sell: 920,
+        spread: 20,
+        variation: 0.5,
+        lastUpdate: new Date().toISOString(),
+      },
     ];
 
-    mockQuotesApi.getAllByCountry.mockResolvedValue({ data: mockData } as Awaited<ReturnType<typeof quotesApi.getAllByCountry>>);
+    mockQuotesApi.getAllByCountry.mockResolvedValue({ data: mockData } as Awaited<
+      ReturnType<typeof quotesApi.getAllByCountry>
+    >);
 
     const { result } = renderHook(() => useQuotes(), {
       wrapper: createWrapper(),
@@ -65,8 +81,8 @@ describe('useQuotes', () => {
     expect(mockQuotesApi.getAllByCountry).toHaveBeenCalledTimes(1);
   });
 
-  it('handles error state', async () => {
-    mockQuotesApi.getAllByCountry.mockRejectedValue(new Error('API Error'));
+  it("handles error state", async () => {
+    mockQuotesApi.getAllByCountry.mockRejectedValue(new Error("API Error"));
 
     const { result } = renderHook(() => useQuotes(), {
       wrapper: createWrapper(),
@@ -79,10 +95,8 @@ describe('useQuotes', () => {
     expect(result.current.error).toBeDefined();
   });
 
-  it('shows loading state initially', () => {
-    mockQuotesApi.getAllByCountry.mockImplementation(
-      () => new Promise(() => {})
-    );
+  it("shows loading state initially", () => {
+    mockQuotesApi.getAllByCountry.mockImplementation(() => new Promise(() => {}));
 
     const { result } = renderHook(() => useQuotes(), {
       wrapper: createWrapper(),

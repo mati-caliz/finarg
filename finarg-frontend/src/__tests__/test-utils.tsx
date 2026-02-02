@@ -1,6 +1,7 @@
-import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { type RenderOptions, render } from "@testing-library/react";
+import type React from "react";
+import type { ReactElement } from "react";
 
 const createTestQueryClient = () =>
   new QueryClient({
@@ -19,26 +20,20 @@ interface AllTheProvidersProps {
 
 const AllTheProviders = ({ children }: AllTheProvidersProps) => {
   const queryClient = createTestQueryClient();
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, "wrapper">) =>
+  render(ui, { wrapper: AllTheProviders, ...options });
 
-export * from '@testing-library/react';
+export * from "@testing-library/react";
 
 export { customRender as render };
 
 export const mockQuote = (overrides = {}) => ({
-  type: 'BLUE',
-  name: 'Dólar Blue',
+  type: "BLUE",
+  name: "Dólar Blue",
   buy: 1000,
   sell: 1050,
   spread: 50,
@@ -51,9 +46,9 @@ export const mockGap = (overrides = {}) => ({
   officialRate: 900,
   parallelRate: 1050,
   gapPercentage: 16.67,
-  level: 'MEDIUM' as const,
-  trafficLightColor: '#f59e0b',
-  description: 'Moderate gap',
+  level: "MEDIUM" as const,
+  trafficLightColor: "#f59e0b",
+  description: "Moderate gap",
   ...overrides,
 });
 
@@ -63,27 +58,27 @@ export const mockReserves = (overrides = {}) => ({
   netReservesBCRA: 2900,
   netReservesFMI: -14100,
   liabilities: [
-    { id: 'china_swap', name: 'Swap China', amount: 18291 },
-    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
-    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
+    { id: "china_swap", name: "Swap China", amount: 18291 },
+    { id: "usa_swap", name: "Swap EE.UU.", amount: 2500 },
+    { id: "bank_deposits", name: "Encajes Bancarios", amount: 10000 },
   ],
   liabilitiesBCRA: [
-    { id: 'china_swap', name: 'Swap China', amount: 18291 },
-    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
-    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
-    { id: 'other_bcra', name: 'Otros pasivos BCRA', amount: 6976 },
+    { id: "china_swap", name: "Swap China", amount: 18291 },
+    { id: "usa_swap", name: "Swap EE.UU.", amount: 2500 },
+    { id: "bank_deposits", name: "Encajes Bancarios", amount: 10000 },
+    { id: "other_bcra", name: "Otros pasivos BCRA", amount: 6976 },
   ],
   liabilitiesFMI: [
-    { id: 'china_swap', name: 'Swap China', amount: 18291 },
-    { id: 'usa_swap', name: 'Swap EE.UU.', amount: 2500 },
-    { id: 'bank_deposits', name: 'Encajes Bancarios', amount: 10000 },
-    { id: 'gov_deposits', name: 'Depósitos del Gobierno', amount: 3000 },
-    { id: 'leliq_pases', name: 'LELIQs y pases (USD)', amount: 8000 },
-    { id: 'other_fmi', name: 'Otros pasivos metodología FMI', amount: 14776 },
+    { id: "china_swap", name: "Swap China", amount: 18291 },
+    { id: "usa_swap", name: "Swap EE.UU.", amount: 2500 },
+    { id: "bank_deposits", name: "Encajes Bancarios", amount: 10000 },
+    { id: "gov_deposits", name: "Depósitos del Gobierno", amount: 3000 },
+    { id: "leliq_pases", name: "LELIQs y pases (USD)", amount: 8000 },
+    { id: "other_fmi", name: "Otros pasivos metodología FMI", amount: 14776 },
   ],
   date: new Date().toISOString(),
   dailyVariation: 100,
-  trend: 'UP',
+  trend: "UP",
   ...overrides,
 });
 
@@ -96,23 +91,23 @@ export const mockInflation = (overrides = {}) => ({
 });
 
 export const mockArbitrage = (overrides = {}) => ({
-  sourceType: 'OFFICIAL',
-  targetType: 'BLUE',
+  sourceType: "OFFICIAL",
+  targetType: "BLUE",
   sourceRate: 900,
   targetRate: 1050,
   spreadPercentage: 16.67,
   estimatedProfitPer1000USD: 166700,
-  description: 'Buy official, sell blue',
-  steps: '1. Buy USD official 2. Sell in blue market',
+  description: "Buy official, sell blue",
+  steps: "1. Buy USD official 2. Sell in blue market",
   viable: true,
-  risk: 'MEDIUM',
+  risk: "MEDIUM",
   ...overrides,
 });
 
 export const mockUser = (overrides = {}) => ({
   id: 1,
-  name: 'Test User',
-  email: 'test@example.com',
+  name: "Test User",
+  email: "test@example.com",
   emailVerified: true,
   ...overrides,
 });
@@ -140,7 +135,7 @@ export const mockIncomeTaxResponse = (overrides = {}) => ({
 });
 
 export const mockSimulationResponse = (overrides = {}) => ({
-  investmentType: 'FIXED_TERM',
+  investmentType: "FIXED_TERM",
   initialAmount: 1000000,
   termDays: 30,
   nominalAnnualRate: 110,
@@ -152,8 +147,20 @@ export const mockSimulationResponse = (overrides = {}) => ({
   profitUSD: 86,
   dollarReturn: -5.2,
   projection: [
-    { month: 1, accumulatedCapital: 1090400, monthlyInterest: 90400, estimatedInflation: 4.2, realReturn: 4.84 },
-    { month: 2, accumulatedCapital: 1188970, monthlyInterest: 98570, estimatedInflation: 4.0, realReturn: 5.04 },
+    {
+      month: 1,
+      accumulatedCapital: 1090400,
+      monthlyInterest: 90400,
+      estimatedInflation: 4.2,
+      realReturn: 4.84,
+    },
+    {
+      month: 2,
+      accumulatedCapital: 1188970,
+      monthlyInterest: 98570,
+      estimatedInflation: 4.0,
+      realReturn: 5.04,
+    },
   ],
   ...overrides,
 });

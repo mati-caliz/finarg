@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getGapColor, getGapClass } from '@/lib/utils';
-import { Gap } from '@/types';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/useTranslation";
+import { getGapClass, getGapColor } from "@/lib/utils";
+import type { Gap } from "@/types";
 
 export interface GapGaugeProps {
   gap: Gap;
@@ -16,19 +16,27 @@ export function GapGauge({ gap }: GapGaugeProps) {
 
   const getGapLabel = () => {
     switch (gap.level) {
-      case 'LOW': return translate('lowGap');
-      case 'MEDIUM': return translate('mediumGap');
-      case 'HIGH': return translate('highGap');
-      default: return '';
+      case "LOW":
+        return translate("lowGap");
+      case "MEDIUM":
+        return translate("mediumGap");
+      case "HIGH":
+        return translate("highGap");
+      default:
+        return "";
     }
   };
 
   const getGapDescription = () => {
     switch (gap.level) {
-      case 'LOW': return translate('stableMarket');
-      case 'MEDIUM': return translate('moderateVolatility');
-      case 'HIGH': return translate('highVolatility');
-      default: return gap.description;
+      case "LOW":
+        return translate("stableMarket");
+      case "MEDIUM":
+        return translate("moderateVolatility");
+      case "HIGH":
+        return translate("highVolatility");
+      default:
+        return gap.description;
     }
   };
 
@@ -36,7 +44,7 @@ export function GapGauge({ gap }: GapGaugeProps) {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
-          {translate('gapIndicator')}
+          {translate("gapIndicator")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -47,9 +55,7 @@ export function GapGauge({ gap }: GapGaugeProps) {
               style={{ backgroundColor: color }}
             />
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">
-                {gap.gapPercentage.toFixed(1)}%
-              </span>
+              <span className="text-2xl font-bold text-white">{gap.gapPercentage.toFixed(1)}%</span>
             </div>
           </div>
 
@@ -57,18 +63,16 @@ export function GapGauge({ gap }: GapGaugeProps) {
             <p className="text-lg font-semibold" style={{ color }}>
               {getGapLabel()}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {getGapDescription()}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">{getGapDescription()}</p>
           </div>
 
           <div className="w-full mt-4 pt-4 border-t border-border">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">{translate('official')}</span>
+              <span className="text-muted-foreground">{translate("official")}</span>
               <span>${gap.officialRate.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm mt-1">
-              <span className="text-muted-foreground">{translate('parallel')}</span>
+              <span className="text-muted-foreground">{translate("parallel")}</span>
               <span>${gap.parallelRate.toFixed(2)}</span>
             </div>
           </div>

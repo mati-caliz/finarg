@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
 import {
-  BarChart as RechartsBarChart,
   Bar,
+  CartesianGrid,
+  Cell,
+  BarChart as RechartsBarChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  ReferenceLine,
-} from 'recharts';
+} from "recharts";
 
 interface ReferenceLineConfig {
   x?: string | number;
@@ -39,14 +39,14 @@ export function BarChart({
   data,
   xKey,
   yKey,
-  color = '#10b981',
+  color = "#10b981",
   height = 300,
   formatX,
   formatY,
   showGrid = true,
   colorByValue = false,
-  positiveColor = '#10b981',
-  negativeColor = '#ef4444',
+  positiveColor = "#10b981",
+  negativeColor = "#ef4444",
   referenceLines = [],
   getBarColor,
 }: BarChartProps) {
@@ -59,35 +59,35 @@ export function BarChart({
           stroke="#888"
           fontSize={12}
           tickFormatter={formatX}
-          tick={{ fill: '#888' }}
+          tick={{ fill: "#888" }}
         />
         <YAxis
           stroke="#888"
           fontSize={12}
           tickFormatter={formatY}
-          tick={{ fill: '#888' }}
+          tick={{ fill: "#888" }}
           width={80}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#1a1a1a',
-            border: '1px solid #333',
-            borderRadius: '8px',
+            backgroundColor: "#1a1a1a",
+            border: "1px solid #333",
+            borderRadius: "8px",
           }}
-          labelStyle={{ color: '#fff' }}
-          itemStyle={{ color: '#fff' }}
-          formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString('es-AR')]}
+          labelStyle={{ color: "#fff" }}
+          itemStyle={{ color: "#fff" }}
+          formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
-        {referenceLines.map((line, index) => (
+        {referenceLines.map((line) => (
           <ReferenceLine
-            key={index}
+            key={line.label || String(line.x)}
             x={line.x}
-            stroke={line.stroke || '#888'}
-            strokeDasharray={line.strokeDasharray || '3 3'}
+            stroke={line.stroke || "#888"}
+            strokeDasharray={line.strokeDasharray || "3 3"}
             label={{
               value: line.label,
-              position: 'top',
-              fill: '#888',
+              position: "top",
+              fill: "#888",
               fontSize: 10,
             }}
           />
@@ -95,16 +95,16 @@ export function BarChart({
         <Bar dataKey={yKey} radius={[4, 4, 0, 0]}>
           {getBarColor
             ? data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={getBarColor(entry, index)} />
+                <Cell key={String(entry[xKey])} fill={getBarColor(entry, index)} />
               ))
             : colorByValue
-              ? data.map((entry, index) => (
+              ? data.map((entry) => (
                   <Cell
-                    key={`cell-${index}`}
+                    key={String(entry[xKey])}
                     fill={Number(entry[yKey]) >= 0 ? positiveColor : negativeColor}
                   />
                 ))
-              : data.map((_, index) => <Cell key={`cell-${index}`} fill={color} />)}
+              : data.map((entry) => <Cell key={String(entry[xKey])} fill={color} />)}
         </Bar>
       </RechartsBarChart>
     </ResponsiveContainer>

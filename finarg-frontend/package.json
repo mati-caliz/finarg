@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "lint": "biome lint . --write",
+    "lint:check": "biome lint .",
+    "format": "biome format . --write",
+    "format:check": "biome format .",
+    "check": "biome check . --write",
+    "check:ci": "biome ci .",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
@@ -37,6 +42,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@testing-library/jest-dom": "^6.6.3",

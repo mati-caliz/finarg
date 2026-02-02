@@ -168,3 +168,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
+
+exchange-bands:
+  floor: 906.51
+  ceiling: 1542.88
+  crawling-peg-monthly: 0.01
+  last-update: "2025-02-01"

@@ -28,55 +28,65 @@ public class ArbitrageDetectorService {
         log.info("Detecting arbitrage opportunities");
         
         Map<CurrencyType, QuoteDTO> quotes = quoteService.getQuotesMap(Country.ARGENTINA);
+        
+        if (quotes == null || quotes.isEmpty()) {
+            log.warn("No quotes available for arbitrage detection");
+            return List.of();
+        }
+        
         List<ArbitrageDTO> opportunities = new ArrayList<>();
 
         ArbitrageDTO mepBlue = analyzeArbitrage(
                 quotes.get(CurrencyType.AR_MEP),
                 quotes.get(CurrencyType.AR_BLUE),
-                "Buy MEP, sell Blue",
-                """
-                        1. Buy AL30 bonds in pesos
-                        2. Sell AL30 bonds for MEP dollars
-                        3. Withdraw dollars
-                        4. Sell in Blue market"""
+                "Comprar MEP, vender Blue",
+                "1. Comprar bonos AL30 en pesos\n2. Vender AL30 por dólares MEP\n3. Retirar dólares\n4. Vender en mercado Blue"
         );
-        if (mepBlue != null && mepBlue.isViable()) {
+        if (mepBlue != null) {
             opportunities.add(mepBlue);
         }
 
         ArbitrageDTO cclBlue = analyzeArbitrage(
                 quotes.get(CurrencyType.AR_CCL),
                 quotes.get(CurrencyType.AR_BLUE),
-                "Buy CCL, sell Blue",
-                """
-                        1. Buy AL30 bonds in pesos
-                        2. Transfer to foreign broker
-                        3. Sell for dollars
-                        4. Bring back and sell in Blue"""
+                "Comprar CCL, vender Blue",
+                "1. Comprar bonos AL30 en pesos\n2. Transferir a broker del exterior\n3. Vender por dólares\n4. Traer y vender en Blue"
         );
-        if (cclBlue != null && cclBlue.isViable()) {
+        if (cclBlue != null) {
             opportunities.add(cclBlue);
         }
 
         ArbitrageDTO cryptoBlue = analyzeArbitrage(
                 quotes.get(CurrencyType.AR_CRYPTO),
                 quotes.get(CurrencyType.AR_BLUE),
-                "Buy Crypto, sell Blue",
-                "1. Buy USDT/DAI on Argentine exchange\n2. Transfer to wallet\n3. Sell P2P or at exchange house"
+                "Comprar Crypto, vender Blue",
+                "1. Comprar USDT/DAI en exchange argentino\n2. Transferir a wallet\n3. Vender P2P o en cueva"
         );
-        if (cryptoBlue != null && cryptoBlue.isViable()) {
+        if (cryptoBlue != null) {
             opportunities.add(cryptoBlue);
+        }
+
+        ArbitrageDTO blueMep = analyzeArbitrage(
+                quotes.get(CurrencyType.AR_BLUE),
+                quotes.get(CurrencyType.AR_MEP),
+                "Comprar Blue, vender MEP",
+                "1. Comprar dólares Blue\n2. Depositar en banco\n3. Comprar bonos AL30D\n4. Vender por pesos"
+        );
+        if (blueMep != null) {
+            opportunities.add(blueMep);
         }
 
         ArbitrageDTO officialBlue = analyzeReverseArbitrage(
                 quotes.get(CurrencyType.AR_OFFICIAL),
                 quotes.get(CurrencyType.AR_BLUE)
         );
-        if (officialBlue != null && officialBlue.isViable()) {
+        if (officialBlue != null) {
             opportunities.add(officialBlue);
         }
 
-        log.info("Found {} arbitrage opportunities", opportunities.size());
+        log.info("Found {} arbitrage opportunities ({} viable)", 
+                opportunities.size(), 
+                opportunities.stream().filter(ArbitrageDTO::isViable).count());
         return opportunities;
     }
 

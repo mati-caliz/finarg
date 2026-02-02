@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatCurrencySimple } from '@/lib/utils';
-import { Quote } from '@/types';
-import { useAppStore } from '@/store/useStore';
-import { CountryCode } from '@/config/countries';
-import { useTranslation } from '@/hooks/useTranslation';
-import { TranslationKey } from '@/i18n/translations';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { CountryCode } from "@/config/countries";
+import { useTranslation } from "@/hooks/useTranslation";
+import type { TranslationKey } from "@/i18n/translations";
+import { formatCurrencySimple } from "@/lib/utils";
+import { useAppStore } from "@/store/useStore";
+import type { Quote } from "@/types";
+import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 export interface QuoteCardProps {
   quote: Quote;
@@ -18,7 +18,7 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryToUse = country || (quote.country as CountryCode) || selectedCountry;
-  
+
   const variation = quote.variation || 0;
   const isPositive = variation > 0;
   const isNegative = variation < 0;
@@ -29,21 +29,19 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
   return (
     <Card className="hover:border-primary/50 transition-colors">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
-          {displayName}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">{displayName}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-end justify-between">
           <div>
             <p className="text-2xl font-bold">{formatCurrencySimple(quote.sell, countryToUse)}</p>
             <p className="text-xs text-muted-foreground">
-              {translate('buy')}: {formatCurrencySimple(quote.buy, countryToUse)}
+              {translate("buy")}: {formatCurrencySimple(quote.buy, countryToUse)}
             </p>
           </div>
           <div
             className={`flex items-center gap-1 text-sm ${
-              isPositive ? 'text-green-500' : isNegative ? 'text-red-500' : 'text-muted-foreground'
+              isPositive ? "text-green-500" : isNegative ? "text-red-500" : "text-muted-foreground"
             }`}
           >
             {isPositive ? (
@@ -57,7 +55,7 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
           </div>
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
-          {translate('spread')}: {formatCurrencySimple(quote.spread, countryToUse)}
+          {translate("spread")}: {formatCurrencySimple(quote.spread, countryToUse)}
         </div>
       </CardContent>
     </Card>

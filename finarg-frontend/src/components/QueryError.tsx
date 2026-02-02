@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { AlertCircle, RefreshCw, WifiOff, ServerCrash, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useTranslation } from '@/hooks/useTranslation';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/useTranslation";
+import { AlertCircle, Clock, RefreshCw, ServerCrash, WifiOff } from "lucide-react";
 
 interface QueryErrorProps {
   error: Error | null;
@@ -22,77 +22,75 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
   const status = (error as AxiosError)?.response?.status;
   const isUnauthorized = status === 401;
 
-  const isNetworkError = !isUnauthorized && (
-    error?.message?.includes('Network') ||
-    error?.message?.includes('fetch') ||
-    error?.name === 'TypeError'
-  );
+  const isNetworkError =
+    !isUnauthorized &&
+    (error?.message?.includes("Network") ||
+      error?.message?.includes("fetch") ||
+      error?.name === "TypeError");
 
-  const isTimeoutError = !isUnauthorized && (
-    error?.message?.includes('timeout') ||
-    error?.message?.includes('Timeout')
-  );
+  const isTimeoutError =
+    !isUnauthorized && (error?.message?.includes("timeout") || error?.message?.includes("Timeout"));
 
-  const isServerError = !isUnauthorized && (
-    error?.message?.includes('500') ||
-    error?.message?.includes('502') ||
-    error?.message?.includes('503')
-  );
+  const isServerError =
+    !isUnauthorized &&
+    (error?.message?.includes("500") ||
+      error?.message?.includes("502") ||
+      error?.message?.includes("503"));
 
   const getErrorConfig = () => {
     if (isUnauthorized) {
       return {
         icon: AlertCircle,
-        title: title || translate('errorTitle'),
-        message: translate('errorUnauthorized'),
-        color: 'text-red-500',
-        bgColor: 'bg-red-500/10',
+        title: title || translate("errorTitle"),
+        message: translate("errorUnauthorized"),
+        color: "text-red-500",
+        bgColor: "bg-red-500/10",
       };
     }
 
     if (isNetworkError) {
       return {
         icon: WifiOff,
-        title: title || translate('errorNoConnection'),
-        message: translate('errorNetwork'),
-        color: 'text-yellow-500',
-        bgColor: 'bg-yellow-500/10',
+        title: title || translate("errorNoConnection"),
+        message: translate("errorNetwork"),
+        color: "text-yellow-500",
+        bgColor: "bg-yellow-500/10",
       };
     }
 
     if (isTimeoutError) {
       return {
         icon: Clock,
-        title: title || translate('errorTimeOutTitle'),
-        message: translate('errorTimeout'),
-        color: 'text-orange-500',
-        bgColor: 'bg-orange-500/10',
+        title: title || translate("errorTimeOutTitle"),
+        message: translate("errorTimeout"),
+        color: "text-orange-500",
+        bgColor: "bg-orange-500/10",
       };
     }
 
     if (isServerError) {
       return {
         icon: ServerCrash,
-        title: title || translate('errorServerTitle'),
-        message: translate('errorServer'),
-        color: 'text-red-500',
-        bgColor: 'bg-red-500/10',
+        title: title || translate("errorServerTitle"),
+        message: translate("errorServer"),
+        color: "text-red-500",
+        bgColor: "bg-red-500/10",
       };
     }
 
     return {
       icon: AlertCircle,
-      title: title || translate('errorTitle'),
-      message: translate('errorGeneric'),
-      color: 'text-red-500',
-      bgColor: 'bg-red-500/10',
+      title: title || translate("errorTitle"),
+      message: translate("errorGeneric"),
+      color: "text-red-500",
+      bgColor: "bg-red-500/10",
     };
   };
 
   const config = getErrorConfig();
   const Icon = config.icon;
 
-  const devErrorMessage = isUnauthorized ? translate('errorUnauthorized') : error?.message;
+  const devErrorMessage = isUnauthorized ? translate("errorUnauthorized") : error?.message;
 
   if (compact) {
     return (
@@ -120,7 +118,7 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
         <h3 className="text-lg font-semibold text-white mb-2">{config.title}</h3>
         <p className="text-gray-400 text-sm mb-4">{config.message}</p>
 
-        {process.env.NODE_ENV === 'development' && error && (
+        {process.env.NODE_ENV === "development" && error && (
           <div className="mb-4 p-3 bg-gray-800/50 rounded-lg text-left overflow-auto max-h-24">
             <p className="text-xs font-mono text-gray-500">{devErrorMessage}</p>
           </div>
@@ -129,7 +127,7 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
         {onRetry && (
           <Button onClick={onRetry} variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
-            {translate('retry')}
+            {translate("retry")}
           </Button>
         )}
       </CardContent>
@@ -148,7 +146,12 @@ interface EmptyStateProps {
   };
 }
 
-export function EmptyState({ icon: Icon = AlertCircle, title, description, action }: EmptyStateProps) {
+export function EmptyState({
+  icon: Icon = AlertCircle,
+  title,
+  description,
+  action,
+}: EmptyStateProps) {
   return (
     <Card className="bg-card">
       <CardContent className="p-8 text-center">
@@ -156,9 +159,7 @@ export function EmptyState({ icon: Icon = AlertCircle, title, description, actio
           <Icon className="h-8 w-8 text-gray-500" />
         </div>
         <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-        {description && (
-          <p className="text-gray-400 text-sm mb-4">{description}</p>
-        )}
+        {description && <p className="text-gray-400 text-sm mb-4">{description}</p>}
         {action && (
           <Button onClick={action.onClick} variant="outline">
             {action.label}

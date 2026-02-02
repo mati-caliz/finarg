@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Bell, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuthStore } from '@/store/useStore';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/store/useStore";
+import { Bell, LogOut } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
@@ -30,9 +30,7 @@ export function Navbar() {
 
           {mounted && isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground hidden sm:inline">
-                {user?.name}
-              </span>
+              <span className="text-sm text-muted-foreground hidden sm:inline">{user?.name}</span>
               <Button variant="ghost" size="icon" onClick={logout}>
                 <LogOut className="h-5 w-5" />
               </Button>

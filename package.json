@@ -4,18 +4,28 @@
   "private": true,
   "description": "Monorepo for FinArg - Frontend and Backend",
   "scripts": {
+    "format": "npm run format:frontend",
+    "format:frontend": "cd finarg-frontend && npm run format",
+    "format:backend": "cd finarg-backend && mvn spotless:apply",
+    "format:check": "npm run format:check:frontend && npm run format:check:backend",
+    "format:check:frontend": "cd finarg-frontend && npm run format:check",
+    "format:check:backend": "cd finarg-backend && mvn spotless:check",
     "lint:frontend": "cd finarg-frontend && npm run lint",
     "lint:backend": "cd finarg-backend && mvn checkstyle:check",
     "lint": "npm run lint:frontend && npm run lint:backend",
+    "check": "npm run check:frontend && npm run check:backend",
+    "check:frontend": "cd finarg-frontend && npm run check",
+    "check:backend": "cd finarg-backend && mvn verify -DskipTests",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
-    "finarg-frontend/**/*.{js,jsx,ts,tsx}": [
-      "bash -c 'cd finarg-frontend && npx eslint --fix \"$@\"' _"
+    "finarg-frontend/**/*.{js,jsx,ts,tsx,json,css}": [
+      "npx biome check --write --no-errors-on-unmatched"
     ]
   }
 }
