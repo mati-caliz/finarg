@@ -7,7 +7,6 @@ export const translations = {
 
     inflation: "Inflación",
     reserves: "Reservas",
-    repos: "Cauciones",
 
     // Countries
     ar: "Argentina",
@@ -15,31 +14,6 @@ export const translations = {
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguay",
-
-    // Cauciones / Repos
-    repoOptimizer: "Optimizador de Cauciones",
-    repoDescription: "Encontrá la mejor estrategia de caución bursátil para tu capital",
-    configureRepo: "Configurar Caución",
-    amountToInvest: "Monto a Invertir",
-    term: "Plazo",
-    optimizeRepo: "Optimizar Caución",
-    optimizing: "Optimizando...",
-    whatIsRepo: "¿Qué es una caución?",
-    repoInfo:
-      "Una caución bursátil es un préstamo a corto plazo donde tu dinero está garantizado por títulos valores. Es una opción de renta fija con liquidez diaria y tasas competitivas.",
-    finalAmount: "Monto Final",
-    grossProfit: "Ganancia Bruta",
-    operationDetail: "Detalle de la Operación",
-    estCommission: "Comisión Est.",
-    netReturn: "Rendimiento Neto",
-    optimalStrategy: "Estrategia Óptima",
-    termComparison: "Comparación de Plazos",
-    recommendations: "Recomendaciones",
-    repoPlaceholder: "Configurá los parámetros para optimizar tu caución",
-    repoPlaceholderDesc: "Compará tasas y plazos para maximizar tu rendimiento",
-    importantInfo: "Información importante",
-    repoDisclaimer:
-      "Las tasas de caución son indicativas y pueden variar según las condiciones del mercado y tu bróker. Las comisiones estimadas son aproximadas y dependen del intermediario. Verificá siempre las condiciones antes de operar.",
 
     // Tasas / Comparador
     ratesComparator: "Comparador de Tasas",
@@ -142,6 +116,8 @@ export const translations = {
     maximizeReturns: "Maximizá tus rendimientos",
     compareReturns: "Compará rendimientos",
     updateValues: "Actualizar valores históricos",
+    wholesaleDollar: "Dólar Mayorista",
+    importantInfo: "Información importante",
 
     // Quotes Page
     allQuotesRealTime: "Cotizaciones en tiempo real",
@@ -330,6 +306,13 @@ export const translations = {
 
     // Exchange Bands
     exchangeBands: "Bandas Cambiarias",
+    bandsPositionText: "Posición en las bandas: {percent}%",
+    bandsCalculator: "Calculadora de Bandas",
+    amountInPesos: "Monto en Pesos",
+    bandsAtFloor: "En el piso",
+    bandsAtMiddle: "En el medio",
+    bandsAtCeiling: "En el techo",
+    bandsDescription: "Monitoreo de las zonas de intervención del BCRA",
     currentRate: "Cotización Actual",
     bandsIntervention: "INTERVENCIÓN",
     bandsOfRange: "del rango",
@@ -339,6 +322,7 @@ export const translations = {
     bandsCrawlingPeg: "Crawling Peg",
     bandsMonthly: "mensual",
     bandsBelowFloor: "Por debajo del piso",
+    bandsNearFloor: "Cerca del piso",
     bandsAboveCeiling: "Por encima del techo",
     bandsNearCeiling: "Cerca del techo",
     bandsNeutralZone: "Zona neutral",
@@ -392,7 +376,6 @@ export const translations = {
 
     inflation: "Inflação",
     reserves: "Reservas",
-    repos: "Títulos", // "Cauciones" is specific to Argentina, maybe "Títulos" or "Repos" is better. Keeping close to original meaning.
 
     // Countries
     ar: "Argentina",
@@ -400,31 +383,6 @@ export const translations = {
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguai",
-
-    // Cauciones / Repos
-    repoOptimizer: "Otimizador de Títulos",
-    repoDescription: "Encontre a melhor estratégia de títulos para seu capital",
-    configureRepo: "Configurar Título",
-    amountToInvest: "Valor a Investir",
-    term: "Prazo",
-    optimizeRepo: "Otimizar Título",
-    optimizing: "Otimizando...",
-    whatIsRepo: "O que é um título?",
-    repoInfo:
-      "Um título de bolsa é um empréstimo de curto prazo onde seu dinheiro é garantido por valores mobiliários. É uma opção de renda fixa com liquidez diária e taxas competitivas.",
-    finalAmount: "Valor Final",
-    grossProfit: "Lucro Bruto",
-    operationDetail: "Detalhe da Operação",
-    estCommission: "Comissão Est.",
-    netReturn: "Retorno Líquido",
-    optimalStrategy: "Estratégia Ótima",
-    termComparison: "Comparação de Prazos",
-    recommendations: "Recomendações",
-    repoPlaceholder: "Configure os parâmetros para otimizar seu título",
-    repoPlaceholderDesc: "Compare taxas e prazos para maximizar seu retorno",
-    importantInfo: "Informação importante",
-    repoDisclaimer:
-      "As taxas de títulos são indicativas e podem variar de acordo com as condições de mercado e sua corretora. As comissões estimadas são aproximadas e dependem do intermediário. Verifique sempre as condições antes de operar.",
 
     ratesComparator: "Comparador de Taxas",
     ratesComparatorDesc: "Compare TNA de carteiras virtuais e prazos fixos de bancos",
@@ -521,6 +479,8 @@ export const translations = {
     maximizeReturns: "Maximize seus retornos",
     compareReturns: "Compare retornos",
     updateValues: "Atualizar valores históricos",
+    wholesaleDollar: "Dólar Comercial",
+    importantInfo: "Informação importante",
 
     // Income Tax Page (Basic translation, though logic might differ)
     incomeTaxTitle: "Calculadora de Salário Líquido",
@@ -601,6 +561,13 @@ export const translations = {
 
     // Exchange Bands
     exchangeBands: "Bandas Cambiais",
+    bandsPositionText: "Posição nas bandas: {percent}%",
+    bandsCalculator: "Calculadora de Bandas",
+    amountInPesos: "Valor em Pesos",
+    bandsAtFloor: "No piso",
+    bandsAtMiddle: "No meio",
+    bandsAtCeiling: "No teto",
+    bandsDescription: "Monitoramento das zonas de intervenção do BCRA",
     currentRate: "Cotação Atual",
     bandsIntervention: "INTERVENÇÃO",
     bandsOfRange: "da faixa",
@@ -610,6 +577,7 @@ export const translations = {
     bandsCrawlingPeg: "Crawling Peg",
     bandsMonthly: "mensal",
     bandsBelowFloor: "Abaixo do piso",
+    bandsNearFloor: "Perto do piso",
     bandsAboveCeiling: "Acima do teto",
     bandsNearCeiling: "Perto do teto",
     bandsNeutralZone: "Zona neutra",
@@ -663,7 +631,6 @@ export const translations = {
 
     inflation: "Inflation",
     reserves: "Reserves",
-    repos: "Repos",
 
     // Countries
     ar: "Argentina",
@@ -671,31 +638,6 @@ export const translations = {
     br: "Brazil",
     cl: "Chile",
     uy: "Uruguay",
-
-    // Cauciones / Repos
-    repoOptimizer: "Repo Optimizer",
-    repoDescription: "Find the best stock exchange repo strategy for your capital",
-    configureRepo: "Configure Repo",
-    amountToInvest: "Amount to Invest",
-    term: "Term",
-    optimizeRepo: "Optimize Repo",
-    optimizing: "Optimizing...",
-    whatIsRepo: "What is a repo?",
-    repoInfo:
-      "A stock exchange repo is a short-term loan where your money is guaranteed by securities. It is a fixed income option with daily liquidity and competitive rates.",
-    finalAmount: "Final Amount",
-    grossProfit: "Gross Profit",
-    operationDetail: "Operation Detail",
-    estCommission: "Est. Commission",
-    netReturn: "Net Return",
-    optimalStrategy: "Optimal Strategy",
-    termComparison: "Term Comparison",
-    recommendations: "Recommendations",
-    repoPlaceholder: "Configure the parameters to optimize your repo",
-    repoPlaceholderDesc: "Compare rates and terms to maximize your return",
-    importantInfo: "Important information",
-    repoDisclaimer:
-      "Repo rates are indicative and may vary according to market conditions and your broker. Estimated commissions are approximate and depend on the intermediary. Always verify the conditions before trading.",
 
     ratesComparator: "Rates Comparator",
     ratesComparatorDesc: "Compare TNA rates from digital wallets and bank fixed-term deposits",
@@ -798,6 +740,9 @@ export const translations = {
 
     // Dashboard
     marketSummary: "Financial market summary",
+    wholesaleDollar: "Wholesale Dollar",
+    importantInfo: "Important information",
+
     socialIndicators: "Social indicators",
     minimumSalary: "Minimum salary",
     minimumPension: "Minimum pension",
@@ -998,6 +943,13 @@ export const translations = {
 
     // Exchange Bands
     exchangeBands: "Exchange Bands",
+    bandsPositionText: "Position in bands: {percent}%",
+    bandsCalculator: "Bands Calculator",
+    amountInPesos: "Amount in Pesos",
+    bandsAtFloor: "At floor",
+    bandsAtMiddle: "At middle",
+    bandsAtCeiling: "At ceiling",
+    bandsDescription: "Monitoring of BCRA intervention zones",
     currentRate: "Current Rate",
     bandsIntervention: "INTERVENTION",
     bandsOfRange: "of range",
@@ -1007,6 +959,7 @@ export const translations = {
     bandsCrawlingPeg: "Crawling Peg",
     bandsMonthly: "monthly",
     bandsBelowFloor: "Below floor",
+    bandsNearFloor: "Near floor",
     bandsAboveCeiling: "Above ceiling",
     bandsNearCeiling: "Near ceiling",
     bandsNeutralZone: "Neutral zone",

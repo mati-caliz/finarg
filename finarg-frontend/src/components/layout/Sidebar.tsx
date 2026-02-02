@@ -15,7 +15,6 @@ import {
   LayoutDashboard,
   Menu,
   Percent,
-  PiggyBank,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -59,13 +58,6 @@ const baseNavigation = [
     href: "/calculadora-sueldo-neto",
     icon: Calculator,
     feature: "incomeTax" as const,
-  },
-
-  {
-    key: "repos" as TranslationKey,
-    href: "/cauciones",
-    icon: PiggyBank,
-    feature: "repos" as const,
   },
 ];
 
