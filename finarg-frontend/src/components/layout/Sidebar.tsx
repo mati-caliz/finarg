@@ -83,9 +83,24 @@ function CountrySelector() {
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarOpen, toggleSidebar, selectedCountry } = useAppStore();
+  const { sidebarOpen, toggleSidebar, setSidebarOpen, selectedCountry } = useAppStore();
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setSidebarOpen]);
 
   const reservesKeyMap: Record<string, TranslationKey> = {
     ar: "bcraReserves",
