@@ -258,6 +258,10 @@ public class RatesService {
             return "ICBC";
         }
 
+        if (cleaned.contains("NTANDER")) {
+            cleaned = cleaned.replace("NTANDER", "SANTANDER");
+        }
+
         String result;
         if (cleaned.startsWith("BANCO DE LA ")) {
             result = extractFirstWords(cleaned.substring(12), 2, "Banco ");
