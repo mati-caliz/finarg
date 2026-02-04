@@ -15,7 +15,9 @@
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
       "Bash(mvn spring-boot:run:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)"
     ]
   }
 }

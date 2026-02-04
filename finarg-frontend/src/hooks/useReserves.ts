@@ -26,6 +26,3 @@ export function useReservesHistory(days = 30) {
     },
   });
 }
-
-export const useReservas = useReserves;
-export const useReservasHistorico = useReservesHistory;

@@ -97,8 +97,3 @@ export const authApi = {
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
   refresh: (refreshToken: string) => api.post("/auth/refresh", refreshToken),
 };
-
-export const cotizacionesApi = quotesApi;
-export const inflacionApi = inflationApi;
-export const gananciasApi = incomeTaxApi;
-export const caucionesApi = reposApi;

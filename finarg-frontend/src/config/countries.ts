@@ -212,9 +212,3 @@ export const COUNTRIES_LIST = Object.values(COUNTRIES);
 export function getCountryConfig(code: CountryCode): CountryConfig {
   return COUNTRIES[code];
 }
-
-export type PaisCodigo = CountryCode;
-export type PaisConfig = CountryConfig;
-export const PAISES = COUNTRIES;
-export const PAISES_LIST = COUNTRIES_LIST;
-export const getPaisConfig = getCountryConfig;
