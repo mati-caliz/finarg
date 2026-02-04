@@ -1,15 +1,15 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/store/useStore";
-import { Bell, LogOut } from "lucide-react";
-import Link from "next/link";
+// import { Button } from "@/components/ui/button";
+// import { useAuthStore } from "@/store/useStore";
+// import { Bell, LogOut } from "lucide-react";
+// import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export function Navbar() {
-  const [mounted, setMounted] = useState(false);
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const [/*mounted*/ , setMounted] = useState(false);
+  // const { user, isAuthenticated, logout } = useAuthStore();
 
   useEffect(() => {
     setMounted(true);
@@ -24,7 +24,7 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Button variant="ghost" size="icon">
+          {/* <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
           </Button>
 
@@ -39,7 +39,7 @@ export function Navbar() {
             <Button variant="outline" size="sm" asChild>
               <Link href="/login">Iniciar Sesion</Link>
             </Button>
-          )}
+          )} */}
         </div>
       </div>
     </header>
