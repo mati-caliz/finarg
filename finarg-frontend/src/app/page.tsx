@@ -55,10 +55,19 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {countryConfig.features.gap && gap && <GapGauge gap={gap} />}
-
-        {countryConfig.features.exchangeBands && (
-          <BandsWidget oficialQuote={quotes?.find((q) => q.type === "oficial")} />
+        {(countryConfig.features.gap || countryConfig.features.exchangeBands) && (
+          <div className="flex flex-col gap-4 h-full min-h-0">
+            {countryConfig.features.gap && gap && (
+              <div className="shrink-0">
+                <GapGauge gap={gap} />
+              </div>
+            )}
+            {countryConfig.features.exchangeBands && (
+              <div className="flex-1">
+                <BandsWidget oficialQuote={quotes?.find((q) => q.type === "oficial")} />
+              </div>
+            )}
+          </div>
         )}
 
         {selectedCountry === "ar" && reserves && (
