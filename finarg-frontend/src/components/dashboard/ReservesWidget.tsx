@@ -18,7 +18,7 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
   const isNegative = variation < 0;
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {label || translate("bcraReserves")}

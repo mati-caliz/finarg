@@ -88,7 +88,7 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   }
 
   return (
-    <Card className={`${colors.border} ${colors.light}`}>
+    <Card className={`h-full ${colors.border} ${colors.light}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <div className={`h-3 w-3 rounded-full ${colors.bg} animate-pulse`} />

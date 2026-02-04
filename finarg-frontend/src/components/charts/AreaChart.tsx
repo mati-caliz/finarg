@@ -4,6 +4,7 @@ import {
   Area,
   CartesianGrid,
   AreaChart as RechartsAreaChart,
+  ReferenceArea,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -22,6 +23,12 @@ interface AreaChartProps {
   gradientId?: string;
   yDomain?: [number, number];
   xAxisInterval?: number | "preserveStart" | "preserveEnd" | "preserveStartEnd";
+  referenceAreas?: Array<{
+    x1: string | number;
+    x2: string | number;
+    fill: string;
+    label?: string;
+  }>;
 }
 
 export function AreaChart({
@@ -36,6 +43,7 @@ export function AreaChart({
   gradientId = "colorValue",
   yDomain,
   xAxisInterval = "preserveStartEnd",
+  referenceAreas = [],
 }: AreaChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -73,6 +81,16 @@ export function AreaChart({
           itemStyle={{ color: "#fff" }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
+        {referenceAreas.map((area) => (
+          <ReferenceArea
+            key={`${area.label}-${area.x1}-${area.x2}`}
+            x1={area.x1}
+            x2={area.x2}
+            fill={area.fill}
+            fillOpacity={0.15}
+            strokeOpacity={0}
+          />
+        ))}
         <Area
           type="monotone"
           dataKey={yKey}
