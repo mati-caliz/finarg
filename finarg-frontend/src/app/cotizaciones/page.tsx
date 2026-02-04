@@ -211,7 +211,7 @@ export default function QuotesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
             {countryConfig.flag} {translate("quotes")} -{" "}
@@ -239,31 +239,18 @@ export default function QuotesPage() {
           )}
         </div>
         {baseCurrencyButtons && (
-          <div className="flex flex-col gap-2 shrink-0 items-center">
-            <div className="flex gap-2">
-              {baseCurrencyButtons.slice(0, 4).map(({ key, labelKey }) => (
-                <Button
-                  key={key}
-                  variant={selectedBaseCurrency === key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedBaseCurrency(key)}
-                >
-                  {translate(labelKey)}
-                </Button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              {baseCurrencyButtons.slice(4).map(({ key, labelKey }) => (
-                <Button
-                  key={key}
-                  variant={selectedBaseCurrency === key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedBaseCurrency(key)}
-                >
-                  {translate(labelKey)}
-                </Button>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+            {baseCurrencyButtons.map(({ key, labelKey }) => (
+              <Button
+                key={key}
+                variant={selectedBaseCurrency === key ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedBaseCurrency(key)}
+                className="text-xs sm:text-sm"
+              >
+                {translate(labelKey)}
+              </Button>
+            ))}
           </div>
         )}
       </div>
