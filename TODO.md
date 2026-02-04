@@ -6,11 +6,13 @@
 
 - [ ] **Calculadora de Interés Compuesto**: Herramienta para calcular rendimientos con reinversión de intereses.
 
-- [ ] **Fix layout dashboard**: Arreglar algunos bugs estéticos y ver que métricas mostrar mejor.
+- [ ] **Fix layout dashboard**: Arreglar algunos bugs estéticos y ver qué métricas mostrar mejor.
 
 - [ ] **Mejorar los gráficos de inflación**: Guiarme del gráfico de reservas BCRA.
 
 - [ ] **Mejorar la seguridad de la app**: Preparar la app para producción. Minificar el código y usar webpack o otro bundler. Implementar HTTPS y otras medidas de seguridad.
+
+- [ ] **Cafecito**: Agregar la opción de cafecito para apoyo.
 
 ## Post MVP
 
@@ -58,5 +60,5 @@
 
 - [ ] **Dashboard personalizable**: Widgets arrastrables y configurables.
 
-- [ ] **Modulo de inversiones inmobiliaras**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
+- [ ] **Módulo de inversiones inmobiliaras**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
 
