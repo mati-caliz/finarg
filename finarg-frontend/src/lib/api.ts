@@ -73,6 +73,10 @@ export const indicatorsApi = {
   getSocial: (country = "ar") => api.get("/indicators/social", { params: { country } }),
 };
 
+export const countryRiskApi = {
+  getCurrent: () => api.get("/country-risk"),
+};
+
 export const ratesApi = {
   getFixedTerm: (country = "ar") => api.get("/rates/fixed-term", { params: { country } }),
   getWallets: (country = "ar") => api.get("/rates/wallets", { params: { country } }),

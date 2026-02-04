@@ -347,9 +347,7 @@ export default function InflationPage() {
           <Card className="bg-card">
             <CardHeader>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">
-                  {translate("monthlyEvolution")} ({getChartPeriodLabel(chartMonthsLimit)})
-                </CardTitle>
+                <CardTitle className="text-lg">{translate("monthlyEvolution")}</CardTitle>
                 <div className="flex flex-wrap gap-2">
                   {chartPeriods.map((p) => (
                     <Button

@@ -60,6 +60,7 @@ public class SecurityConfig {
                                 "/api/v1/exchange-bands/**",
                                 "/api/v1/rates/**",
                                 "/api/v1/indicators/**",
+                                "/api/v1/country-risk/**",
                                 "/api/v1/countries",
                                 "/api-docs/**",
                                 "/swagger-ui/**",

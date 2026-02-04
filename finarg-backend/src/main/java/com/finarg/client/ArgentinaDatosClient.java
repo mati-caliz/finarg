@@ -170,6 +170,27 @@ public class ArgentinaDatosClient {
         }
     }
 
+    public CountryRiskResponse getLatestCountryRisk() {
+        try {
+            log.debug("Fetching latest country risk from ArgentinaDatos API");
+
+            CountryRiskResponse response = webClient.get()
+                    .uri("/finanzas/indices/riesgo-pais/ultimo")
+                    .retrieve()
+                    .bodyToMono(CountryRiskResponse.class)
+                    .block();
+
+            if (response != null) {
+                log.info("Latest country risk: {} points on {}", response.getValue(), response.getDate());
+            }
+
+            return response;
+        } catch (Exception e) {
+            log.error("Error fetching country risk from ArgentinaDatos: {}", e.getMessage());
+            return null;
+        }
+    }
+
     private InflationDTO mapToInflationDTO(InflationResponse response) {
         return InflationDTO.builder()
                 .date(LocalDate.parse(response.getDate()))
@@ -379,6 +400,14 @@ public class ArgentinaDatosClient {
         private String commercialName;
         @JsonProperty("tna")
         private BigDecimal tna;
+    }
+
+    @Data
+    public static class CountryRiskResponse {
+        @JsonProperty("fecha")
+        private String date;
+        @JsonProperty("valor")
+        private BigDecimal value;
     }
 
 }
