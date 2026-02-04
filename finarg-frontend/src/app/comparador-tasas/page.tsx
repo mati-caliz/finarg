@@ -9,12 +9,12 @@ import type { TranslationKey } from "@/i18n/translations";
 import { ratesApi } from "@/lib/api";
 import { useAppStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, ExternalLink, Landmark, Wallet } from "lucide-react";
+import { AlertCircle, ExternalLink, Home, Landmark, Wallet } from "lucide-react";
 import { type ElementType, useState } from "react"; // Added ElementType import
 
 // --- Types & Constants ---
 
-type TabType = "wallets" | "banks" | "usdAccounts";
+type TabType = "wallets" | "banks" | "usdAccounts" | "uvaMortgages";
 
 interface RateDTO {
   id: string;
@@ -112,7 +112,7 @@ interface RateSectionProps {
   refetch: () => void;
   emptyMessage: string;
   maxTna: number;
-  type: "wallet" | "bank" | "usd";
+  type: "wallet" | "bank" | "usd" | "mortgage";
   translate: (key: TranslationKey) => string;
 }
 
@@ -188,7 +188,10 @@ const RateSection = ({
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((row) => {
-            const isHighest = row.tna >= maxTna && maxTna > 0;
+            const isBest =
+              type === "mortgage"
+                ? row.tna <= maxTna && maxTna > 0
+                : row.tna >= maxTna && maxTna > 0;
             const limitStr = formatLimit(row.limit);
             const logoUrl = getLogoUrl(row);
 
@@ -196,7 +199,7 @@ const RateSection = ({
               <Card
                 key={row.id}
                 className={`overflow-hidden transition-colors ${
-                  isHighest ? "border-primary/50 bg-primary/5" : ""
+                  isBest ? "border-primary/50 bg-primary/5" : ""
                 }`}
               >
                 <CardContent className="p-4">
@@ -247,9 +250,9 @@ const RateSection = ({
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-semibold text-foreground">{row.name}</span>
-                          {isHighest && (
+                          {isBest && (
                             <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-normal text-primary">
-                              {translate("highest")}
+                              {translate(type === "mortgage" ? "lowest" : "highest")}
                             </span>
                           )}
                         </div>
@@ -380,6 +383,20 @@ export default function RatesPage() {
     enabled: selectedCountry === "ar",
   });
 
+  const {
+    data: uvaMortgageRates = [],
+    isLoading: uvaMortgagesLoading,
+    error: uvaMortgagesErrorData,
+    refetch: refetchUvaMortgages,
+  } = useQuery({
+    queryKey: ["rates", "uva-mortgages", selectedCountry],
+    queryFn: async () => {
+      const res = await ratesApi.getUvaMortgages(selectedCountry);
+      return (res.data as RateDTO[]) ?? [];
+    },
+    enabled: selectedCountry === "ar",
+  });
+
   const showWallets = selectedCountry === "ar";
   const showBanks = selectedCountry === "ar";
 
@@ -387,6 +404,8 @@ export default function RatesPage() {
   const maxWalletTna = walletRates.length > 0 ? Math.max(...walletRates.map((r) => r.tna)) : 0;
   const maxUsdAccountTna =
     usdAccountRates.length > 0 ? Math.max(...usdAccountRates.map((r) => r.tna)) : 0;
+  const minUvaMortgageTna =
+    uvaMortgageRates.length > 0 ? Math.min(...uvaMortgageRates.map((r) => r.tna)) : 0;
 
   if (!showWallets && !showBanks) {
     return (
@@ -449,6 +468,17 @@ export default function RatesPage() {
             {translate("usdAccounts")}
           </Button>
         )}
+        {showWallets && (
+          <Button
+            variant={activeTab === "uvaMortgages" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("uvaMortgages")}
+            className="flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            {translate("uvaMortgages")}
+          </Button>
+        )}
       </div>
 
       {activeTab === "wallets" && showWallets && (
@@ -495,6 +525,22 @@ export default function RatesPage() {
           emptyMessage="No hay datos disponibles"
           maxTna={maxUsdAccountTna}
           type="usd"
+          translate={translate}
+        />
+      )}
+
+      {activeTab === "uvaMortgages" && showWallets && (
+        <RateSection
+          title={translate("uvaMortgagesRates")}
+          disclaimer={translate("uvaMortgagesDisclaimer")}
+          icon={Home}
+          data={uvaMortgageRates}
+          isLoading={uvaMortgagesLoading}
+          error={uvaMortgagesErrorData as Error}
+          refetch={refetchUvaMortgages}
+          emptyMessage="No hay datos disponibles"
+          maxTna={minUvaMortgageTna}
+          type="mortgage"
           translate={translate}
         />
       )}

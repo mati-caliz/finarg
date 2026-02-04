@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,9 +40,26 @@ public class RatesService {
             Map.entry("UALA PLUS 2", "uala.com.ar")
     );
 
+    private static final Map<String, String> BANK_DOMAINS = Map.ofEntries(
+            Map.entry("BANCO NACIÓN", "bna.com.ar"),
+            Map.entry("BBVA", "bbva.com.ar"),
+            Map.entry("BANCO DEL SOL", "bancodelsol.ar"),
+            Map.entry("BANCO CIUDAD", "bancociudad.com.ar"),
+            Map.entry("COMAFI", "comafi.com.ar"),
+            Map.entry("ICBC", "icbc.com.ar"),
+            Map.entry("BRUBANK", "brubank.com"),
+            Map.entry("CREDICOOP", "bancocredicoop.coop"),
+            Map.entry("BANCO HIPOTECARIO", "hipotecario.com.ar"),
+            Map.entry("BANCO PATAGONIA", "bancopatagonia.com.ar"),
+            Map.entry("SUPERVIELLE", "supervielle.com.ar"),
+            Map.entry("SANTANDER", "santander.com.ar"),
+            Map.entry("BANCO MACRO", "macro.com.ar"),
+            Map.entry("BANCO GALICIA", "galicia.com.ar")
+    );
+
     private final ArgentinaDatosClient argentinaDatosClient;
 
-    @Cacheable(value = "rates", key = "'fixedTerm_' + #country + '_v2'")
+    @Cacheable(value = "rates", key = "'fixedTerm_' + #country + '_v3'")
     public List<RateDTO> getFixedTermRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -58,7 +76,7 @@ public class RatesService {
                 .toList();
     }
 
-    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v8'")
+    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v9'")
     public List<RateDTO> getWalletRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -74,32 +92,51 @@ public class RatesService {
                 .toList();
     }
 
-    @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v1'")
+    @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v3'")
     public List<RateDTO> getUsdAccountRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
         }
         List<ArgentinaDatosClient.UsdAccountResponse> accounts = argentinaDatosClient.getUsdAccounts();
         List<ArgentinaDatosClient.YieldResponse> yields = argentinaDatosClient.getYields();
-        
+
         java.util.List<RateDTO> result = new java.util.ArrayList<>();
-        
+
         if (accounts != null) {
             accounts.stream()
-                    .filter(r -> r.getEntity() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
+                    .filter(r -> r.getEntity() != null && r.getTasa() != null && r.getTasa().compareTo(BigDecimal.ZERO) > 0)
                     .map(this::mapUsdAccountToRateDTO)
                     .forEach(result::add);
         }
-        
+
         if (yields != null) {
             yields.stream()
-                    .filter(r -> r.getEntity() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
-                    .map(this::mapYieldToRateDTO)
+                    .filter(r -> r.getEntity() != null && r.getRendimientos() != null)
+                    .flatMap(r -> r.getRendimientos().stream()
+                            .filter(detail -> "USD".equalsIgnoreCase(detail.getCurrency()))
+                            .filter(detail -> detail.getApy() != null && detail.getApy().compareTo(BigDecimal.ZERO) > 0)
+                            .map(detail -> mapYieldToRateDTO(r.getEntity(), detail)))
                     .forEach(result::add);
         }
-        
+
         result.sort((a, b) -> b.getTna().compareTo(a.getTna()));
         return result;
+    }
+
+    @Cacheable(value = "rates", key = "'uvaMortgages_' + #country + '_v3'")
+    public List<RateDTO> getUvaMortgageRates(Country country) {
+        if (country != Country.ARGENTINA) {
+            return List.of();
+        }
+        List<ArgentinaDatosClient.UvaMortgageResponse> mortgages = argentinaDatosClient.getUvaMortgages();
+        if (mortgages == null) {
+            return List.of();
+        }
+        return mortgages.stream()
+                .filter(r -> r.getCommercialName() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
+                .map(this::mapUvaMortgageToRateDTO)
+                .sorted(Comparator.comparing(RateDTO::getTna))
+                .toList();
     }
 
     private RateDTO mapFciToRateDTO(FciRateResponse r) {
@@ -125,7 +162,7 @@ public class RatesService {
 
     private static String formatFundName(String fund) {
         if (fund == null || fund.isBlank()) return "";
-        return fixMojibake(fund.trim());
+        return fixMojibake(fund.trim()).toUpperCase();
     }
 
     private static String walletLogoUrl(String fund) {
@@ -144,6 +181,17 @@ public class RatesService {
                 .replaceAll("[^a-z0-9]", "");
         if (baseName.isEmpty()) return null;
         return String.format(GOOGLE_FAVICON_API, baseName + ".com.ar");
+    }
+
+    private static String bankLogoUrl(String bankName) {
+        if (bankName == null || bankName.isBlank()) return null;
+        String upperName = bankName.toUpperCase().trim();
+        for (Map.Entry<String, String> entry : BANK_DOMAINS.entrySet()) {
+            if (upperName.contains(entry.getKey())) {
+                return String.format(GOOGLE_FAVICON_API, entry.getValue());
+            }
+        }
+        return null;
     }
 
     private boolean hasValidTna(FixedTermRateResponse r) {
@@ -223,7 +271,7 @@ public class RatesService {
             result = extractFirstWords(cleaned, 2, "");
         }
 
-        return titleCase(result).trim();
+        return result.toUpperCase().trim();
     }
 
     private static String extractFirstWords(String text, int maxWords, String prefix) {
@@ -238,20 +286,6 @@ public class RatesService {
             count++;
         }
         return sb.toString();
-    }
-
-    private static String titleCase(String s) {
-        if (s == null || s.isEmpty()) return s;
-        return java.util.Arrays.stream(s.split("\\s+"))
-                .map(word -> {
-                    if (word.isEmpty()) return "";
-                    if (word.length() >= 2 && word.length() <= 5 && word.chars().allMatch(Character::isUpperCase)) {
-                        return word;
-                    }
-                    return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
-                })
-                .reduce((a, b) -> a + " " + b)
-                .orElse(s);
     }
 
     private static String fixMojibake(String s) {
@@ -291,41 +325,57 @@ public class RatesService {
     }
 
     private RateDTO mapUsdAccountToRateDTO(ArgentinaDatosClient.UsdAccountResponse r) {
-        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
-        BigDecimal teaPct = r.getTea() != null
-                ? r.getTea().multiply(BigDecimal.valueOf(100))
-                : teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+        BigDecimal tnaPct = r.getTasa().multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = teaFromTna(r.getTasa()).multiply(BigDecimal.valueOf(100));
         String entityName = formatFundName(r.getEntity());
         return RateDTO.builder()
                 .id(sanitizeId(r.getEntity()))
                 .name(entityName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
-                .product(r.getConditions())
+                .product(null)
                 .term(null)
-                .date(r.getDate())
+                .date(null)
                 .limit(r.getLimit())
                 .logo(null)
                 .link(null)
                 .build();
     }
 
-    private RateDTO mapYieldToRateDTO(ArgentinaDatosClient.YieldResponse r) {
-        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
-        BigDecimal teaPct = r.getTea() != null
-                ? r.getTea().multiply(BigDecimal.valueOf(100))
-                : teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
-        String entityName = formatFundName(r.getEntity());
+    private RateDTO mapYieldToRateDTO(String entity, ArgentinaDatosClient.YieldDetail detail) {
+        BigDecimal apyDecimal = detail.getApy().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        BigDecimal tnaPct = detail.getApy();
+        BigDecimal teaPct = teaFromTna(apyDecimal).multiply(BigDecimal.valueOf(100));
+        String entityName = formatFundName(entity);
         return RateDTO.builder()
-                .id(sanitizeId(r.getEntity()))
+                .id(sanitizeId(entity + "_" + detail.getCurrency()))
                 .name(entityName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
-                .product(r.getProduct())
+                .product("Rendimiento en " + detail.getCurrency())
                 .term(null)
-                .date(r.getDate())
-                .limit(r.getLimit())
+                .date(detail.getDate())
+                .limit(null)
                 .logo(null)
+                .link(null)
+                .build();
+    }
+
+    private RateDTO mapUvaMortgageToRateDTO(ArgentinaDatosClient.UvaMortgageResponse r) {
+        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+        String entityName = formatFundName(r.getCommercialName());
+        String logo = bankLogoUrl(r.getCommercialName());
+        return RateDTO.builder()
+                .id(sanitizeId(r.getCommercialName()))
+                .name(entityName)
+                .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
+                .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
+                .product("Crédito Hipotecario UVA")
+                .term(null)
+                .date(null)
+                .limit(null)
+                .logo(logo)
                 .link(null)
                 .build();
     }

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude config set:*)",
+      "Bash(npm run lint)",
+      "Bash(mvn clean:*)",
+      "Bash(curl:*)",
+      "Bash(where:*)",
+      "Bash(ls:*)"
+    ]
+  }
+}
