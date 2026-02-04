@@ -105,57 +105,6 @@ export default function ReservesPage() {
     });
   };
 
-  const getReferenceAreas = (
-    historicalData: { fecha: string; valor: number }[],
-    formattedData: { fecha: string; valor: number }[],
-  ) => {
-    if (!historicalData || historicalData.length === 0) {
-      return [];
-    }
-
-    const reversedData = [...historicalData].reverse();
-    const firstDataDate = new Date(reversedData[0]?.fecha || "");
-    const lastDataDate = new Date(reversedData[reversedData.length - 1]?.fecha || "");
-
-    return governments
-      .filter((gov) => {
-        const govStart = new Date(gov.startDate);
-        const govEnd = new Date(gov.endDate);
-        return govStart <= lastDataDate && govEnd >= firstDataDate;
-      })
-      .map((gov) => {
-        const govStart = new Date(gov.startDate);
-        const govEnd = new Date(gov.endDate);
-
-        let x1Index = -1;
-        let x2Index = -1;
-
-        for (let i = 0; i < reversedData.length; i++) {
-          const date = new Date(reversedData[i].fecha);
-          if (x1Index === -1 && date >= govStart) {
-            x1Index = i;
-          }
-          if (date <= govEnd) {
-            x2Index = i;
-          }
-        }
-
-        if (x1Index === -1) {
-          x1Index = 0;
-        }
-        if (x2Index === -1) {
-          x2Index = reversedData.length - 1;
-        }
-
-        return {
-          x1: formattedData[x1Index]?.fecha || formattedData[0].fecha,
-          x2: formattedData[x2Index]?.fecha || formattedData[formattedData.length - 1].fecha,
-          fill: gov.color,
-          label: gov.label,
-        };
-      });
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -416,18 +365,60 @@ export default function ReservesPage() {
             </div>
           ) : historicalReserves && historicalReserves.length > 0 ? (
             (() => {
-              const chartData = [...historicalReserves]
-                .reverse()
-                .map((r: { fecha: string; valor: number }) => ({
-                  fecha: formatDate(r.fecha),
-                  valor: Number(r.valor),
-                }));
+              const reversedRaw = [...historicalReserves].reverse();
+              const chartData = reversedRaw.map((r: { fecha: string; valor: number }, idx) => ({
+                index: idx,
+                fecha: formatDate(r.fecha),
+                fechaOriginal: r.fecha,
+                valor: Number(r.valor),
+              }));
               const values = chartData.map((d) => d.valor);
               const minVal = Math.min(...values);
               const maxVal = Math.max(...values);
               const padding = Math.max((maxVal - minVal) * 0.05, 500);
-              const referenceAreas = getReferenceAreas(historicalReserves, chartData);
+
+              const firstDataDate = new Date(reversedRaw[0]?.fecha || "");
+              const lastDataDate = new Date(reversedRaw[reversedRaw.length - 1]?.fecha || "");
+
+              const referenceAreas = governments
+                .filter((gov) => {
+                  const govStart = new Date(gov.startDate);
+                  const govEnd = new Date(gov.endDate);
+                  return govStart <= lastDataDate && govEnd >= firstDataDate;
+                })
+                .map((gov) => {
+                  const govStart = new Date(gov.startDate);
+                  const govEnd = new Date(gov.endDate);
+
+                  let x1 = chartData[0]?.fecha;
+                  let x2 = chartData[chartData.length - 1]?.fecha;
+
+                  for (let i = 0; i < chartData.length; i++) {
+                    const date = new Date(chartData[i].fechaOriginal);
+                    if (date >= govStart) {
+                      x1 = chartData[i].fecha;
+                      break;
+                    }
+                  }
+
+                  for (let i = chartData.length - 1; i >= 0; i--) {
+                    const date = new Date(chartData[i].fechaOriginal);
+                    if (date <= govEnd) {
+                      x2 = chartData[i].fecha;
+                      break;
+                    }
+                  }
+
+                  return {
+                    x1,
+                    x2,
+                    fill: gov.color,
+                    label: gov.label,
+                  };
+                });
+
               const visibleGovs = getVisibleGovernments(historicalReserves);
+
               return (
                 <>
                   <AreaChart

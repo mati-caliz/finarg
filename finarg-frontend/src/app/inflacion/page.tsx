@@ -131,57 +131,6 @@ export default function InflationPage() {
     });
   };
 
-  const getReferenceAreas = (
-    inflationData: Inflation[],
-    formattedData: { fecha: string; valor: number | string }[],
-  ) => {
-    if (!inflationData || inflationData.length === 0) {
-      return [];
-    }
-
-    const reversedData = [...inflationData].reverse();
-    const firstDataDate = new Date(reversedData[0]?.date || "");
-    const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
-
-    return governments
-      .filter((gov) => {
-        const govStart = new Date(gov.startDate);
-        const govEnd = new Date(gov.endDate);
-        return govStart <= lastDataDate && govEnd >= firstDataDate;
-      })
-      .map((gov) => {
-        const govStart = new Date(gov.startDate);
-        const govEnd = new Date(gov.endDate);
-
-        let x1Index = -1;
-        let x2Index = -1;
-
-        for (let i = 0; i < reversedData.length; i++) {
-          const date = new Date(reversedData[i].date);
-          if (x1Index === -1 && date >= govStart) {
-            x1Index = i;
-          }
-          if (date <= govEnd) {
-            x2Index = i;
-          }
-        }
-
-        if (x1Index === -1) {
-          x1Index = 0;
-        }
-        if (x2Index === -1) {
-          x2Index = reversedData.length - 1;
-        }
-
-        return {
-          x1: formattedData[x1Index]?.fecha || formattedData[0].fecha,
-          x2: formattedData[x2Index]?.fecha || formattedData[formattedData.length - 1].fecha,
-          fill: gov.color,
-          label: gov.label,
-        };
-      });
-  };
-
   return (
     <div className="space-y-6">
       <div>
@@ -393,12 +342,55 @@ export default function InflationPage() {
             <CardContent>
               {monthlyInflation && monthlyInflation.length > 0 ? (
                 (() => {
-                  const chartData = [...monthlyInflation].reverse().map((i) => ({
+                  const reversedData = [...monthlyInflation].reverse();
+                  const chartData = reversedData.map((i) => ({
                     fecha: formatDate(i.date),
+                    fechaOriginal: i.date,
                     valor: i.value,
                   }));
-                  const referenceAreas = getReferenceAreas(monthlyInflation, chartData);
+
+                  const firstDataDate = new Date(reversedData[0]?.date || "");
+                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
+
+                  const referenceAreas = governments
+                    .filter((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+                      return govStart <= lastDataDate && govEnd >= firstDataDate;
+                    })
+                    .map((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+
+                      let x1 = chartData[0]?.fecha;
+                      let x2 = chartData[chartData.length - 1]?.fecha;
+
+                      for (let i = 0; i < chartData.length; i++) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date >= govStart) {
+                          x1 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      for (let i = chartData.length - 1; i >= 0; i--) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date <= govEnd) {
+                          x2 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      return {
+                        x1,
+                        x2,
+                        fill: gov.color,
+                        label: gov.label,
+                      };
+                    });
+
                   const visibleGovs = getVisibleGovernments(monthlyInflation);
+
                   return (
                     <>
                       <BarChart
@@ -458,12 +450,55 @@ export default function InflationPage() {
               {monthlyInflation && monthlyInflation.length > 0 ? (
                 (() => {
                   const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
-                  const chartData = [...filteredData].reverse().map((i) => ({
+                  const reversedData = [...filteredData].reverse();
+                  const chartData = reversedData.map((i) => ({
                     fecha: formatDate(i.date),
+                    fechaOriginal: i.date,
                     valor: i.yearOverYear as number,
                   }));
-                  const referenceAreas = getReferenceAreas(filteredData, chartData);
+
+                  const firstDataDate = new Date(reversedData[0]?.date || "");
+                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
+
+                  const referenceAreas = governments
+                    .filter((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+                      return govStart <= lastDataDate && govEnd >= firstDataDate;
+                    })
+                    .map((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+
+                      let x1 = chartData[0]?.fecha;
+                      let x2 = chartData[chartData.length - 1]?.fecha;
+
+                      for (let i = 0; i < chartData.length; i++) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date >= govStart) {
+                          x1 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      for (let i = chartData.length - 1; i >= 0; i--) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date <= govEnd) {
+                          x2 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      return {
+                        x1,
+                        x2,
+                        fill: gov.color,
+                        label: gov.label,
+                      };
+                    });
+
                   const visibleGovs = getVisibleGovernments(filteredData);
+
                   return (
                     <>
                       <BarChart

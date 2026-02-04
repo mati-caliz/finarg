@@ -48,6 +48,35 @@ const WALLET_DOMAINS: Record<string, string> = {
   Fiwind: "fiwind.io",
 };
 
+const BANK_DOMAINS: Record<string, string> = {
+  ASTROPAY: "astropay.com",
+  LETSBIT: "letsbit.io",
+  BNA: "bna.com.ar",
+  "Banco Nación": "bna.com.ar",
+  "Banco de la Nación": "bna.com.ar",
+  GALICIA: "bancogalicia.com",
+  "Banco Galicia": "bancogalicia.com",
+  SUPERVIELLE: "supervielle.com.ar",
+  "Banco Supervielle": "supervielle.com.ar",
+  BBVA: "bbva.com.ar",
+  ICBC: "icbc.com.ar",
+  Santander: "santander.com.ar",
+  "Banco Santander": "santander.com.ar",
+  HSBC: "hsbc.com.ar",
+  Macro: "macro.com.ar",
+  "Banco Macro": "macro.com.ar",
+  "Banco Ciudad": "bancociudad.com.ar",
+  "Ciudad de Buenos Aires": "bancociudad.com.ar",
+  Patagonia: "bancopatagonia.com.ar",
+  "Banco Patagonia": "bancopatagonia.com.ar",
+  Comafi: "comafi.com.ar",
+  "Banco Comafi": "comafi.com.ar",
+  Itaú: "itau.com.ar",
+  "Banco Itaú": "itau.com.ar",
+  Credicoop: "bancocredicoop.coop",
+  "Banco Credicoop": "bancocredicoop.coop",
+};
+
 // --- Helper Functions ---
 
 function extractDomainFromFaviconUrl(url: string): string | null {
@@ -69,13 +98,22 @@ function getFallbackLogoUrl(domain: string): string {
 }
 
 function getLogoUrl(row: RateDTO): string {
-  const knownDomain = Object.entries(WALLET_DOMAINS).find(([key]) =>
+  const walletDomain = Object.entries(WALLET_DOMAINS).find(([key]) =>
     row.name.toLowerCase().includes(key.toLowerCase()),
   )?.[1];
 
-  if (knownDomain) {
-    return `https://www.google.com/s2/favicons?domain=${knownDomain}&sz=128`;
+  if (walletDomain) {
+    return `https://www.google.com/s2/favicons?domain=${walletDomain}&sz=128`;
   }
+
+  const bankDomain = Object.entries(BANK_DOMAINS).find(([key]) =>
+    row.name.toLowerCase().includes(key.toLowerCase()),
+  )?.[1];
+
+  if (bankDomain) {
+    return `https://www.google.com/s2/favicons?domain=${bankDomain}&sz=128`;
+  }
+
   return row.logo || "";
 }
 

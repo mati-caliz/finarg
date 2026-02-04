@@ -8,7 +8,14 @@
       "Bash(where:*)",
       "Bash(ls:*)",
       "WebSearch",
-      "Bash(wmic:*)"
+      "Bash(wmic:*)",
+      "WebFetch(domain:www.infobae.com)",
+      "WebFetch(domain:www.bcra.gob.ar)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(timeout:*)"
     ]
   }
 }

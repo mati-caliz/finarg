@@ -92,7 +92,7 @@ export function BarChart({
             x1={area.x1}
             x2={area.x2}
             fill={area.fill}
-            fillOpacity={0.15}
+            fillOpacity={0.2}
             strokeOpacity={0}
           />
         ))}
