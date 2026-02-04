@@ -152,3 +152,15 @@ export interface ExchangeBands {
   lastUpdate: string;
   notes?: string;
 }
+
+export interface CountryRisk {
+  value: number;
+  date: string;
+}
+
+export interface Government {
+  startDate: string;
+  endDate: string;
+  label: string;
+  color: string;
+}

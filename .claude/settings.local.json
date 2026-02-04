@@ -6,7 +6,8 @@
       "Bash(mvn clean:*)",
       "Bash(curl:*)",
       "Bash(where:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebSearch"
     ]
   }
 }
