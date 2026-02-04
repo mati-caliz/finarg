@@ -14,6 +14,8 @@
 
 - [ ] **Cafecito**: Agregar la opción de cafecito para apoyo.
 
+- [ ] **Optimización**: Pedirle a opus que optimice toda la app y elimine duplicados.
+
 ## Post MVP
 
 - [ ] **Agregar funcionalidades para otros países**: Expandir features y datos para los países ya soportados (Colombia, Brasil, Chile, Uruguay) y evaluar nuevos mercados.
