@@ -5,6 +5,7 @@ import {
   CartesianGrid,
   Cell,
   BarChart as RechartsBarChart,
+  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -32,6 +33,12 @@ interface BarChartProps {
   positiveColor?: string;
   negativeColor?: string;
   referenceLines?: ReferenceLineConfig[];
+  referenceAreas?: Array<{
+    x1: string | number;
+    x2: string | number;
+    fill: string;
+    label?: string;
+  }>;
   getBarColor?: (entry: Record<string, string | number>, index: number) => string;
 }
 
@@ -48,6 +55,7 @@ export function BarChart({
   positiveColor = "#10b981",
   negativeColor = "#ef4444",
   referenceLines = [],
+  referenceAreas = [],
   getBarColor,
 }: BarChartProps) {
   return (
@@ -78,6 +86,16 @@ export function BarChart({
           itemStyle={{ color: "#fff" }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
+        {referenceAreas.map((area) => (
+          <ReferenceArea
+            key={`${area.label}-${area.x1}-${area.x2}`}
+            x1={area.x1}
+            x2={area.x2}
+            fill={area.fill}
+            fillOpacity={0.15}
+            strokeOpacity={0}
+          />
+        ))}
         {referenceLines.map((line) => (
           <ReferenceLine
             key={line.label || String(line.x)}

@@ -1,7 +1,9 @@
 package com.finarg.controller;
 
 import com.finarg.client.DatosGobArClient;
+import com.finarg.model.dto.GovernmentDTO;
 import com.finarg.model.dto.ReservesDTO;
+import com.finarg.service.GovernmentsService;
 import com.finarg.service.ReservesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ReservesController {
 
     private final ReservesService reservesService;
+    private final GovernmentsService governmentsService;
 
     @GetMapping
     @Operation(summary = "Get current reserves by country")
@@ -34,5 +37,12 @@ public class ReservesController {
     public ResponseEntity<List<DatosGobArClient.SeriesDataPoint>> getHistory(
             @RequestParam(defaultValue = "30") int days) {
         return ResponseEntity.ok(reservesService.getHistory(days));
+    }
+
+    @GetMapping("/governments")
+    @Operation(summary = "Get government periods for chart visualization")
+    public ResponseEntity<List<GovernmentDTO>> getGovernments(
+            @RequestParam(defaultValue = "ar") String country) {
+        return ResponseEntity.ok(governmentsService.getGovernments(country));
     }
 }

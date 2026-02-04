@@ -86,6 +86,37 @@ export default function DashboardPage() {
 
         {selectedCountry === "ar" && (
           <div className="flex flex-col gap-4 h-full min-h-0">
+            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
+
+            {countryConfig.features.inflation && (
+              <Card className="shrink-0">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {translate("monthlyInflation")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 pb-6">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-3xl font-bold text-red-500">
+                        {inflation?.value?.toFixed(1) ?? "0"}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {translate("last12Months")}
+                      </p>
+                    </div>
+                    <TrendingUp className="h-8 w-8 text-red-500/50" />
+                  </div>
+                  <Link
+                    href="/inflacion"
+                    className="text-sm text-primary hover:underline mt-4 inline-block"
+                  >
+                    {translate("viewHistory")}
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+
             {socialIndicators &&
               ((socialIndicators.minimumSalary !== undefined &&
                 socialIndicators.minimumSalary !== null) ||
@@ -181,37 +212,6 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               )}
-
-            {countryConfig.features.inflation && (
-              <Card className="shrink-0">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {translate("monthlyInflation")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 pb-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-red-500">
-                        {inflation?.value?.toFixed(1) ?? "0"}%
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {translate("last12Months")}
-                      </p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-red-500/50" />
-                  </div>
-                  <Link
-                    href="/inflacion"
-                    className="text-sm text-primary hover:underline mt-4 inline-block"
-                  >
-                    {translate("viewHistory")}
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
-
-            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
           </div>
         )}
 
