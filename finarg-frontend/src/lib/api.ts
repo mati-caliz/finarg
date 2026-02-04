@@ -77,6 +77,7 @@ export const ratesApi = {
   getFixedTerm: (country = "ar") => api.get("/rates/fixed-term", { params: { country } }),
   getWallets: (country = "ar") => api.get("/rates/wallets", { params: { country } }),
   getUsdAccounts: (country = "ar") => api.get("/rates/usd-accounts", { params: { country } }),
+  getUvaMortgages: (country = "ar") => api.get("/rates/uva-mortgages", { params: { country } }),
 };
 
 export const reposApi = {

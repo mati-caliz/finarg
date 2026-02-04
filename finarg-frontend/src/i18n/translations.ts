@@ -21,14 +21,17 @@ export const translations = {
     walletRates: "Billeteras virtuales",
     fixedTermRates: "Plazos fijos",
     usdAccounts: "Cuentas USD",
+    uvaMortgages: "Créditos UVA",
     walletTnaRates: "TNA de Billeteras Virtuales",
     fixedTermBankRates: "Plazos Fijos por Banco",
     usdAccountsRates: "Cuentas y Billeteras en USD",
+    uvaMortgagesRates: "Créditos Hipotecarios UVA",
     wallet: "Billetera",
     product: "Producto",
     conditions: "Condiciones",
     bank: "Banco",
-    highest: "mayor tasa",
+    highest: "Mayor Tasa",
+    lowest: "Menor Tasa",
     tnaValidSince: "TNA vigente desde",
     noLimit: "Sin límites",
     limitLabel: "Límite",
@@ -37,6 +40,8 @@ export const translations = {
     fixedTermRatesDisclaimer:
       "Tasas para plazos fijos en pesos. Las tasas pueden variar según el monto y el plazo. Verificá en cada banco.",
     usdAccountsDisclaimer: "Cuentas remuneradas y rendimientos en dólares.",
+    uvaMortgagesDisclaimer:
+      "Tasas de créditos hipotecarios ajustados por UVA. Las tasas son orientativas.",
     ratesDisclaimer:
       "Las tasas son indicativas y pueden cambiar. Verificá siempre en la fuente oficial antes de tomar decisiones de inversión. Esta información no constituye asesoramiento financiero.",
     ratesNotAvailableCountry:
@@ -335,6 +340,7 @@ export const translations = {
     bandsDisclaimer: "Sobre las bandas cambiarias",
     bandsDisclaimerText:
       "El sistema de bandas define los límites de intervención del Banco Central. Cuando el dólar toca el piso, el BCRA compra para sostener el precio. Cuando toca el techo, vende para frenar la suba. En la zona media, el mercado opera libremente.",
+    bandsDataUnavailable: "No se pudieron cargar los datos de las bandas cambiarias",
 
     // Gap Indicator
     gapIndicator: "Indicador de Brecha",
@@ -389,14 +395,17 @@ export const translations = {
     walletRates: "Carteiras virtuais",
     fixedTermRates: "Prazos fixos",
     usdAccounts: "Contas USD",
+    uvaMortgages: "Créditos UVA",
     walletTnaRates: "TNA de Carteiras Virtuais",
     fixedTermBankRates: "Prazos Fixos por Banco",
     usdAccountsRates: "Contas e Carteiras em USD",
+    uvaMortgagesRates: "Créditos Hipotecários UVA",
     wallet: "Carteira",
     product: "Produto",
     conditions: "Condições",
     bank: "Banco",
-    highest: "maior taxa",
+    highest: "Maior Taxa",
+    lowest: "Menor Taxa",
     tnaValidSince: "TNA vigente desde",
     noLimit: "Sem limites",
     limitLabel: "Limite",
@@ -404,6 +413,8 @@ export const translations = {
     walletRatesDisclaimer: "Taxas TNA do produto de poupança/investimento de cada carteira.",
     fixedTermRatesDisclaimer: "Taxas para prazos fixos em pesos.",
     usdAccountsDisclaimer: "Contas remuneradas e rendimentos em dólares.",
+    uvaMortgagesDisclaimer:
+      "Taxas de créditos hipotecários ajustados por UVA. As taxas são orientativas.",
     ratesDisclaimer: "As taxas são indicativas e podem mudar.",
     ratesNotAvailableCountry:
       "O comparador de taxas está disponível apenas para Argentina no momento.",
@@ -590,6 +601,7 @@ export const translations = {
     bandsDisclaimer: "Sobre as bandas cambiais",
     bandsDisclaimerText:
       "O sistema de bandas define os limites de intervenção do Banco Central. Quando o dólar toca o piso, o BCRA compra para sustentar o preço. Quando toca o teto, vende para conter a alta. Na zona média, o mercado opera livremente.",
+    bandsDataUnavailable: "Não foi possível carregar os dados das bandas cambiais",
 
     // Gap Indicator
     gapIndicator: "Indicador de Brecha",
@@ -644,14 +656,17 @@ export const translations = {
     walletRates: "Digital wallets",
     fixedTermRates: "Fixed-term deposits",
     usdAccounts: "USD Accounts",
+    uvaMortgages: "UVA Loans",
     walletTnaRates: "Wallet TNA Rates",
     fixedTermBankRates: "Fixed-Term by Bank",
     usdAccountsRates: "USD Accounts and Wallets",
+    uvaMortgagesRates: "UVA Mortgage Loans",
     wallet: "Wallet",
     product: "Product",
     conditions: "Conditions",
     bank: "Bank",
-    highest: "highest rate",
+    highest: "Highest Rate",
+    lowest: "Lowest Rate",
     tnaValidSince: "TNA valid since",
     noLimit: "No limits",
     limitLabel: "Limit",
@@ -659,6 +674,7 @@ export const translations = {
     walletRatesDisclaimer: "TNA rates for each wallet's savings/investment product.",
     fixedTermRatesDisclaimer: "Rates for fixed-term deposits in local currency.",
     usdAccountsDisclaimer: "USD remunerated accounts and yields.",
+    uvaMortgagesDisclaimer: "UVA-adjusted mortgage loan rates. Rates are indicative.",
     ratesDisclaimer: "Rates are indicative and may change.",
     ratesNotAvailableCountry: "The rates comparator is only available for Argentina at this time.",
     noWalletRates: "No wallet rate data available.",
@@ -972,6 +988,7 @@ export const translations = {
     bandsDisclaimer: "About exchange bands",
     bandsDisclaimerText:
       "The bands system defines Central Bank intervention limits. When the dollar hits the floor, the BCRA buys to support the price. When it hits the ceiling, it sells to curb the rise. In the middle zone, the market operates freely.",
+    bandsDataUnavailable: "Could not load exchange bands data",
 
     // Gap Indicator
     gapIndicator: "Gap Indicator",
