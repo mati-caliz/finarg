@@ -74,16 +74,16 @@ cp .env.example .env
 nano .env  # Editar con tus valores de producción
 
 # 2. Construir las imágenes
-docker-compose -f docker-compose.yml build
+docker-compose -f docker-compose.prod.yml build
 
 # 3. Levantar los servicios
-docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.prod.yml up -d
 
 # 4. Verificar que todo está corriendo
-docker-compose -f docker-compose.yml ps
+docker-compose -f docker-compose.prod.yml ps
 
 # 5. Ver logs
-docker-compose -f docker-compose.yml logs -f
+docker-compose -f docker-compose.prod.yml logs -f
 ```
 
 ### Opción 2: En un VPS (AWS, DigitalOcean, etc.)
@@ -101,12 +101,12 @@ nano .env
 # Pegar las variables de producción
 
 # 3. Ejecutar el deploy
-docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
 ### Configuración de Nginx (Opcional pero Recomendado)
 
-Si usas el `docker-compose.yml`, necesitas configurar Nginx:
+Si usas el `docker-compose.prod.yml`, necesitas configurar Nginx:
 
 ```bash
 # Crear directorio para la configuración
