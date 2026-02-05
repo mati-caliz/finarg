@@ -20,20 +20,31 @@ if [ -z "$JWT_SECRET" ]; then
     exit 1
 fi
 
+# Detectar si usa docker-compose o docker compose
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE="docker compose"
+else
+    echo "❌ Error: Docker Compose no está instalado"
+    echo "Instala Docker Compose: https://docs.docker.com/compose/install/"
+    exit 1
+fi
+
 echo "📦 Construyendo imágenes..."
-docker-compose -f docker-compose.prod.yml build --no-cache
+$DOCKER_COMPOSE -f docker-compose.prod.yml build --no-cache
 
 echo "🛑 Deteniendo contenedores anteriores..."
-docker-compose -f docker-compose.prod.yml down
+$DOCKER_COMPOSE -f docker-compose.prod.yml down
 
 echo "🚀 Levantando servicios..."
-docker-compose -f docker-compose.prod.yml up -d
+$DOCKER_COMPOSE -f docker-compose.prod.yml up -d
 
 echo "⏳ Esperando que los servicios estén listos..."
 sleep 10
 
 echo "✅ Verificando estado de los servicios..."
-docker-compose -f docker-compose.prod.yml ps
+$DOCKER_COMPOSE -f docker-compose.prod.yml ps
 
 echo ""
 echo "✅ Deploy completado!"
@@ -44,4 +55,4 @@ echo "  - Backend: http://localhost:8080"
 echo "  - API Docs: http://localhost:8080/swagger-ui.html"
 echo ""
 echo "📝 Ver logs:"
-echo "  docker-compose -f docker-compose.prod.yml logs -f"
+echo "  $DOCKER_COMPOSE -f docker-compose.prod.yml logs -f"
