@@ -57,6 +57,7 @@ public class SecurityConfig {
                                 "/api/v1/indicators/**",
                                 "/api/v1/country-risk/**",
                                 "/api/v1/countries",
+                                "/actuator/health",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
