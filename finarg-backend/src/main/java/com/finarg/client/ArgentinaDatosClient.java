@@ -207,7 +207,7 @@ public class ArgentinaDatosClient {
     }
 
     public List<QuoteHistory> getCurrencyHistory(String currencyCode, LocalDate from, LocalDate to) {
-        record Mapping(String moneda, CurrencyType type) {}
+        record Mapping(String moneda, CurrencyType type) { }
         Mapping m = switch (currencyCode) {
             case "eur_oficial" -> new Mapping("EUR", CurrencyType.AR_EUR_OFICIAL);
             case "brl_oficial" -> new Mapping("BRL", CurrencyType.AR_BRL_OFICIAL);

@@ -161,12 +161,16 @@ public class RatesService {
     }
 
     private static String formatFundName(String fund) {
-        if (fund == null || fund.isBlank()) return "";
+        if (fund == null || fund.isBlank()) {
+            return "";
+        }
         return fixMojibake(fund.trim()).toUpperCase();
     }
 
     private static String walletLogoUrl(String fund) {
-        if (fund == null || fund.isBlank()) return null;
+        if (fund == null || fund.isBlank()) {
+            return null;
+        }
         String domain = WALLET_DOMAINS.get(fund.toUpperCase().trim());
         if (domain != null) {
             return String.format(GOOGLE_FAVICON_API, domain);
@@ -179,12 +183,16 @@ public class RatesService {
                 .replaceAll("\\s+", "")
                 .toLowerCase()
                 .replaceAll("[^a-z0-9]", "");
-        if (baseName.isEmpty()) return null;
+        if (baseName.isEmpty()) {
+            return null;
+        }
         return String.format(GOOGLE_FAVICON_API, baseName + ".com.ar");
     }
 
     private static String bankLogoUrl(String bankName) {
-        if (bankName == null || bankName.isBlank()) return null;
+        if (bankName == null || bankName.isBlank()) {
+            return null;
+        }
         String upperName = bankName.toUpperCase().trim();
         for (Map.Entry<String, String> entry : BANK_DOMAINS.entrySet()) {
             if (upperName.contains(entry.getKey())) {
@@ -283,9 +291,15 @@ public class RatesService {
         StringBuilder sb = new StringBuilder(prefix);
         int count = 0;
         for (String w : words) {
-            if (w.isEmpty() || SKIP_WORDS.contains(w)) continue;
-            if (count >= maxWords) break;
-            if (sb.length() > prefix.length()) sb.append(" ");
+            if (w.isEmpty() || SKIP_WORDS.contains(w)) {
+                continue;
+            }
+            if (count >= maxWords) {
+                break;
+            }
+            if (sb.length() > prefix.length()) {
+                sb.append(" ");
+            }
             sb.append(w);
             count++;
         }
@@ -293,7 +307,9 @@ public class RatesService {
     }
 
     private static String fixMojibake(String s) {
-        if (s == null || s.isEmpty()) return s;
+        if (s == null || s.isEmpty()) {
+            return s;
+        }
         if (s.contains("Ã")) {
             try {
                 String decoded = new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);

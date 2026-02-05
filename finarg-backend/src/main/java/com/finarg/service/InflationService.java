@@ -101,7 +101,9 @@ public class InflationService {
         BigDecimal accumulated = BigDecimal.ONE;
         int count = 0;
         for (InflationDTO inf : inflations) {
-            if (count >= 12) break;
+            if (count >= 12) {
+                break;
+            }
             BigDecimal factor = BigDecimal.ONE.add(
                     inf.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
             );
@@ -117,7 +119,9 @@ public class InflationService {
         int currentYear = LocalDate.now().getYear();
         BigDecimal accumulated = BigDecimal.ONE;
         for (InflationDTO inf : inflations) {
-            if (inf.getDate().getYear() != currentYear) break;
+            if (inf.getDate().getYear() != currentYear) {
+                break;
+            }
             BigDecimal factor = BigDecimal.ONE.add(
                     inf.getValue().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP)
             );

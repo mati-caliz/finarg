@@ -21,7 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MdcRequestLoggingFilter extends OncePerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(MdcRequestLoggingFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MdcRequestLoggingFilter.class);
     private static final String REQUEST_ID_HEADER = "X-Request-Id";
     private static final String REQUEST_ID_MDC_KEY = "requestId";
 
@@ -54,7 +54,7 @@ public class MdcRequestLoggingFilter extends OncePerRequestFilter {
                 String path = loggingProperties.getRequest().isIncludeQueryString()
                         ? request.getRequestURI() + (request.getQueryString() != null ? "?" + request.getQueryString() : "")
                         : request.getRequestURI();
-                log.info("{} {} {} {}ms", request.getMethod(), path, wrappedResponse.getCapturedStatus(), duration);
+                LOG.info("{} {} {} {}ms", request.getMethod(), path, wrappedResponse.getCapturedStatus(), duration);
             }
             MDC.remove(REQUEST_ID_MDC_KEY);
         }

@@ -100,7 +100,9 @@ public class GovernmentsService {
                 String start = getStringValue(binding, "start");
                 String end = getStringValue(binding, "end");
 
-                if (label == null || start == null) continue;
+                if (label == null || start == null) {
+                    continue;
+                }
 
                 String startDate = start.substring(0, Math.min(10, start.length()));
                 String endDate = end != null && end.length() >= 10
@@ -128,7 +130,9 @@ public class GovernmentsService {
 
     private String getStringValue(JsonNode binding, String key) {
         JsonNode node = binding.path(key);
-        if (node.isMissingNode()) return null;
+        if (node.isMissingNode()) {
+            return null;
+        }
         JsonNode value = node.path("value");
         return value.isMissingNode() ? null : value.asText();
     }
@@ -150,7 +154,9 @@ public class GovernmentsService {
     }
 
     private String shortenLabel(String fullLabel) {
-        if (fullLabel == null) return "?";
+        if (fullLabel == null) {
+            return "?";
+        }
         return fullLabel
                 .replace(" (Presidente de Argentina)", "")
                 .replace(" (President of Argentina)", "")
