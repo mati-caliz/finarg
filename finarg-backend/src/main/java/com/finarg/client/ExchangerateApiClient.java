@@ -31,6 +31,7 @@ public class ExchangerateApiClient {
             if (response != null && response.getRates() != null && "success".equals(response.getResult())) {
                 return Optional.of(response.getRates());
             }
+
             return Optional.empty();
         } catch (Exception e) {
             log.error("Error fetching rates from Exchangerate API: {}", e.getMessage());
