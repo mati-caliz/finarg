@@ -46,7 +46,7 @@ public class BcraClient {
             List<BcraDataPoint> data = webClient.get()
                     .uri(path)
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<BcraDataPoint>>() {})
+                    .bodyToMono(new ParameterizedTypeReference<List<BcraDataPoint>>() { })
                     .block();
 
             if (data == null || data.isEmpty()) {
@@ -66,7 +66,7 @@ public class BcraClient {
             List<BcraDataPoint> data = webClient.get()
                     .uri(path)
                     .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<BcraDataPoint>>() {})
+                    .bodyToMono(new ParameterizedTypeReference<List<BcraDataPoint>>() { })
                     .block();
 
             if (data == null || data.isEmpty()) {
