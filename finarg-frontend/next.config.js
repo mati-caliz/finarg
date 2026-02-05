@@ -34,6 +34,7 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   transpilePackages: ["lucide-react"],
   images: {
     domains: ["www.bcra.gob.ar"],
