@@ -74,16 +74,16 @@ cp .env.example .env
 nano .env  # Editar con tus valores de producción
 
 # 2. Construir las imágenes
-docker-compose -f docker-compose.prod.yml build
+docker-compose -f docker-compose.yml build
 
 # 3. Levantar los servicios
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml up -d
 
 # 4. Verificar que todo está corriendo
-docker-compose -f docker-compose.prod.yml ps
+docker-compose -f docker-compose.yml ps
 
 # 5. Ver logs
-docker-compose -f docker-compose.prod.yml logs -f
+docker-compose -f docker-compose.yml logs -f
 ```
 
 ### Opción 2: En un VPS (AWS, DigitalOcean, etc.)
@@ -101,12 +101,12 @@ nano .env
 # Pegar las variables de producción
 
 # 3. Ejecutar el deploy
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml up -d
 ```
 
 ### Configuración de Nginx (Opcional pero Recomendado)
 
-Si usas el `docker-compose.prod.yml`, necesitas configurar Nginx:
+Si usas el `docker-compose.yml`, necesitas configurar Nginx:
 
 ```bash
 # Crear directorio para la configuración
@@ -191,15 +191,15 @@ Para producción, es recomendable usar herramientas de migración como Flyway o 
 ### Ver logs en tiempo real
 
 ```bash
-docker-compose -f docker-compose.prod.yml logs -f backend
-docker-compose -f docker-compose.prod.yml logs -f frontend
+docker-compose -f docker-compose.yml logs -f backend
+docker-compose -f docker-compose.yml logs -f frontend
 ```
 
 ### Reiniciar un servicio
 
 ```bash
-docker-compose -f docker-compose.prod.yml restart backend
-docker-compose -f docker-compose.prod.yml restart frontend
+docker-compose -f docker-compose.yml restart backend
+docker-compose -f docker-compose.yml restart frontend
 ```
 
 ### Backup de la base de datos
@@ -222,7 +222,7 @@ git pull origin main
 docker-compose -f docker-compose.prod.yml build
 
 # 3. Reiniciar con los nuevos contenedores
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.yml up -d
 ```
 
 ## Troubleshooting
@@ -231,10 +231,10 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ```bash
 # Verificar que postgres esté corriendo
-docker-compose -f docker-compose.prod.yml ps postgres
+docker-compose -f docker-compose.yml ps postgres
 
 # Ver logs de postgres
-docker-compose -f docker-compose.prod.yml logs postgres
+docker-compose -f docker-compose.yml logs postgres
 
 # Verificar la conexión
 docker exec -it finarg-postgres-prod psql -U finarg_prod -d finarg_prod
@@ -244,7 +244,7 @@ docker exec -it finarg-postgres-prod psql -U finarg_prod -d finarg_prod
 
 ```bash
 # Verificar la variable NEXT_PUBLIC_API_URL
-docker-compose -f docker-compose.prod.yml exec frontend printenv | grep NEXT_PUBLIC_API_URL
+docker-compose -f docker-compose.yml exec frontend printenv | grep NEXT_PUBLIC_API_URL
 
 # Debe apuntar a tu dominio público, no a localhost
 ```
@@ -252,7 +252,7 @@ docker-compose -f docker-compose.prod.yml exec frontend printenv | grep NEXT_PUB
 ### Memoria insuficiente
 
 ```bash
-# Ajustar JAVA_OPTS en docker-compose.prod.yml
+# Ajustar JAVA_OPTS en docker-compose.yml
 JAVA_OPTS: "-Xmx512m -Xms256m"  # Para servidores con menos RAM
 ```
 
