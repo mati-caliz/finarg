@@ -3,81 +3,67 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: finarg-postgres
+    container_name: finarg-postgres-prod
     environment:
-      POSTGRES_DB: ${DB_NAME:-finarg}
-      POSTGRES_USER: ${DB_USERNAME:-finarg}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-finarg123}
-    ports:
-      - "${DB_PORT:-5432}:5432"
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - finarg-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finarg}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+    restart: always
 
   redis:
     image: redis:7-alpine
-    container_name: finarg-redis
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
+    container_name: finarg-redis-prod
     volumes:
       - redis_data:/data
     networks:
       - finarg-network
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
+    restart: always
 
   backend:
     build:
       context: ./finarg-backend
       dockerfile: Dockerfile
-    container_name: finarg-backend
+    container_name: finarg-backend-prod
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     environment:
-      # Database
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-finarg}
-      DB_USERNAME: ${DB_USERNAME:-finarg}
-      DB_PASSWORD: ${DB_PASSWORD:-finarg123}
-      # Hibernate
-      HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-update}
-      HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL:-false}
-      # Redis
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      HIBERNATE_DDL_AUTO: validate
+      HIBERNATE_SHOW_SQL: false
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      # JWT
       JWT_SECRET: ${JWT_SECRET}
-      # Mail
-      MAIL_USERNAME: ${MAIL_USERNAME:-}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
-      # Google OAuth
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      # Logging
-      LOG_LEVEL_ROOT: ${LOG_LEVEL_ROOT:-INFO}
-      LOG_LEVEL_APP: ${LOG_LEVEL_APP:-DEBUG}
-      # Java options
-      JAVA_OPTS: ${JAVA_OPTS:--Xmx512m -Xms256m}
-    ports:
-      - "8080:8080"
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      LOG_LEVEL_ROOT: INFO
+      LOG_LEVEL_APP: INFO
+      JAVA_OPTS: "-Xmx1024m -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
     networks:
       - finarg-network
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
       interval: 30s
@@ -89,18 +75,32 @@ services:
     build:
       context: ./finarg-frontend
       dockerfile: Dockerfile
-    container_name: finarg-frontend
+    container_name: finarg-frontend-prod
     depends_on:
       backend:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
-      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-    ports:
-      - "3000:3000"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
     networks:
       - finarg-network
-    restart: unless-stopped
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    container_name: finarg-nginx
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - finarg-network
+    restart: always
 
 volumes:
   postgres_data:

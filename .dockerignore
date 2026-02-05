@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+
+# Environment
+.env
+.env.*
+
+# IDE
+.idea
+.vscode
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
