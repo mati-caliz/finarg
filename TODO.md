@@ -1,8 +1,12 @@
 # TODO FinArg
 
-## En Progreso
+## MVP
 
-- [ ] **Revisar UX en otras resoluciones y en mobile**: Probar y ajustar la experiencia de usuario en diferentes tamaños de pantalla (tablet, mobile) y resoluciones.
+- [ ] **Calculadora de Interés Compuesto**: Herramienta para calcular rendimientos con reinversión de intereses.
+
+- [ ] **Optimización**: Pedirle a opus que optimice toda la app y elimine duplicados.
+
+## Post MVP
 
 - [ ] **Agregar funcionalidades para otros países**: Expandir features y datos para los países ya soportados (Colombia, Brasil, Chile, Uruguay) y evaluar nuevos mercados.
 
@@ -10,17 +14,11 @@
 
 - [ ] **Reservas netas sin APIs externas**: Implementar una forma de obtener solo los datos hardcodeados de reservas netas (sin overrides de APIs externas). *(ReservesService.java)*
 
-## Calculadoras y Herramientas
-
-- [ ] **Calculadora de Interés Compuesto**: Herramienta para calcular rendimientos con reinversión de intereses.
-
 - [ ] **Conversor de Monedas en Tiempo Real**: Conversión entre múltiples monedas con tasas actualizadas.
 
 - [ ] **Calculadora de Poder de Compra Histórico**: Ver cuánto valía una suma de dinero en el pasado vs hoy.
 
 - [ ] **Optimización de Impuestos**: Calculadora para planificación fiscal y deducciones.
-
-## Simuladores e Indicadores
 
 - [ ] **Simulador de Inversiones en el Tiempo**: Proyección de carteras con diferentes instrumentos.
 
@@ -32,8 +30,6 @@
 
 - [ ] **Índice de Paridad de Poder Adquisitivo Regional**: Comparación del costo de vida entre regiones.
 
-## Datos Económicos y Análisis
-
 - [ ] **Calendario Económico**: Fechas importantes (inflación, tasas, PBI, etc.).
 
 - [ ] **Salarios Promedios**: Estadísticas de salarios por sector/profesión.
@@ -44,18 +40,17 @@
 
 - [ ] **Tablero de Reservas vs Base Monetaria**: Relación entre reservas del BCRA y emisión monetaria.
 
-## Funcionalidades Avanzadas
-
 - [ ] **IA Predictora de Inflación**: Modelo de ML para predecir la inflación del mes actual basado en datos históricos.
 
 - [ ] **Alertas Personalizadas**: Sistema de notificaciones cuando se cumplen condiciones (ej: dólar > X, brecha > Y%).
 
 - [ ] **API Pública/Privada Monetizable**: Endpoints para terceros con diferentes tiers de acceso (free/premium).
 
-## Prioridad Baja
-
 - [ ] **Temas y personalización**: Permitir más opciones de customización visual.
 
 - [ ] **Sistema de usuarios**: Registro, login, portfolios personalizados.
 
 - [ ] **Dashboard personalizable**: Widgets arrastrables y configurables.
+
+- [ ] **Módulo de inversiones inmobiliaras**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
+

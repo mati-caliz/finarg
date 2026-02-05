@@ -47,7 +47,3 @@ export function useGap(country?: CountryCode) {
     refetchInterval: 180000,
   });
 }
-
-export const useCotizaciones = useQuotes;
-export const useCotizacion = useQuote;
-export const useBrecha = useGap;

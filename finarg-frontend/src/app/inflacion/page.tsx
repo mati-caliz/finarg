@@ -116,29 +116,6 @@ export default function InflationPage() {
     return `${months} ${translate("months")}`;
   };
 
-  const getGovernmentForDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    for (let i = governments.length - 1; i >= 0; i--) {
-      const gov = governments[i];
-      if (gov && date >= new Date(gov.startDate) && date < new Date(gov.endDate)) {
-        return gov;
-      }
-    }
-    return governments[0];
-  };
-
-  const getBarColorByGovernment = (inflationData: Inflation[]) => {
-    const reversedData = [...inflationData].reverse();
-    return (_entry: Record<string, string | number>, index: number) => {
-      const dataPoint = reversedData[index];
-      if (!dataPoint) {
-        return "#10b981";
-      }
-      const gov = getGovernmentForDate(dataPoint.date);
-      return gov?.color || "#10b981";
-    };
-  };
-
   const getVisibleGovernments = (inflationData: Inflation[]) => {
     if (!inflationData || inflationData.length === 0) {
       return [];
@@ -347,9 +324,7 @@ export default function InflationPage() {
           <Card className="bg-card">
             <CardHeader>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">
-                  {translate("monthlyEvolution")} ({getChartPeriodLabel(chartMonthsLimit)})
-                </CardTitle>
+                <CardTitle className="text-lg">{translate("monthlyEvolution")}</CardTitle>
                 <div className="flex flex-wrap gap-2">
                   {chartPeriods.map((p) => (
                     <Button
@@ -366,30 +341,83 @@ export default function InflationPage() {
             </CardHeader>
             <CardContent>
               {monthlyInflation && monthlyInflation.length > 0 ? (
-                <>
-                  <BarChart
-                    data={[...monthlyInflation].reverse().map((i) => ({
-                      fecha: formatDate(i.date),
-                      valor: i.value,
-                    }))}
-                    xKey="fecha"
-                    yKey="valor"
-                    height={250}
-                    formatY={(v) => `${Number(v).toFixed(1)}%`}
-                    getBarColor={getBarColorByGovernment(monthlyInflation)}
-                  />
-                  <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                    {getVisibleGovernments(monthlyInflation).map((gov) => (
-                      <div key={gov.label} className="flex items-center gap-1.5">
-                        <div
-                          className="w-3 h-3 rounded-sm"
-                          style={{ backgroundColor: gov.color }}
-                        />
-                        <span className="text-xs text-muted-foreground">{gov.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                (() => {
+                  const reversedData = [...monthlyInflation].reverse();
+                  const chartData = reversedData.map((i) => ({
+                    fecha: formatDate(i.date),
+                    fechaOriginal: i.date,
+                    valor: i.value,
+                  }));
+
+                  const firstDataDate = new Date(reversedData[0]?.date || "");
+                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
+
+                  const referenceAreas = governments
+                    .filter((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+                      return govStart <= lastDataDate && govEnd >= firstDataDate;
+                    })
+                    .map((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+
+                      let x1 = chartData[0]?.fecha;
+                      let x2 = chartData[chartData.length - 1]?.fecha;
+
+                      for (let i = 0; i < chartData.length; i++) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date >= govStart) {
+                          x1 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      for (let i = chartData.length - 1; i >= 0; i--) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date <= govEnd) {
+                          x2 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      return {
+                        x1,
+                        x2,
+                        fill: gov.color,
+                        label: gov.label,
+                      };
+                    });
+
+                  const visibleGovs = getVisibleGovernments(monthlyInflation);
+
+                  return (
+                    <>
+                      <BarChart
+                        data={chartData}
+                        xKey="fecha"
+                        yKey="valor"
+                        height={250}
+                        formatY={(v) => `${Number(v).toFixed(1)}%`}
+                        color="#10b981"
+                        referenceAreas={referenceAreas}
+                      />
+                      {visibleGovs.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                          {visibleGovs.map((gov) => (
+                            <div key={gov.label} className="flex items-center gap-1.5">
+                              <div
+                                className="w-3 h-3 rounded-sm"
+                                style={{ backgroundColor: gov.color }}
+                              />
+                              <span className="text-xs text-muted-foreground">{gov.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
               ) : (
                 <div className="h-[250px] flex items-center justify-center text-gray-500">
                   Loading data...
@@ -422,30 +450,79 @@ export default function InflationPage() {
               {monthlyInflation && monthlyInflation.length > 0 ? (
                 (() => {
                   const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
+                  const reversedData = [...filteredData].reverse();
+                  const chartData = reversedData.map((i) => ({
+                    fecha: formatDate(i.date),
+                    fechaOriginal: i.date,
+                    valor: i.yearOverYear as number,
+                  }));
+
+                  const firstDataDate = new Date(reversedData[0]?.date || "");
+                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
+
+                  const referenceAreas = governments
+                    .filter((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+                      return govStart <= lastDataDate && govEnd >= firstDataDate;
+                    })
+                    .map((gov) => {
+                      const govStart = new Date(gov.startDate);
+                      const govEnd = new Date(gov.endDate);
+
+                      let x1 = chartData[0]?.fecha;
+                      let x2 = chartData[chartData.length - 1]?.fecha;
+
+                      for (let i = 0; i < chartData.length; i++) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date >= govStart) {
+                          x1 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      for (let i = chartData.length - 1; i >= 0; i--) {
+                        const date = new Date(chartData[i].fechaOriginal);
+                        if (date <= govEnd) {
+                          x2 = chartData[i].fecha;
+                          break;
+                        }
+                      }
+
+                      return {
+                        x1,
+                        x2,
+                        fill: gov.color,
+                        label: gov.label,
+                      };
+                    });
+
+                  const visibleGovs = getVisibleGovernments(filteredData);
+
                   return (
                     <>
                       <BarChart
-                        data={[...filteredData].reverse().map((i) => ({
-                          fecha: formatDate(i.date),
-                          valor: i.yearOverYear as number,
-                        }))}
+                        data={chartData}
                         xKey="fecha"
                         yKey="valor"
                         height={250}
                         formatY={(v) => `${Number(v).toFixed(1)}%`}
-                        getBarColor={getBarColorByGovernment(filteredData)}
+                        color="#ef4444"
+                        referenceAreas={referenceAreas}
                       />
-                      <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                        {getVisibleGovernments(filteredData).map((gov) => (
-                          <div key={gov.label} className="flex items-center gap-1.5">
-                            <div
-                              className="w-3 h-3 rounded-sm"
-                              style={{ backgroundColor: gov.color }}
-                            />
-                            <span className="text-xs text-muted-foreground">{gov.label}</span>
-                          </div>
-                        ))}
-                      </div>
+                      {visibleGovs.length > 0 && (
+                        <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                          {visibleGovs.map((gov) => (
+                            <div key={gov.label} className="flex items-center gap-1.5">
+                              <div
+                                className="w-3 h-3 rounded-sm"
+                                style={{ backgroundColor: gov.color }}
+                              />
+                              <span className="text-xs text-muted-foreground">{gov.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </>
                   );
                 })()

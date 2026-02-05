@@ -42,6 +42,13 @@ public class RatesController {
         return ResponseEntity.ok(ratesService.getUsdAccountRates(c));
     }
 
+    @GetMapping("/uva-mortgages")
+    @Operation(summary = "Get UVA mortgage loan rates")
+    public ResponseEntity<List<RateDTO>> getUvaMortgageRates() {
+        Country c = mapCountry();
+        return ResponseEntity.ok(ratesService.getUvaMortgageRates(c));
+    }
+
     private static Country mapCountry() {
         return Country.ARGENTINA;
     }
