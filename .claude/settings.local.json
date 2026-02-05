@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude config set:*)",
+      "Bash(npm run lint)",
+      "Bash(mvn clean:*)",
+      "Bash(curl:*)",
+      "Bash(where:*)",
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(wmic:*)",
+      "WebFetch(domain:www.infobae.com)",
+      "WebFetch(domain:www.bcra.gob.ar)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(timeout:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)"
+    ]
+  }
+}

@@ -154,6 +154,43 @@ public class ArgentinaDatosClient {
         }
     }
 
+    public List<UvaMortgageResponse> getUvaMortgages() {
+        try {
+            List<UvaMortgageResponse> responses = webClient.get()
+                    .uri("/finanzas/creditos/hipotecariosUva/")
+                    .retrieve()
+                    .bodyToFlux(UvaMortgageResponse.class)
+                    .collectList()
+                    .block();
+
+            return responses != null ? responses : List.of();
+        } catch (Exception e) {
+            log.error("Error fetching UVA mortgages: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    public CountryRiskResponse getLatestCountryRisk() {
+        try {
+            log.debug("Fetching latest country risk from ArgentinaDatos API");
+
+            CountryRiskResponse response = webClient.get()
+                    .uri("/finanzas/indices/riesgo-pais/ultimo")
+                    .retrieve()
+                    .bodyToMono(CountryRiskResponse.class)
+                    .block();
+
+            if (response != null) {
+                log.info("Latest country risk: {} points on {}", response.getValue(), response.getDate());
+            }
+
+            return response;
+        } catch (Exception e) {
+            log.error("Error fetching country risk from ArgentinaDatos: {}", e.getMessage());
+            return null;
+        }
+    }
+
     private InflationDTO mapToInflationDTO(InflationResponse response) {
         return InflationDTO.builder()
                 .date(LocalDate.parse(response.getDate()))
@@ -331,32 +368,46 @@ public class ArgentinaDatosClient {
     public static class UsdAccountResponse {
         @JsonProperty("entidad")
         private String entity;
-        @JsonProperty("tna")
-        private BigDecimal tna;
-        @JsonProperty("tea")
-        private BigDecimal tea;
+        @JsonProperty("tasa")
+        private BigDecimal tasa;
         @JsonProperty("tope")
         private BigDecimal limit;
-        @JsonProperty("fecha")
-        private String date;
-        @JsonProperty("condiciones")
-        private String conditions;
     }
 
     @Data
     public static class YieldResponse {
         @JsonProperty("entidad")
         private String entity;
-        @JsonProperty("tna")
-        private BigDecimal tna;
-        @JsonProperty("tea")
-        private BigDecimal tea;
-        @JsonProperty("tope")
-        private BigDecimal limit;
+        @JsonProperty("rendimientos")
+        private List<YieldDetail> rendimientos;
+    }
+
+    @Data
+    public static class YieldDetail {
+        @JsonProperty("moneda")
+        private String currency;
+        @JsonProperty("apy")
+        private BigDecimal apy;
         @JsonProperty("fecha")
         private String date;
-        @JsonProperty("producto")
-        private String product;
+    }
+
+    @Data
+    public static class UvaMortgageResponse {
+        @JsonProperty("entidad")
+        private String entity;
+        @JsonProperty("nombreComercial")
+        private String commercialName;
+        @JsonProperty("tna")
+        private BigDecimal tna;
+    }
+
+    @Data
+    public static class CountryRiskResponse {
+        @JsonProperty("fecha")
+        private String date;
+        @JsonProperty("valor")
+        private BigDecimal value;
     }
 
 }

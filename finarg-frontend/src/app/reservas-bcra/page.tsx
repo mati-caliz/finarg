@@ -48,6 +48,17 @@ export default function ReservesPage() {
     staleTime: 0,
   });
 
+  const { data: governments = [] } = useQuery({
+    queryKey: ["reserves-governments", "ar"],
+    queryFn: async () => {
+      const response = await reservesApi.getGovernments("ar");
+      return (
+        (response.data as { startDate: string; endDate: string; label: string; color: string }[]) ??
+        []
+      );
+    },
+  });
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
@@ -77,6 +88,21 @@ export default function ReservesPage() {
       default:
         return "text-muted-foreground";
     }
+  };
+
+  const getVisibleGovernments = (historicalData: { fecha: string; valor: number }[]) => {
+    if (!historicalData || historicalData.length === 0) {
+      return [];
+    }
+    const reversedData = [...historicalData].reverse();
+    const firstDate = new Date(reversedData[0]?.fecha || "");
+    const lastDate = new Date(reversedData[reversedData.length - 1]?.fecha || "");
+
+    return governments.filter((gov) => {
+      const govStart = new Date(gov.startDate);
+      const govEnd = new Date(gov.endDate);
+      return govStart <= lastDate && govEnd >= firstDate;
+    });
   };
 
   return (
@@ -339,30 +365,90 @@ export default function ReservesPage() {
             </div>
           ) : historicalReserves && historicalReserves.length > 0 ? (
             (() => {
-              const chartData = [...historicalReserves]
-                .reverse()
-                .map((r: { fecha: string; valor: number }) => ({
-                  fecha: formatDate(r.fecha),
-                  valor: Number(r.valor),
-                }));
+              const reversedRaw = [...historicalReserves].reverse();
+              const chartData = reversedRaw.map((r: { fecha: string; valor: number }, idx) => ({
+                index: idx,
+                fecha: formatDate(r.fecha),
+                fechaOriginal: r.fecha,
+                valor: Number(r.valor),
+              }));
               const values = chartData.map((d) => d.valor);
               const minVal = Math.min(...values);
               const maxVal = Math.max(...values);
               const padding = Math.max((maxVal - minVal) * 0.05, 500);
-              return (
-                <AreaChart
-                  data={chartData}
-                  xKey="fecha"
-                  yKey="valor"
-                  color="#10b981"
-                  height={300}
-                  formatY={(v) => `${Number(v).toLocaleString("es-AR")} M`}
-                  gradientId="reservesGradient"
-                  yDomain={[Math.floor(minVal - padding), Math.ceil(maxVal + padding)]}
-                  xAxisInterval={
-                    chartData.length > 20 ? Math.max(1, Math.floor(chartData.length / 12)) : 0
+
+              const firstDataDate = new Date(reversedRaw[0]?.fecha || "");
+              const lastDataDate = new Date(reversedRaw[reversedRaw.length - 1]?.fecha || "");
+
+              const referenceAreas = governments
+                .filter((gov) => {
+                  const govStart = new Date(gov.startDate);
+                  const govEnd = new Date(gov.endDate);
+                  return govStart <= lastDataDate && govEnd >= firstDataDate;
+                })
+                .map((gov) => {
+                  const govStart = new Date(gov.startDate);
+                  const govEnd = new Date(gov.endDate);
+
+                  let x1 = chartData[0]?.fecha;
+                  let x2 = chartData[chartData.length - 1]?.fecha;
+
+                  for (let i = 0; i < chartData.length; i++) {
+                    const date = new Date(chartData[i].fechaOriginal);
+                    if (date >= govStart) {
+                      x1 = chartData[i].fecha;
+                      break;
+                    }
                   }
-                />
+
+                  for (let i = chartData.length - 1; i >= 0; i--) {
+                    const date = new Date(chartData[i].fechaOriginal);
+                    if (date <= govEnd) {
+                      x2 = chartData[i].fecha;
+                      break;
+                    }
+                  }
+
+                  return {
+                    x1,
+                    x2,
+                    fill: gov.color,
+                    label: gov.label,
+                  };
+                });
+
+              const visibleGovs = getVisibleGovernments(historicalReserves);
+
+              return (
+                <>
+                  <AreaChart
+                    data={chartData}
+                    xKey="fecha"
+                    yKey="valor"
+                    color="#10b981"
+                    height={300}
+                    formatY={(v) => `${Number(v).toLocaleString("es-AR")} M`}
+                    gradientId="reservesGradient"
+                    yDomain={[Math.floor(minVal - padding), Math.ceil(maxVal + padding)]}
+                    xAxisInterval={
+                      chartData.length > 20 ? Math.max(1, Math.floor(chartData.length / 12)) : 0
+                    }
+                    referenceAreas={referenceAreas}
+                  />
+                  {visibleGovs.length > 0 && (
+                    <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                      {visibleGovs.map((gov) => (
+                        <div key={gov.label} className="flex items-center gap-1.5">
+                          <div
+                            className="w-3 h-3 rounded-sm"
+                            style={{ backgroundColor: gov.color }}
+                          />
+                          <span className="text-xs text-muted-foreground">{gov.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               );
             })()
           ) : (

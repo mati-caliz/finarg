@@ -36,7 +36,3 @@ export function useAdjustInflation() {
     },
   });
 }
-
-export const useInflacionActual = useCurrentInflation;
-export const useInflacionMensual = useMonthlyInflation;
-export const useAjustarInflacion = useAdjustInflation;

@@ -59,6 +59,7 @@ export const inflationApi = {
 export const reservesApi = {
   getCurrent: (country = "ar") => api.get("/reserves", { params: { country } }),
   getHistory: (days = 30) => api.get("/reserves/history", { params: { days } }),
+  getGovernments: (country = "ar") => api.get("/reserves/governments", { params: { country } }),
 };
 
 export const incomeTaxApi = {
@@ -73,10 +74,15 @@ export const indicatorsApi = {
   getSocial: (country = "ar") => api.get("/indicators/social", { params: { country } }),
 };
 
+export const countryRiskApi = {
+  getCurrent: () => api.get("/country-risk"),
+};
+
 export const ratesApi = {
   getFixedTerm: (country = "ar") => api.get("/rates/fixed-term", { params: { country } }),
   getWallets: (country = "ar") => api.get("/rates/wallets", { params: { country } }),
   getUsdAccounts: (country = "ar") => api.get("/rates/usd-accounts", { params: { country } }),
+  getUvaMortgages: (country = "ar") => api.get("/rates/uva-mortgages", { params: { country } }),
 };
 
 export const reposApi = {
@@ -91,8 +97,3 @@ export const authApi = {
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
   refresh: (refreshToken: string) => api.post("/auth/refresh", refreshToken),
 };
-
-export const cotizacionesApi = quotesApi;
-export const inflacionApi = inflationApi;
-export const gananciasApi = incomeTaxApi;
-export const caucionesApi = reposApi;

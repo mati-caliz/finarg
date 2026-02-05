@@ -81,6 +81,3 @@ export function GapGauge({ gap }: GapGaugeProps) {
     </Card>
   );
 }
-
-export { GapGauge as BrechaGauge };
-export type { GapGaugeProps as BrechaGaugeProps };

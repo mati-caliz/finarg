@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,20 +36,20 @@ public class QuoteService {
     public List<QuoteDTO> getAllQuotes(Country country) {
         log.info("Fetching all quotes for country: {}", country);
         QuoteClient client = quoteClientFactory.getClient(country);
-        return client.getAllQuotes();
+        List<QuoteDTO> quotes = client.getAllQuotes();
+        return enrichQuotesWithVariation(quotes);
     }
 
     @Cacheable(value = "quotes", key = "#country.code + '_' + #type.code")
     public QuoteDTO getQuote(Country country, CurrencyType type) {
         log.info("Fetching quote for country: {}, type: {}", country, type);
         QuoteClient client = quoteClientFactory.getClient(country);
-        return client.getQuote(type);
-    }
-
-    public Map<CurrencyType, QuoteDTO> getQuotesMap(Country country) {
-        QuoteClient client = quoteClientFactory.getClient(country);
-        return client.getAllQuotes().stream()
-                .collect(Collectors.toMap(QuoteDTO::getType, q -> q, (a, b) -> a));
+        QuoteDTO quote = client.getQuote(type);
+        if (quote != null) {
+            BigDecimal variation = calculateVariation(quote.getType(), quote.getSell());
+            quote.setVariation(variation);
+        }
+        return quote;
     }
 
     @Cacheable(value = "quotes", key = "'gap_' + #country.code")
@@ -162,5 +162,38 @@ public class QuoteService {
     @CacheEvict(value = "quotes", allEntries = true)
     public void refreshCache() {
         log.info("Quotes cache cleared");
+    }
+
+    private List<QuoteDTO> enrichQuotesWithVariation(List<QuoteDTO> quotes) {
+        return quotes.stream()
+                .peek(quote -> {
+                    BigDecimal variation = calculateVariation(quote.getType(), quote.getSell());
+                    quote.setVariation(variation);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private BigDecimal calculateVariation(CurrencyType type, BigDecimal currentSell) {
+        if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        LocalDate today = LocalDate.now();
+        Optional<QuoteHistory> previousQuote = quoteHistoryRepository.findLatestByTypeBeforeDate(type, today);
+
+        if (previousQuote.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal previousSell = previousQuote.get().getSell();
+        if (previousSell.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal difference = currentSell.subtract(previousSell);
+        BigDecimal variation = difference.divide(previousSell, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+
+        return variation.setScale(2, RoundingMode.HALF_UP);
     }
 }

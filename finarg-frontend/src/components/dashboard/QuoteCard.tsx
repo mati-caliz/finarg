@@ -26,6 +26,17 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
   const translated = translate(quote.type as TranslationKey);
   const displayName = translated === quote.type ? quote.name : translated;
 
+  const isDollarQuote =
+    quote.type.includes("OFFICIAL") ||
+    quote.type.includes("BLUE") ||
+    quote.type.includes("MEP") ||
+    quote.type.includes("CCL") ||
+    quote.type.includes("WHOLESALE") ||
+    quote.type.includes("MAYORISTA") ||
+    quote.type.includes("CARD") ||
+    quote.type.includes("TARJETA") ||
+    quote.type.includes("CRYPTO");
+
   return (
     <Card className="hover:border-primary/50 transition-colors">
       <CardHeader className="pb-2">
@@ -39,20 +50,26 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
               {translate("buy")}: {formatCurrencySimple(quote.buy, countryToUse)}
             </p>
           </div>
-          <div
-            className={`flex items-center gap-1 text-sm ${
-              isPositive ? "text-green-500" : isNegative ? "text-red-500" : "text-muted-foreground"
-            }`}
-          >
-            {isPositive ? (
-              <TrendingUp className="h-4 w-4" />
-            ) : isNegative ? (
-              <TrendingDown className="h-4 w-4" />
-            ) : (
-              <Minus className="h-4 w-4" />
-            )}
-            <span>{variation.toFixed(2)}%</span>
-          </div>
+          {isDollarQuote && (
+            <div
+              className={`flex items-center gap-1 text-sm ${
+                isPositive
+                  ? "text-green-500"
+                  : isNegative
+                    ? "text-red-500"
+                    : "text-muted-foreground"
+              }`}
+            >
+              {isPositive ? (
+                <TrendingUp className="h-4 w-4" />
+              ) : isNegative ? (
+                <TrendingDown className="h-4 w-4" />
+              ) : (
+                <Minus className="h-4 w-4" />
+              )}
+              <span>{variation.toFixed(2)}%</span>
+            </div>
+          )}
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
           {translate("spread")}: {formatCurrencySimple(quote.spread, countryToUse)}

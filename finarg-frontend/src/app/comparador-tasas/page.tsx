@@ -9,12 +9,12 @@ import type { TranslationKey } from "@/i18n/translations";
 import { ratesApi } from "@/lib/api";
 import { useAppStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, ExternalLink, Landmark, Wallet } from "lucide-react";
+import { AlertCircle, ExternalLink, Home, Landmark, Wallet } from "lucide-react";
 import { type ElementType, useState } from "react"; // Added ElementType import
 
 // --- Types & Constants ---
 
-type TabType = "wallets" | "banks" | "usdAccounts";
+type TabType = "wallets" | "banks" | "usdAccounts" | "uvaMortgages";
 
 interface RateDTO {
   id: string;
@@ -48,6 +48,35 @@ const WALLET_DOMAINS: Record<string, string> = {
   Fiwind: "fiwind.io",
 };
 
+const BANK_DOMAINS: Record<string, string> = {
+  ASTROPAY: "astropay.com",
+  LETSBIT: "letsbit.io",
+  BNA: "bna.com.ar",
+  "Banco Nación": "bna.com.ar",
+  "Banco de la Nación": "bna.com.ar",
+  GALICIA: "bancogalicia.com",
+  "Banco Galicia": "bancogalicia.com",
+  SUPERVIELLE: "supervielle.com.ar",
+  "Banco Supervielle": "supervielle.com.ar",
+  BBVA: "bbva.com.ar",
+  ICBC: "icbc.com.ar",
+  Santander: "santander.com.ar",
+  "Banco Santander": "santander.com.ar",
+  HSBC: "hsbc.com.ar",
+  Macro: "macro.com.ar",
+  "Banco Macro": "macro.com.ar",
+  "Banco Ciudad": "bancociudad.com.ar",
+  "Ciudad de Buenos Aires": "bancociudad.com.ar",
+  Patagonia: "bancopatagonia.com.ar",
+  "Banco Patagonia": "bancopatagonia.com.ar",
+  Comafi: "comafi.com.ar",
+  "Banco Comafi": "comafi.com.ar",
+  Itaú: "itau.com.ar",
+  "Banco Itaú": "itau.com.ar",
+  Credicoop: "bancocredicoop.coop",
+  "Banco Credicoop": "bancocredicoop.coop",
+};
+
 // --- Helper Functions ---
 
 function extractDomainFromFaviconUrl(url: string): string | null {
@@ -69,13 +98,22 @@ function getFallbackLogoUrl(domain: string): string {
 }
 
 function getLogoUrl(row: RateDTO): string {
-  const knownDomain = Object.entries(WALLET_DOMAINS).find(([key]) =>
+  const walletDomain = Object.entries(WALLET_DOMAINS).find(([key]) =>
     row.name.toLowerCase().includes(key.toLowerCase()),
   )?.[1];
 
-  if (knownDomain) {
-    return `https://www.google.com/s2/favicons?domain=${knownDomain}&sz=128`;
+  if (walletDomain) {
+    return `https://www.google.com/s2/favicons?domain=${walletDomain}&sz=128`;
   }
+
+  const bankDomain = Object.entries(BANK_DOMAINS).find(([key]) =>
+    row.name.toLowerCase().includes(key.toLowerCase()),
+  )?.[1];
+
+  if (bankDomain) {
+    return `https://www.google.com/s2/favicons?domain=${bankDomain}&sz=128`;
+  }
+
   return row.logo || "";
 }
 
@@ -112,7 +150,7 @@ interface RateSectionProps {
   refetch: () => void;
   emptyMessage: string;
   maxTna: number;
-  type: "wallet" | "bank" | "usd";
+  type: "wallet" | "bank" | "usd" | "mortgage";
   translate: (key: TranslationKey) => string;
 }
 
@@ -188,7 +226,10 @@ const RateSection = ({
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((row) => {
-            const isHighest = row.tna >= maxTna && maxTna > 0;
+            const isBest =
+              type === "mortgage"
+                ? row.tna <= maxTna && maxTna > 0
+                : row.tna >= maxTna && maxTna > 0;
             const limitStr = formatLimit(row.limit);
             const logoUrl = getLogoUrl(row);
 
@@ -196,7 +237,7 @@ const RateSection = ({
               <Card
                 key={row.id}
                 className={`overflow-hidden transition-colors ${
-                  isHighest ? "border-primary/50 bg-primary/5" : ""
+                  isBest ? "border-primary/50 bg-primary/5" : ""
                 }`}
               >
                 <CardContent className="p-4">
@@ -247,9 +288,9 @@ const RateSection = ({
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-semibold text-foreground">{row.name}</span>
-                          {isHighest && (
+                          {isBest && (
                             <span className="rounded bg-primary/10 px-2 py-0.5 text-xs font-normal text-primary">
-                              {translate("highest")}
+                              {translate(type === "mortgage" ? "lowest" : "highest")}
                             </span>
                           )}
                         </div>
@@ -380,6 +421,20 @@ export default function RatesPage() {
     enabled: selectedCountry === "ar",
   });
 
+  const {
+    data: uvaMortgageRates = [],
+    isLoading: uvaMortgagesLoading,
+    error: uvaMortgagesErrorData,
+    refetch: refetchUvaMortgages,
+  } = useQuery({
+    queryKey: ["rates", "uva-mortgages", selectedCountry],
+    queryFn: async () => {
+      const res = await ratesApi.getUvaMortgages(selectedCountry);
+      return (res.data as RateDTO[]) ?? [];
+    },
+    enabled: selectedCountry === "ar",
+  });
+
   const showWallets = selectedCountry === "ar";
   const showBanks = selectedCountry === "ar";
 
@@ -387,6 +442,8 @@ export default function RatesPage() {
   const maxWalletTna = walletRates.length > 0 ? Math.max(...walletRates.map((r) => r.tna)) : 0;
   const maxUsdAccountTna =
     usdAccountRates.length > 0 ? Math.max(...usdAccountRates.map((r) => r.tna)) : 0;
+  const minUvaMortgageTna =
+    uvaMortgageRates.length > 0 ? Math.min(...uvaMortgageRates.map((r) => r.tna)) : 0;
 
   if (!showWallets && !showBanks) {
     return (
@@ -449,6 +506,17 @@ export default function RatesPage() {
             {translate("usdAccounts")}
           </Button>
         )}
+        {showWallets && (
+          <Button
+            variant={activeTab === "uvaMortgages" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveTab("uvaMortgages")}
+            className="flex items-center gap-2"
+          >
+            <Home className="h-4 w-4" />
+            {translate("uvaMortgages")}
+          </Button>
+        )}
       </div>
 
       {activeTab === "wallets" && showWallets && (
@@ -495,6 +563,22 @@ export default function RatesPage() {
           emptyMessage="No hay datos disponibles"
           maxTna={maxUsdAccountTna}
           type="usd"
+          translate={translate}
+        />
+      )}
+
+      {activeTab === "uvaMortgages" && showWallets && (
+        <RateSection
+          title={translate("uvaMortgagesRates")}
+          disclaimer={translate("uvaMortgagesDisclaimer")}
+          icon={Home}
+          data={uvaMortgageRates}
+          isLoading={uvaMortgagesLoading}
+          error={uvaMortgagesErrorData as Error}
+          refetch={refetchUvaMortgages}
+          emptyMessage="No hay datos disponibles"
+          maxTna={minUvaMortgageTna}
+          type="mortgage"
           translate={translate}
         />
       )}
