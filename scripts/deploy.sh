@@ -10,6 +10,11 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+# Cargar variables del archivo .env
+set -a
+source .env
+set +a
+
 if [ -z "$JWT_SECRET" ]; then
     echo "❌ Error: JWT_SECRET no configurado en .env"
     exit 1
