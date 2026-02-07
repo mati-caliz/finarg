@@ -4,18 +4,37 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
+    name: Deploy to VPS
     runs-on: ubuntu-latest
+
     steps:
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /root/finarg
+
+            echo "📥 Pulling latest changes..."
             git pull origin main
-            ./scripts/deploy.sh
+
+            echo "🔨 Building containers..."
+            docker compose -f docker-compose.prod.yml build --no-cache
+
+            echo "🚀 Starting services..."
+            docker compose -f docker-compose.prod.yml up -d
+
+            echo "⏳ Waiting for services..."
+            sleep 10
+
+            echo "📊 Service status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "✅ Deployment complete!"
