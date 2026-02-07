@@ -192,7 +192,7 @@ En `finarg-frontend/.env.local` (crealo a partir de `.env.example`):
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
 ```
 
-Sin este valor el botón "Continuar con Google" no se muestra.
+Sin este valor el botón "Continuar con Google" no se muestra nunca.
 
 ### 3. Configurar el backend
 
