@@ -33,7 +33,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com",
+      "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com https://www.google.com",
       `connect-src 'self' https://accounts.google.com ${isProd ? "https://finarg.vercel.app" : "http://localhost:8080"}`,
       "frame-src https://accounts.google.com",
     ].join("; "),
@@ -49,6 +49,14 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "www.bcra.gob.ar",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
   },
