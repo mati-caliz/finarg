@@ -24,7 +24,9 @@
       "Bash(mvn checkstyle:check:*)",
       "Bash(npm run lint:check:*)",
       "Bash(npm uninstall:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(xargs:*)",
+      "Bash(docker pull:*)"
     ]
   }
 }
