@@ -48,6 +48,6 @@
 
 - [ ] **Dashboard personalizable**: Widgets arrastrables y configurables.
 
-- [ ] **Módulo de inversiones inmobiliaras**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
+- [ ] **Módulo de inversiones inmobiliarias (Real State Intelligence)**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
 
 - [ ] **UX 2.0**: Mejorar toda la UX de la página.
