@@ -39,7 +39,7 @@ cd finarg
 
 ```bash
 npm install
-cd finarg-frontend && npm install && cd ..
+cd web && npm install && cd ..
 ```
 
 ### 3. Iniciar servicios de infraestructura
@@ -71,9 +71,9 @@ docker-compose down
 
 ### 4. Configurar variables de entorno
 
-**Frontend** (`finarg-frontend/.env.local`): copiá `finarg-frontend/.env.example` y completá los valores. Ver [Login con Google](#login-con-google) si querés habilitar el login con Google.
+**Frontend** (`web/.env.local`): copiá `web/.env.example` y completá los valores. Ver [Login con Google](#login-con-google) si querés habilitar el login con Google.
 
-**Backend**: podés exportar variables o usar `finarg-backend/.env` (si usás algo como `dotenv`). Copiá `finarg-backend/.env.example` como referencia.
+**Backend**: podés exportar variables o usar `api/.env` (si usás algo como `dotenv`). Copiá `api/.env.example` como referencia.
 
 ```bash
 # JWT (usa un valor por defecto si no se configura)
@@ -92,7 +92,7 @@ export GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
 Desde el directorio raíz:
 
 ```bash
-cd finarg-backend
+cd api
 mvn spring-boot:run
 ```
 
@@ -106,7 +106,7 @@ El backend estará disponible en:
 En otra terminal, desde el directorio raíz:
 
 ```bash
-cd finarg-frontend
+cd web
 npm run dev
 ```
 
@@ -122,7 +122,7 @@ npm run lint:frontend     # Ejecuta ESLint en el frontend
 npm run lint:backend      # Ejecuta Checkstyle en el backend
 ```
 
-### Backend (finarg-backend)
+### Backend (api)
 
 ```bash
 mvn spring-boot:run       # Iniciar aplicación
@@ -131,7 +131,7 @@ mvn test                  # Ejecutar tests
 mvn checkstyle:check      # Verificar estilo de código
 ```
 
-### Frontend (finarg-frontend)
+### Frontend (web)
 
 ```bash
 npm run dev               # Modo desarrollo
@@ -147,14 +147,14 @@ npm run test:coverage     # Tests con cobertura
 
 ```
 finarg/
-├── finarg-backend/       # API Spring Boot
+├── api/       # API Spring Boot
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/
 │   │   │   └── resources/
 │   │   └── test/
 │   └── pom.xml
-├── finarg-frontend/      # Aplicación Next.js
+├── web/      # Aplicación Next.js
 │   ├── src/
 │   │   ├── app/
 │   │   ├── components/
@@ -186,7 +186,7 @@ Para habilitar "Iniciar sesión con Google" en login y registro hay que crear cr
 
 ### 2. Configurar el frontend
 
-En `finarg-frontend/.env.local` (crealo a partir de `.env.example`):
+En `web/.env.local` (crealo a partir de `.env.example`):
 
 ```env
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
@@ -200,7 +200,7 @@ Exportá la misma variable antes de levantar el backend, o configurala en tu ent
 
 ```bash
 export GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
-cd finarg-backend
+cd api
 mvn spring-boot:run
 ```
 
@@ -290,7 +290,7 @@ curl -X POST http://localhost:8080/api/quotes/refresh
 
 Limpiar y recompilar:
 ```bash
-cd finarg-backend
+cd api
 mvn clean install
 ```
 

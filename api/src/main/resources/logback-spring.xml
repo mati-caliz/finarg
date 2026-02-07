@@ -2,7 +2,7 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="finarg-backend"/>
+    <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="api"/>
     <springProperty scope="context" name="logFile" source="logging.file.name" defaultValue=""/>
     <property name="LOG_PATTERN_DEV" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr([%X{requestId}]){yellow} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
 

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: finarg-backend
+    name: api
 
   autoconfigure:
     exclude:

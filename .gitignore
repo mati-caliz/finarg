@@ -15,7 +15,7 @@ build/
 dist/
 
 # Java/Maven
-finarg-backend/target/
+api/target/
 *.jar
 *.war
 *.ear
