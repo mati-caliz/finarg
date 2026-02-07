@@ -25,16 +25,19 @@ jobs:
             echo "📥 Pulling latest changes..."
             git pull origin main
 
-            echo "🔨 Building containers..."
-            docker compose -f docker-compose.prod.yml build --no-cache
+            echo "🔨 Building containers with cache..."
+            DOCKER_BUILDKIT=1 docker compose -f docker-compose.prod.yml build
 
             echo "🚀 Starting services..."
             docker compose -f docker-compose.prod.yml up -d
 
             echo "⏳ Waiting for services..."
-            sleep 10
+            sleep 15
 
             echo "📊 Service status:"
             docker compose -f docker-compose.prod.yml ps
+
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f --filter "dangling=true"
 
             echo "✅ Deployment complete!"
