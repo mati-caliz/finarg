@@ -7,9 +7,33 @@ on:
   workflow_call:
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'finarg-frontend/**'
+              - 'package*.json'
+            backend:
+              - 'finarg-backend/**'
+              - 'pom.xml'
+
   frontend-lint:
     name: Frontend Linting
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     defaults:
       run:
         working-directory: ./finarg-frontend
@@ -25,6 +49,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: finarg-frontend/package-lock.json
 
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            finarg-frontend/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('finarg-frontend/package-lock.json') }}-${{ hashFiles('finarg-frontend/**/*.js', 'finarg-frontend/**/*.jsx', 'finarg-frontend/**/*.ts', 'finarg-frontend/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('finarg-frontend/package-lock.json') }}-
+
       - name: Install dependencies
         run: npm ci
 
@@ -39,6 +72,8 @@ jobs:
   backend-build:
     name: Backend Build & Test
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     defaults:
       run:
         working-directory: ./finarg-backend
@@ -64,12 +99,15 @@ jobs:
   summary:
     name: CI Summary
     runs-on: ubuntu-latest
-    needs: [frontend-lint, backend-build]
+    needs: [changes, frontend-lint, backend-build]
     if: always()
 
     steps:
       - name: Check results
         run: |
+          echo "Frontend changed: ${{ needs.changes.outputs.frontend }}"
+          echo "Backend changed: ${{ needs.changes.outputs.backend }}"
+
           if [ "${{ needs.frontend-lint.result }}" == "failure" ] || [ "${{ needs.backend-build.result }}" == "failure" ]; then
             echo "❌ CI checks failed"
             exit 1

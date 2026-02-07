@@ -40,10 +40,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build backend image
-        run: |
-          cd finarg-backend
-          docker build -t finarg-backend:scan .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image with cache
+        uses: docker/build-push-action@v5
+        with:
+          context: ./finarg-backend
+          push: false
+          load: true
+          tags: finarg-backend:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -60,10 +68,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build frontend image
-        run: |
-          cd finarg-frontend
-          docker build -t finarg-frontend:scan .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image with cache
+        uses: docker/build-push-action@v5
+        with:
+          context: ./finarg-frontend
+          push: false
+          load: true
+          tags: finarg-frontend:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
