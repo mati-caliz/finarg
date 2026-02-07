@@ -107,6 +107,7 @@ export default function LoginPage() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="pl-10"
                       required
+                      autoComplete="email"
                     />
                   </div>
                 </label>
@@ -125,6 +126,7 @@ export default function LoginPage() {
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="pl-10"
                       required
+                      autoComplete="current-password"
                     />
                   </div>
                 </label>

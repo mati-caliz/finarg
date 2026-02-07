@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.access.AccessDeniedException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +54,7 @@ public class AlertService {
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
         if (!alert.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized");
+            throw new AccessDeniedException("Access denied");
         }
 
         alertRepository.delete(alert);
@@ -64,17 +66,13 @@ public class AlertService {
                 .orElseThrow(() -> new RuntimeException("Alert not found"));
 
         if (!alert.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized");
+            throw new AccessDeniedException("Access denied");
         }
 
         alert.setActive(!alert.isActive());
         alert = alertRepository.save(alert);
 
         return mapToDTO(alert);
-    }
-
-    public List<Alert> getActiveAlerts() {
-        return alertRepository.findByActiveTrue();
     }
 
     private AlertResponseDTO mapToDTO(Alert alert) {

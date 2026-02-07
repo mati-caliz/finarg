@@ -19,16 +19,24 @@ const securityHeaders = [
     value: "DENY",
   },
   {
-    key: "X-XSS-Protection",
-    value: "1; mode=block",
-  },
-  {
     key: "Referrer-Policy",
     value: "strict-origin-when-cross-origin",
   },
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
+  },
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com",
+      `connect-src 'self' https://accounts.google.com ${isProd ? "https://finarg.vercel.app" : "http://localhost:8080"}`,
+      "frame-src https://accounts.google.com",
+    ].join("; "),
   },
 ];
 
@@ -37,7 +45,12 @@ const nextConfig = {
   output: "standalone",
   transpilePackages: ["lucide-react"],
   images: {
-    domains: ["www.bcra.gob.ar"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.bcra.gob.ar",
+      },
+    ],
   },
   compiler: {
     removeConsole: isProd ? { exclude: ["error", "warn"] } : false,
@@ -62,7 +75,7 @@ const nextConfig = {
     return [
       {
         source: "/api/backend/:path*",
-        destination: "http://localhost:8080/api/v1/:path*",
+        destination: `${process.env.BACKEND_URL || "http://localhost:8080"}/api/v1/:path*`,
       },
     ];
   },

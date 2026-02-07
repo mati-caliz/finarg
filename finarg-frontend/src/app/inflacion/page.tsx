@@ -58,14 +58,6 @@ export default function InflationPage() {
     },
   });
 
-  useQuery({
-    queryKey: ["inflation-year-over-year"],
-    queryFn: async () => {
-      const response = await inflationApi.getYearOverYear();
-      return response.data;
-    },
-  });
-
   const adjustMutation = useMutation({
     mutationFn: async () => {
       const response = await inflationApi.adjust(originalAmount, startDate, endDate);

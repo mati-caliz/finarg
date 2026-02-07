@@ -7,8 +7,11 @@ import com.finarg.service.GovernmentsService;
 import com.finarg.service.ReservesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v1/reserves")
 @RequiredArgsConstructor
 @Tag(name = "Reserves", description = "BCRA Reserves")
+@Validated
 public class ReservesController {
 
     private final ReservesService reservesService;
@@ -35,7 +39,7 @@ public class ReservesController {
     @GetMapping("/history")
     @Operation(summary = "Get reserves history")
     public ResponseEntity<List<DatosGobArClient.SeriesDataPoint>> getHistory(
-            @RequestParam(defaultValue = "30") int days) {
+            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
         return ResponseEntity.ok(reservesService.getHistory(days));
     }
 

@@ -15,6 +15,7 @@ public class AlertRequestDTO {
     @NotNull(message = "Alert type is required")
     private AlertType type;
     
+    @Size(max = 500, message = "Condition must not exceed 500 characters")
     private String condition;
     
     private BigDecimal targetValue;

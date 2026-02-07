@@ -8,8 +8,11 @@ import com.finarg.service.InflationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +27,7 @@ import java.util.List;
 @RequestMapping("/api/v1/inflation")
 @RequiredArgsConstructor
 @Tag(name = "Inflation", description = "Inflation data and CPI adjustment")
+@Validated
 public class InflationController {
 
     private final InflationService inflationService;
@@ -38,7 +42,7 @@ public class InflationController {
     @GetMapping("/monthly")
     @Operation(summary = "Get monthly historical inflation")
     public ResponseEntity<List<InflationDTO>> getMonthlyInflation(
-            @RequestParam(defaultValue = "12") int months) {
+            @RequestParam(defaultValue = "12") @Min(1) @Max(120) int months) {
         return ResponseEntity.ok(inflationService.getMonthlyInflation(months));
     }
 

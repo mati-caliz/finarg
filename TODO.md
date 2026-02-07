@@ -1,12 +1,8 @@
 # TODO FinArg
 
-## MVP
+## POST MVP
 
 - [ ] **Calculadora de Interés Compuesto**: Herramienta para calcular rendimientos con reinversión de intereses.
-
-- [ ] **Optimización**: Pedirle a opus que optimice toda la app y elimine duplicados.
-
-## Post MVP
 
 - [ ] **Agregar funcionalidades para otros países**: Expandir features y datos para los países ya soportados (Colombia, Brasil, Chile, Uruguay) y evaluar nuevos mercados.
 
@@ -54,3 +50,4 @@
 
 - [ ] **Módulo de inversiones inmobiliaras**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
 
+- [ ] **UX 2.0**: Mejorar toda la UX de la página.

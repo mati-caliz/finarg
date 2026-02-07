@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-finarg}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-finarg123}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -25,7 +25,7 @@ services:
     image: redis:7-alpine
     container_name: finarg-redis
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -74,7 +74,7 @@ services:
       # Java options
       JAVA_OPTS: ${JAVA_OPTS:--Xmx512m -Xms256m}
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     networks:
       - finarg-network
     restart: unless-stopped
@@ -97,7 +97,7 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api/v1}
       NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     networks:
       - finarg-network
     restart: unless-stopped

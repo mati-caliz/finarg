@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/**",
-                                "/api/v1/quotes/**",
+                                "/api/v1/{country}/quotes/**",
+                                "/api/v1/quotes/history/**",
                                 "/api/v1/ar/**",
                                 "/api/v1/br/**",
                                 "/api/v1/cl/**",
@@ -57,13 +58,19 @@ public class SecurityConfig {
                                 "/api/v1/indicators/**",
                                 "/api/v1/country-risk/**",
                                 "/api/v1/countries",
-                                "/actuator/health",
+                                "/actuator/health"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/v1/quotes/refresh"
+                        ).authenticated()
+                        .requestMatchers(
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
