@@ -1,7 +1,7 @@
 # Multi-stage build para optimizar el tamaño de la imagen
 
 # Stage 1: Build
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
+FROM maven:3-eclipse-temurin-25-alpine AS build
 WORKDIR /app
 
 # Copiar archivos de configuración de Maven primero (para cache de dependencias)
