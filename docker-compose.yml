@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: finarg-postgres
+    container_name: api-postgres
     environment:
       POSTGRES_DB: ${DB_NAME:-finarg}
       POSTGRES_USER: ${DB_USERNAME:-finarg}
@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - finarg-network
+      - api-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finarg}"]
       interval: 10s
@@ -23,13 +23,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: finarg-redis
+    container_name: api-redis
     ports:
       - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
-      - finarg-network
+      - api-network
     command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -109,5 +109,5 @@ volumes:
     driver: local
 
 networks:
-  finarg-network:
+  api-network:
     driver: bridge
