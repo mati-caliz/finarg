@@ -47,7 +47,7 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponseDTO register(AuthRequestDTO request) {
         String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
-        log.info("Registering new user: {}", email);
+        log.info("Registering new user: {}", maskEmail(email));
 
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new com.finarg.exception.EmailAlreadyRegisteredException();
@@ -72,7 +72,7 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponseDTO login(AuthRequestDTO request) {
         String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
-        log.info("User login: {}", email);
+        log.info("User login: {}", maskEmail(email));
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, request.getPassword())
@@ -92,13 +92,14 @@ public class AuthService implements UserDetailsService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!jwtService.isTokenValid(refreshToken, user)) {
+        if (!jwtService.isTokenValid(refreshToken, user) || !jwtService.isRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid token");
         }
 
         String newAccessToken = jwtService.generateToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
 
-        return buildAuthResponse(user, newAccessToken, refreshToken);
+        return buildAuthResponse(user, newAccessToken, newRefreshToken);
     }
 
     public AuthResponseDTO loginWithGoogle(String idToken) {
@@ -128,6 +129,16 @@ public class AuthService implements UserDetailsService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         return buildAuthResponse(user, accessToken, refreshToken);
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            return "***";
+        }
+        String[] parts = email.split("@");
+        String local = parts[0];
+        String masked = local.length() <= 2 ? "***" : local.charAt(0) + "***" + local.charAt(local.length() - 1);
+        return masked + "@" + parts[1];
     }
 
     private AuthResponseDTO buildAuthResponse(User user, String accessToken, String refreshToken) {

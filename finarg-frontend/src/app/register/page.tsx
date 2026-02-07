@@ -180,6 +180,7 @@ export default function RegisterPage() {
                       onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                       className="pl-10"
                       required
+                      autoComplete="name"
                     />
                   </div>
                 </label>
@@ -198,6 +199,7 @@ export default function RegisterPage() {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="pl-10"
                       required
+                      autoComplete="email"
                     />
                   </div>
                 </label>
@@ -217,6 +219,7 @@ export default function RegisterPage() {
                       className="pl-10"
                       required
                       minLength={8}
+                      autoComplete="new-password"
                     />
                   </div>
                 </label>
@@ -273,6 +276,7 @@ export default function RegisterPage() {
                       }
                       className="pl-10"
                       required
+                      autoComplete="new-password"
                     />
                   </div>
                 </label>

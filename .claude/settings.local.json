@@ -19,7 +19,12 @@
       "Bash(npx tsc:*)",
       "Bash(npm test:*)",
       "Bash(chmod:*)",
-      "Bash(mvn clean compile:*)"
+      "Bash(mvn clean compile:*)",
+      "Bash(xargs -I {} sh -c 'echo \"\"\"\"=== {} ===\"\"\"\" && find {} -maxdepth 1 -type f | head -10')",
+      "Bash(mvn checkstyle:check:*)",
+      "Bash(npm run lint:check:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(gh api:*)"
     ]
   }
 }

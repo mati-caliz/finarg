@@ -17,6 +17,15 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { TrendingDown, TrendingUp, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+function useUpdateProgress(dataUpdatedAt: number, intervalMs: number): number {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, []);
+  return dataUpdatedAt ? Math.min(100, ((Date.now() - dataUpdatedAt) / intervalMs) * 100) : 0;
+}
+
 const AR_CURRENCY_GROUPS = {
   usd: ["oficial", "blue", "bolsa", "contadoconliqui", "tarjeta", "mayorista", "cripto"],
   eur: ["eur_oficial", "eur_blue", "eur_tarjeta"],
@@ -142,15 +151,7 @@ export default function QuotesPage() {
     return sortQuotesByVariant(list);
   }, [quotes, hasCurrencyGroups, selectedBaseCurrency]);
 
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const updateProgress = dataUpdatedAt
-    ? Math.min(100, ((Date.now() - dataUpdatedAt) / QUOTES_REFETCH_MS) * 100)
-    : 0;
+  const updateProgress = useUpdateProgress(dataUpdatedAt, QUOTES_REFETCH_MS);
 
   const chartableSelectedTypes = useMemo(
     () => selectedTypes.filter((t) => !hasCurrencyGroups || hasChartHistory(t)),

@@ -8,13 +8,13 @@ spring:
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:finarg}
-    username: ${DB_USERNAME:finarg}
-    password: ${DB_PASSWORD:finarg123}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: ${HIBERNATE_DDL_AUTO:update}
+      ddl-auto: ${HIBERNATE_DDL_AUTO:validate}
     show-sql: ${HIBERNATE_SHOW_SQL:false}
     properties:
       hibernate:

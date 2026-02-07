@@ -6,6 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/a
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -95,5 +96,5 @@ export const authApi = {
   register: (email: string, password: string, name: string) =>
     api.post("/auth/register", { email, password, name }),
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
-  refresh: (refreshToken: string) => api.post("/auth/refresh", refreshToken),
+  refresh: (refreshToken: string) => api.post("/auth/refresh", { refreshToken }),
 };

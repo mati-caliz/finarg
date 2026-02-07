@@ -3,6 +3,7 @@ package com.finarg.controller;
 import com.finarg.model.dto.AuthRequestDTO;
 import com.finarg.model.dto.AuthResponseDTO;
 import com.finarg.model.dto.GoogleAuthRequestDTO;
+import com.finarg.model.dto.RefreshTokenRequestDTO;
 import com.finarg.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +43,7 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @Operation(summary = "Refrescar token de acceso")
-    public ResponseEntity<AuthResponseDTO> refresh(@RequestBody String refreshToken) {
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    public ResponseEntity<AuthResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequestDTO request) {
+        return ResponseEntity.ok(authService.refreshToken(request.getRefreshToken()));
     }
 }
