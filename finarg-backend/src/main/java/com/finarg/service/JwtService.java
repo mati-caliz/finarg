@@ -109,4 +109,8 @@ public class JwtService {
     public long getExpirationTime() {
         return jwtExpiration;
     }
+
+    public long getRefreshExpirationTime() {
+        return refreshExpiration;
+    }
 }

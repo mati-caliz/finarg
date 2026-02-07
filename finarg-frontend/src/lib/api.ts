@@ -10,25 +10,15 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-});
-
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  return config;
+  withCredentials: true,
 });
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
@@ -96,5 +86,6 @@ export const authApi = {
   register: (email: string, password: string, name: string) =>
     api.post("/auth/register", { email, password, name }),
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
-  refresh: (refreshToken: string) => api.post("/auth/refresh", { refreshToken }),
+  refresh: () => api.post("/auth/refresh"),
+  logout: () => api.post("/auth/logout"),
 };
