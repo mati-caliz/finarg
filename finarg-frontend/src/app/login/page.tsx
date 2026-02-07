@@ -28,8 +28,6 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
       router.push("/");
     },
@@ -52,8 +50,6 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
       setAuth(data.user, data.accessToken);
       router.push("/");
     },

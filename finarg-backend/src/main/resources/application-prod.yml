@@ -37,6 +37,9 @@ logging:
 app:
   google:
     client-id: ${GOOGLE_CLIENT_ID}
+  cookie:
+    secure: true
+    domain: ${COOKIE_DOMAIN:}
   logging:
     request:
       enabled: true
