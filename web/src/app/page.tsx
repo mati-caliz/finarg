@@ -16,7 +16,7 @@ import { useSocialIndicators } from "@/hooks/useSocialIndicators";
 import { useTranslation } from "@/hooks/useTranslation";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
-import { Loader2, TrendingUp } from "lucide-react";
+import { ArrowRight, Calculator, Loader2, Percent, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
@@ -35,18 +35,26 @@ export default function DashboardPage() {
   if (loadingQuotes || loadingGap || (selectedCountry === "ar" && loadingReserves)) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Cargando datos...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{translate("dashboard")}</h1>
-        <p className="text-muted-foreground">
-          {countryConfig.flag} {translate("marketSummary")} - {translate(selectedCountry)}
-        </p>
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">{translate("dashboard")}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+              {countryConfig.flag} {translate(selectedCountry)}
+            </span>
+            <span className="text-sm text-muted-foreground">{translate("marketSummary")}</span>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -89,9 +97,10 @@ export default function DashboardPage() {
             {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
 
             {countryConfig.features.inflation && (
-              <Card className="shrink-0">
+              <Card className="shrink-0 border-t-[3px] border-t-red-400">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Percent className="h-3.5 w-3.5" />
                     {translate("monthlyInflation")}
                   </CardTitle>
                 </CardHeader>
@@ -105,13 +114,16 @@ export default function DashboardPage() {
                         {translate("last12Months")}
                       </p>
                     </div>
-                    <TrendingUp className="h-8 w-8 text-red-500/50" />
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                      <TrendingUp className="h-5 w-5 text-red-500" />
+                    </div>
                   </div>
                   <Link
                     href="/inflacion"
-                    className="text-sm text-primary hover:underline mt-4 inline-block"
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
                   >
                     {translate("viewHistory")}
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </CardContent>
               </Card>
@@ -126,7 +138,7 @@ export default function DashboardPage() {
                   socialIndicators.canastaBasicaTotal !== null) ||
                 (socialIndicators.uva !== undefined && socialIndicators.uva !== null) ||
                 (socialIndicators.cer !== undefined && socialIndicators.cer !== null)) && (
-                <Card className="shrink-0">
+                <Card className="shrink-0 border-t-[3px] border-t-indigo-400">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
                       {translate("socialIndicators")}
@@ -136,7 +148,7 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 gap-3">
                       {socialIndicators.minimumSalary !== undefined &&
                         socialIndicators.minimumSalary !== null && (
-                          <div>
+                          <div className="p-2 rounded-lg bg-muted/50">
                             <p className="text-xs text-muted-foreground">
                               {translate("minimumSalary")}
                             </p>
@@ -151,7 +163,7 @@ export default function DashboardPage() {
                         )}
                       {socialIndicators.minimumPension !== undefined &&
                         socialIndicators.minimumPension !== null && (
-                          <div>
+                          <div className="p-2 rounded-lg bg-muted/50">
                             <p className="text-xs text-muted-foreground">
                               {translate("minimumPension")}
                             </p>
@@ -166,7 +178,7 @@ export default function DashboardPage() {
                         )}
                       {socialIndicators.canastaBasicaTotal !== undefined &&
                         socialIndicators.canastaBasicaTotal !== null && (
-                          <div>
+                          <div className="p-2 rounded-lg bg-muted/50">
                             <p className="text-xs text-muted-foreground">
                               {translate("canastaBasicaTotal")}
                             </p>
@@ -180,7 +192,7 @@ export default function DashboardPage() {
                           </div>
                         )}
                       {socialIndicators.uva !== undefined && socialIndicators.uva !== null && (
-                        <div>
+                        <div className="p-2 rounded-lg bg-muted/50">
                           <p className="text-xs text-muted-foreground">{translate("uva")}</p>
                           <p className="text-lg font-semibold text-foreground">
                             {new Intl.NumberFormat("es-AR", {
@@ -192,7 +204,7 @@ export default function DashboardPage() {
                         </div>
                       )}
                       {socialIndicators.cer !== undefined && socialIndicators.cer !== null && (
-                        <div>
+                        <div className="p-2 rounded-lg bg-muted/50">
                           <p className="text-xs text-muted-foreground">{translate("cer")}</p>
                           <p className="text-lg font-semibold text-foreground">
                             {socialIndicators.cer.toLocaleString("es-AR", {
@@ -205,9 +217,10 @@ export default function DashboardPage() {
                     </div>
                     <Link
                       href="/calculadora-sueldo-neto"
-                      className="text-sm text-primary hover:underline mt-4 inline-block"
+                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
                     >
                       {translate("incomeTaxCalculator")}
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </CardContent>
                 </Card>
@@ -216,9 +229,10 @@ export default function DashboardPage() {
         )}
 
         {countryConfig.features.inflation && selectedCountry !== "ar" && (
-          <Card>
+          <Card className="border-t-[3px] border-t-red-400">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <Percent className="h-3.5 w-3.5" />
                 {translate("monthlyInflation")}
               </CardTitle>
             </CardHeader>
@@ -230,13 +244,16 @@ export default function DashboardPage() {
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">{translate("last12Months")}</p>
                 </div>
-                <TrendingUp className="h-8 w-8 text-red-500/50" />
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                  <TrendingUp className="h-5 w-5 text-red-500" />
+                </div>
               </div>
               <Link
                 href="/inflacion"
-                className="text-sm text-primary hover:underline mt-4 inline-block"
+                className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
               >
                 {translate("viewHistory")}
+                <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </CardContent>
           </Card>
@@ -261,10 +278,19 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {countryConfig.features.incomeTax && (
           <Link href="/calculadora-sueldo-neto">
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+            <Card className="group cursor-pointer border-l-[3px] border-l-primary hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
               <CardContent className="pt-6">
-                <p className="font-medium">{translate("incomeTaxCalculator")}</p>
-                <p className="text-sm text-muted-foreground">{translate("incomeTaxSubtitle")}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{translate("incomeTaxCalculator")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {translate("incomeTaxSubtitle")}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <Calculator className="h-5 w-5 text-primary" />
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </Link>
@@ -272,10 +298,17 @@ export default function DashboardPage() {
 
         {countryConfig.features.inflation && (
           <Link href="/inflacion">
-            <Card className="hover:border-primary/50 transition-colors cursor-pointer">
+            <Card className="group cursor-pointer border-l-[3px] border-l-accent hover:shadow-lg hover:shadow-accent/5 transition-all duration-300">
               <CardContent className="pt-6">
-                <p className="font-medium">{translate("adjustmentCalculator")}</p>
-                <p className="text-sm text-muted-foreground">{translate("updateValues")}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{translate("adjustmentCalculator")}</p>
+                    <p className="text-sm text-muted-foreground">{translate("updateValues")}</p>
+                  </div>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10 group-hover:bg-accent/20 transition-colors">
+                    <Percent className="h-5 w-5 text-accent" />
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </Link>

@@ -29,7 +29,9 @@
       "Bash(docker pull:*)",
       "Bash(docker compose:*)",
       "Bash(docker compose build:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(python -c:*)",
+      "Bash(docker info:*)"
     ]
   }
 }

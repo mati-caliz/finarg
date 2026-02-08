@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { getGapClass, getGapColor } from "@/lib/utils";
 import type { Gap } from "@/types";
+import { Activity } from "lucide-react";
 
 export interface GapGaugeProps {
   gap: Gap;
@@ -40,10 +41,24 @@ export function GapGauge({ gap }: GapGaugeProps) {
     }
   };
 
+  const getBorderColor = () => {
+    switch (gap.level) {
+      case "LOW":
+        return "border-t-emerald-500";
+      case "MEDIUM":
+        return "border-t-yellow-500";
+      case "HIGH":
+        return "border-t-red-500";
+      default:
+        return "border-t-slate-400";
+    }
+  };
+
   return (
-    <Card>
+    <Card className={`border-t-[3px] ${getBorderColor()}`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Activity className="h-3.5 w-3.5" />
           {translate("gapIndicator")}
         </CardTitle>
       </CardHeader>
@@ -51,11 +66,14 @@ export function GapGauge({ gap }: GapGaugeProps) {
         <div className="flex flex-col items-center">
           <div className="relative mb-4">
             <div
-              className={`w-20 h-20 rounded-full ${animationClass}`}
+              className={`w-24 h-24 rounded-full ${animationClass} flex items-center justify-center`}
               style={{ backgroundColor: color }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-bold text-white">{gap.gapPercentage.toFixed(1)}%</span>
+            >
+              <div className="w-20 h-20 rounded-full bg-card flex items-center justify-center">
+                <span className="text-2xl font-bold" style={{ color }}>
+                  {gap.gapPercentage.toFixed(1)}%
+                </span>
+              </div>
             </div>
           </div>
 
@@ -66,14 +84,14 @@ export function GapGauge({ gap }: GapGaugeProps) {
             <p className="text-sm text-muted-foreground mt-1">{getGapDescription()}</p>
           </div>
 
-          <div className="w-full mt-4 pt-4 border-t border-border">
-            <div className="flex justify-between text-sm">
+          <div className="w-full mt-4 pt-4 border-t border-border/50 space-y-2">
+            <div className="flex justify-between items-center text-sm px-2 py-1.5 rounded-lg bg-muted/50">
               <span className="text-muted-foreground">{translate("official")}</span>
-              <span>${gap.officialRate.toFixed(2)}</span>
+              <span className="font-medium">${gap.officialRate.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-sm mt-1">
+            <div className="flex justify-between items-center text-sm px-2 py-1.5 rounded-lg bg-muted/50">
               <span className="text-muted-foreground">{translate("parallel")}</span>
-              <span>${gap.parallelRate.toFixed(2)}</span>
+              <span className="font-medium">${gap.parallelRate.toFixed(2)}</span>
             </div>
           </div>
         </div>

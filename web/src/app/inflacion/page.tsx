@@ -101,8 +101,8 @@ export default function InflationPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">{translate("inflationTitle")}</h1>
-        <p className="text-gray-400 text-sm mt-1">{translate("inflationDesc")}</p>
+        <h1 className="text-2xl font-bold text-foreground">{translate("inflationTitle")}</h1>
+        <p className="text-muted-foreground text-sm mt-1">{translate("inflationDesc")}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -184,12 +184,12 @@ export default function InflationPage() {
               <div>
                 <label
                   htmlFor="originalAmount"
-                  className="block text-sm font-medium text-gray-300 mb-2"
+                  className="block text-sm font-medium text-muted-foreground mb-2"
                 >
                   {translate("originalAmount")}
                 </label>
                 <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="originalAmount"
                     type="number"
@@ -202,7 +202,10 @@ export default function InflationPage() {
               </div>
 
               <div>
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  htmlFor="startDate"
+                  className="block text-sm font-medium text-muted-foreground mb-2"
+                >
                   {translate("startDate")}
                 </label>
                 <Input
@@ -215,7 +218,10 @@ export default function InflationPage() {
               </div>
 
               <div>
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-2">
+                <label
+                  htmlFor="endDate"
+                  className="block text-sm font-medium text-muted-foreground mb-2"
+                >
                   {translate("endDate")}
                 </label>
                 <Input
@@ -248,17 +254,21 @@ export default function InflationPage() {
               <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
                 <div className="space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">{translate("originalAmount")}</span>
-                    <span className="text-white">
+                    <span className="text-muted-foreground text-sm">
+                      {translate("originalAmount")}
+                    </span>
+                    <span className="text-foreground">
                       {formatCurrency(adjustmentResult.originalAmount)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">{translate("monthsElapsed")}</span>
-                    <span className="text-white">{adjustmentResult.monthsElapsed}</span>
+                    <span className="text-muted-foreground text-sm">
+                      {translate("monthsElapsed")}
+                    </span>
+                    <span className="text-foreground">{adjustmentResult.monthsElapsed}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400 text-sm">
+                    <span className="text-muted-foreground text-sm">
                       {translate("cumulativeInflation")}
                     </span>
                     <span className="text-red-500">
@@ -270,14 +280,16 @@ export default function InflationPage() {
                       )}
                     </span>
                   </div>
-                  <div className="pt-3 border-t border-gray-700">
+                  <div className="pt-3 border-t border-border">
                     <div className="flex justify-between items-center">
-                      <span className="text-white font-medium">{translate("adjustedAmount")}</span>
+                      <span className="text-foreground font-medium">
+                        {translate("adjustedAmount")}
+                      </span>
                       <span className="text-2xl font-bold text-primary">
                         {formatCurrency(adjustmentResult.adjustedAmount)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs text-muted-foreground mt-2">
                       {translate("maintainPurchasingPower")}
                     </p>
                   </div>
@@ -386,7 +398,7 @@ export default function InflationPage() {
                   );
                 })()
               ) : (
-                <div className="h-[250px] flex items-center justify-center text-gray-500">
+                <div className="h-[250px] flex items-center justify-center text-muted-foreground">
                   Loading data...
                 </div>
               )}
@@ -492,7 +504,7 @@ export default function InflationPage() {
                   );
                 })()
               ) : (
-                <div className="h-[250px] flex items-center justify-center text-gray-500">
+                <div className="h-[250px] flex items-center justify-center text-muted-foreground">
                   Loading data...
                 </div>
               )}

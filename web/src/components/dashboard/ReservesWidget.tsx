@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatReservesUSD } from "@/lib/utils";
 import type { Reserves } from "@/types";
-import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { Landmark, Minus, TrendingDown, TrendingUp } from "lucide-react";
 
 interface ReservesWidgetProps {
   reserves: Reserves;
@@ -18,9 +18,10 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
   const isNegative = variation < 0;
 
   return (
-    <Card className="h-full">
+    <Card className="h-full border-t-[3px] border-t-cyan-500">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Landmark className="h-3.5 w-3.5" />
           {label || translate("bcraReserves")}
         </CardTitle>
       </CardHeader>
@@ -29,24 +30,26 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
           <div>
             <p className="text-xs text-muted-foreground">{translate("grossMillionsUsd")}</p>
             <div className="flex items-end justify-between">
-              <p className="text-2xl font-bold">{formatReservesUSD(reserves.grossReserves)}</p>
+              <p className="text-2xl font-bold tracking-tight">
+                {formatReservesUSD(reserves.grossReserves)}
+              </p>
               <div
-                className={`flex items-center gap-1 text-sm ${
+                className={`flex items-center gap-1 text-sm px-2 py-1 rounded-full ${
                   isPositive
-                    ? "text-green-500"
+                    ? "text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/15"
                     : isNegative
-                      ? "text-red-500"
-                      : "text-muted-foreground"
+                      ? "text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/15"
+                      : "text-muted-foreground bg-muted"
                 }`}
               >
                 {isPositive ? (
-                  <TrendingUp className="h-4 w-4" />
+                  <TrendingUp className="h-3.5 w-3.5" />
                 ) : isNegative ? (
-                  <TrendingDown className="h-4 w-4" />
+                  <TrendingDown className="h-3.5 w-3.5" />
                 ) : (
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3.5 w-3.5" />
                 )}
-                <span>
+                <span className="text-xs font-medium">
                   {variation > 0 ? "+" : ""}
                   {variation.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
                 </span>
@@ -54,13 +57,13 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border space-y-2">
+          <div className="pt-2 border-t border-border/50 space-y-3">
             {reserves.netReservesBCRA !== undefined && reserves.netReservesBCRA !== null && (
-              <div>
+              <div className="p-2 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">{translate("netBcra")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesBCRA < 0 ? "text-red-500" : "text-green-500"
+                    reserves.netReservesBCRA < 0 ? "text-red-500" : "text-emerald-500"
                   }`}
                 >
                   {formatReservesUSD(reserves.netReservesBCRA)}
@@ -68,25 +71,25 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
               </div>
             )}
             {reserves.netReservesFMI !== undefined && reserves.netReservesFMI !== null && (
-              <div>
+              <div className="p-2 rounded-lg bg-muted/50">
                 <p className="text-xs text-muted-foreground">{translate("netFmi")}</p>
                 <p
                   className={`text-lg font-semibold ${
                     reserves.netReservesFMI < 0 ? "text-red-500" : "text-amber-600"
                   }`}
                 >
-                  {reserves.netReservesFMI < 0 ? "−" : ""}
+                  {reserves.netReservesFMI < 0 ? "\u2212" : ""}
                   {formatReservesUSD(Math.abs(reserves.netReservesFMI))}
                 </p>
               </div>
             )}
             {(reserves.netReservesBCRA === undefined || reserves.netReservesBCRA === null) &&
               (reserves.netReservesFMI === undefined || reserves.netReservesFMI === null) && (
-                <div>
+                <div className="p-2 rounded-lg bg-muted/50">
                   <p className="text-xs text-muted-foreground">{translate("netEstimated")}</p>
                   <p
                     className={`text-lg font-semibold ${
-                      reserves.netReserves < 0 ? "text-red-500" : "text-green-500"
+                      reserves.netReserves < 0 ? "text-red-500" : "text-emerald-500"
                     }`}
                   >
                     {formatReservesUSD(reserves.netReserves)}
@@ -96,11 +99,11 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
           </div>
 
           {reserves.liabilities && reserves.liabilities.length > 0 && (
-            <div className="pt-2 border-t border-border text-xs text-muted-foreground space-y-1">
+            <div className="pt-2 border-t border-border/50 text-xs text-muted-foreground space-y-1.5">
               {reserves.liabilities.map((liability) => (
-                <div key={liability.id} className="flex justify-between">
+                <div key={liability.id} className="flex justify-between px-1">
                   <span>{liability.name}</span>
-                  <span>-{formatReservesUSD(liability.amount)}</span>
+                  <span className="font-medium">-{formatReservesUSD(liability.amount)}</span>
                 </div>
               ))}
             </div>
