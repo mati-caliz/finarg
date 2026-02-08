@@ -5,6 +5,7 @@ export const translations = {
     quotes: "Cotizaciones",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
+    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflación",
     reserves: "Reservas",
@@ -406,6 +407,7 @@ export const translations = {
     // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Otros países próximamente",
+    comingSoon: "Próximamente",
 
     errorGeneric: "Ocurrió un error inesperado. Intentá nuevamente.",
     errorUnauthorized: "Sesión expirada o no autorizado. Iniciá sesión nuevamente.",
@@ -424,6 +426,7 @@ export const translations = {
     quotes: "Cotações",
     incomeTaxCalculator: "Calculadora de Imposto de Renda",
     compoundInterestCalculator: "Calculadora de Juros Compostos",
+    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflação",
     reserves: "Reservas",
@@ -721,6 +724,7 @@ export const translations = {
     // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Outros países em breve",
+    comingSoon: "Em breve",
 
     errorGeneric: "Ocorreu um erro inesperado. Tente novamente.",
     errorUnauthorized: "Sessão expirada ou não autorizado. Faça login novamente.",
@@ -739,6 +743,7 @@ export const translations = {
     quotes: "Quotes",
     incomeTaxCalculator: "Income Tax Calculator",
     compoundInterestCalculator: "Compound Interest Calculator",
+    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflation",
     reserves: "Reserves",
@@ -1152,6 +1157,7 @@ export const translations = {
     // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Other countries coming soon",
+    comingSoon: "Coming Soon",
 
     errorGeneric: "An unexpected error occurred. Please try again.",
     errorUnauthorized: "Session expired or unauthorized. Please log in again.",

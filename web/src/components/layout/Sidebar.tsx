@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
   BarChart2,
+  Building2,
   Calculator,
   DollarSign,
   Gauge,
@@ -64,6 +65,12 @@ const baseNavigation = [
     key: "compoundInterestCalculator" as TranslationKey,
     href: "/calculadora-interes-compuesto",
     icon: TrendingUp,
+    feature: null,
+  },
+  {
+    key: "realEstateIntelligence" as TranslationKey,
+    href: "#",
+    icon: Building2,
     feature: null,
   },
 ];
@@ -181,11 +188,16 @@ export function Sidebar() {
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               const isNew = item.href === "/calculadora-interes-compuesto";
+              const isComingSoon = item.href === "#";
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => {
+                  onClick={(e) => {
+                    if (isComingSoon) {
+                      e.preventDefault();
+                      return;
+                    }
                     if (window.innerWidth < 1024) {
                       toggleSidebar();
                     }
@@ -195,6 +207,7 @@ export function Sidebar() {
                     isActive
                       ? "bg-primary text-white shadow-lg shadow-primary/25"
                       : "text-white/60 hover:bg-white/10 hover:text-white",
+                    isComingSoon && "cursor-default opacity-70",
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
@@ -202,6 +215,11 @@ export function Sidebar() {
                   {isNew && (
                     <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-500 text-white uppercase tracking-wide">
                       Nuevo
+                    </span>
+                  )}
+                  {isComingSoon && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500 text-white uppercase tracking-wide">
+                      {translate("comingSoon")}
                     </span>
                   )}
                 </Link>
