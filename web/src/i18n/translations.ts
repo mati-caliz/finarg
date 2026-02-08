@@ -100,7 +100,7 @@ export const translations = {
     adjustedAmount: "Monto Ajustado",
     maintainPurchasingPower: "Para mantener el mismo poder adquisitivo",
     monthlyEvolution: "Inflación Mensual - Evolución",
-    yearOverYearEvolution: "Inflación Interanual - Evolución TEST TUTE",
+    yearOverYearEvolution: "Inflación Interanual - Evolución",
     monthlyData: "Datos Mensuales",
     period: "Período",
     monthly: "Mensual",
