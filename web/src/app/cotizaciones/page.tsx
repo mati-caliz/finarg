@@ -272,9 +272,9 @@ export default function QuotesPage() {
                 }`}
                 onClick={() => {
                   setActiveCard(quote.type);
-                  setSelectedTypes((prev) =>
-                    prev.includes(quote.type) ? prev : [...prev, quote.type],
-                  );
+                  if (hasChartHistory(quote.type)) {
+                    setSelectedTypes([quote.type]);
+                  }
                 }}
               >
                 <CardContent className="p-4">
@@ -357,9 +357,7 @@ export default function QuotesPage() {
                             size="sm"
                             onClick={() => {
                               setActiveCard(t.value);
-                              setSelectedTypes((prev) =>
-                                prev.includes(t.value) ? prev : [...prev, t.value],
-                              );
+                              setSelectedTypes([t.value]);
                             }}
                           >
                             {t.label}
