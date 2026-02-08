@@ -40,7 +40,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    container_name: finarg-backend
+    container_name: api
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,7 +87,7 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
-    container_name: finarg-frontend
+    container_name: web
     depends_on:
       backend:
         condition: service_healthy

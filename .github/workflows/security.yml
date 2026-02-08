@@ -46,17 +46,17 @@ jobs:
       - name: Build backend image with cache
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
-          context: ./finarg-backend
+          context: ./api
           push: false
           load: true
-          tags: finarg-backend:scan
+          tags: api:scan
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
-          image-ref: 'finarg-backend:scan'
+          image-ref: 'api:scan'
           format: 'table'
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
@@ -74,17 +74,17 @@ jobs:
       - name: Build frontend image with cache
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
-          context: ./finarg-frontend
+          context: ./web
           push: false
           load: true
-          tags: finarg-frontend:scan
+          tags: web:scan
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
-          image-ref: 'finarg-frontend:scan'
+          image-ref: 'web:scan'
           format: 'table'
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
