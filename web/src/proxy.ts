@@ -5,7 +5,7 @@ const PROTECTED_ROUTES: string[] = [];
 
 const PUBLIC_ONLY_ROUTES = ["/login", "/register"];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   if (PROTECTED_ROUTES.length === 0) {
     return NextResponse.next();
   }
