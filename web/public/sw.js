@@ -110,7 +110,15 @@ const cacheStrategies = {
         }
         return response;
       })
-      .catch(() => cached);
+      .catch(() => {
+        if (cached) {
+          return cached;
+        }
+        return new Response(JSON.stringify({ error: "Network error" }), {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        });
+      });
 
     return cached || fetchPromise;
   },
