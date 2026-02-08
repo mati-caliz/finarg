@@ -39,7 +39,7 @@ public class ReservesController {
     @GetMapping("/history")
     @Operation(summary = "Get reserves history")
     public ResponseEntity<List<DatosGobArClient.SeriesDataPoint>> getHistory(
-            @RequestParam(defaultValue = "30") @Min(1) @Max(365) int days) {
+            @RequestParam(defaultValue = "30") @Min(1) @Max(7300) int days) {
         return ResponseEntity.ok(reservesService.getHistory(days));
     }
 

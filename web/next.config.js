@@ -34,7 +34,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com https://www.google.com",
+      "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com",
       [
         "connect-src 'self' https://accounts.google.com",
         !isProd && "http://localhost:8080",
@@ -64,6 +64,10 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.gstatic.com",
       },
     ],
   },

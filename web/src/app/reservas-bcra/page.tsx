@@ -390,13 +390,13 @@ export default function ReservesPage() {
                   const govStart = new Date(gov.startDate);
                   const govEnd = new Date(gov.endDate);
 
-                  let x1 = chartData[0]?.fecha;
-                  let x2 = chartData[chartData.length - 1]?.fecha;
+                  let x1Idx = 0;
+                  let x2Idx = chartData.length - 1;
 
                   for (let i = 0; i < chartData.length; i++) {
                     const date = new Date(chartData[i].fechaOriginal);
                     if (date >= govStart) {
-                      x1 = chartData[i].fecha;
+                      x1Idx = i;
                       break;
                     }
                   }
@@ -404,14 +404,14 @@ export default function ReservesPage() {
                   for (let i = chartData.length - 1; i >= 0; i--) {
                     const date = new Date(chartData[i].fechaOriginal);
                     if (date <= govEnd) {
-                      x2 = chartData[i].fecha;
+                      x2Idx = i;
                       break;
                     }
                   }
 
                   return {
-                    x1,
-                    x2,
+                    x1: chartData[x1Idx]?.index,
+                    x2: chartData[x2Idx]?.index,
                     fill: gov.color,
                     label: gov.label,
                   };
@@ -423,10 +423,11 @@ export default function ReservesPage() {
                 <>
                   <AreaChart
                     data={chartData}
-                    xKey="fecha"
+                    xKey="index"
                     yKey="valor"
                     color="#10b981"
                     height={300}
+                    formatX={(v) => chartData[Number(v)]?.fecha || ""}
                     formatY={(v) => `${Number(v).toLocaleString("es-AR")} M`}
                     gradientId="reservesGradient"
                     yDomain={[Math.floor(minVal - padding), Math.ceil(maxVal + padding)]}
