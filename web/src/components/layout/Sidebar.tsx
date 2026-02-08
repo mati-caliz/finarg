@@ -72,11 +72,11 @@ function CountrySelector() {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-muted">
+      <div className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">
         <span className="text-lg">{countryConfig.flag}</span>
-        <span>{translate(countryConfig.code as TranslationKey)}</span>
+        <span className="text-white/90">{translate(countryConfig.code as TranslationKey)}</span>
       </div>
-      <p className="text-xs text-muted-foreground px-1">{translate("otherCountriesComingSoon")}</p>
+      <p className="text-xs text-white/40 px-1">{translate("otherCountriesComingSoon")}</p>
     </div>
   );
 }
@@ -138,7 +138,7 @@ export function Sidebar() {
 
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
           onClick={toggleSidebar}
           onKeyDown={(e) => e.key === "Enter" && toggleSidebar()}
           role="button"
@@ -148,23 +148,29 @@ export function Sidebar() {
 
       <aside
         className={cn(
-          "fixed left-0 top-0 z-40 h-screen w-64 transform bg-card border-r border-border transition-transform duration-200 ease-in-out lg:translate-x-0",
+          "fixed left-0 top-0 z-40 h-screen w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
+        style={{
+          background:
+            "linear-gradient(180deg, hsl(var(--sidebar-start)) 0%, hsl(var(--sidebar-end)) 100%)",
+        }}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-center border-b border-border">
-            <Link href="/" className="flex items-center gap-2">
-              <DollarSign className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold">FinLatam</span>
+          <div className="flex h-16 items-center justify-center border-b border-white/10">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/20">
+                <DollarSign className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-xl font-bold text-white">FinLatam</span>
             </Link>
           </div>
 
-          <div className="p-4 border-b border-border">
+          <div className="p-4 border-b border-white/10">
             <CountrySelector />
           </div>
 
-          <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
+          <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -177,24 +183,22 @@ export function Sidebar() {
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      ? "bg-primary text-white shadow-lg shadow-primary/25"
+                      : "text-white/60 hover:bg-white/10 hover:text-white",
                   )}
                 >
-                  <item.icon className="h-5 w-5" />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   {item.name}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="border-t border-border p-4">
-            <p className="text-xs text-muted-foreground text-center">
-              {translate("footerVersion")}
-            </p>
-            <p className="text-xs text-muted-foreground text-center mt-1">
+          <div className="border-t border-white/10 p-4">
+            <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
+            <p className="text-xs text-white/40 text-center mt-1">
               {countryConfig.flag} {countryConfig.shortName}
             </p>
           </div>

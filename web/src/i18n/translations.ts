@@ -3,7 +3,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
-    incomeTaxCalculator: "Calculadora de Ganancias",
+    incomeTaxCalculator: "Calculadora de Sueldo Neto",
 
     inflation: "Inflación",
     reserves: "Reservas",

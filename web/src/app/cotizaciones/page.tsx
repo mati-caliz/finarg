@@ -265,8 +265,10 @@ export default function QuotesPage() {
           : filteredQuotes?.map((quote) => (
               <Card
                 key={quote.type}
-                className={`bg-card cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
-                  activeCard === quote.type ? "ring-2 ring-primary" : ""
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                  activeCard === quote.type
+                    ? "ring-2 ring-primary shadow-lg shadow-primary/10 border-primary/30"
+                    : "hover:ring-2 hover:ring-primary/50"
                 }`}
                 onClick={() => {
                   setActiveCard(quote.type);
@@ -286,14 +288,16 @@ export default function QuotesPage() {
                       </p>
                     </div>
                     <div
-                      className={`flex items-center gap-1 text-sm ${
-                        quote.variation >= 0 ? "text-green-500" : "text-red-500"
+                      className={`flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+                        quote.variation >= 0
+                          ? "text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/15"
+                          : "text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/15"
                       }`}
                     >
                       {quote.variation >= 0 ? (
-                        <TrendingUp className="h-4 w-4" />
+                        <TrendingUp className="h-3.5 w-3.5" />
                       ) : (
-                        <TrendingDown className="h-4 w-4" />
+                        <TrendingDown className="h-3.5 w-3.5" />
                       )}
                       {Math.abs(quote.variation).toFixed(2)}%
                     </div>
