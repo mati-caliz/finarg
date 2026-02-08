@@ -58,6 +58,7 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: false
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://finlatamio.com,https://www.finlatamio.com}
       LOG_LEVEL_ROOT: INFO
       LOG_LEVEL_APP: INFO
       JAVA_OPTS: "-Xmx1024m -Xms512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
