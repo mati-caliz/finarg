@@ -21,7 +21,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 20m
           script: |
-            cd /root/finarg
+            cd /home/deploy/finarg
 
             echo "📥 Pulling latest changes..."
             git pull origin main
