@@ -47,63 +47,66 @@ function SemicircleGauge({
   return (
     <div className="flex flex-col items-center py-6">
       <div className="relative w-full max-w-md mx-auto px-4">
-        <svg viewBox="0 0 200 110" className="w-full h-auto drop-shadow-lg">
+        <svg
+          viewBox="0 0 200 110"
+          className="w-full h-auto drop-shadow-lg"
+          style={{ shapeRendering: "geometricPrecision" }}
+        >
           <title>{translate("exchangeBands")}</title>
           <defs>
             <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#22c55e" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity="1" />
+              <stop offset="0%" stopColor="#22c55e" />
+              <stop offset="100%" stopColor="#22c55e" />
             </linearGradient>
             <linearGradient id="yellowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#eab308" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#eab308" stopOpacity="1" />
+              <stop offset="0%" stopColor="#eab308" />
+              <stop offset="100%" stopColor="#eab308" />
             </linearGradient>
             <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#f97316" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#f97316" stopOpacity="1" />
+              <stop offset="0%" stopColor="#f97316" />
+              <stop offset="100%" stopColor="#f97316" />
             </linearGradient>
             <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#ef4444" stopOpacity="1" />
-              <stop offset="100%" stopColor="#ef4444" stopOpacity="0.6" />
+              <stop offset="0%" stopColor="#ef4444" />
+              <stop offset="100%" stopColor="#ef4444" />
             </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="2" result="coloredBlur" />
-              <feMerge>
-                <feMergeNode in="coloredBlur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
           </defs>
 
           <path
-            d="M 10 100 A 90 90 0 0 1 46.1 27.6"
+            d="M 10 100 A 90 90 0 0 1 36.36 36.36"
             fill="none"
             stroke="url(#greenGrad)"
-            strokeWidth="20"
-            strokeLinecap="round"
-            opacity="0.9"
+            strokeWidth="22"
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
+            vectorEffect="non-scaling-stroke"
           />
           <path
-            d="M 46.1 27.6 A 90 90 0 0 1 100 10"
+            d="M 36.36 36.36 A 90 90 0 0 1 100 10"
             fill="none"
             stroke="url(#yellowGrad)"
-            strokeWidth="20"
-            opacity="0.9"
+            strokeWidth="22"
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
+            vectorEffect="non-scaling-stroke"
           />
           <path
-            d="M 100 10 A 90 90 0 0 1 153.9 27.6"
+            d="M 100 10 A 90 90 0 0 1 163.64 36.36"
             fill="none"
             stroke="url(#orangeGrad)"
-            strokeWidth="20"
-            opacity="0.9"
+            strokeWidth="22"
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
+            vectorEffect="non-scaling-stroke"
           />
           <path
-            d="M 153.9 27.6 A 90 90 0 0 1 190 100"
+            d="M 163.64 36.36 A 90 90 0 0 1 190 100"
             fill="none"
             stroke="url(#redGrad)"
-            strokeWidth="20"
-            strokeLinecap="round"
-            opacity="0.9"
+            strokeWidth="22"
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
+            vectorEffect="non-scaling-stroke"
           />
 
           <line

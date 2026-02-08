@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === "production";
+const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
 
 const securityHeaders = [
   {
@@ -34,7 +35,13 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com https://www.google.com",
-      `connect-src 'self' https://accounts.google.com ${isProd ? "https://finarg.vercel.app" : "http://localhost:8080"}`,
+      [
+        "connect-src 'self' https://accounts.google.com",
+        !isProd && "http://localhost:8080",
+        backendUrl.replace("/api/v1", ""),
+      ]
+        .filter(Boolean)
+        .join(" "),
       "frame-src https://accounts.google.com",
     ].join("; "),
   },
