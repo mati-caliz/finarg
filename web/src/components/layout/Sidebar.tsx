@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Menu,
   Percent,
+  TrendingUp,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -58,6 +59,12 @@ const baseNavigation = [
     href: "/calculadora-sueldo-neto",
     icon: Calculator,
     feature: "incomeTax" as const,
+  },
+  {
+    key: "compoundInterestCalculator" as TranslationKey,
+    href: "/calculadora-interes-compuesto",
+    icon: TrendingUp,
+    feature: null,
   },
 ];
 
@@ -173,6 +180,7 @@ export function Sidebar() {
           <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
+              const isNew = item.href === "/calculadora-interes-compuesto";
               return (
                 <Link
                   key={item.name}
@@ -183,14 +191,19 @@ export function Sidebar() {
                     }
                   }}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
                     isActive
                       ? "bg-primary text-white shadow-lg shadow-primary/25"
                       : "text-white/60 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  {item.name}
+                  <span className="flex-1">{item.name}</span>
+                  {isNew && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-500 text-white uppercase tracking-wide">
+                      Nuevo
+                    </span>
+                  )}
                 </Link>
               );
             })}

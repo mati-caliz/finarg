@@ -166,3 +166,25 @@ export interface Government {
   label: string;
   color: string;
 }
+
+export type CompoundingFrequency = "MONTHLY" | "QUARTERLY" | "YEARLY";
+
+export interface CompoundInterestRequest {
+  initialCapital: number;
+  annualRate: number;
+  years: number;
+  compoundingFrequency: CompoundingFrequency;
+  periodicContribution?: number;
+}
+
+export interface CompoundInterestResponse {
+  finalAmount: number;
+  totalContributions: number;
+  totalInterest: number;
+  periods: {
+    period: number;
+    principal: number;
+    interest: number;
+    total: number;
+  }[];
+}
