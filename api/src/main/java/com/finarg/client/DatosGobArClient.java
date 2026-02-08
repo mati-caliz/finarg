@@ -24,6 +24,8 @@ public class DatosGobArClient {
     private static final String MINIMUM_SALARY_SERIES_ID = "57.1_SMVMM_0_M_34";
     private static final String MINIMUM_PENSION_SERIES_ID = "58.1_MP_0_M_24";
     private static final String CANASTA_BASICA_TOTAL_SERIES_ID = "444.1_CANASTA_batotGBA_0_0_26_47";
+    private static final String CANASTA_BASICA_ALIMENTARIA_SERIES_ID = "444.1_CANASTA_baalimGBA_0_0_26_47";
+    private static final String SALARIO_RIPTE_SERIES_ID = "353.2_RIPTE_0_M_29";
     private static final String PASIVOS_LETRAS_USD_ID = "92.2_PASIVOS_MORES_0_0_33_100";
     private static final String DEPOSITOS_GOBIERNO_ID = "92.2_OTROS_DEPORNO_0_0_24_42";
     private static final String POSICION_NETA_PASES_ID = "92.2_POSICION_NSES_0_0_19_25";
@@ -43,6 +45,14 @@ public class DatosGobArClient {
 
     public BigDecimal getLatestCanastaBasicaTotal() {
         return fetchLatestValue(CANASTA_BASICA_TOTAL_SERIES_ID);
+    }
+
+    public BigDecimal getLatestCanastaBasicaAlimentaria() {
+        return fetchLatestValue(CANASTA_BASICA_ALIMENTARIA_SERIES_ID);
+    }
+
+    public BigDecimal getLatestSalarioRipte() {
+        return fetchLatestValue(SALARIO_RIPTE_SERIES_ID);
     }
 
     private BigDecimal fetchLatestValue(String seriesId) {

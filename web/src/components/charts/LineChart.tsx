@@ -6,6 +6,7 @@ import {
   ComposedChart,
   Legend,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -39,12 +40,49 @@ export function LineChart({
 }: LineChartProps) {
   const yKeys = Array.isArray(yKey) ? yKey : [yKey];
 
+  const yearMarkers = data.reduce<Array<{ x: string; year: number }>>((acc, point, index) => {
+    const dateValue = point[xKey];
+    const date = new Date(dateValue);
+    const year = date.getFullYear();
+
+    if (index === 0) {
+      acc.push({ x: String(dateValue), year });
+    } else {
+      const prevDateValue = data[index - 1][xKey];
+      const prevDate = new Date(prevDateValue);
+      const prevYear = prevDate.getFullYear();
+
+      if (year !== prevYear) {
+        acc.push({ x: String(dateValue), year });
+      }
+    }
+
+    return acc;
+  }, []);
+
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 20, left: 10, bottom: 8 }}>
         {showGrid && (
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
         )}
+        {yearMarkers.map((marker) => (
+          <ReferenceLine
+            key={marker.x}
+            x={marker.x}
+            stroke="hsl(var(--muted-foreground))"
+            strokeOpacity={0.3}
+            strokeWidth={1}
+            strokeDasharray="4 4"
+            label={{
+              value: String(marker.year),
+              position: "top",
+              fill: "hsl(var(--muted-foreground))",
+              fontSize: 11,
+              fontWeight: 500,
+            }}
+          />
+        ))}
         <defs>
           {yKeys.map((key, index) => {
             const color = colors[index % colors.length];

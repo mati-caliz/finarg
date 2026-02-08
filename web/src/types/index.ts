@@ -111,7 +111,9 @@ export interface IncomeTaxResponse {
 export interface SocialIndicators {
   minimumSalary?: number;
   minimumPension?: number;
-  canastaBasicaTotal?: number;
+  totalBasicBasket?: number;
+  foodBasicBasket?: number;
+  ripteSalary?: number;
   uva?: number;
   cer?: number;
 }

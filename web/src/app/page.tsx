@@ -134,8 +134,12 @@ export default function DashboardPage() {
                 socialIndicators.minimumSalary !== null) ||
                 (socialIndicators.minimumPension !== undefined &&
                   socialIndicators.minimumPension !== null) ||
-                (socialIndicators.canastaBasicaTotal !== undefined &&
-                  socialIndicators.canastaBasicaTotal !== null) ||
+                (socialIndicators.totalBasicBasket !== undefined &&
+                  socialIndicators.totalBasicBasket !== null) ||
+                (socialIndicators.foodBasicBasket !== undefined &&
+                  socialIndicators.foodBasicBasket !== null) ||
+                (socialIndicators.ripteSalary !== undefined &&
+                  socialIndicators.ripteSalary !== null) ||
                 (socialIndicators.uva !== undefined && socialIndicators.uva !== null) ||
                 (socialIndicators.cer !== undefined && socialIndicators.cer !== null)) && (
                 <Card className="shrink-0 border-t-[3px] border-t-indigo-400">
@@ -176,8 +180,8 @@ export default function DashboardPage() {
                             </p>
                           </div>
                         )}
-                      {socialIndicators.canastaBasicaTotal !== undefined &&
-                        socialIndicators.canastaBasicaTotal !== null && (
+                      {socialIndicators.totalBasicBasket !== undefined &&
+                        socialIndicators.totalBasicBasket !== null && (
                           <div className="p-2 rounded-lg bg-muted/50">
                             <p className="text-xs text-muted-foreground">
                               {translate("canastaBasicaTotal")}
@@ -187,7 +191,37 @@ export default function DashboardPage() {
                                 style: "currency",
                                 currency: "ARS",
                                 maximumFractionDigits: 0,
-                              }).format(socialIndicators.canastaBasicaTotal)}
+                              }).format(socialIndicators.totalBasicBasket)}
+                            </p>
+                          </div>
+                        )}
+                      {socialIndicators.foodBasicBasket !== undefined &&
+                        socialIndicators.foodBasicBasket !== null && (
+                          <div className="p-2 rounded-lg bg-muted/50">
+                            <p className="text-xs text-muted-foreground">
+                              {translate("canastaBasicaAlimentaria")}
+                            </p>
+                            <p className="text-lg font-semibold text-foreground">
+                              {new Intl.NumberFormat("es-AR", {
+                                style: "currency",
+                                currency: "ARS",
+                                maximumFractionDigits: 0,
+                              }).format(socialIndicators.foodBasicBasket)}
+                            </p>
+                          </div>
+                        )}
+                      {socialIndicators.ripteSalary !== undefined &&
+                        socialIndicators.ripteSalary !== null && (
+                          <div className="p-2 rounded-lg bg-muted/50">
+                            <p className="text-xs text-muted-foreground">
+                              {translate("salarioRipte")}
+                            </p>
+                            <p className="text-lg font-semibold text-foreground">
+                              {new Intl.NumberFormat("es-AR", {
+                                style: "currency",
+                                currency: "ARS",
+                                maximumFractionDigits: 0,
+                              }).format(socialIndicators.ripteSalary)}
                             </p>
                           </div>
                         )}
@@ -261,13 +295,12 @@ export default function DashboardPage() {
       </div>
 
       {quotes &&
-        quotes.filter((q) => !["blue", "oficial", "tarjeta", "bolsa"].includes(q.type)).length >
-          0 && (
+        quotes.filter((q) => q.type.startsWith("eur_") || q.type.startsWith("brl_")).length > 0 && (
           <div>
             <h2 className="text-lg font-semibold mb-4">{translate("otherQuotes")}</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {sortQuotesByVariant(
-                quotes.filter((q) => !["blue", "oficial", "tarjeta", "bolsa"].includes(q.type)),
+                quotes.filter((q) => q.type.startsWith("eur_") || q.type.startsWith("brl_")),
               ).map((quote) => (
                 <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
               ))}
