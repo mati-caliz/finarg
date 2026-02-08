@@ -1,5 +1,5 @@
 import type { CountryCode } from "@/config/countries";
-import type { IncomeTaxRequest } from "@/types";
+import type { CompoundInterestRequest, IncomeTaxRequest } from "@/types";
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
@@ -55,6 +55,10 @@ export const reservesApi = {
 
 export const incomeTaxApi = {
   calculate: (data: IncomeTaxRequest) => api.post("/income-tax/calculate", data),
+};
+
+export const compoundInterestApi = {
+  calculate: (data: CompoundInterestRequest) => api.post("/compound-interest/calculate", data),
 };
 
 export const exchangeBandsApi = {

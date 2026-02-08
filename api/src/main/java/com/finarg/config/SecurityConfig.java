@@ -52,6 +52,7 @@ public class SecurityConfig {
                                 "/api/v1/inflation/**",
                                 "/api/v1/reserves/**",
                                 "/api/v1/income-tax/**",
+                                "/api/v1/compound-interest/**",
                                 "/api/v1/simulator/**",
                                 "/api/v1/exchange-bands/**",
                                 "/api/v1/rates/**",

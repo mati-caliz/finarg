@@ -4,6 +4,7 @@ export const translations = {
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
+    compoundInterestCalculator: "Calculadora de Interés Compuesto",
 
     inflation: "Inflación",
     reserves: "Reservas",
@@ -51,6 +52,43 @@ export const translations = {
     noBankRates:
       "No hay datos de plazos fijos disponibles. Las tasas se obtienen automáticamente del BCRA.",
     ratesUpdateNote: "Las tasas se actualizan según la fuente (BCRA y API de billeteras).",
+
+    // Calculadora de Interés Compuesto
+    compoundInterestTitle: "Calculadora de Interés Compuesto",
+    compoundInterestSubtitle:
+      "Calculá cuánto podés ganar invirtiendo con interés compuesto a lo largo del tiempo.",
+    investmentData: "Datos de Inversión",
+    initialCapital: "Capital Inicial",
+    annualInterestRate: "Tasa de Interés Anual",
+    investmentPeriod: "Período de Inversión",
+    compoundingFrequency: "Frecuencia de Capitalización",
+    quarterly: "Trimestral",
+    yearly: "Anual",
+    periodicContribution: "Aporte Mensual",
+    optional: "Opcional",
+    periodicContributionNote: "Aporte adicional cada mes",
+    month: "Mes",
+    calculate: "Calcular",
+    finalAmount: "Monto Final",
+    totalContributions: "Total Aportado",
+    contributions: "Aportes",
+    totalInterest: "Intereses Ganados",
+    interest: "Intereses",
+    total: "Total",
+    interestEarnings: "Ganancia por intereses",
+    growthEvolution: "Evolución del Crecimiento",
+    faqCompoundInterestQuestion: "¿Qué es el interés compuesto?",
+    faqCompoundInterestAnswer:
+      "Es el interés que se calcula sobre el capital inicial más los intereses acumulados de períodos anteriores. En otras palabras, ganás intereses sobre tus intereses, lo que genera un crecimiento exponencial.",
+    faqCompoundingFrequencyQuestion: "¿Qué es la frecuencia de capitalización?",
+    faqCompoundingFrequencyAnswer:
+      "Es la frecuencia con la que los intereses se suman al capital. Cuanto más frecuente, mayor será el rendimiento final. Por ejemplo, capitalización mensual genera más intereses que anual.",
+    faqPeriodicContributionQuestion: "¿Qué son los aportes periódicos?",
+    faqPeriodicContributionAnswer:
+      "Son inversiones adicionales que realizás en cada período de capitalización. Por ejemplo, si elegís capitalización mensual y un aporte de $1000, estarás invirtiendo $1000 adicionales cada mes.",
+    faqCompoundVsSimpleQuestion: "¿Cuál es la diferencia con el interés simple?",
+    faqCompoundVsSimpleAnswer:
+      "En el interés simple, los intereses se calculan solo sobre el capital inicial. En el interés compuesto, los intereses se calculan sobre el capital inicial más los intereses acumulados, generando un rendimiento mucho mayor a largo plazo.",
 
     // Reservas
     bcraReservesTitle: "Reservas BCRA",
@@ -385,6 +423,7 @@ export const translations = {
     dashboard: "Dashboard",
     quotes: "Cotações",
     incomeTaxCalculator: "Calculadora de Imposto de Renda",
+    compoundInterestCalculator: "Calculadora de Juros Compostos",
 
     inflation: "Inflação",
     reserves: "Reservas",
@@ -426,6 +465,44 @@ export const translations = {
       "O comparador de taxas está disponível apenas para Argentina no momento.",
     noWalletRates: "Não há dados de carteiras disponíveis.",
     noBankRates: "Não há dados de prazos fixos disponíveis.",
+    ratesUpdateNote: "As taxas são atualizadas conforme a fonte (BCRA e APIs de carteiras).",
+
+    // Calculadora de Juros Compostos
+    compoundInterestTitle: "Calculadora de Juros Compostos",
+    compoundInterestSubtitle:
+      "Calcule quanto você pode ganhar investindo com juros compostos ao longo do tempo.",
+    investmentData: "Dados do Investimento",
+    initialCapital: "Capital Inicial",
+    annualInterestRate: "Taxa de Juros Anual",
+    investmentPeriod: "Período de Investimento",
+    compoundingFrequency: "Frequência de Capitalização",
+    quarterly: "Trimestral",
+    yearly: "Anual",
+    periodicContribution: "Contribuição Mensal",
+    optional: "Opcional",
+    periodicContributionNote: "Contribuição adicional a cada mês",
+    month: "Mês",
+    calculate: "Calcular",
+    finalAmount: "Valor Final",
+    totalContributions: "Total Contribuído",
+    contributions: "Contribuições",
+    totalInterest: "Juros Ganhos",
+    interest: "Juros",
+    total: "Total",
+    interestEarnings: "Ganho por juros",
+    growthEvolution: "Evolução do Crescimento",
+    faqCompoundInterestQuestion: "O que são juros compostos?",
+    faqCompoundInterestAnswer:
+      "São os juros calculados sobre o capital inicial mais os juros acumulados de períodos anteriores. Em outras palavras, você ganha juros sobre seus juros, gerando um crescimento exponencial.",
+    faqCompoundingFrequencyQuestion: "O que é a frequência de capitalização?",
+    faqCompoundingFrequencyAnswer:
+      "É a frequência com que os juros são adicionados ao capital. Quanto mais frequente, maior será o rendimento final. Por exemplo, capitalização mensal gera mais juros que anual.",
+    faqPeriodicContributionQuestion: "O que são contribuições periódicas?",
+    faqPeriodicContributionAnswer:
+      "São investimentos adicionais que você faz em cada período de capitalização. Por exemplo, se escolher capitalização mensal e uma contribuição de R$ 1000, você estará investindo R$ 1000 adicionais a cada mês.",
+    faqCompoundVsSimpleQuestion: "Qual é a diferença com os juros simples?",
+    faqCompoundVsSimpleAnswer:
+      "Nos juros simples, os juros são calculados apenas sobre o capital inicial. Nos juros compostos, os juros são calculados sobre o capital inicial mais os juros acumulados, gerando um rendimento muito maior a longo prazo.",
 
     // Reservas
     bcraReservesTitle: "Reservas BCRA",
@@ -661,6 +738,7 @@ export const translations = {
     dashboard: "Dashboard",
     quotes: "Quotes",
     incomeTaxCalculator: "Income Tax Calculator",
+    compoundInterestCalculator: "Compound Interest Calculator",
 
     inflation: "Inflation",
     reserves: "Reserves",
@@ -701,6 +779,43 @@ export const translations = {
     noWalletRates: "No wallet rate data available.",
     noBankRates: "No fixed-term rate data available.",
     ratesUpdateNote: "Rates are updated according to the source (BCRA and wallet APIs).",
+
+    // Compound Interest Calculator
+    compoundInterestTitle: "Compound Interest Calculator",
+    compoundInterestSubtitle:
+      "Calculate how much you can earn by investing with compound interest over time.",
+    investmentData: "Investment Data",
+    initialCapital: "Initial Capital",
+    annualInterestRate: "Annual Interest Rate",
+    investmentPeriod: "Investment Period",
+    compoundingFrequency: "Compounding Frequency",
+    quarterly: "Quarterly",
+    yearly: "Yearly",
+    periodicContribution: "Monthly Contribution",
+    optional: "Optional",
+    periodicContributionNote: "Additional contribution each month",
+    month: "Month",
+    calculate: "Calculate",
+    finalAmount: "Final Amount",
+    totalContributions: "Total Contributed",
+    contributions: "Contributions",
+    totalInterest: "Interest Earned",
+    interest: "Interest",
+    total: "Total",
+    interestEarnings: "Interest earnings",
+    growthEvolution: "Growth Evolution",
+    faqCompoundInterestQuestion: "What is compound interest?",
+    faqCompoundInterestAnswer:
+      "It's the interest calculated on the initial principal plus the accumulated interest from previous periods. In other words, you earn interest on your interest, generating exponential growth.",
+    faqCompoundingFrequencyQuestion: "What is the compounding frequency?",
+    faqCompoundingFrequencyAnswer:
+      "It's the frequency at which interest is added to the principal. The more frequent, the higher the final return. For example, monthly compounding generates more interest than yearly.",
+    faqPeriodicContributionQuestion: "What are periodic contributions?",
+    faqPeriodicContributionAnswer:
+      "They are additional investments you make at each compounding period. For example, if you choose monthly compounding and a $1000 contribution, you'll be investing an additional $1000 each month.",
+    faqCompoundVsSimpleQuestion: "What's the difference with simple interest?",
+    faqCompoundVsSimpleAnswer:
+      "With simple interest, interest is calculated only on the initial principal. With compound interest, interest is calculated on the initial principal plus accumulated interest, generating much higher returns in the long term.",
 
     // Reserves
     bcraReservesTitle: "BCRA Reserves",
