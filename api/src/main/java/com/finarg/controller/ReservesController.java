@@ -43,7 +43,6 @@ public class ReservesController {
         return ResponseEntity.ok(reservesService.getHistory(days));
     }
 
-
     @GetMapping("/governments")
     @Operation(summary = "Get government periods for chart visualization")
     public ResponseEntity<List<GovernmentDTO>> getGovernments(

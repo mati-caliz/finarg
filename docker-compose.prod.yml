@@ -36,7 +36,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    container_name: finarg-backend-prod
+    container_name: api-prod
     depends_on:
       postgres:
         condition: service_healthy
@@ -78,7 +78,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-    container_name: finarg-frontend-prod
+    container_name: web-prod
     depends_on:
       backend:
         condition: service_healthy

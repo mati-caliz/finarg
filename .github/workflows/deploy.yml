@@ -27,8 +27,8 @@ jobs:
             git pull origin main
 
             echo "🔍 Detecting changes..."
-            BACKEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep -q "finarg-backend/" && echo "true" || echo "false")
-            FRONTEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep -q "finarg-frontend/" && echo "true" || echo "false")
+            BACKEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep -q "api/" && echo "true" || echo "false")
+            FRONTEND_CHANGED=$(git diff HEAD@{1} HEAD --name-only | grep -q "web/" && echo "true" || echo "false")
 
             echo "Backend changed: $BACKEND_CHANGED"
             echo "Frontend changed: $FRONTEND_CHANGED"
