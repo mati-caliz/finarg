@@ -1,5 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" stroke="#10b981" stroke-width="24">
-  <rect x="64" y="64" width="384" height="384" rx="48" fill="#0a0a0a"/>
-  <path d="M256 128v256M128 256h256" stroke-linecap="round"/>
-  <circle cx="256" cy="256" r="96" fill="none"/>
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradBlue" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0b2e4f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#20b2aa;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="gradGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fdd835;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fbc02d;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(50, 20)">
+
+    <path d="M220,100 C200,110 180,120 190,140 L200,150 L210,180 L230,220 L240,260 L250,300 C240,320 230,330 240,350 L250,340 C270,300 290,250 320,200 C310,180 300,160 280,150 C260,140 240,130 220,100 Z"
+          fill="#1e6b7b" opacity="0.8" />
+
+    <circle cx="200" cy="200" r="140" fill="none" stroke="url(#gradBlue)" stroke-width="15" stroke-linecap="round" />
+
+    <g transform="translate(130, 160)">
+      <path d="M0,40 A40,40 0 1,1 80,40" fill="none" stroke="url(#gradGold)" stroke-width="6" />
+      <line x1="40" y1="-10" x2="40" y2="-25" stroke="url(#gradGold)" stroke-width="4" />
+      <line x1="10" y1="5" x2="-5" y2="-5" stroke="url(#gradGold)" stroke-width="4" />
+      <line x1="70" y1="5" x2="85" y2="-5" stroke="url(#gradGold)" stroke-width="4" />
+    </g>
+
+    <path d="M90,280 L180,180 L220,220 L350,70 L320,80 M350,70 L340,100"
+          fill="none" stroke="url(#gradBlue)" stroke-width="25" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <path d="M350,70 L315,85 L335,105 Z" fill="url(#gradBlue)" />
+  </g>
+
+  <text x="250" y="450" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="60" fill="#0b2e4f" letter-spacing="2">
+    FINLATAM
+  </text>
 </svg>

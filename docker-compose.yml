@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -13,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - api-network
+      - finarg-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finarg}"]
       interval: 10s
@@ -29,7 +27,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - api-network
+      - finarg-network
     command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -40,7 +38,7 @@ services:
 
   backend:
     build:
-      context: ./finarg-backend
+      context: ./api
       dockerfile: Dockerfile
     container_name: finarg-backend
     depends_on:
@@ -87,7 +85,7 @@ services:
 
   frontend:
     build:
-      context: ./finarg-frontend
+      context: ./web
       dockerfile: Dockerfile
     container_name: finarg-frontend
     depends_on:
@@ -109,5 +107,5 @@ volumes:
     driver: local
 
 networks:
-  api-network:
+  finarg-network:
     driver: bridge
