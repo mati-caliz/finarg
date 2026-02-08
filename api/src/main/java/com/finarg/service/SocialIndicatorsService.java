@@ -21,17 +21,22 @@ public class SocialIndicatorsService {
         log.info("Fetching social indicators for Argentina from APIs");
         var minimumSalary = datosGobArClient.getLatestMinimumSalary();
         var minimumPension = datosGobArClient.getLatestMinimumPension();
-        var canastaBasicaTotal = datosGobArClient.getLatestCanastaBasicaTotal();
+        var totalBasicBasket = datosGobArClient.getLatestCanastaBasicaTotal();
+        var foodBasicBasket = datosGobArClient.getLatestCanastaBasicaAlimentaria();
+        var ripteSalary = datosGobArClient.getLatestSalarioRipte();
         var uva = bcraClient.getUva();
         var cer = bcraClient.getCer();
-        if (minimumSalary == null && minimumPension == null && canastaBasicaTotal == null
+        if (minimumSalary == null && minimumPension == null && totalBasicBasket == null
+                && foodBasicBasket == null && ripteSalary == null
                 && uva == null && cer == null) {
             return null;
         }
         return SocialIndicatorsDTO.builder()
                 .minimumSalary(minimumSalary)
                 .minimumPension(minimumPension)
-                .canastaBasicaTotal(canastaBasicaTotal)
+                .totalBasicBasket(totalBasicBasket)
+                .foodBasicBasket(foodBasicBasket)
+                .ripteSalary(ripteSalary)
                 .uva(uva)
                 .cer(cer)
                 .build();
