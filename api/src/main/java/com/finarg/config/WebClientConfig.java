@@ -60,6 +60,12 @@ public class WebClientConfig {
     @Value("${external.apis.wikidata.timeout:15000}")
     private int wikidataTimeout;
 
+    @Value("${external.apis.fci.base-url:https://api.argentinadatos.com}")
+    private String fciBaseUrl;
+
+    @Value("${external.apis.fci.timeout:30000}")
+    private int fciTimeout;
+
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
         return WebClient.builder()
@@ -183,6 +189,21 @@ public class WebClientConfig {
                 .baseUrl(wikidataBaseUrl)
                 .defaultHeader(HttpHeaders.ACCEPT, "application/sparql-results+json, application/json")
                 .defaultHeader("User-Agent", "Finarg/1.0 (https://finarg.app)")
+                .build();
+    }
+
+    @Bean("fciWebClient")
+    public WebClient fciWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .followRedirect(true)
+                .responseTimeout(Duration.ofMillis(fciTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(fciBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+                .defaultHeader("User-Agent", "Finarg/1.0")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
     }
 }

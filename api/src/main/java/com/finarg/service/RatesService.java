@@ -3,6 +3,7 @@ package com.finarg.service;
 import com.finarg.client.ArgentinaDatosClient;
 import com.finarg.client.ArgentinaDatosClient.FciRateResponse;
 import com.finarg.client.ArgentinaDatosClient.FixedTermRateResponse;
+import com.finarg.client.FciClient;
 import com.finarg.model.dto.RateDTO;
 import com.finarg.model.enums.Country;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +14,12 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -36,8 +40,22 @@ public class RatesService {
             Map.entry("NARANJA X", "naranjax.com"),
             Map.entry("SUPERVIELLE", "supervielle.com.ar"),
             Map.entry("UALA", "uala.com.ar"),
+            Map.entry("UALÁ", "uala.com.ar"),
             Map.entry("UALA PLUS 1", "uala.com.ar"),
-            Map.entry("UALA PLUS 2", "uala.com.ar")
+            Map.entry("UALA PLUS 2", "uala.com.ar"),
+            Map.entry("PREX", "prex.com.ar"),
+            Map.entry("PERSONAL PAY", "personalpay.com.ar"),
+            Map.entry("BALANZ", "balanz.com"),
+            Map.entry("IEB+", "ieb.com.ar"),
+            Map.entry("MERCADO PAGO", "mercadopago.com.ar"),
+            Map.entry("TORONTO AHORRO", "torontotrust.com.ar"),
+            Map.entry("LEMON", "lemon.me"),
+            Map.entry("ICBC", "icbc.com.ar"),
+            Map.entry("MACRO", "macro.com.ar"),
+            Map.entry("GALICIA", "galicia.com.ar"),
+            Map.entry("CLARO PAY", "claropay.com.ar"),
+            Map.entry("IOL (INVERTIRONLINE)", "iol.com.ar"),
+            Map.entry("IOL", "iol.com.ar")
     );
 
     private static final Map<String, String> BANK_DOMAINS = Map.ofEntries(
@@ -58,6 +76,27 @@ public class RatesService {
     );
 
     private final ArgentinaDatosClient argentinaDatosClient;
+    private final FciClient fciClient;
+
+    private static final Map<String, String> FCI_TO_WALLET_MAPPING = Map.ofEntries(
+            Map.entry("Allaria Ahorro - Clase E", "Prex"),
+            Map.entry("Adcap Ahorro Pesos Fondo de Dinero - Clase A", "Adcap"),
+            Map.entry("Premier Renta CP en Pesos - Clase A", "Supervielle"),
+            Map.entry("Ualintec Ahorro Pesos - Clase A", "Ualá"),
+            Map.entry("Delta Pesos - Clase X", "Personal Pay"),
+            Map.entry("Balanz Capital Money Market - Clase A", "Balanz"),
+            Map.entry("IEB Ahorro - Clase A", "IEB+"),
+            Map.entry("Mercado Fondo - Clase A", "Mercado Pago"),
+            Map.entry("Toronto Trust Ahorro - Clase A", "Toronto Ahorro"),
+            Map.entry("Fima Premium - Clase P", "Lemon"),
+            Map.entry("Super Ahorro $ - Clase A", "Santander"),
+            Map.entry("Alpha Pesos - Clase A", "ICBC"),
+            Map.entry("Pionero Pesos - Clase A", "Macro"),
+            Map.entry("Fima Premium - Clase A", "Galicia"),
+            Map.entry("SBS Ahorro Pesos - Clase A", "Claro Pay"),
+            Map.entry("Delta Pesos - Clase A", "Fiwind"),
+            Map.entry("SBS Ahorro Pesos - Clase B", "Brubank")
+    );
 
     @Cacheable(value = "rates", key = "'fixedTerm_' + #country + '_v3'")
     public List<RateDTO> getFixedTermRates(Country country) {
@@ -76,20 +115,58 @@ public class RatesService {
                 .toList();
     }
 
-    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v9'")
+    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v13'")
     public List<RateDTO> getWalletRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
         }
+
+        Map<String, BigDecimal> fciTnas = fciClient.calculateAllTnas();
+        Set<String> fciWalletNames = new HashSet<>(FCI_TO_WALLET_MAPPING.values());
+
+        List<RateDTO> result = new ArrayList<>();
+
         List<FciRateResponse> raw = argentinaDatosClient.getWalletFciRates();
-        if (raw == null) {
-            return List.of();
+        if (raw != null) {
+            raw.stream()
+                    .filter(r -> r.getFund() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
+                    .map(this::mapFciToRateDTO)
+                    .filter(dto -> !fciWalletNames.contains(dto.getName()))
+                    .forEach(result::add);
         }
-        return raw.stream()
-                .filter(r -> r.getFund() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
-                .map(this::mapFciToRateDTO)
-                .sorted((a, b) -> b.getTna().compareTo(a.getTna()))
-                .toList();
+
+        for (Map.Entry<String, String> entry : FCI_TO_WALLET_MAPPING.entrySet()) {
+            String fciName = entry.getKey();
+            String walletName = entry.getValue();
+            BigDecimal tna = fciTnas.get(fciName);
+
+            if (tna != null && tna.compareTo(BigDecimal.ZERO) > 0) {
+                result.add(createFciRateDTO(walletName, tna));
+            }
+        }
+
+        result.sort((a, b) -> b.getTna().compareTo(a.getTna()));
+        return result;
+    }
+
+    private RateDTO createFciRateDTO(String walletName, BigDecimal tnaDecimal) {
+        BigDecimal teaPct = teaFromTna(tnaDecimal.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP))
+                .multiply(BigDecimal.valueOf(100));
+
+        String logo = walletLogoUrl(walletName);
+
+        return RateDTO.builder()
+                .id(sanitizeId(walletName))
+                .name(walletName.toUpperCase())
+                .tna(tnaDecimal.setScale(1, RoundingMode.HALF_UP))
+                .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
+                .product("Fondo Común de Inversión")
+                .term(null)
+                .date(null)
+                .limit(null)
+                .logo(logo)
+                .link(null)
+                .build();
     }
 
     @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v3'")

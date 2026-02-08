@@ -151,6 +151,9 @@ external:
     wikidata:
       base-url: https://query.wikidata.org
       timeout: 15000
+    fci:
+      base-url: https://api.argentinadatos.com
+      timeout: 30000
 
 logging:
   level:
