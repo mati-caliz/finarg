@@ -55,6 +55,61 @@ public class DatosGobArClient {
         return fetchLatestValue(SALARIO_RIPTE_SERIES_ID);
     }
 
+    public BigDecimal getLatestUva() {
+        return fetchLatestCsvValue("uva_diario");
+    }
+
+    public BigDecimal getLatestCer() {
+        return fetchLatestCsvValue("cer_diario");
+    }
+
+    private BigDecimal fetchLatestCsvValue(String columnName) {
+        try {
+            String csvContent = webClient.get()
+                    .uri("https://infra.datos.gob.ar/catalog/sspm/dataset/94/distribution/94.2/download/cer-uva-uvi-diarios.csv")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            if (csvContent == null || csvContent.isEmpty()) {
+                return null;
+            }
+
+            String[] lines = csvContent.split("\n");
+            if (lines.length < 2) {
+                return null;
+            }
+
+            String headerLine = lines[0];
+            String lastLine = lines[lines.length - 1];
+
+            String[] headers = headerLine.split(",");
+            String[] values = lastLine.split(",");
+
+            int columnIndex = -1;
+            for (int i = 0; i < headers.length; i++) {
+                if (headers[i].trim().equals(columnName)) {
+                    columnIndex = i;
+                    break;
+                }
+            }
+
+            if (columnIndex == -1 || columnIndex >= values.length) {
+                return null;
+            }
+
+            String value = values[columnIndex].trim();
+            if (value.isEmpty()) {
+                return null;
+            }
+
+            return new BigDecimal(value);
+        } catch (Exception e) {
+            log.error("Error fetching {} from datos.gob.ar CSV: {}", columnName, e.getMessage());
+            return null;
+        }
+    }
+
     private BigDecimal fetchLatestValue(String seriesId) {
         try {
             SeriesApiResponse response = webClient.get()

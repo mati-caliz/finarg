@@ -5,6 +5,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { exchangeBandsApi } from "@/lib/api";
 import type { ExchangeBands, Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 interface BandsWidgetProps {
   oficialQuote: Quote | undefined;
@@ -88,75 +89,79 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   }
 
   return (
-    <Card className={`h-full ${colors.border} ${colors.light}`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <div className={`h-3 w-3 rounded-full ${colors.bg} animate-pulse`} />
-          {translate("exchangeBands")}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">{translate("currentRate")}</p>
-            <p className="text-2xl font-bold">${currentValue.toLocaleString("es-AR")}</p>
+    <Link href="/bandas-cambiarias" className="block h-full">
+      <Card
+        className={`h-full ${colors.border} ${colors.light} transition-all hover:shadow-lg cursor-pointer`}
+      >
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <div className={`h-3 w-3 rounded-full ${colors.bg} animate-pulse`} />
+            {translate("exchangeBands")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">{translate("currentRate")}</p>
+              <p className="text-2xl font-bold">${currentValue.toLocaleString("es-AR")}</p>
+            </div>
+            <div className={`text-right ${colors.text}`}>
+              <p className="text-xs font-medium">{zoneLabel}</p>
+              <p className="text-sm">
+                {position < 0 || position > 100 ? (
+                  <span className="font-bold">{translate("bandsIntervention")}</span>
+                ) : (
+                  `${clampedPosition.toFixed(0)}% ${translate("bandsOfRange")}`
+                )}
+              </p>
+            </div>
           </div>
-          <div className={`text-right ${colors.text}`}>
-            <p className="text-xs font-medium">{zoneLabel}</p>
-            <p className="text-sm">
-              {position < 0 || position > 100 ? (
-                <span className="font-bold">{translate("bandsIntervention")}</span>
-              ) : (
-                `${clampedPosition.toFixed(0)}% ${translate("bandsOfRange")}`
-              )}
+
+          <div className="space-y-2">
+            <div className="relative h-4 bg-muted rounded-full overflow-hidden">
+              <div
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
+                style={{ width: "20%" }}
+              />
+              <div
+                className="absolute inset-y-0 left-[20%] bg-gradient-to-r from-yellow-500/30 via-transparent to-yellow-500/30"
+                style={{ width: "60%" }}
+              />
+              <div
+                className="absolute inset-y-0 right-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
+                style={{ width: "20%" }}
+              />
+
+              <div
+                className={`absolute top-1/2 -translate-y-1/2 h-5 w-1.5 rounded-full ${colors.bg} shadow-lg transition-all duration-500`}
+                style={{ left: `calc(${clampedPosition}% - 3px)` }}
+              />
+            </div>
+
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <div className="text-left">
+                <p className="font-medium">{translate("bandsFloor")}</p>
+                <p>${floor.toLocaleString("es-AR")}</p>
+              </div>
+              <div className="text-center">
+                <p className="font-medium">{translate("bandsMiddle")}</p>
+                <p>${((floor + ceiling) / 2).toLocaleString("es-AR")}</p>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">{translate("bandsCeiling")}</p>
+                <p>${ceiling.toLocaleString("es-AR")}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground">
+              {translate("bandsCrawlingPeg")}: {(bands.crawlingPegMonthly * 100).toFixed(1)}%{" "}
+              {translate("bandsMonthly")}
             </p>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="relative h-4 bg-muted rounded-full overflow-hidden">
-            <div
-              className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
-              style={{ width: "20%" }}
-            />
-            <div
-              className="absolute inset-y-0 left-[20%] bg-gradient-to-r from-yellow-500/30 via-transparent to-yellow-500/30"
-              style={{ width: "60%" }}
-            />
-            <div
-              className="absolute inset-y-0 right-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
-              style={{ width: "20%" }}
-            />
-
-            <div
-              className={`absolute top-1/2 -translate-y-1/2 h-5 w-1.5 rounded-full ${colors.bg} shadow-lg transition-all duration-500`}
-              style={{ left: `calc(${clampedPosition}% - 3px)` }}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <div className="text-left">
-              <p className="font-medium">{translate("bandsFloor")}</p>
-              <p>${floor.toLocaleString("es-AR")}</p>
-            </div>
-            <div className="text-center">
-              <p className="font-medium">{translate("bandsMiddle")}</p>
-              <p>${((floor + ceiling) / 2).toLocaleString("es-AR")}</p>
-            </div>
-            <div className="text-right">
-              <p className="font-medium">{translate("bandsCeiling")}</p>
-              <p>${ceiling.toLocaleString("es-AR")}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            {translate("bandsCrawlingPeg")}: {(bands.crawlingPegMonthly * 100).toFixed(1)}%{" "}
-            {translate("bandsMonthly")}
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

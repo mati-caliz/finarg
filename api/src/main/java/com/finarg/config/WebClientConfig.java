@@ -1,5 +1,8 @@
 package com.finarg.config;
 
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +12,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
+import javax.net.ssl.SSLException;
 import java.time.Duration;
 
 @Configuration
@@ -113,14 +117,25 @@ public class WebClientConfig {
 
     @Bean("bcraWebClient")
     public WebClient bcraWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(bcraTimeout));
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(bcraBaseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
+        try {
+            SslContext sslContext = SslContextBuilder
+                    .forClient()
+                    .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                    .build();
+
+            HttpClient httpClient = HttpClient.create()
+                    .responseTimeout(Duration.ofMillis(bcraTimeout))
+                    .secure(sslSpec -> sslSpec.sslContext(sslContext));
+
+            return WebClient.builder()
+                    .clientConnector(new ReactorClientHttpConnector(httpClient))
+                    .baseUrl(bcraBaseUrl)
+                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                    .build();
+        } catch (SSLException e) {
+            throw new RuntimeException("Failed to create SSL context for BCRA client", e);
+        }
     }
 
     @Bean("colombiaApiWebClient")

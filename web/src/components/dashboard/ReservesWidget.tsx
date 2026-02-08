@@ -18,7 +18,7 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
   const isNegative = variation < 0;
 
   return (
-    <Card className="h-full border-t-[3px] border-t-cyan-500">
+    <Card className="h-full border-t-[3px] border-t-cyan-500 transition-all hover:shadow-lg hover:border-cyan-400 cursor-pointer">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <Landmark className="h-3.5 w-3.5" />
@@ -97,17 +97,6 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
                 </div>
               )}
           </div>
-
-          {reserves.liabilities && reserves.liabilities.length > 0 && (
-            <div className="pt-2 border-t border-border/50 text-xs text-muted-foreground space-y-1.5">
-              {reserves.liabilities.map((liability) => (
-                <div key={liability.id} className="flex justify-between px-1">
-                  <span>{liability.name}</span>
-                  <span className="font-medium">-{formatReservesUSD(liability.amount)}</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

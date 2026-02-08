@@ -182,10 +182,7 @@ export default function QuotesPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {countryConfig.flag} {translate("quotes")} -{" "}
-            {translate(countryConfig.code as TranslationKey)}
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">{translate("quotes")}</h1>
           <p className="text-muted-foreground text-sm mt-1">{translate("allQuotesRealTime")}</p>
         </div>
         <QueryError
@@ -214,12 +211,8 @@ export default function QuotesPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {countryConfig.flag} {translate("quotes")} -{" "}
-            {translate(countryConfig.code as TranslationKey)}
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground">{translate("quotes")}</h1>
           <p className="text-muted-foreground text-sm mt-1">{translate("allQuotesRealTime")}</p>
-          <p className="text-muted-foreground text-xs mt-1">{translate("quotesUpdateNote")}</p>
           {!isLoading && dataUpdatedAt !== null && (
             <div className="mt-2 w-full max-w-xs">
               <div

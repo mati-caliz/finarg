@@ -5,7 +5,14 @@ import { CountryRiskWidget } from "@/components/dashboard/CountryRiskWidget";
 import { GapGauge } from "@/components/dashboard/GapGauge";
 import { QuoteCard } from "@/components/dashboard/QuoteCard";
 import { ReservesWidget } from "@/components/dashboard/ReservesWidget";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { getCountryConfig } from "@/config/countries";
 
 import { useCountryRisk } from "@/hooks/useCountryRisk";
@@ -14,10 +21,12 @@ import { useGap, useQuotes } from "@/hooks/useQuotes";
 import { useReserves } from "@/hooks/useReserves";
 import { useSocialIndicators } from "@/hooks/useSocialIndicators";
 import { useTranslation } from "@/hooks/useTranslation";
+import type { TranslationKey } from "@/i18n/translations";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
-import { ArrowRight, Calculator, Loader2, Percent, TrendingUp } from "lucide-react";
+import { ArrowRight, Calculator, ChevronDown, Loader2, Percent, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function DashboardPage() {
   const { translate } = useTranslation();
@@ -31,6 +40,54 @@ export default function DashboardPage() {
   const { data: inflation } = useCurrentInflation();
   const { data: socialIndicators } = useSocialIndicators(selectedCountry);
   const { data: countryRisk } = useCountryRisk();
+
+  const otherQuotes = quotes?.filter(
+    (q) =>
+      q.type.startsWith("eur_") ||
+      q.type.startsWith("brl_") ||
+      q.type.startsWith("clp_") ||
+      q.type.startsWith("uyu_") ||
+      q.type.startsWith("pyg_") ||
+      q.type.startsWith("bob_") ||
+      q.type.startsWith("cny_"),
+  );
+
+  const currencyToTranslationKey: Record<string, TranslationKey> = {
+    eur: "currencyEuro",
+    brl: "currencyReal",
+    clp: "currencyClp",
+    uyu: "currencyUyu",
+    cop: "currencyCop",
+    pyg: "currencyPyg",
+    bob: "currencyBob",
+    cny: "currencyCny",
+  };
+
+  const availableCurrencies = Array.from(
+    new Set(otherQuotes?.map((q) => q.type.split("_")[0]) ?? []),
+  ).sort((a, b) => {
+    if (a === "eur") {
+      return -1;
+    }
+    if (b === "eur") {
+      return 1;
+    }
+    if (a === "brl") {
+      return -1;
+    }
+    if (b === "brl") {
+      return 1;
+    }
+    const nameA = translate(currencyToTranslationKey[a] ?? "currencyDollar");
+    const nameB = translate(currencyToTranslationKey[b] ?? "currencyDollar");
+    return nameA.localeCompare(nameB, "es");
+  });
+
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("eur");
+
+  const filteredQuotesByCurrency = otherQuotes?.filter((q) =>
+    q.type.startsWith(`${selectedCurrency}_`),
+  );
 
   if (loadingQuotes || loadingGap || (selectedCountry === "ar" && loadingReserves)) {
     return (
@@ -81,52 +138,19 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {selectedCountry === "ar" && reserves && (
-          <ReservesWidget
-            reserves={reserves}
-            label={
-              countryConfig.reservesLabelKey
-                ? translate(countryConfig.reservesLabelKey)
-                : countryConfig.reservesLabel
-            }
-          />
-        )}
-
         {selectedCountry === "ar" && (
           <div className="flex flex-col gap-4 h-full min-h-0">
-            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
-
-            {countryConfig.features.inflation && (
-              <Card className="shrink-0 border-t-[3px] border-t-red-400">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Percent className="h-3.5 w-3.5" />
-                    {translate("monthlyInflation")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 pb-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-red-500">
-                        {inflation?.value?.toFixed(1) ?? "0"}%
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {translate("last12Months")}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
-                      <TrendingUp className="h-5 w-5 text-red-500" />
-                    </div>
-                  </div>
-                  <Link
-                    href="/inflacion"
-                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
-                  >
-                    {translate("viewHistory")}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </CardContent>
-              </Card>
+            {reserves && (
+              <Link href="/reservas-bcra" className="block">
+                <ReservesWidget
+                  reserves={reserves}
+                  label={
+                    countryConfig.reservesLabelKey
+                      ? translate(countryConfig.reservesLabelKey)
+                      : countryConfig.reservesLabel
+                  }
+                />
+              </Link>
             )}
 
             {socialIndicators &&
@@ -262,6 +286,45 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {selectedCountry === "ar" && (
+          <div className="flex flex-col gap-4 h-full min-h-0">
+            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
+
+            {countryConfig.features.inflation && (
+              <Card className="shrink-0 border-t-[3px] border-t-red-400">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Percent className="h-3.5 w-3.5" />
+                    {translate("monthlyInflation")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 pb-6">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-3xl font-bold text-red-500">
+                        {inflation?.value?.toFixed(1) ?? "0"}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {translate("last12Months")}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                      <TrendingUp className="h-5 w-5 text-red-500" />
+                    </div>
+                  </div>
+                  <Link
+                    href="/inflacion"
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                  >
+                    {translate("viewHistory")}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
         {countryConfig.features.inflation && selectedCountry !== "ar" && (
           <Card className="border-t-[3px] border-t-red-400">
             <CardHeader className="pb-2">
@@ -294,19 +357,35 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {quotes &&
-        quotes.filter((q) => q.type.startsWith("eur_") || q.type.startsWith("brl_")).length > 0 && (
-          <div>
-            <h2 className="text-lg font-semibold mb-4">{translate("otherQuotes")}</h2>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {sortQuotesByVariant(
-                quotes.filter((q) => q.type.startsWith("eur_") || q.type.startsWith("brl_")),
-              ).map((quote) => (
+      {otherQuotes && otherQuotes.length > 0 && availableCurrencies.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <h2 className="text-lg font-semibold">{translate("otherQuotes")}</h2>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full sm:w-[200px] justify-between">
+                  {translate(currencyToTranslationKey[selectedCurrency] ?? "currencyDollar")}
+                  <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full sm:w-[200px]">
+                {availableCurrencies.map((currency) => (
+                  <DropdownMenuItem key={currency} onClick={() => setSelectedCurrency(currency)}>
+                    {translate(currencyToTranslationKey[currency] ?? "currencyDollar")}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          {filteredQuotesByCurrency && filteredQuotesByCurrency.length > 0 && (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {sortQuotesByVariant(filteredQuotesByCurrency).map((quote) => (
                 <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {countryConfig.features.incomeTax && (
