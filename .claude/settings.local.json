@@ -36,7 +36,9 @@
       "Bash(docker-compose up:*)",
       "Bash(docker-compose ps:*)",
       "Bash(docker-compose logs:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "WebFetch(domain:datos.gob.ar)",
+      "Bash(npm run build:*)"
     ]
   }
 }

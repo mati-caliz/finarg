@@ -83,7 +83,7 @@ export const translations = {
     reservesUpdateNote: "Los datos se actualizan cada 5 minutos aproximadamente.",
 
     // Inflacion
-    inflationTitle: "Inflación Argentina",
+    inflationTitle: "Inflación",
     inflationDesc: "Datos del IPC y calculadora de ajuste por inflación",
     monthlyInflation: "Inflación Mensual",
     yearOverYear: "Inflación Interanual",
@@ -131,6 +131,7 @@ export const translations = {
 
     // Quotes Page
     allQuotesRealTime: "Cotizaciones en tiempo real",
+    selectQuote: "Seleccionar cotización",
     currencyDollar: "Dólar",
     currencyEuro: "Euro",
     currencyReal: "Real",
@@ -336,11 +337,11 @@ export const translations = {
     bandsAboveCeiling: "Por encima del techo",
     bandsNearCeiling: "Cerca del techo",
     bandsNeutralZone: "Zona neutral",
-    bandsFloorAction: "Piso inferior",
+    bandsFloorAction: "Piso",
     bandsBCRABuys: "BCRA compra",
     bandsMiddleAction: "Zona de no intervención",
     bandsNoIntervention: "Sin intervención",
-    bandsCeilingAction: "Tope superior",
+    bandsCeilingAction: "Techo",
     bandsBCRASells: "BCRA vende",
     bandsDisclaimer: "Sobre las bandas cambiarias",
     bandsDisclaimerText:
@@ -457,7 +458,7 @@ export const translations = {
     reservesUpdateNote: "Os dados são atualizados aproximadamente a cada 5 minutos.",
 
     // Inflacion
-    inflationTitle: "Inflação Argentina",
+    inflationTitle: "Inflação",
     inflationDesc: "Dados do IPC e calculadora de ajuste de inflação",
     monthlyInflation: "Inflação Mensal",
     yearOverYear: "Inflação Interanual",
@@ -496,6 +497,16 @@ export const translations = {
     basisPoints: "pontos-base",
     government: "Governo",
     otherQuotes: "Outras Cotações",
+    selectQuote: "Selecionar cotação",
+    currencyDollar: "Dólar",
+    currencyEuro: "Euro",
+    currencyReal: "Real",
+    currencyClp: "Peso Chileno",
+    currencyUyu: "Peso Uruguaio",
+    currencyCop: "Peso Colombiano",
+    currencyPyg: "Guarani Paraguaio",
+    currencyBob: "Peso Boliviano",
+    currencyCny: "Yuan",
     viewHistory: "Ver histórico e ajustar valores",
     maximizeReturns: "Maximize seus retornos",
     compareReturns: "Compare retornos",
@@ -602,11 +613,11 @@ export const translations = {
     bandsAboveCeiling: "Acima do teto",
     bandsNearCeiling: "Perto do teto",
     bandsNeutralZone: "Zona neutra",
-    bandsFloorAction: "Piso inferior",
+    bandsFloorAction: "Piso",
     bandsBCRABuys: "BCRA compra",
     bandsMiddleAction: "Zona de não intervenção",
     bandsNoIntervention: "Sem intervenção",
-    bandsCeilingAction: "Teto superior",
+    bandsCeilingAction: "Teto",
     bandsBCRASells: "BCRA vende",
     bandsDisclaimer: "Sobre as bandas cambiais",
     bandsDisclaimerText:
@@ -722,7 +733,7 @@ export const translations = {
     reservesUpdateNote: "Data is updated approximately every 5 minutes.",
 
     // Inflacion
-    inflationTitle: "Argentina Inflation",
+    inflationTitle: "Argentina",
     inflationDesc: "CPI data and inflation adjustment calculator",
     monthlyInflation: "Monthly Inflation",
     yearOverYear: "Year-over-Year Inflation",
@@ -789,6 +800,7 @@ export const translations = {
 
     // Quotes Page
     allQuotesRealTime: "All quotes in real-time",
+    selectQuote: "Select quote",
     currencyDollar: "Dollar",
     currencyEuro: "Euro",
     currencyReal: "Real",
@@ -994,11 +1006,11 @@ export const translations = {
     bandsAboveCeiling: "Above ceiling",
     bandsNearCeiling: "Near ceiling",
     bandsNeutralZone: "Neutral zone",
-    bandsFloorAction: "Lower floor",
+    bandsFloorAction: "Floor",
     bandsBCRABuys: "BCRA buys",
     bandsMiddleAction: "Non-intervention zone",
     bandsNoIntervention: "No intervention",
-    bandsCeilingAction: "Upper ceiling",
+    bandsCeilingAction: "Ceiling",
     bandsBCRASells: "BCRA sells",
     bandsDisclaimer: "About exchange bands",
     bandsDisclaimerText:

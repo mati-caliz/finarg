@@ -1,6 +1,5 @@
 package com.finarg.service;
 
-import com.finarg.client.BcraClient;
 import com.finarg.client.DatosGobArClient;
 import com.finarg.model.dto.SocialIndicatorsDTO;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class SocialIndicatorsService {
 
     private final DatosGobArClient datosGobArClient;
-    private final BcraClient bcraClient;
 
     @Cacheable(value = "indicators", key = "'social_ar'", unless = "#result == null")
     public SocialIndicatorsDTO getSocialIndicatorsArgentina() {
@@ -24,8 +22,8 @@ public class SocialIndicatorsService {
         var totalBasicBasket = datosGobArClient.getLatestCanastaBasicaTotal();
         var foodBasicBasket = datosGobArClient.getLatestCanastaBasicaAlimentaria();
         var ripteSalary = datosGobArClient.getLatestSalarioRipte();
-        var uva = bcraClient.getUva();
-        var cer = bcraClient.getCer();
+        var uva = datosGobArClient.getLatestUva();
+        var cer = datosGobArClient.getLatestCer();
         if (minimumSalary == null && minimumPension == null && totalBasicBasket == null
                 && foodBasicBasket == null && ripteSalary == null
                 && uva == null && cer == null) {
