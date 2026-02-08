@@ -83,31 +83,6 @@ export default function InflationPage() {
     return date.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
   };
 
-  const getChartPeriodLabel = (months: number) => {
-    if (months >= 600) {
-      return translate("max");
-    }
-    if (months === 240) {
-      return `20 ${translate("years")}`;
-    }
-    if (months === 120) {
-      return `10 ${translate("years")}`;
-    }
-    if (months === 60) {
-      return `5 ${translate("years")}`;
-    }
-    if (months === 36) {
-      return `3 ${translate("years")}`;
-    }
-    if (months === 24) {
-      return `2 ${translate("years")}`;
-    }
-    if (months === 12) {
-      return `1 ${translate("year")}`;
-    }
-    return `${months} ${translate("months")}`;
-  };
-
   const getVisibleGovernments = (inflationData: Inflation[]) => {
     if (!inflationData || inflationData.length === 0) {
       return [];
@@ -421,9 +396,7 @@ export default function InflationPage() {
           <Card className="bg-card">
             <CardHeader>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">
-                  {translate("yearOverYearEvolution")} ({getChartPeriodLabel(chartMonthsLimit)})
-                </CardTitle>
+                <CardTitle className="text-lg">{translate("yearOverYearEvolution")}</CardTitle>
                 <div className="flex flex-wrap gap-2">
                   {chartPeriods.map((p) => (
                     <Button
