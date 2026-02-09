@@ -53,7 +53,8 @@
       "Bash(docker-compose restart:*)",
       "Bash(trivy fs:*)",
       "Bash(npm run security:*)",
-      "Bash(lighthouse:*)"
+      "Bash(lighthouse:*)",
+      "Bash(npm run dev:*)"
     ]
   }
 }

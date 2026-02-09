@@ -61,6 +61,7 @@ const nextConfig = {
   transpilePackages: ["lucide-react"],
   compress: true,
   poweredByHeader: false,
+  turbopack: {},
   images: {
     remotePatterns: [
       {
