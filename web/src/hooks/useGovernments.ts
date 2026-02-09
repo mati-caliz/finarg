@@ -12,5 +12,8 @@ export function useGovernments(country = "ar") {
       return (response.data as Government[]) ?? [];
     },
     staleTime: 86400000,
+    gcTime: 86400000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 }

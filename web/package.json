@@ -14,7 +14,8 @@
     "check:ci": "biome ci .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "security": "trivy fs --scanners vuln --severity HIGH,CRITICAL ."
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
@@ -41,9 +42,9 @@
     "zustand": "^5.0.3"
   },
   "overrides": {
-    "cross-spawn": "^7.0.6",
-    "glob": "^13.0.1",
-    "tar": "^7.5.7"
+    "cross-spawn": "7.0.6",
+    "glob": "13.0.1",
+    "tar": "7.5.7"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

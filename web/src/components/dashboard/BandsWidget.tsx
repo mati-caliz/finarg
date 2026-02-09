@@ -13,16 +13,19 @@ interface BandsWidgetProps {
 
 export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   const { translate } = useTranslation();
-  const { data: bands } = useQuery({
+  const { data: bands, isLoading } = useQuery({
     queryKey: ["exchangeBands"],
     queryFn: async () => {
       const response = await exchangeBandsApi.getCurrent();
       return response.data as ExchangeBands;
     },
-    staleTime: 3600000,
+    staleTime: 86400000,
+    gcTime: 86400000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
-  if (!bands) {
+  if (isLoading || !bands) {
     return null;
   }
 
