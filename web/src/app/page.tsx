@@ -69,9 +69,10 @@ export default function DashboardPage() {
   const { data: gap, isLoading: loadingGap } = useGap();
   const { data: reserves, isLoading: loadingReserves } = useReserves(selectedCountry);
 
-  const { data: inflation } = useCurrentInflation();
-  const { data: socialIndicators } = useSocialIndicators(selectedCountry);
-  const { data: countryRisk } = useCountryRisk();
+  const { data: inflation, isLoading: loadingInflation } = useCurrentInflation();
+  const { data: socialIndicators, isLoading: loadingSocialIndicators } =
+    useSocialIndicators(selectedCountry);
+  const { data: countryRisk, isLoading: loadingCountryRisk } = useCountryRisk();
 
   const otherQuotes = useMemo(
     () =>
@@ -131,7 +132,14 @@ export default function DashboardPage() {
     [otherQuotes, selectedCurrency],
   );
 
-  if (loadingQuotes || loadingGap || (selectedCountry === "ar" && loadingReserves)) {
+  const isLoadingMainData =
+    loadingQuotes ||
+    loadingGap ||
+    (selectedCountry === "ar" &&
+      (loadingReserves || loadingSocialIndicators || loadingCountryRisk)) ||
+    (countryConfig.features.inflation && loadingInflation);
+
+  if (isLoadingMainData) {
     return (
       <div className="flex items-center justify-center h-[60vh]">
         <div className="flex flex-col items-center gap-3">
