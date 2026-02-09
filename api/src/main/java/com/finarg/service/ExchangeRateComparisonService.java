@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,23 +30,27 @@ public class ExchangeRateComparisonService {
                 .filter(quote -> quote.getBuy().compareTo(BigDecimal.ZERO) > 0)
                 .filter(quote -> quote.getSell().compareTo(BigDecimal.ZERO) > 0)
                 .map(this::convertToRateItem)
-                .collect(Collectors.toList());
+                .toList();
 
-        ExchangeRateComparisonDTO.ExchangeRateItemDTO cheapestToBuy = rateItems.stream()
-                .min(Comparator.comparing(ExchangeRateComparisonDTO.ExchangeRateItemDTO::getBuy))
-                .orElse(null);
+        ExchangeRateComparisonDTO.ExchangeRateItemDTO cheapestToBuy = null;
+        ExchangeRateComparisonDTO.ExchangeRateItemDTO cheapestToSell = null;
+        ExchangeRateComparisonDTO.ExchangeRateItemDTO mostExpensiveToBuy = null;
+        ExchangeRateComparisonDTO.ExchangeRateItemDTO mostExpensiveToSell = null;
 
-        ExchangeRateComparisonDTO.ExchangeRateItemDTO cheapestToSell = rateItems.stream()
-                .min(Comparator.comparing(ExchangeRateComparisonDTO.ExchangeRateItemDTO::getSell))
-                .orElse(null);
-
-        ExchangeRateComparisonDTO.ExchangeRateItemDTO mostExpensiveToBuy = rateItems.stream()
-                .max(Comparator.comparing(ExchangeRateComparisonDTO.ExchangeRateItemDTO::getBuy))
-                .orElse(null);
-
-        ExchangeRateComparisonDTO.ExchangeRateItemDTO mostExpensiveToSell = rateItems.stream()
-                .max(Comparator.comparing(ExchangeRateComparisonDTO.ExchangeRateItemDTO::getSell))
-                .orElse(null);
+        for (ExchangeRateComparisonDTO.ExchangeRateItemDTO item : rateItems) {
+            if (cheapestToBuy == null || item.getBuy().compareTo(cheapestToBuy.getBuy()) < 0) {
+                cheapestToBuy = item;
+            }
+            if (cheapestToSell == null || item.getSell().compareTo(cheapestToSell.getSell()) < 0) {
+                cheapestToSell = item;
+            }
+            if (mostExpensiveToBuy == null || item.getBuy().compareTo(mostExpensiveToBuy.getBuy()) > 0) {
+                mostExpensiveToBuy = item;
+            }
+            if (mostExpensiveToSell == null || item.getSell().compareTo(mostExpensiveToSell.getSell()) > 0) {
+                mostExpensiveToSell = item;
+            }
+        }
 
         return ExchangeRateComparisonDTO.builder()
                 .country(country)
