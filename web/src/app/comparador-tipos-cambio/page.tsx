@@ -40,16 +40,22 @@ function HighlightCard({
   icon: Icon,
   color,
   translate,
+  highlightField,
 }: {
   title: string;
   rate: ExchangeRateComparison["cheapestToBuy"];
   icon: React.ElementType;
   color: string;
   translate: (key: TranslationKey) => string;
+  highlightField: "buy" | "sell";
 }) {
   if (!rate) {
     return null;
   }
+
+  const primaryValue = highlightField === "buy" ? rate.buy : rate.sell;
+  const secondaryValue = highlightField === "buy" ? rate.sell : rate.buy;
+  const secondaryLabel = highlightField === "buy" ? translate("sell") : translate("buy");
 
   return (
     <Card className="border-t-[3px]" style={{ borderTopColor: color }}>
@@ -61,11 +67,11 @@ function HighlightCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <p className="text-2xl font-bold">${formatNumber(rate.sell)}</p>
+          <p className="text-2xl font-bold">${formatNumber(primaryValue)}</p>
           <p className="text-sm text-muted-foreground">{rate.name}</p>
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-muted-foreground">{translate("buy")}:</span>
-            <span className="font-medium">${formatNumber(rate.buy)}</span>
+            <span className="text-muted-foreground">{secondaryLabel}:</span>
+            <span className="font-medium">${formatNumber(secondaryValue)}</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
             <span className="text-muted-foreground">{translate("spread")}:</span>
@@ -85,7 +91,7 @@ export default function ExchangeRateComparatorPage() {
     queryKey: ["exchangeRateComparison", selectedCountry],
     queryFn: async () => {
       const response = await exchangeRateComparisonApi.compareRates(selectedCountry);
-      return response.data as ExchangeRateComparison;
+      return response.data;
     },
     staleTime: 180000,
     gcTime: 300000,
@@ -119,6 +125,7 @@ export default function ExchangeRateComparatorPage() {
           icon={TrendingDown}
           color="#22c55e"
           translate={translate}
+          highlightField="buy"
         />
         <HighlightCard
           title={translate("mostExpensiveToBuy")}
@@ -126,6 +133,7 @@ export default function ExchangeRateComparatorPage() {
           icon={TrendingUp}
           color="#ef4444"
           translate={translate}
+          highlightField="buy"
         />
         <HighlightCard
           title={translate("bestPriceToSell")}
@@ -133,6 +141,7 @@ export default function ExchangeRateComparatorPage() {
           icon={TrendingUp}
           color="#3b82f6"
           translate={translate}
+          highlightField="sell"
         />
         <HighlightCard
           title={translate("worstPriceToSell")}
@@ -140,6 +149,7 @@ export default function ExchangeRateComparatorPage() {
           icon={TrendingDown}
           color="#f97316"
           translate={translate}
+          highlightField="sell"
         />
       </div>
 
