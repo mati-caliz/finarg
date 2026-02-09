@@ -89,7 +89,9 @@ const nextConfig = {
           exclude: ["error", "warn"],
         }
       : false,
+    reactRemoveProperties: isProd,
   },
+  productionBrowserSourceMaps: false,
   experimental: {
     optimizePackageImports: [
       "lucide-react",
@@ -101,6 +103,7 @@ const nextConfig = {
       "@radix-ui/react-tabs",
       "@radix-ui/react-toast",
     ],
+    optimizeCss: true,
   },
   modularizeImports: {
     "date-fns": {
@@ -112,6 +115,33 @@ const nextConfig = {
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/icon.svg",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/manifest.json",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, must-revalidate",
+          },
+        ],
       },
     ];
   },
