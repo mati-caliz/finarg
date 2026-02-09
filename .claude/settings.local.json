@@ -54,7 +54,9 @@
       "Bash(trivy fs:*)",
       "Bash(npm run security:*)",
       "Bash(lighthouse:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npx next build --help:*)"
     ]
   }
 }
