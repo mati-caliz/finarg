@@ -14,16 +14,6 @@ export function useCurrentInflation() {
   });
 }
 
-export function useMonthlyInflation(months = 12) {
-  return useQuery<Inflation[]>({
-    queryKey: ["inflation", "monthly", months],
-    queryFn: async () => {
-      const response = await inflationApi.getMonthly(months);
-      return response.data;
-    },
-  });
-}
-
 export function useAdjustInflation() {
   return useMutation<
     InflationAdjustment,

@@ -120,20 +120,6 @@ export interface SocialIndicators {
   uva?: number;
   cer?: number;
 }
-
-export interface Arbitrage {
-  sourceType: string;
-  targetType: string;
-  sourceRate: number;
-  targetRate: number;
-  spreadPercentage: number;
-  estimatedProfitPer1000USD: number;
-  description: string;
-  steps: string;
-  viable: boolean;
-  risk: string;
-}
-
 export interface User {
   id: number;
   name: string;

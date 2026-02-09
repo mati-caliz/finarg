@@ -1,12 +1,12 @@
 package com.finarg.client;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,29 +30,39 @@ public class DatosGobArClient {
     private static final String DEPOSITOS_GOBIERNO_ID = "92.2_OTROS_DEPORNO_0_0_24_42";
     private static final String POSICION_NETA_PASES_ID = "92.2_POSICION_NSES_0_0_19_25";
     private static final String TIPO_CAMBIO_VAL_ID = "92.2_TIPO_CAMBIION_0_0_21_24";
+    private static final String CSV_URL = "https://infra.datos.gob.ar/catalog/sspm/dataset/94/distribution/94.2/download/cer-uva-uvi-diarios.csv";
 
     public List<SeriesDataPoint> getBCRAReserves(int limit) {
-        return fetchSeries(limit);
+        SeriesApiResponse response = fetchSeriesData(RESERVES_SERIES_ID, limit);
+        if (response == null || response.data() == null) {
+            return List.of();
+        }
+        return response.data().stream()
+                .map(arr -> new SeriesDataPoint(
+                        LocalDate.parse(arr.get(0).toString()),
+                        toBigDecimal(arr, 1)
+                ))
+                .toList();
     }
 
     public BigDecimal getLatestMinimumSalary() {
-        return fetchLatestValue(MINIMUM_SALARY_SERIES_ID);
+        return fetchSingleValue(MINIMUM_SALARY_SERIES_ID);
     }
 
     public BigDecimal getLatestMinimumPension() {
-        return fetchLatestValue(MINIMUM_PENSION_SERIES_ID);
+        return fetchSingleValue(MINIMUM_PENSION_SERIES_ID);
     }
 
     public BigDecimal getLatestCanastaBasicaTotal() {
-        return fetchLatestValue(CANASTA_BASICA_TOTAL_SERIES_ID);
+        return fetchSingleValue(CANASTA_BASICA_TOTAL_SERIES_ID);
     }
 
     public BigDecimal getLatestCanastaBasicaAlimentaria() {
-        return fetchLatestValue(CANASTA_BASICA_ALIMENTARIA_SERIES_ID);
+        return fetchSingleValue(CANASTA_BASICA_ALIMENTARIA_SERIES_ID);
     }
 
     public BigDecimal getLatestSalarioRipte() {
-        return fetchLatestValue(SALARIO_RIPTE_SERIES_ID);
+        return fetchSingleValue(SALARIO_RIPTE_SERIES_ID);
     }
 
     public BigDecimal getLatestUva() {
@@ -63,28 +73,78 @@ public class DatosGobArClient {
         return fetchLatestCsvValue("cer_diario");
     }
 
+    public BCRALiabilitiesData fetchBCRALiabilities() {
+        String ids = String.join(",",
+                PASIVOS_LETRAS_USD_ID,
+                DEPOSITOS_GOBIERNO_ID,
+                POSICION_NETA_PASES_ID,
+                TIPO_CAMBIO_VAL_ID);
+
+        SeriesApiResponse response = fetchSeriesData(ids, 1);
+
+        if (response == null || response.data() == null || response.data().isEmpty()) {
+            return null;
+        }
+
+        List<Object> row = response.data().get(0);
+        BigDecimal pasivosLetrasPesos = toBigDecimal(row, 1);
+        BigDecimal depositosGovPesos = toBigDecimal(row, 2);
+        BigDecimal posicionPasesPesos = toBigDecimal(row, 3);
+        BigDecimal tipoCambio = toBigDecimal(row, 4);
+
+        if (tipoCambio.compareTo(BigDecimal.ZERO) <= 0) {
+            return null;
+        }
+
+        return new BCRALiabilitiesData(
+                pasivosLetrasPesos.divide(tipoCambio, 0, RoundingMode.HALF_UP),
+                depositosGovPesos.divide(tipoCambio, 0, RoundingMode.HALF_UP),
+                posicionPasesPesos.divide(tipoCambio, 0, RoundingMode.HALF_UP)
+        );
+    }
+
+    private BigDecimal fetchSingleValue(String seriesId) {
+        SeriesApiResponse response = fetchSeriesData(seriesId, 1);
+        if (response == null || response.data() == null || response.data().isEmpty()) {
+            return null;
+        }
+        return toBigDecimal(response.data().get(0), 1);
+    }
+
+    private SeriesApiResponse fetchSeriesData(String ids, int limit) {
+        try {
+            return webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/series/")
+                            .queryParam("ids", ids)
+                            .queryParam("limit", limit)
+                            .queryParam("sort", "desc")
+                            .queryParam("format", "json")
+                            .build())
+                    .retrieve()
+                    .bodyToMono(SeriesApiResponse.class)
+                    .block();
+        } catch (Exception e) {
+            log.error("Error fetching series data for IDs {}: {}", ids, e.getMessage());
+            return null;
+        }
+    }
+
     private BigDecimal fetchLatestCsvValue(String columnName) {
         try {
             String csvContent = webClient.get()
-                    .uri("https://infra.datos.gob.ar/catalog/sspm/dataset/94/distribution/94.2/download/cer-uva-uvi-diarios.csv")
+                    .uri(CSV_URL)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
 
-            if (csvContent == null || csvContent.isEmpty()) {
-                return null;
-            }
+            if (csvContent == null || csvContent.isEmpty()) return null;
 
             String[] lines = csvContent.split("\n");
-            if (lines.length < 2) {
-                return null;
-            }
+            if (lines.length < 2) return null;
 
-            String headerLine = lines[0];
-            String lastLine = lines[lines.length - 1];
-
-            String[] headers = headerLine.split(",");
-            String[] values = lastLine.split(",");
+            String[] headers = lines[0].split(",");
+            String[] values = lines[lines.length - 1].split(",");
 
             int columnIndex = -1;
             for (int i = 0; i < headers.length; i++) {
@@ -94,157 +154,34 @@ public class DatosGobArClient {
                 }
             }
 
-            if (columnIndex == -1 || columnIndex >= values.length) {
-                return null;
-            }
+            if (columnIndex == -1 || columnIndex >= values.length) return null;
 
             String value = values[columnIndex].trim();
-            if (value.isEmpty()) {
-                return null;
-            }
-
-            return new BigDecimal(value);
+            return value.isEmpty() ? null : new BigDecimal(value);
         } catch (Exception e) {
-            log.error("Error fetching {} from datos.gob.ar CSV: {}", columnName, e.getMessage());
+            log.error("Error fetching CSV value for column {}: {}", columnName, e.getMessage());
             return null;
-        }
-    }
-
-    private BigDecimal fetchLatestValue(String seriesId) {
-        try {
-            SeriesApiResponse response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/series/")
-                            .queryParam("ids", seriesId)
-                            .queryParam("limit", 1)
-                            .queryParam("sort", "desc")
-                            .queryParam("format", "json")
-                            .build())
-                    .retrieve()
-                    .bodyToMono(SeriesApiResponse.class)
-                    .block();
-
-            if (response == null || response.getData() == null || response.getData().isEmpty()) {
-                return null;
-            }
-            return toBigDecimal(response.getData().get(0), 1);
-        } catch (Exception e) {
-            log.error("Error fetching series {} from datos.gob.ar: {}", seriesId, e.getMessage());
-            return null;
-        }
-    }
-
-    public BCRALiabilitiesData fetchBCRALiabilities() {
-        String ids = String.join(",",
-                PASIVOS_LETRAS_USD_ID,
-                DEPOSITOS_GOBIERNO_ID,
-                POSICION_NETA_PASES_ID,
-                TIPO_CAMBIO_VAL_ID);
-        try {
-            SeriesApiResponse response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/series/")
-                            .queryParam("ids", ids)
-                            .queryParam("limit", 1)
-                            .queryParam("sort", "desc")
-                            .queryParam("format", "json")
-                            .build())
-                    .retrieve()
-                    .bodyToMono(SeriesApiResponse.class)
-                    .block();
-
-            if (response == null || response.getData() == null || response.getData().isEmpty()) {
-                return null;
-            }
-
-            List<Object> row = response.getData().get(0);
-            BigDecimal pasivosLetrasPesos = toBigDecimal(row, 1);
-            BigDecimal depositosGovPesos = toBigDecimal(row, 2);
-            BigDecimal posicionPasesPesos = toBigDecimal(row, 3);
-            BigDecimal tipoCambio = toBigDecimal(row, 4);
-            if (tipoCambio.compareTo(BigDecimal.ZERO) <= 0) {
-                return null;
-            }
-            BigDecimal pasivosLetrasUsd = pasivosLetrasPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
-            BigDecimal depositosGovUsd = depositosGovPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
-            BigDecimal posicionPasesUsd = posicionPasesPesos.divide(tipoCambio, 0, java.math.RoundingMode.HALF_UP);
-            return new BCRALiabilitiesData(pasivosLetrasUsd, depositosGovUsd, posicionPasesUsd);
-        } catch (Exception e) {
-            log.error("Error fetching BCRA liabilities from datos.gob.ar: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    private List<SeriesDataPoint> fetchSeries(int limit) {
-        try {
-            SeriesApiResponse response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/series/")
-                            .queryParam("ids", DatosGobArClient.RESERVES_SERIES_ID)
-                            .queryParam("limit", limit)
-                            .queryParam("sort", "desc")
-                            .queryParam("format", "json")
-                            .build())
-                    .retrieve()
-                    .bodyToMono(SeriesApiResponse.class)
-                    .block();
-
-            if (response == null || response.getData() == null) {
-                return List.of();
-            }
-
-            return response.getData().stream()
-                    .map(arr -> new SeriesDataPoint(
-                            LocalDate.parse(arr.get(0).toString()),
-                            toBigDecimal(arr, 1)
-                    ))
-                    .toList();
-        } catch (Exception e) {
-            log.error("Error fetching series {} from datos.gob.ar: {}", DatosGobArClient.RESERVES_SERIES_ID, e.getMessage());
-            return List.of();
         }
     }
 
     private static BigDecimal toBigDecimal(List<Object> row, int index) {
-        if (row == null || index >= row.size()) {
+        if (row == null || index >= row.size() || row.get(index) == null) {
             return BigDecimal.ZERO;
         }
-        Object v = row.get(index);
-        return v != null ? new BigDecimal(v.toString()) : BigDecimal.ZERO;
+        return new BigDecimal(row.get(index).toString());
     }
 
-    @Data
-    public static class BCRALiabilitiesData {
-        private final BigDecimal pasivosLetrasUsd;
-        private final BigDecimal depositosGobiernoUsd;
-        private final BigDecimal posicionNetaPasesUsd;
-    }
+    public record BCRALiabilitiesData(
+            BigDecimal pasivosLetrasUsd,
+            BigDecimal depositosGobiernoUsd,
+            BigDecimal posicionNetaPasesUsd
+    ) {}
 
-    @Data
-    public static class SeriesApiResponse {
-        private List<List<Object>> data;
-        private List<SeriesMeta> meta;
+    public record SeriesApiResponse(List<List<Object>> data, List<SeriesMeta> meta) {}
 
-        @Data
-        public static class SeriesMeta {
-            private SeriesField field;
+    public record SeriesMeta(SeriesField field) {}
 
-            @Data
-            public static class SeriesField {
-                private String description;
-                private String units;
-            }
-        }
-    }
+    public record SeriesField(String description, String units) {}
 
-    @Data
-    public static class SeriesDataPoint {
-        private LocalDate fecha;
-        private BigDecimal valor;
-
-        public SeriesDataPoint(LocalDate fecha, BigDecimal valor) {
-            this.fecha = fecha;
-            this.valor = valor;
-        }
-    }
+    public record SeriesDataPoint(LocalDate fecha, BigDecimal valor) {}
 }
