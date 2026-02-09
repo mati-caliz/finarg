@@ -17,6 +17,7 @@ const STATIC_ASSETS = [
   "/login",
   "/register",
   "/manifest.json",
+  "/icon.svg",
 ];
 
 // Rutas de API para cachear con estrategia stale-while-revalidate
