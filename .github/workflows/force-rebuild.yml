@@ -1,0 +1,59 @@
+name: Force Rebuild Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to rebuild'
+        required: true
+        type: choice
+        options:
+          - frontend
+          - backend
+          - both
+
+jobs:
+  force-rebuild:
+    name: Force Rebuild ${{ inputs.service }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Force Rebuild via SSH
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 30m
+          script: |
+            cd /home/deploy/finarg
+
+            echo "📥 Pulling latest changes..."
+            git pull origin main
+
+            if [ "${{ inputs.service }}" = "frontend" ] || [ "${{ inputs.service }}" = "both" ]; then
+              echo "🔨 Force rebuilding frontend (no cache)..."
+              docker compose -f docker-compose.prod.yml build frontend --no-cache
+            fi
+
+            if [ "${{ inputs.service }}" = "backend" ] || [ "${{ inputs.service }}" = "both" ]; then
+              echo "🔨 Force rebuilding backend (no cache)..."
+              docker compose -f docker-compose.prod.yml build backend --no-cache
+            fi
+
+            echo "🚀 Restarting services..."
+            docker compose -f docker-compose.prod.yml up -d --force-recreate ${{ inputs.service == 'both' && 'frontend backend' || inputs.service }}
+
+            echo "⏳ Waiting for services to be healthy..."
+            sleep 20
+
+            echo "📊 Service status:"
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f --filter "dangling=true"
+            docker builder prune -f
+
+            echo "✅ Force rebuild complete!"
+            echo "🌐 Site: http://178.156.210.71"
