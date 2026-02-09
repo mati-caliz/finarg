@@ -29,13 +29,13 @@ export function getGapColor(level: string): string {
   switch (level) {
     case "LOW":
     case "BAJA":
-      return "hsl(152 69% 36%)";
+      return "hsl(152 75% 25%)";
     case "MEDIUM":
     case "MEDIA":
-      return "hsl(38 92% 40%)";
+      return "hsl(38 92% 28%)";
     case "HIGH":
     case "ALTA":
-      return "hsl(0 72% 45%)";
+      return "hsl(0 75% 38%)";
     default:
       return "#6b7280";
   }

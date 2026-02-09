@@ -56,7 +56,8 @@
       "Bash(lighthouse:*)",
       "Bash(npm run dev:*)",
       "Bash(npm outdated:*)",
-      "Bash(npx next build --help:*)"
+      "Bash(npx next build --help:*)",
+      "Bash(powershell:*)"
     ]
   }
 }
