@@ -89,15 +89,16 @@ jobs:
           severity: 'CRITICAL,HIGH'
           exit-code: '1'
 
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-
-      - name: Dependency Review
-        uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4
-        with:
-          fail-on-severity: high
+  # Dependency Review requires GitHub Advanced Security (paid feature for private repos)
+  # Disabled for private repositories
+  # dependency-review:
+  #   name: Dependency Review
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+  #     - name: Dependency Review
+  #       uses: actions/dependency-review-action@3c4e3dcb1aa7874d2c16be7d79418e9b7efd6261 # v4
+  #       with:
+  #         fail-on-severity: high

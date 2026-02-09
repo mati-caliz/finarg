@@ -19,15 +19,15 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
 
   const getRiskColor = (value: number) => {
     if (value < 500) {
-      return "text-emerald-500";
+      return "text-success-accessible";
     }
     if (value < 800) {
-      return "text-yellow-500";
+      return "text-warning-accessible";
     }
     if (value < 1200) {
-      return "text-orange-500";
+      return "text-orange-600";
     }
-    return "text-red-500";
+    return "text-destructive-accessible";
   };
 
   const getRiskBorderColor = (value: number) => {

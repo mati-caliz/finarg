@@ -24,8 +24,8 @@ public interface QuoteHistoryRepository extends JpaRepository<QuoteHistory, Long
         return findFirstByTypeAndDateLessThanOrderByDateDesc(type, date);
     }
 
-    @Query("SELECT q FROM QuoteHistory q WHERE q.type IN :types AND q.date = " +
-           "(SELECT MAX(q2.date) FROM QuoteHistory q2 WHERE q2.type = q.type AND q2.date < :date)")
+    @Query("SELECT q FROM QuoteHistory q WHERE q.type IN :types AND q.date = "
+           + "(SELECT MAX(q2.date) FROM QuoteHistory q2 WHERE q2.type = q.type AND q2.date < :date)")
     List<QuoteHistory> findLatestByTypesBeforeDate(@Param("types") List<CurrencyType> types, @Param("date") LocalDate date);
 
 }
