@@ -69,18 +69,21 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
       bg: "bg-emerald-500",
       text: "text-emerald-700 dark:text-emerald-400",
       border: "border-t-emerald-400",
+      hoverBorder: "hover:border-t-emerald-300",
       indicator: "bg-emerald-500",
     },
     yellow: {
       bg: "bg-amber-500",
       text: "text-amber-700 dark:text-amber-400",
       border: "border-t-amber-400",
+      hoverBorder: "hover:border-t-amber-300",
       indicator: "bg-amber-500",
     },
     red: {
       bg: "bg-red-500",
       text: "text-red-700 dark:text-red-400",
       border: "border-t-red-400",
+      hoverBorder: "hover:border-t-red-300",
       indicator: "bg-red-500",
     },
   };
@@ -94,7 +97,7 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   return (
     <Link href="/bandas-cambiarias" className="block h-full">
       <Card
-        className={`h-full border-t-[3px] ${colors.border} transition-all hover:shadow-lg cursor-pointer`}
+        className={`h-full border-t-[3px] ${colors.border} ${colors.hoverBorder} transition-all hover:shadow-lg cursor-pointer`}
       >
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
