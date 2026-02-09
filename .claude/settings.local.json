@@ -40,7 +40,8 @@
       "WebFetch(domain:datos.gob.ar)",
       "Bash(npm run build:*)",
       "Bash(test:*)",
-      "Bash(./mvnw.cmd clean compile:*)"
+      "Bash(./mvnw.cmd clean compile:*)",
+      "Bash(find:*)"
     ]
   }
 }

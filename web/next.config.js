@@ -25,13 +25,20 @@ const securityHeaders = [
   },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    value:
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()",
+  },
+  {
+    key: "X-XSS-Protection",
+    value: "1; mode=block",
   },
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
+      isProd
+        ? "script-src 'self' 'unsafe-inline' https://accounts.google.com"
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://www.bcra.gob.ar https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com",
@@ -43,7 +50,12 @@ const securityHeaders = [
         .filter(Boolean)
         .join(" "),
       "frame-src https://accounts.google.com",
-    ].join("; "),
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ]
+      .filter(Boolean)
+      .join("; "),
   },
 ];
 
@@ -72,7 +84,14 @@ const nextConfig = {
     ],
   },
   compiler: {
-    removeConsole: isProd ? { exclude: ["error", "warn"] } : false,
+    removeConsole: isProd
+      ? {
+          exclude: ["error", "warn"],
+        }
+      : false,
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
   async headers() {
     return [

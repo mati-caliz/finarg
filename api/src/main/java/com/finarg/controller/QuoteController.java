@@ -88,7 +88,12 @@ public class QuoteController {
                         c.getLocalCurrency(),
                         c.getLocale(),
                         Arrays.stream(CurrencyType.valuesForCountry(c))
-                                .map(t -> new CurrencyTypeInfo(t.getCode(), t.getName()))
+                                .map(t -> new CurrencyTypeInfo(
+                                        t.getCode(),
+                                        t.getName(),
+                                        t.getBaseCurrency(),
+                                        t.isHasHistory()
+                                ))
                                 .collect(Collectors.toList())
                 ))
                 .collect(Collectors.toList());
@@ -105,6 +110,8 @@ public class QuoteController {
 
     public record CurrencyTypeInfo(
             String code,
-            String name
+            String name,
+            String baseCurrency,
+            Boolean hasHistory
     ) { }
 }

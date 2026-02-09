@@ -27,30 +27,7 @@ function useUpdateProgress(dataUpdatedAt: number, intervalMs: number): number {
   return dataUpdatedAt ? Math.min(100, ((Date.now() - dataUpdatedAt) / intervalMs) * 100) : 0;
 }
 
-const AR_CURRENCY_GROUPS = {
-  usd: ["oficial", "blue", "bolsa", "contadoconliqui", "tarjeta", "mayorista", "cripto"],
-  eur: ["eur_oficial", "eur_blue", "eur_tarjeta"],
-  brl: ["brl_oficial", "brl_blue", "brl_tarjeta"],
-  clp: ["clp_oficial", "clp_blue", "clp_tarjeta"],
-  uyu: ["uyu_oficial", "uyu_blue", "uyu_tarjeta"],
-  pyg: ["pyg_oficial", "pyg_blue", "pyg_tarjeta"],
-  bob: ["bob_oficial", "bob_blue", "bob_tarjeta"],
-  cny: ["cny_oficial", "cny_blue", "cny_tarjeta"],
-} as const;
-
-const AR_CHART_TYPES = new Set([
-  ...AR_CURRENCY_GROUPS.usd,
-  "eur_oficial",
-  "brl_oficial",
-  "clp_oficial",
-  "uyu_oficial",
-]);
-
-function hasChartHistory(type: string): boolean {
-  return AR_CHART_TYPES.has(type) || type.endsWith("_oficial");
-}
-
-type BaseCurrency = keyof typeof AR_CURRENCY_GROUPS;
+type BaseCurrency = "usd" | "eur" | "brl" | "clp" | "uyu" | "pyg" | "bob" | "cny";
 
 export default function QuotesPage() {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
@@ -59,50 +36,9 @@ export default function QuotesPage() {
   const hasCurrencyGroups = selectedCountry === "ar";
 
   const [selectedBaseCurrency, setSelectedBaseCurrency] = useState<BaseCurrency>("usd");
-
-  const currencyTypes = useMemo(() => {
-    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
-    const types = hasCurrencyGroups
-      ? countryConfig.currencyTypes.filter((t) => allowed.includes(t.code))
-      : countryConfig.currencyTypes;
-    return types.map((tType) => ({
-      value: tType.code,
-      label: translate(tType.code as TranslationKey),
-    }));
-  }, [countryConfig, selectedBaseCurrency, hasCurrencyGroups, translate]);
-
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [period, setPeriod] = useState("30");
-
-  const allowedTypeCodes = useMemo(() => {
-    const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
-    const types = hasCurrencyGroups
-      ? countryConfig.currencyTypes.filter((t) => allowed.includes(t.code))
-      : countryConfig.currencyTypes;
-    return new Set(types.map((t) => t.code));
-  }, [selectedBaseCurrency, hasCurrencyGroups, countryConfig.currencyTypes]);
-
-  const chartableTypeCodes = useMemo(() => {
-    return Array.from(allowedTypeCodes).filter((code) => hasChartHistory(code));
-  }, [allowedTypeCodes]);
-
-  useEffect(() => {
-    setSelectedTypes((prev) => {
-      const kept = prev.filter((t) => allowedTypeCodes.has(t));
-      if (kept.length > 0) {
-        return kept;
-      }
-      const first = chartableTypeCodes[0];
-      return first !== undefined ? [first] : [];
-    });
-    setActiveCard((prev) => {
-      if (prev !== null && allowedTypeCodes.has(prev)) {
-        return prev;
-      }
-      return chartableTypeCodes[0] ?? null;
-    });
-  }, [allowedTypeCodes, chartableTypeCodes]);
 
   const periods = useMemo(
     () => [
@@ -139,25 +75,79 @@ export default function QuotesPage() {
     refetchInterval: QUOTES_REFETCH_MS,
   });
 
+  const availableBaseCurrencies = useMemo(() => {
+    if (!quotes || selectedCountry !== "ar") return [];
+    const baseCurrencySet = new Set(
+      quotes
+        .map((q) => q.baseCurrency)
+        .filter((bc): bc is string => bc !== undefined && bc !== null),
+    );
+    return Array.from(baseCurrencySet) as BaseCurrency[];
+  }, [quotes, selectedCountry]);
+
+  const chartableTypes = useMemo(() => {
+    if (!quotes) return new Set<string>();
+    return new Set(quotes.filter((q) => q.hasHistory === true).map((q) => q.type));
+  }, [quotes]);
+
+  const hasChartHistory = (type: string): boolean => {
+    return chartableTypes.has(type);
+  };
+
+  const allowedTypeCodes = useMemo(() => {
+    if (!quotes) return new Set<string>();
+    const types = hasCurrencyGroups
+      ? quotes.filter((q) => q.baseCurrency === selectedBaseCurrency).map((q) => q.type)
+      : quotes.map((q) => q.type);
+    return new Set(types);
+  }, [quotes, selectedBaseCurrency, hasCurrencyGroups]);
+
+  const chartableTypeCodes = useMemo(() => {
+    return Array.from(allowedTypeCodes).filter((code) => chartableTypes.has(code));
+  }, [allowedTypeCodes, chartableTypes]);
+
+  const currencyTypes = useMemo(() => {
+    const types = hasCurrencyGroups
+      ? countryConfig.currencyTypes.filter((t) => allowedTypeCodes.has(t.code))
+      : countryConfig.currencyTypes;
+    return types.map((tType) => ({
+      value: tType.code,
+      label: translate(tType.code as TranslationKey),
+    }));
+  }, [countryConfig, allowedTypeCodes, hasCurrencyGroups, translate]);
+
   const filteredQuotes = useMemo(() => {
     if (!quotes) {
       return undefined;
     }
     const list = !hasCurrencyGroups
       ? quotes
-      : (() => {
-          const allowed = AR_CURRENCY_GROUPS[selectedBaseCurrency] as readonly string[];
-          const typeSet = new Set(allowed);
-          return quotes.filter((q) => typeSet.has(q.type));
-        })();
+      : quotes.filter((q) => q.baseCurrency === selectedBaseCurrency);
     return sortQuotesByVariant(list);
   }, [quotes, hasCurrencyGroups, selectedBaseCurrency]);
+
+  useEffect(() => {
+    setSelectedTypes((prev) => {
+      const kept = prev.filter((t) => allowedTypeCodes.has(t));
+      if (kept.length > 0) {
+        return kept;
+      }
+      const first = chartableTypeCodes[0];
+      return first !== undefined ? [first] : [];
+    });
+    setActiveCard((prev) => {
+      if (prev !== null && allowedTypeCodes.has(prev)) {
+        return prev;
+      }
+      return chartableTypeCodes[0] ?? null;
+    });
+  }, [allowedTypeCodes, chartableTypeCodes]);
 
   const updateProgress = useUpdateProgress(dataUpdatedAt, QUOTES_REFETCH_MS);
 
   const chartableSelectedTypes = useMemo(
-    () => selectedTypes.filter((t) => !hasCurrencyGroups || hasChartHistory(t)),
-    [selectedTypes, hasCurrencyGroups],
+    () => selectedTypes.filter((t) => !hasCurrencyGroups || chartableTypes.has(t)),
+    [selectedTypes, hasCurrencyGroups, chartableTypes],
   );
 
   const historyQueries = useQueries({
@@ -196,18 +186,24 @@ export default function QuotesPage() {
     );
   }
 
-  const baseCurrencyButtons = hasCurrencyGroups
-    ? ([
-        { key: "usd" as BaseCurrency, labelKey: "currencyDollar" as TranslationKey },
-        { key: "eur" as BaseCurrency, labelKey: "currencyEuro" as TranslationKey },
-        { key: "brl" as BaseCurrency, labelKey: "currencyReal" as TranslationKey },
-        { key: "cny" as BaseCurrency, labelKey: "currencyCny" as TranslationKey },
-        { key: "clp" as BaseCurrency, labelKey: "currencyClp" as TranslationKey },
-        { key: "uyu" as BaseCurrency, labelKey: "currencyUyu" as TranslationKey },
-        { key: "pyg" as BaseCurrency, labelKey: "currencyPyg" as TranslationKey },
-        { key: "bob" as BaseCurrency, labelKey: "currencyBob" as TranslationKey },
-      ] as const)
-    : null;
+  const currencyMap: Record<string, TranslationKey> = {
+    usd: "currencyDollar",
+    eur: "currencyEuro",
+    brl: "currencyReal",
+    cny: "currencyCny",
+    clp: "currencyClp",
+    uyu: "currencyUyu",
+    pyg: "currencyPyg",
+    bob: "currencyBob",
+  };
+
+  const baseCurrencyButtons =
+    hasCurrencyGroups && availableBaseCurrencies.length > 0
+      ? availableBaseCurrencies.map((bc) => ({
+          key: bc,
+          labelKey: currencyMap[bc] ?? ("currencyDollar" as TranslationKey),
+        }))
+      : null;
 
   return (
     <div className="space-y-6">
