@@ -61,19 +61,26 @@ public class RatesService {
 
     private static final Map<String, String> BANK_DOMAINS = Map.ofEntries(
             Map.entry("BANCO NACIÓN", "bna.com.ar"),
+            Map.entry("NACIÓN", "bna.com.ar"),
+            Map.entry("BNA", "bna.com.ar"),
+            Map.entry("GALICIA", "galicia.com.ar"),
+            Map.entry("BANCO GALICIA", "galicia.com.ar"),
             Map.entry("BBVA", "bbva.com.ar"),
             Map.entry("BANCO DEL SOL", "bancodelsol.ar"),
             Map.entry("BANCO CIUDAD", "bancociudad.com.ar"),
+            Map.entry("CIUDAD", "bancociudad.com.ar"),
             Map.entry("COMAFI", "comafi.com.ar"),
             Map.entry("ICBC", "icbc.com.ar"),
             Map.entry("BRUBANK", "brubank.com"),
             Map.entry("CREDICOOP", "bancocredicoop.coop"),
             Map.entry("BANCO HIPOTECARIO", "hipotecario.com.ar"),
+            Map.entry("HIPOTECARIO", "hipotecario.com.ar"),
             Map.entry("BANCO PATAGONIA", "bancopatagonia.com.ar"),
+            Map.entry("PATAGONIA", "bancopatagonia.com.ar"),
             Map.entry("SUPERVIELLE", "supervielle.com.ar"),
             Map.entry("SANTANDER", "santander.com.ar"),
-            Map.entry("BANCO MACRO", "macro.com.ar"),
-            Map.entry("BANCO GALICIA", "galicia.com.ar")
+            Map.entry("MACRO", "macro.com.ar"),
+            Map.entry("BANCO MACRO", "macro.com.ar")
     );
 
     private final ArgentinaDatosClient argentinaDatosClient;
@@ -99,7 +106,7 @@ public class RatesService {
             Map.entry("SBS Ahorro Pesos - Clase B", "Brubank")
     );
 
-    @Cacheable(value = "rates", key = "'fixedTerm_' + #country + '_v3'")
+    @Cacheable(value = "rates", key = "'fixedTerm_' + #country + '_v5'")
     public List<RateDTO> getFixedTermRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -171,7 +178,7 @@ public class RatesService {
                 .build();
     }
 
-    @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v3'")
+    @Cacheable(value = "rates", key = "'usdAccounts_' + #country + '_v5'")
     public List<RateDTO> getUsdAccountRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -202,7 +209,7 @@ public class RatesService {
         return markBestRate(result);
     }
 
-    @Cacheable(value = "rates", key = "'uvaMortgages_' + #country + '_v3'")
+    @Cacheable(value = "rates", key = "'uvaMortgages_' + #country + '_v5'")
     public List<RateDTO> getUvaMortgageRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -356,25 +363,33 @@ public class RatesService {
             cleaned = cleaned.replace("NTANDER", "SANTANDER");
         }
 
+        if (cleaned.contains("BNA") || cleaned.contains("NACION") || cleaned.contains("NACIÓN")) {
+            return "BANCO NACIÓN";
+        }
+
+        if (cleaned.contains("GALICIA")) {
+            return "GALICIA";
+        }
+
         String result;
         if (cleaned.startsWith("BANCO DE LA ")) {
-            result = extractFirstWords(cleaned.substring(12), 2, "Banco ");
+            result = extractFirstWords(cleaned.substring(12), 2);
         } else if (cleaned.startsWith("BANCO DEL ")) {
-            result = extractFirstWords(cleaned.substring(10), 1, "Banco ");
+            result = extractFirstWords(cleaned.substring(10), 1);
         } else if (cleaned.startsWith("BANCO DE ")) {
-            result = extractFirstWords(cleaned.substring(9), 1, "Banco ");
+            result = extractFirstWords(cleaned.substring(9), 1);
         } else if (cleaned.startsWith("BANCO ")) {
-            result = extractFirstWords(cleaned.substring(6), 2, "");
+            result = extractFirstWords(cleaned.substring(6), 2);
         } else {
-            result = extractFirstWords(cleaned, 2, "");
+            result = extractFirstWords(cleaned, 2);
         }
 
         return result.toUpperCase().trim();
     }
 
-    private static String extractFirstWords(String text, int maxWords, String prefix) {
+    private static String extractFirstWords(String text, int maxWords) {
         String[] words = text.split("\\s+");
-        StringBuilder sb = new StringBuilder(prefix);
+        StringBuilder sb = new StringBuilder();
         int count = 0;
         for (String w : words) {
             if (w.isEmpty() || SKIP_WORDS.contains(w)) {
@@ -383,7 +398,7 @@ public class RatesService {
             if (count >= maxWords) {
                 break;
             }
-            if (sb.length() > prefix.length()) {
+            if (sb.length() > "".length()) {
                 sb.append(" ");
             }
             sb.append(w);
@@ -448,6 +463,7 @@ public class RatesService {
         BigDecimal tnaPct = r.getTasa().multiply(BigDecimal.valueOf(100));
         BigDecimal teaPct = teaFromTna(r.getTasa()).multiply(BigDecimal.valueOf(100));
         String entityName = formatFundName(r.getEntity());
+        String logo = bankLogoUrl(r.getEntity());
         return RateDTO.builder()
                 .id(sanitizeId(r.getEntity()))
                 .name(entityName)
@@ -457,7 +473,7 @@ public class RatesService {
                 .term(null)
                 .date(null)
                 .limit(r.getLimit())
-                .logo(null)
+                .logo(logo)
                 .link(null)
                 .build();
     }
@@ -467,6 +483,7 @@ public class RatesService {
         BigDecimal tnaPct = detail.getApy();
         BigDecimal teaPct = teaFromTna(apyDecimal).multiply(BigDecimal.valueOf(100));
         String entityName = formatFundName(entity);
+        String logo = walletLogoUrl(entity);
         return RateDTO.builder()
                 .id(sanitizeId(entity + "_" + detail.getCurrency()))
                 .name(entityName)
@@ -476,7 +493,7 @@ public class RatesService {
                 .term(null)
                 .date(detail.getDate())
                 .limit(null)
-                .logo(null)
+                .logo(logo)
                 .link(null)
                 .build();
     }
