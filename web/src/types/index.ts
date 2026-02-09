@@ -190,3 +190,23 @@ export interface CompoundInterestResponse {
     total: number;
   }[];
 }
+
+export interface ExchangeRateItem {
+  type: string;
+  name: string;
+  baseCurrency: string;
+  buy: number;
+  sell: number;
+  spread: number;
+  spreadPercentage: number;
+  variation: number;
+}
+
+export interface ExchangeRateComparison {
+  country: CountryCode;
+  rates: ExchangeRateItem[];
+  cheapestToBuy: ExchangeRateItem | null;
+  cheapestToSell: ExchangeRateItem | null;
+  mostExpensiveToBuy: ExchangeRateItem | null;
+  mostExpensiveToSell: ExchangeRateItem | null;
+}

@@ -3,6 +3,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
+    exchangeRatesComparator: "Comparador de Tipos de Cambio",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
     realEstateIntelligence: "Real Estate Intelligence",
@@ -16,6 +17,15 @@ export const translations = {
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguay",
+
+    // Exchange Rate Comparator
+    exchangeRatesComparatorDesc: "Comparación de todos los tipos de cambio disponibles",
+    cheapestToBuy: "Más barato para comprar",
+    mostExpensiveToBuy: "Más caro para comprar",
+    bestPriceToSell: "Mejor precio para vender",
+    worstPriceToSell: "Peor precio para vender",
+    allQuotes: "Todas las Cotizaciones",
+    exchangeRateType: "Tipo de Cambio",
 
     // Tasas / Comparador
     ratesComparator: "Comparador de Tasas",
@@ -425,6 +435,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Cotações",
+    exchangeRatesComparator: "Comparador de Taxas de Câmbio",
     incomeTaxCalculator: "Calculadora de Imposto de Renda",
     compoundInterestCalculator: "Calculadora de Juros Compostos",
     realEstateIntelligence: "Real Estate Intelligence",
@@ -438,6 +449,15 @@ export const translations = {
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguai",
+
+    // Exchange Rate Comparator
+    exchangeRatesComparatorDesc: "Comparação de todas as taxas de câmbio disponíveis",
+    cheapestToBuy: "Mais barato para comprar",
+    mostExpensiveToBuy: "Mais caro para comprar",
+    bestPriceToSell: "Melhor preço para vender",
+    worstPriceToSell: "Pior preço para vender",
+    allQuotes: "Todas as Cotações",
+    exchangeRateType: "Tipo de Câmbio",
 
     ratesComparator: "Comparador de Taxas",
     ratesComparatorDesc: "Compare TNA de carteiras virtuais e prazos fixos de bancos",
@@ -742,6 +762,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Quotes",
+    exchangeRatesComparator: "Exchange Rates Comparator",
     incomeTaxCalculator: "Income Tax Calculator",
     compoundInterestCalculator: "Compound Interest Calculator",
     realEstateIntelligence: "Real Estate Intelligence",
@@ -755,6 +776,15 @@ export const translations = {
     br: "Brazil",
     cl: "Chile",
     uy: "Uruguay",
+
+    // Exchange Rate Comparator
+    exchangeRatesComparatorDesc: "Comparison of all available exchange rates",
+    cheapestToBuy: "Cheapest to buy",
+    mostExpensiveToBuy: "Most expensive to buy",
+    bestPriceToSell: "Best price to sell",
+    worstPriceToSell: "Worst price to sell",
+    allQuotes: "All Quotes",
+    exchangeRateType: "Exchange Rate Type",
 
     ratesComparator: "Rates Comparator",
     ratesComparatorDesc: "Compare TNA rates from digital wallets and bank fixed-term deposits",
