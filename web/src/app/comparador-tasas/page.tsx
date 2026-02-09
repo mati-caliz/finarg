@@ -12,9 +12,7 @@ import { formatDateSlash, formatLimit, formatPercent } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, ExternalLink, Home, Landmark, Wallet } from "lucide-react";
-import { type ElementType, useState } from "react"; // Added ElementType import
-
-// --- Types & Constants ---
+import { type ElementType, useState } from "react";
 
 type TabType = "wallets" | "banks" | "usdAccounts" | "uvaMortgages";
 

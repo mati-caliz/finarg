@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
-import type React from "react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {
@@ -55,11 +54,6 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo: null,
     });
   };
-
-  handleReload = (): void => {
-    window.location.reload();
-  };
-
   handleGoHome = (): void => {
     window.location.href = "/";
   };
@@ -111,20 +105,4 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return this.props.children;
   }
-}
-
-// HOC for wrapping components with error boundary
-export function withErrorBoundary<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  fallback?: ReactNode,
-): React.FC<P> {
-  const WithErrorBoundary: React.FC<P> = (props) => (
-    <ErrorBoundary fallback={fallback}>
-      <WrappedComponent {...props} />
-    </ErrorBoundary>
-  );
-
-  WithErrorBoundary.displayName = `WithErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || "Component"})`;
-
-  return WithErrorBoundary;
 }

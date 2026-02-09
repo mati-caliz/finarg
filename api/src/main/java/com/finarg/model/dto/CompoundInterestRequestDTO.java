@@ -5,10 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -38,6 +35,7 @@ public class CompoundInterestRequestDTO {
     @DecimalMin(value = "0.0", message = "Periodic contribution must be at least 0")
     private BigDecimal periodicContribution;
 
+    @Getter
     public enum CompoundingFrequency {
         MONTHLY(12),
         QUARTERLY(4),
@@ -49,8 +47,5 @@ public class CompoundInterestRequestDTO {
             this.periodsPerYear = periodsPerYear;
         }
 
-        public int getPeriodsPerYear() {
-            return periodsPerYear;
-        }
     }
 }

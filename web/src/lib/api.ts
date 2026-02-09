@@ -33,7 +33,6 @@ export const quotesApi = {
   getGapByCountry: (country: CountryCode) => api.get(`/${country}/quotes/gap`),
   getHistory: (type: string, from: string, to: string, country: CountryCode = "ar") =>
     api.get(`/quotes/history/${type}`, { params: { country, from, to } }),
-  getCountries: () => api.get("/countries"),
 };
 
 export const inflationApi = {
@@ -81,17 +80,9 @@ export const exchangeRateComparisonApi = {
   compareRates: (country: CountryCode) =>
     api.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
 };
-
-export const reposApi = {
-  optimize: (amount: number, termDays: number) =>
-    api.post("/repos/optimize", null, { params: { amount, termDays } }),
-};
-
 export const authApi = {
   login: (email: string, password: string) => api.post("/auth/login", { email, password }),
   register: (email: string, password: string, name: string) =>
     api.post("/auth/register", { email, password, name }),
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
-  refresh: () => api.post("/auth/refresh"),
-  logout: () => api.post("/auth/logout"),
 };
