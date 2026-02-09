@@ -50,7 +50,9 @@ export const ReservesWidget = memo(function ReservesWidget({
                 <p className="text-xs text-muted-foreground">{translate("netBcra")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesBCRA < 0 ? "text-red-500" : "text-emerald-500"
+                    reserves.netReservesBCRA < 0
+                      ? "text-destructive-accessible"
+                      : "text-success-accessible"
                   }`}
                 >
                   {formatReservesUSD(reserves.netReservesBCRA)}
@@ -62,7 +64,9 @@ export const ReservesWidget = memo(function ReservesWidget({
                 <p className="text-xs text-muted-foreground">{translate("netFmi")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesFMI < 0 ? "text-red-500" : "text-amber-600"
+                    reserves.netReservesFMI < 0
+                      ? "text-destructive-accessible"
+                      : "text-warning-accessible"
                   }`}
                 >
                   {reserves.netReservesFMI < 0 ? "\u2212" : ""}
@@ -76,7 +80,9 @@ export const ReservesWidget = memo(function ReservesWidget({
                   <p className="text-xs text-muted-foreground">{translate("netEstimated")}</p>
                   <p
                     className={`text-lg font-semibold ${
-                      reserves.netReserves < 0 ? "text-red-500" : "text-emerald-500"
+                      reserves.netReserves < 0
+                        ? "text-destructive-accessible"
+                        : "text-success-accessible"
                     }`}
                   >
                     {formatReservesUSD(reserves.netReserves)}

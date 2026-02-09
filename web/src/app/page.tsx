@@ -116,7 +116,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{translate("dashboard")}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-success-accessible">
               {countryConfig.flag} {translate(selectedCountry)}
             </span>
             <span className="text-sm text-muted-foreground">{translate("marketSummary")}</span>
@@ -285,7 +285,7 @@ export default function DashboardPage() {
                     </div>
                     <Link
                       href="/calculadora-sueldo-neto"
-                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                      className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
                     >
                       {translate("incomeTaxCalculator")}
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -324,7 +324,7 @@ export default function DashboardPage() {
                   </div>
                   <Link
                     href="/inflacion"
-                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                    className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
                   >
                     {translate("viewHistory")}
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -357,7 +357,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/inflacion"
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
               >
                 {translate("viewHistory")}
                 <ArrowRight className="h-3.5 w-3.5" />

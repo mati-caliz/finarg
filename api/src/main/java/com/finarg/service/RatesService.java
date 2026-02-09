@@ -434,7 +434,10 @@ public class RatesService {
         if (rates.isEmpty()) {
             return rates;
         }
-        BigDecimal maxTna = rates.get(0).getTna();
+        BigDecimal maxTna = rates.stream()
+                .map(RateDTO::getTna)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
         for (RateDTO rate : rates) {
             rate.setIsBestRate(rate.getTna().compareTo(maxTna) == 0);
         }

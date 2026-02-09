@@ -180,7 +180,11 @@ public class QuoteService {
         Map<CurrencyType, QuoteHistory> previousByType = quoteHistoryRepository
                 .findLatestByTypesBeforeDate(types, today)
                 .stream()
-                .collect(Collectors.toMap(QuoteHistory::getType, q -> q, (a, b) -> a));
+                .collect(Collectors.toMap(
+                        QuoteHistory::getType,
+                        q -> q,
+                        (a, b) -> a.getId() > b.getId() ? a : b
+                ));
 
         return quotes.stream()
                 .peek(quote -> {
