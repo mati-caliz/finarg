@@ -61,8 +61,6 @@ const nextConfig = {
   transpilePackages: ["lucide-react"],
   compress: true,
   poweredByHeader: false,
-  optimizeFonts: true,
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
