@@ -10,6 +10,7 @@ import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { quotesApi } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import { formatCurrencySimple, sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import type { Quote } from "@/types";
@@ -129,11 +130,12 @@ export default function QuotesPage() {
     refetch,
     dataUpdatedAt,
   } = useQuery({
-    queryKey: ["quotes", selectedCountry],
+    queryKey: queryKeys.quotes.all(selectedCountry),
     queryFn: async () => {
       const response = await quotesApi.getAllByCountry(selectedCountry);
       return response.data as Quote[];
     },
+    staleTime: 30000,
     refetchInterval: QUOTES_REFETCH_MS,
   });
 
@@ -160,7 +162,7 @@ export default function QuotesPage() {
 
   const historyQueries = useQueries({
     queries: chartableSelectedTypes.map((type) => ({
-      queryKey: ["history", selectedCountry, type, period],
+      queryKey: queryKeys.quotes.history(selectedCountry, type, period),
       queryFn: async () => {
         const to = new Date().toISOString().split("T")[0];
         const from = new Date(Date.now() - Number.parseInt(period, 10) * 24 * 60 * 60 * 1000)

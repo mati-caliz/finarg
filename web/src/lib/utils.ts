@@ -116,3 +116,75 @@ export function formatLimit(limit: number | undefined): string | null {
   }
   return `$${limit}`;
 }
+
+interface ChartDataWithDate {
+  fecha: string;
+  fechaOriginal: string;
+  [key: string]: string | number;
+}
+
+interface Government {
+  startDate: string;
+  endDate: string;
+  label: string;
+  color: string;
+}
+
+interface ReferenceArea {
+  x1: string | number;
+  x2: string | number;
+  fill: string;
+  label: string;
+}
+
+export function generateReferenceAreas(
+  chartData: ChartDataWithDate[],
+  governments: Government[],
+  useIndex = false,
+): ReferenceArea[] {
+  if (!chartData || chartData.length === 0) {
+    return [];
+  }
+
+  const firstDataDate = new Date(chartData[0]?.fechaOriginal || "");
+  const lastDataDate = new Date(chartData[chartData.length - 1]?.fechaOriginal || "");
+
+  return governments
+    .filter((gov) => {
+      const govStart = new Date(gov.startDate);
+      const govEnd = new Date(gov.endDate);
+      return govStart <= lastDataDate && govEnd >= firstDataDate;
+    })
+    .map((gov) => {
+      const govStart = new Date(gov.startDate);
+      const govEnd = new Date(gov.endDate);
+
+      let x1: string | number = useIndex ? 0 : chartData[0]?.fecha;
+      let x2: string | number = useIndex
+        ? chartData.length - 1
+        : chartData[chartData.length - 1]?.fecha;
+
+      for (let i = 0; i < chartData.length; i++) {
+        const date = new Date(chartData[i].fechaOriginal);
+        if (date >= govStart) {
+          x1 = useIndex ? i : chartData[i].fecha;
+          break;
+        }
+      }
+
+      for (let i = chartData.length - 1; i >= 0; i--) {
+        const date = new Date(chartData[i].fechaOriginal);
+        if (date <= govEnd) {
+          x2 = useIndex ? i : chartData[i].fecha;
+          break;
+        }
+      }
+
+      return {
+        x1,
+        x2,
+        fill: gov.color,
+        label: gov.label,
+      };
+    });
+}

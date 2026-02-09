@@ -1,5 +1,7 @@
 package com.finarg.service;
 
+import com.finarg.exception.InvalidTokenException;
+import com.finarg.exception.UserNotFoundException;
 import com.finarg.model.dto.AuthRequestDTO;
 import com.finarg.model.dto.AuthResponseDTO;
 import com.finarg.model.entity.User;
@@ -79,7 +81,7 @@ public class AuthService implements UserDetailsService {
         );
 
         User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -90,10 +92,10 @@ public class AuthService implements UserDetailsService {
     public AuthResponseDTO refreshToken(String refreshToken) {
         String email = jwtService.extractUsername(refreshToken);
         User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         if (!jwtService.isTokenValid(refreshToken, user) || !jwtService.isRefreshToken(refreshToken)) {
-            throw new RuntimeException("Invalid token");
+            throw new InvalidTokenException();
         }
 
         String newAccessToken = jwtService.generateToken(user);
