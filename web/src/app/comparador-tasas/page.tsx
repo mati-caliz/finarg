@@ -29,6 +29,7 @@ interface RateDTO {
   limit?: number;
   logo?: string;
   link?: string;
+  isBestRate?: boolean;
 }
 
 function extractDomainFromFaviconUrl(url: string): string | null {
@@ -58,7 +59,6 @@ interface RateSectionProps {
   error: Error | null;
   refetch: () => void;
   emptyMessage: string;
-  maxTna: number;
   type: "wallet" | "bank" | "usd" | "mortgage";
   translate: (key: TranslationKey) => string;
 }
@@ -72,7 +72,6 @@ const RateSection = ({
   error,
   refetch,
   emptyMessage,
-  maxTna,
   type,
   translate,
 }: RateSectionProps) => {
@@ -135,10 +134,7 @@ const RateSection = ({
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((row) => {
-            const isBest =
-              type === "mortgage"
-                ? row.tna <= maxTna && maxTna > 0
-                : row.tna >= maxTna && maxTna > 0;
+            const isBest = row.isBestRate === true;
             const limitStr = formatLimit(row.limit);
             const logoUrl = row.logo || "";
 
@@ -347,13 +343,6 @@ export default function RatesPage() {
   const showWallets = selectedCountry === "ar";
   const showBanks = selectedCountry === "ar";
 
-  const maxBankTna = bankRates.length > 0 ? Math.max(...bankRates.map((r) => r.tna)) : 0;
-  const maxWalletTna = walletRates.length > 0 ? Math.max(...walletRates.map((r) => r.tna)) : 0;
-  const maxUsdAccountTna =
-    usdAccountRates.length > 0 ? Math.max(...usdAccountRates.map((r) => r.tna)) : 0;
-  const minUvaMortgageTna =
-    uvaMortgageRates.length > 0 ? Math.min(...uvaMortgageRates.map((r) => r.tna)) : 0;
-
   if (!showWallets && !showBanks) {
     return (
       <div className="space-y-6">
@@ -438,7 +427,6 @@ export default function RatesPage() {
           error={walletsErrorData as Error}
           refetch={refetchWallets}
           emptyMessage={translate("noWalletRates")}
-          maxTna={maxWalletTna}
           type="wallet"
           translate={translate}
         />
@@ -454,7 +442,6 @@ export default function RatesPage() {
           error={banksErrorData as Error}
           refetch={refetchBanks}
           emptyMessage={translate("noBankRates")}
-          maxTna={maxBankTna}
           type="bank"
           translate={translate}
         />
@@ -470,7 +457,6 @@ export default function RatesPage() {
           error={usdAccountsErrorData as Error}
           refetch={refetchUsdAccounts}
           emptyMessage="No hay datos disponibles"
-          maxTna={maxUsdAccountTna}
           type="usd"
           translate={translate}
         />
@@ -486,7 +472,6 @@ export default function RatesPage() {
           error={uvaMortgagesErrorData as Error}
           refetch={refetchUvaMortgages}
           emptyMessage="No hay datos disponibles"
-          maxTna={minUvaMortgageTna}
           type="mortgage"
           translate={translate}
         />

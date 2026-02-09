@@ -4,6 +4,7 @@ import { BarChart } from "@/components/charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAdjustInflation } from "@/hooks/useInflation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
@@ -14,7 +15,7 @@ import {
   generateReferenceAreas,
 } from "@/lib/utils";
 import type { Inflation, InflationAdjustment } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -65,19 +66,18 @@ export default function InflationPage() {
     },
   });
 
-  const adjustMutation = useMutation({
-    mutationFn: async () => {
-      const response = await inflationApi.adjust(originalAmount, startDate, endDate);
-      return response.data as InflationAdjustment;
-    },
-    onSuccess: (data) => {
-      setAdjustmentResult(data);
-    },
-  });
+  const adjustMutation = useAdjustInflation();
 
   const handleAdjust = (e: React.FormEvent) => {
     e.preventDefault();
-    adjustMutation.mutate();
+    adjustMutation.mutate(
+      { amount: originalAmount, fromDate: startDate, toDate: endDate },
+      {
+        onSuccess: (data) => {
+          setAdjustmentResult(data);
+        },
+      },
+    );
   };
 
   const getVisibleGovernments = (inflationData: Inflation[]) => {

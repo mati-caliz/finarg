@@ -1,13 +1,13 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VariationBadge } from "@/components/ui/variation-badge";
 import type { CountryCode } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { formatCurrencySimple } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import type { Quote } from "@/types";
-import { Minus, TrendingDown, TrendingUp } from "lucide-react";
 import { memo } from "react";
 
 export interface QuoteCardProps {
@@ -74,10 +74,6 @@ export const QuoteCard = memo(function QuoteCard({ quote, country }: QuoteCardPr
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryToUse = country || (quote.country as CountryCode) || selectedCountry;
 
-  const variation = quote.variation || 0;
-  const isPositive = variation > 0;
-  const isNegative = variation < 0;
-
   const translated = translate(quote.type as TranslationKey);
   const displayName = translated === quote.type ? quote.name : translated;
 
@@ -112,26 +108,7 @@ export const QuoteCard = memo(function QuoteCard({ quote, country }: QuoteCardPr
               {translate("buy")}: {formatCurrencySimple(quote.buy, countryToUse)}
             </p>
           </div>
-          {isDollarQuote && (
-            <div
-              className={`flex items-center gap-1 text-sm px-2 py-1 rounded-full ${
-                isPositive
-                  ? "text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/15"
-                  : isNegative
-                    ? "text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/15"
-                    : "text-muted-foreground bg-muted"
-              }`}
-            >
-              {isPositive ? (
-                <TrendingUp className="h-3.5 w-3.5" />
-              ) : isNegative ? (
-                <TrendingDown className="h-3.5 w-3.5" />
-              ) : (
-                <Minus className="h-3.5 w-3.5" />
-              )}
-              <span className="text-xs font-medium">{variation.toFixed(2)}%</span>
-            </div>
-          )}
+          {isDollarQuote && <VariationBadge variation={quote.variation || 0} />}
         </div>
         <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
           {translate("spread")}: {formatCurrencySimple(quote.spread, countryToUse)}

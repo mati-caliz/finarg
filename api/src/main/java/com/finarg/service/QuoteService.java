@@ -165,9 +165,14 @@ public class QuoteService {
     }
 
     private List<QuoteDTO> enrichQuotesWithVariation(List<QuoteDTO> quotes) {
+        if (quotes.isEmpty()) {
+            return quotes;
+        }
+
         LocalDate today = LocalDate.now();
         List<CurrencyType> types = quotes.stream()
                 .map(QuoteDTO::getType)
+                .distinct()
                 .collect(Collectors.toList());
 
         Map<CurrencyType, QuoteHistory> previousByType = quoteHistoryRepository
