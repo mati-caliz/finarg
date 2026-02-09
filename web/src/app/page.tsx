@@ -3,12 +3,9 @@
 import { QuoteCard } from "@/components/dashboard/QuoteCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getCountryConfig } from "@/config/countries";
 
-import { BandsWidget } from "@/components/dashboard/BandsWidget";
-import { CountryRiskWidget } from "@/components/dashboard/CountryRiskWidget";
-import { GapGauge } from "@/components/dashboard/GapGauge";
-import { ReservesWidget } from "@/components/dashboard/ReservesWidget";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,9 +21,44 @@ import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
-import { ArrowRight, Calculator, ChevronDown, Loader2, Percent, TrendingUp } from "lucide-react";
+import { ArrowRight, Calculator, ChevronDown, Percent, TrendingUp } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+
+const BandsWidget = dynamic(
+  () => import("@/components/dashboard/BandsWidget").then((mod) => ({ default: mod.BandsWidget })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
+const GapGauge = dynamic(
+  () => import("@/components/dashboard/GapGauge").then((mod) => ({ default: mod.GapGauge })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
+const ReservesWidget = dynamic(
+  () =>
+    import("@/components/dashboard/ReservesWidget").then((mod) => ({
+      default: mod.ReservesWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
+const CountryRiskWidget = dynamic(
+  () =>
+    import("@/components/dashboard/CountryRiskWidget").then((mod) => ({
+      default: mod.CountryRiskWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
 
 export default function DashboardPage() {
   const { translate } = useTranslation();
@@ -34,13 +66,12 @@ export default function DashboardPage() {
   const countryConfig = getCountryConfig(selectedCountry);
 
   const { data: quotes, isLoading: loadingQuotes } = useQuotes();
-  const { data: gap, isLoading: loadingGap } = useGap();
-  const { data: reserves, isLoading: loadingReserves } = useReserves(selectedCountry);
+  const { data: gap } = useGap();
+  const { data: reserves } = useReserves(selectedCountry);
 
-  const { data: inflation, isLoading: loadingInflation } = useCurrentInflation();
-  const { data: socialIndicators, isLoading: loadingSocialIndicators } =
-    useSocialIndicators(selectedCountry);
-  const { data: countryRisk, isLoading: loadingCountryRisk } = useCountryRisk();
+  const { data: inflation } = useCurrentInflation();
+  const { data: socialIndicators } = useSocialIndicators(selectedCountry);
+  const { data: countryRisk } = useCountryRisk();
 
   const otherQuotes = useMemo(
     () =>
@@ -100,31 +131,13 @@ export default function DashboardPage() {
     [otherQuotes, selectedCurrency],
   );
 
-  const isLoadingMainData =
-    loadingQuotes ||
-    loadingGap ||
-    (selectedCountry === "ar" &&
-      (loadingReserves || loadingSocialIndicators || loadingCountryRisk)) ||
-    (countryConfig.features.inflation && loadingInflation);
-
-  if (isLoadingMainData) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Cargando datos...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{translate("dashboard")}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-success-accessible">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-success-accessible">
               {countryConfig.flag} {translate(selectedCountry)}
             </span>
             <span className="text-sm text-muted-foreground">{translate("marketSummary")}</span>
@@ -133,11 +146,18 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {sortQuotesByVariant(quotes ?? [])
-          .filter((quote) => ["blue", "oficial", "tarjeta", "bolsa"].includes(quote.type))
-          .map((quote) => (
-            <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
-          ))}
+        {loadingQuotes ? (
+          <>
+            <Skeleton className="h-36 rounded-xl" />
+            <Skeleton className="h-36 rounded-xl" />
+            <Skeleton className="h-36 rounded-xl" />
+            <Skeleton className="h-36 rounded-xl" />
+          </>
+        ) : (
+          sortQuotesByVariant(quotes ?? [])
+            .filter((quote) => ["blue", "oficial", "tarjeta", "bolsa"].includes(quote.type))
+            .map((quote) => <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />)
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -379,14 +399,14 @@ export default function DashboardPage() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <h2 className="text-lg font-semibold">{translate("otherQuotes")}</h2>
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full sm:w-[200px] justify-between">
                   {translate(currencyToTranslationKey[selectedCurrency] ?? "currencyDollar")}
                   <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-full sm:w-[200px]">
+              <DropdownMenuContent align="end" className="w-full sm:w-[200px]">
                 {availableCurrencies.map((currency) => (
                   <DropdownMenuItem key={currency} onClick={() => setSelectedCurrency(currency)}>
                     {translate(currencyToTranslationKey[currency] ?? "currencyDollar")}

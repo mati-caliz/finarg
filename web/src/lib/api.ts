@@ -1,5 +1,5 @@
 import type { CountryCode } from "@/config/countries";
-import type { CompoundInterestRequest, IncomeTaxRequest } from "@/types";
+import type { CompoundInterestRequest, ExchangeRateComparison, IncomeTaxRequest } from "@/types";
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
@@ -75,6 +75,11 @@ export const ratesApi = {
   getWallets: (country = "ar") => api.get("/rates/wallets", { params: { country } }),
   getUsdAccounts: (country = "ar") => api.get("/rates/usd-accounts", { params: { country } }),
   getUvaMortgages: (country = "ar") => api.get("/rates/uva-mortgages", { params: { country } }),
+};
+
+export const exchangeRateComparisonApi = {
+  compareRates: (country: CountryCode) =>
+    api.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
 };
 
 export const reposApi = {

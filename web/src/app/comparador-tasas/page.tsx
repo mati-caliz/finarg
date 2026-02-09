@@ -50,6 +50,19 @@ function getFallbackLogoUrl(domain: string): string {
   return `https://icon.horse/icon/${domain}`;
 }
 
+function getOptimizedLogoUrl(originalUrl: string): string {
+  if (!originalUrl) {
+    return "";
+  }
+
+  const domain = extractDomainFromFaviconUrl(originalUrl);
+  if (domain) {
+    return getFallbackLogoUrl(domain);
+  }
+
+  return originalUrl;
+}
+
 interface RateSectionProps {
   title: string;
   disclaimer: string;
@@ -136,7 +149,8 @@ const RateSection = ({
           {data.map((row) => {
             const isBest = row.isBestRate === true;
             const limitStr = formatLimit(row.limit);
-            const logoUrl = row.logo || "";
+            const originalLogoUrl = row.logo || "";
+            const optimizedLogoUrl = getOptimizedLogoUrl(originalLogoUrl);
 
             return (
               <Card
@@ -150,39 +164,33 @@ const RateSection = ({
                     <div className="flex min-w-0 flex-1 gap-3">
                       {/* Logo Section */}
                       <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-muted/50 p-1.5">
-                        {logoUrl ? (
+                        {optimizedLogoUrl ? (
                           <>
                             <img
-                              src={logoUrl}
+                              src={optimizedLogoUrl}
                               alt=""
                               className="rate-logo-img max-h-full max-w-full shrink-0 object-contain object-center"
                               loading="lazy"
                               onError={(e) => {
                                 const img = e.currentTarget;
-                                const domain = extractDomainFromFaviconUrl(logoUrl);
-                                if (domain && !img.dataset.triedFallback) {
-                                  img.dataset.triedFallback = "true";
-                                  img.src = getFallbackLogoUrl(domain);
-                                } else {
-                                  img.style.display = "none";
-                                  const fallback = img.nextElementSibling;
-                                  if (fallback instanceof HTMLElement) {
-                                    fallback.classList.remove("hidden");
-                                    fallback.className =
-                                      "rate-logo-fallback flex h-full w-full items-center justify-center";
-                                  }
+                                img.style.display = "none";
+                                const fallback = img.nextElementSibling;
+                                if (fallback instanceof HTMLElement) {
+                                  fallback.classList.remove("hidden");
+                                  fallback.className =
+                                    "rate-logo-fallback flex h-full w-full items-center justify-center";
                                 }
                               }}
                             />
                             <span className="rate-logo-fallback hidden h-full w-full items-center justify-center">
-                              {type === "bank" ? (
+                              {type === "bank" || type === "usd" ? (
                                 <Landmark className="h-6 w-6 text-muted-foreground" />
                               ) : (
                                 <Wallet className="h-6 w-6 text-muted-foreground" />
                               )}
                             </span>
                           </>
-                        ) : type === "bank" ? (
+                        ) : type === "bank" || type === "usd" ? (
                           <Landmark className="h-6 w-6 text-muted-foreground" />
                         ) : (
                           <Wallet className="h-6 w-6 text-muted-foreground" />

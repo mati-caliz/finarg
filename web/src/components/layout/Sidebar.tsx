@@ -7,6 +7,7 @@ import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
+  ArrowLeftRight,
   BarChart2,
   Building2,
   Calculator,
@@ -35,6 +36,12 @@ const baseNavigation = [
     key: "exchangeBands" as TranslationKey,
     href: "/bandas-cambiarias",
     icon: Gauge,
+    feature: "quotes" as const,
+  },
+  {
+    key: "exchangeRatesComparator" as TranslationKey,
+    href: "/comparador-tipos-cambio",
+    icon: ArrowLeftRight,
     feature: "quotes" as const,
   },
   {
@@ -222,20 +229,20 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
                     isActive
-                      ? "bg-primary text-white shadow-lg shadow-primary/25"
+                      ? "bg-[hsl(152_69%_24%)] text-white shadow-lg shadow-primary/25"
                       : "text-white/60 hover:bg-white/10 hover:text-white",
-                    isComingSoon && "cursor-default opacity-70",
+                    isComingSoon && "cursor-default",
                   )}
                 >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  <span className="flex-1">{item.name}</span>
+                  <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
+                  <span className={cn("flex-1", isComingSoon && "opacity-50")}>{item.name}</span>
                   {isNew && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-500 text-white uppercase tracking-wide">
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
                       Nuevo
                     </span>
                   )}
                   {isComingSoon && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-500 text-white uppercase tracking-wide">
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-700 text-white uppercase tracking-wide">
                       {translate("comingSoon")}
                     </span>
                   )}
