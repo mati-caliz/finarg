@@ -1,18 +1,8 @@
 "use client";
 
-import { BandsWidget } from "@/components/dashboard/BandsWidget";
-import { CountryRiskWidget } from "@/components/dashboard/CountryRiskWidget";
-import { GapGauge } from "@/components/dashboard/GapGauge";
 import { QuoteCard } from "@/components/dashboard/QuoteCard";
-import { ReservesWidget } from "@/components/dashboard/ReservesWidget";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { getCountryConfig } from "@/config/countries";
 
 import { useCountryRisk } from "@/hooks/useCountryRisk";
@@ -25,8 +15,50 @@ import type { TranslationKey } from "@/i18n/translations";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import { ArrowRight, Calculator, ChevronDown, Loader2, Percent, TrendingUp } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+
+const BandsWidget = dynamic(
+  () => import("@/components/dashboard/BandsWidget").then((mod) => ({ default: mod.BandsWidget })),
+  { ssr: false },
+);
+const CountryRiskWidget = dynamic(
+  () =>
+    import("@/components/dashboard/CountryRiskWidget").then((mod) => ({
+      default: mod.CountryRiskWidget,
+    })),
+  { ssr: false },
+);
+const GapGauge = dynamic(
+  () => import("@/components/dashboard/GapGauge").then((mod) => ({ default: mod.GapGauge })),
+  { ssr: false },
+);
+const ReservesWidget = dynamic(
+  () =>
+    import("@/components/dashboard/ReservesWidget").then((mod) => ({
+      default: mod.ReservesWidget,
+    })),
+  { ssr: false },
+);
+const DropdownMenu = dynamic(
+  () => import("@/components/ui/dropdown-menu").then((mod) => ({ default: mod.DropdownMenu })),
+  { ssr: false },
+);
+const DropdownMenuContent = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then((mod) => ({ default: mod.DropdownMenuContent })),
+  { ssr: false },
+);
+const DropdownMenuItem = dynamic(
+  () => import("@/components/ui/dropdown-menu").then((mod) => ({ default: mod.DropdownMenuItem })),
+  { ssr: false },
+);
+const DropdownMenuTrigger = dynamic(
+  () =>
+    import("@/components/ui/dropdown-menu").then((mod) => ({ default: mod.DropdownMenuTrigger })),
+  { ssr: false },
+);
 
 export default function DashboardPage() {
   const { translate } = useTranslation();

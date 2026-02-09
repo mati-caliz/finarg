@@ -1,15 +1,28 @@
 "use client";
 
-import { AreaChart } from "@/components/charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
 import { formatDateDayShort, formatReservesUSD, generateReferenceAreas } from "@/lib/utils";
 import type { Reserves } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, Landmark, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useState } from "react";
+
+const AreaChart = dynamic(
+  () => import("@/components/charts").then((mod) => ({ default: mod.AreaChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] flex items-center justify-center">
+        <Skeleton className="w-full h-full" />
+      </div>
+    ),
+  },
+);
 
 const LIABILITY_COLORS = ["#ef4444", "#3b82f6", "#eab308", "#8b5cf6", "#06b6d4"];
 

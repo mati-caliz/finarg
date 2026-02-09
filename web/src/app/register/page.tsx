@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleOAuthWrapper } from "@/components/GoogleOAuthWrapper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -313,14 +314,16 @@ export default function RegisterPage() {
 
               <div className="flex flex-col items-center gap-2">
                 {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
-                  <GoogleLogin
-                    onSuccess={(res) => handleGoogleSuccess(res?.credential)}
-                    onError={() => setError("Error al registrarse con Google.")}
-                    useOneTap={false}
-                    theme="filled_black"
-                    size="large"
-                    text="continue_with"
-                  />
+                  <GoogleOAuthWrapper>
+                    <GoogleLogin
+                      onSuccess={(res) => handleGoogleSuccess(res?.credential)}
+                      onError={() => setError("Error al registrarse con Google.")}
+                      useOneTap={false}
+                      theme="filled_black"
+                      size="large"
+                      text="continue_with"
+                    />
+                  </GoogleOAuthWrapper>
                 ) : (
                   <>
                     <Button

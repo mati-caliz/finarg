@@ -59,6 +59,10 @@ const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
   transpilePackages: ["lucide-react"],
+  compress: true,
+  poweredByHeader: false,
+  optimizeFonts: true,
+  swcMinify: true,
   images: {
     remotePatterns: [
       {
