@@ -442,6 +442,10 @@ export default function QuotesPage() {
                 </div>
               ))}
             </div>
+          ) : !filteredQuotes || filteredQuotes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+              <p className="text-sm">{translate("noQuotesAvailable")}</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -465,7 +469,7 @@ export default function QuotesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredQuotes?.map((quote) => (
+                  {filteredQuotes.map((quote) => (
                     <tr key={quote.type} className="border-b border-border/50 hover:bg-muted/50">
                       <td className="py-3 px-4">
                         <span className="font-medium text-foreground">
