@@ -57,7 +57,12 @@
       "Bash(npm run dev:*)",
       "Bash(npm outdated:*)",
       "Bash(npx next build --help:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "WebFetch(domain:apis.datos.gob.ar)",
+      "WebFetch(domain:api.argentinadatos.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:argentinadatos.com)",
+      "WebFetch(domain:argenstats.com)"
     ]
   }
 }
