@@ -1,9 +1,9 @@
 "use client";
 
-import { BarChart } from "@/components/charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAdjustInflation } from "@/hooks/useInflation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
@@ -17,7 +17,20 @@ import {
 import type { Inflation, InflationAdjustment } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+
+const BarChart = dynamic(
+  () => import("@/components/charts").then((mod) => ({ default: mod.BarChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] flex items-center justify-center">
+        <Skeleton className="w-full h-full" />
+      </div>
+    ),
+  },
+);
 
 export default function InflationPage() {
   const { translate } = useTranslation();

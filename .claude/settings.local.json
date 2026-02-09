@@ -52,7 +52,8 @@
       "Bash(node analyze-lighthouse.js:*)",
       "Bash(docker-compose restart:*)",
       "Bash(trivy fs:*)",
-      "Bash(npm run security:*)"
+      "Bash(npm run security:*)",
+      "Bash(lighthouse:*)"
     ]
   }
 }

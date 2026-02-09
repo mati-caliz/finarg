@@ -1,7 +1,9 @@
-const CACHE_NAME = "finarg-v2";
-const STATIC_CACHE = "finarg-static-v2";
-const DYNAMIC_CACHE = "finarg-dynamic-v2";
-const API_CACHE = "finarg-api-v2";
+const CACHE_VERSION = "v3";
+const CACHE_NAME = `finarg-${CACHE_VERSION}`;
+const STATIC_CACHE = `finarg-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `finarg-dynamic-${CACHE_VERSION}`;
+const API_CACHE = `finarg-api-${CACHE_VERSION}`;
+const CHUNKS_CACHE = `finarg-chunks-${CACHE_VERSION}`;
 
 // Archivos estáticos para cachear
 const STATIC_ASSETS = [
@@ -45,7 +47,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames
           .filter((name) => {
-            return name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== API_CACHE;
+            return name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== API_CACHE && name !== CHUNKS_CACHE;
           })
           .map((name) => {
             console.log("[SW] Deleting old cache:", name);
@@ -143,7 +145,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets - cache first (except scripts which use network-first to avoid HMR issues)
+  // Static assets - cache first with longer TTL
   if (
     request.destination === "image" ||
     request.destination === "font" ||
@@ -153,7 +155,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Scripts use network-first to avoid caching corrupted HMR modules
+  // Next.js chunks and static scripts - cache first in production
+  if (request.destination === "script" && (url.pathname.includes("/_next/static/") || url.pathname.includes("/_next/chunks/"))) {
+    event.respondWith(
+      caches.open(CHUNKS_CACHE).then((cache) => {
+        return cache.match(request).then((cached) => {
+          if (cached) {
+            return cached;
+          }
+          return fetch(request).then((response) => {
+            if (response.ok) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  // Other scripts use network-first to avoid caching HMR modules
   if (request.destination === "script") {
     event.respondWith(cacheStrategies.networkFirst(request));
     return;

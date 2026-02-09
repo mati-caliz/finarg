@@ -4,9 +4,14 @@ import "./globals.css";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { HeadPrefetch } from "./head-prefetch";
 import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+});
 
 export const metadata: Metadata = {
   title: "FinLatam - App Financiera Latinoamerica",
@@ -48,12 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           rel="preconnect"
           href={process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:8080"}
         />
-        <link rel="preconnect" href="https://accounts.google.com" />
-        <link rel="dns-prefetch" href="https://accounts.google.com" />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -63,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={inter.className}>
         <Providers>
+          <HeadPrefetch />
           <div className="min-h-screen bg-background">
             <Sidebar />
             <div className="lg:pl-64">

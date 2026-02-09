@@ -1,7 +1,20 @@
 "use client";
 
-import { LineChart } from "@/components/charts";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import dynamic from "next/dynamic";
+
+const LineChart = dynamic(
+  () => import("@/components/charts").then((mod) => ({ default: mod.LineChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] flex items-center justify-center">
+        <Skeleton className="w-full h-full" />
+      </div>
+    ),
+  },
+);
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/useTranslation";

@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryError } from "@/components/QueryError";
-import { LineChart } from "@/components/charts";
 import { DolarCardSkeleton } from "@/components/skeletons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +15,20 @@ import { useAppStore } from "@/store/useStore";
 import type { Quote } from "@/types";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { TrendingDown, TrendingUp, X } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
+
+const LineChart = dynamic(
+  () => import("@/components/charts").then((mod) => ({ default: mod.LineChart })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center">
+        <Skeleton className="w-full h-full" />
+      </div>
+    ),
+  },
+);
 
 function useUpdateProgress(dataUpdatedAt: number, intervalMs: number): number {
   const [, setTick] = useState(0);
