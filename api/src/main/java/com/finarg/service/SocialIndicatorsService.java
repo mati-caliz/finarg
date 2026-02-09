@@ -35,6 +35,7 @@ public class SocialIndicatorsService {
                 .totalBasicBasket(totalBasicBasket)
                 .foodBasicBasket(foodBasicBasket)
                 .ripteSalary(ripteSalary)
+                .averageSalary(ripteSalary)
                 .uva(uva)
                 .cer(cer)
                 .build();

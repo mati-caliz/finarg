@@ -462,7 +462,7 @@ public class RatesService {
     private RateDTO mapUsdAccountToRateDTO(ArgentinaDatosClient.UsdAccountResponse r) {
         BigDecimal tnaPct = r.getTasa().multiply(BigDecimal.valueOf(100));
         BigDecimal teaPct = teaFromTna(r.getTasa()).multiply(BigDecimal.valueOf(100));
-        String entityName = formatFundName(r.getEntity());
+        String entityName = shortenBankName(r.getEntity());
         String logo = bankLogoUrl(r.getEntity());
         return RateDTO.builder()
                 .id(sanitizeId(r.getEntity()))
@@ -501,7 +501,7 @@ public class RatesService {
     private RateDTO mapUvaMortgageToRateDTO(ArgentinaDatosClient.UvaMortgageResponse r) {
         BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
         BigDecimal teaPct = teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
-        String entityName = formatFundName(r.getCommercialName());
+        String entityName = shortenBankName(r.getCommercialName());
         String logo = bankLogoUrl(r.getCommercialName());
         return RateDTO.builder()
                 .id(sanitizeId(r.getCommercialName()))
