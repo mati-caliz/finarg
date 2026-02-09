@@ -102,18 +102,34 @@ export function Sidebar() {
   const { translate } = useTranslation();
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
       }
+      timeoutId = setTimeout(() => {
+        if (window.innerWidth >= 1024) {
+          setSidebarOpen(true);
+        } else {
+          setSidebarOpen(false);
+        }
+      }, 150);
     };
 
-    handleResize();
+    if (window.innerWidth >= 1024) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarOpen(false);
+    }
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
+      window.removeEventListener("resize", handleResize);
+    };
   }, [setSidebarOpen]);
 
   const reservesKeyMap: Record<string, TranslationKey> = {
@@ -146,6 +162,7 @@ export function Sidebar() {
         size="icon"
         className="fixed top-4 left-4 z-50 lg:hidden"
         onClick={toggleSidebar}
+        aria-label={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>

@@ -205,7 +205,10 @@ export default function BandsPage() {
       const response = await exchangeBandsApi.getCurrent();
       return response.data as ExchangeBands;
     },
-    staleTime: 3600000,
+    staleTime: 86400000,
+    gcTime: 86400000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const mayoristaQuote =

@@ -26,9 +26,7 @@ api.interceptors.response.use(
 );
 
 export const quotesApi = {
-  getAll: () => api.get("/quotes"),
   getAllByCountry: (country: CountryCode) => api.get(`/${country}/quotes`),
-  getByType: (type: string) => api.get(`/quotes/${type}`),
   getByCountryAndType: (country: CountryCode, type: string) =>
     api.get(`/${country}/quotes/${type}`),
   getGap: () => api.get("/quotes/gap"),
@@ -41,7 +39,6 @@ export const quotesApi = {
 export const inflationApi = {
   getCurrent: () => api.get("/inflation/current"),
   getMonthly: (months = 12) => api.get("/inflation/monthly", { params: { months } }),
-  getYearOverYear: () => api.get("/inflation/year-over-year"),
   getGovernments: (country = "ar") => api.get("/inflation/governments", { params: { country } }),
   adjust: (amount: number, fromDate: string, toDate: string) =>
     api.post("/inflation/adjust", null, { params: { amount, fromDate, toDate } }),

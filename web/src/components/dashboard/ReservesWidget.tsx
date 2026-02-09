@@ -1,21 +1,23 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VariationBadge } from "@/components/ui/variation-badge";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatReservesUSD } from "@/lib/utils";
 import type { Reserves } from "@/types";
-import { Landmark, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { Landmark } from "lucide-react";
+import { memo } from "react";
 
 interface ReservesWidgetProps {
   reserves: Reserves;
   label?: string;
 }
 
-export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
+export const ReservesWidget = memo(function ReservesWidget({
+  reserves,
+  label,
+}: ReservesWidgetProps) {
   const { translate } = useTranslation();
-  const variation = reserves.dailyVariation || 0;
-  const isPositive = variation > 0;
-  const isNegative = variation < 0;
 
   return (
     <Card className="h-full border-t-[3px] border-t-cyan-500 transition-all hover:shadow-lg hover:border-cyan-400 cursor-pointer">
@@ -33,27 +35,12 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
               <p className="text-2xl font-bold tracking-tight">
                 {formatReservesUSD(reserves.grossReserves)}
               </p>
-              <div
-                className={`flex items-center gap-1 text-sm px-2 py-1 rounded-full ${
-                  isPositive
-                    ? "text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/15"
-                    : isNegative
-                      ? "text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-500/15"
-                      : "text-muted-foreground bg-muted"
-                }`}
-              >
-                {isPositive ? (
-                  <TrendingUp className="h-3.5 w-3.5" />
-                ) : isNegative ? (
-                  <TrendingDown className="h-3.5 w-3.5" />
-                ) : (
-                  <Minus className="h-3.5 w-3.5" />
-                )}
-                <span className="text-xs font-medium">
-                  {variation > 0 ? "+" : ""}
-                  {variation.toLocaleString("es-AR", { maximumFractionDigits: 0 })}
-                </span>
-              </div>
+              <VariationBadge
+                variation={reserves.dailyVariation || 0}
+                format="absolute"
+                decimals={0}
+                showSign={true}
+              />
             </div>
           </div>
 
@@ -63,7 +50,9 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
                 <p className="text-xs text-muted-foreground">{translate("netBcra")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesBCRA < 0 ? "text-red-500" : "text-emerald-500"
+                    reserves.netReservesBCRA < 0
+                      ? "text-destructive-accessible"
+                      : "text-success-accessible"
                   }`}
                 >
                   {formatReservesUSD(reserves.netReservesBCRA)}
@@ -75,7 +64,9 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
                 <p className="text-xs text-muted-foreground">{translate("netFmi")}</p>
                 <p
                   className={`text-lg font-semibold ${
-                    reserves.netReservesFMI < 0 ? "text-red-500" : "text-amber-600"
+                    reserves.netReservesFMI < 0
+                      ? "text-destructive-accessible"
+                      : "text-warning-accessible"
                   }`}
                 >
                   {reserves.netReservesFMI < 0 ? "\u2212" : ""}
@@ -89,7 +80,9 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
                   <p className="text-xs text-muted-foreground">{translate("netEstimated")}</p>
                   <p
                     className={`text-lg font-semibold ${
-                      reserves.netReserves < 0 ? "text-red-500" : "text-emerald-500"
+                      reserves.netReserves < 0
+                        ? "text-destructive-accessible"
+                        : "text-success-accessible"
                     }`}
                   >
                     {formatReservesUSD(reserves.netReserves)}
@@ -101,4 +94,4 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
       </CardContent>
     </Card>
   );
-}
+});
