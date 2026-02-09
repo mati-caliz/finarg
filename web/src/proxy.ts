@@ -6,6 +6,16 @@ const PROTECTED_ROUTES: string[] = [];
 const PUBLIC_ONLY_ROUTES = ["/login", "/register"];
 
 export function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  if (
+    pathname.includes("app-pages-internals") ||
+    pathname.includes("main-app") ||
+    pathname.endsWith("main-app.js")
+  ) {
+    return new NextResponse(null, { status: 204 });
+  }
+
   if (PROTECTED_ROUTES.length === 0) {
     return NextResponse.next();
   }
