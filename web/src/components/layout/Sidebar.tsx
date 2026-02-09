@@ -102,10 +102,12 @@ export function Sidebar() {
   const { translate } = useTranslation();
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const handleResize = () => {
-      clearTimeout(timeoutId);
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
       timeoutId = setTimeout(() => {
         if (window.innerWidth >= 1024) {
           setSidebarOpen(true);
@@ -123,7 +125,9 @@ export function Sidebar() {
 
     window.addEventListener("resize", handleResize);
     return () => {
-      clearTimeout(timeoutId);
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
+      }
       window.removeEventListener("resize", handleResize);
     };
   }, [setSidebarOpen]);

@@ -48,6 +48,8 @@ public class QuoteService {
         if (quote != null) {
             BigDecimal variation = calculateVariation(quote.getType(), quote.getSell());
             quote.setVariation(variation);
+            quote.setBaseCurrency(quote.getType().getBaseCurrency());
+            quote.setHasHistory(quote.getType().isHasHistory());
         }
         return quote;
     }
@@ -184,6 +186,8 @@ public class QuoteService {
                 .peek(quote -> {
                     BigDecimal variation = computeVariation(quote.getSell(), previousByType.get(quote.getType()));
                     quote.setVariation(variation);
+                    quote.setBaseCurrency(quote.getType().getBaseCurrency());
+                    quote.setHasHistory(quote.getType().isHasHistory());
                 })
                 .collect(Collectors.toList());
     }

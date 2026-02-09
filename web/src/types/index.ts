@@ -9,6 +9,8 @@ export interface Quote {
   spread: number;
   variation: number;
   lastUpdate: string;
+  baseCurrency?: string;
+  hasHistory?: boolean;
 }
 
 export interface Gap {
