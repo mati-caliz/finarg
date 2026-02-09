@@ -66,22 +66,22 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
 
   const colorClasses = {
     green: {
-      bg: "bg-green-600",
-      text: "text-success-accessible",
-      border: "border-green-500/50",
-      light: "bg-green-500/20",
+      bg: "bg-emerald-500",
+      text: "text-emerald-700 dark:text-emerald-400",
+      border: "border-t-emerald-400",
+      indicator: "bg-emerald-500",
     },
     yellow: {
-      bg: "bg-amber-600",
-      text: "text-warning-accessible",
-      border: "border-amber-500/50",
-      light: "bg-amber-500/20",
+      bg: "bg-amber-500",
+      text: "text-amber-700 dark:text-amber-400",
+      border: "border-t-amber-400",
+      indicator: "bg-amber-500",
     },
     red: {
-      bg: "bg-red-600",
-      text: "text-destructive-accessible",
-      border: "border-red-500/50",
-      light: "bg-red-500/20",
+      bg: "bg-red-500",
+      text: "text-red-700 dark:text-red-400",
+      border: "border-t-red-400",
+      indicator: "bg-red-500",
     },
   };
 
@@ -94,11 +94,11 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   return (
     <Link href="/bandas-cambiarias" className="block h-full">
       <Card
-        className={`h-full ${colors.border} ${colors.light} transition-all hover:shadow-lg cursor-pointer`}
+        className={`h-full border-t-[3px] ${colors.border} transition-all hover:shadow-lg cursor-pointer`}
       >
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <div className={`h-3 w-3 rounded-full ${colors.bg} animate-pulse`} />
+            <div className={`h-2.5 w-2.5 rounded-full ${colors.indicator}`} />
             {translate("exchangeBands")}
           </CardTitle>
         </CardHeader>
@@ -121,23 +121,23 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
           </div>
 
           <div className="space-y-2">
-            <div className="relative h-4 bg-muted rounded-full overflow-hidden">
+            <div className="relative h-3 bg-muted rounded-full overflow-hidden">
               <div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-400/40 via-blue-300/40 to-transparent"
                 style={{ width: "20%" }}
               />
               <div
-                className="absolute inset-y-0 left-[20%] bg-gradient-to-r from-yellow-500/30 via-transparent to-yellow-500/30"
+                className="absolute inset-y-0 left-[20%] bg-gradient-to-r from-transparent via-primary/10 to-transparent"
                 style={{ width: "60%" }}
               />
               <div
-                className="absolute inset-y-0 right-0 bg-gradient-to-r from-green-500 via-green-400 to-green-500 opacity-30"
+                className="absolute inset-y-0 right-0 bg-gradient-to-r from-transparent via-blue-300/40 to-blue-400/40"
                 style={{ width: "20%" }}
               />
 
               <div
-                className={`absolute top-1/2 -translate-y-1/2 h-5 w-1.5 rounded-full ${colors.bg} shadow-lg transition-all duration-500`}
-                style={{ left: `calc(${clampedPosition}% - 3px)` }}
+                className={`absolute top-1/2 -translate-y-1/2 h-4 w-1 rounded-full ${colors.indicator} shadow-md transition-all duration-500`}
+                style={{ left: `calc(${clampedPosition}% - 2px)` }}
               />
             </div>
 
