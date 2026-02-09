@@ -18,8 +18,11 @@ public interface QuoteHistoryRepository extends JpaRepository<QuoteHistory, Long
     List<QuoteHistory> findByTypeAndDateBetweenOrderByDateAsc(
             CurrencyType type, LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT q FROM QuoteHistory q WHERE q.type = :type AND q.date < :date ORDER BY q.date DESC LIMIT 1")
-    Optional<QuoteHistory> findLatestByTypeBeforeDate(CurrencyType type, LocalDate date);
+    Optional<QuoteHistory> findFirstByTypeAndDateLessThanOrderByDateDesc(CurrencyType type, LocalDate date);
+
+    default Optional<QuoteHistory> findLatestByTypeBeforeDate(CurrencyType type, LocalDate date) {
+        return findFirstByTypeAndDateLessThanOrderByDateDesc(type, date);
+    }
 
     @Query("SELECT q FROM QuoteHistory q WHERE q.type IN :types AND q.date = " +
            "(SELECT MAX(q2.date) FROM QuoteHistory q2 WHERE q2.type = q.type AND q2.date < :date)")

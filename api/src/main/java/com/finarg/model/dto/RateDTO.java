@@ -22,4 +22,5 @@ public class RateDTO {
     private BigDecimal limit;
     private String logo;
     private String link;
+    private Boolean isBestRate;
 }

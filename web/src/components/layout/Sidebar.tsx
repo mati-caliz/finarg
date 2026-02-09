@@ -102,18 +102,30 @@ export function Sidebar() {
   const { translate } = useTranslation();
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (window.innerWidth >= 1024) {
+          setSidebarOpen(true);
+        } else {
+          setSidebarOpen(false);
+        }
+      }, 150);
     };
 
-    handleResize();
+    if (window.innerWidth >= 1024) {
+      setSidebarOpen(true);
+    } else {
+      setSidebarOpen(false);
+    }
 
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener("resize", handleResize);
+    };
   }, [setSidebarOpen]);
 
   const reservesKeyMap: Record<string, TranslationKey> = {
