@@ -73,3 +73,46 @@ function quoteVariantOrder(type: string): number {
 export function sortQuotesByVariant<T extends { type: string }>(quotes: T[]): T[] {
   return [...quotes].sort((a, b) => quoteVariantOrder(a.type) - quoteVariantOrder(b.type));
 }
+
+export function formatCurrency(value: number | null | undefined): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) {
+    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(0);
+  }
+  return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(n);
+}
+
+export function formatPercent(value: number | string, decimals = 2): string {
+  return `${Number(value).toFixed(decimals)}%`;
+}
+
+export function formatDateShort(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
+}
+
+export function formatDateDayShort(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
+}
+
+export function formatDateSlash(dateStr: string | undefined): string | null {
+  if (!dateStr) {
+    return null;
+  }
+  const [y, m, d] = dateStr.split("-");
+  return d && m && y ? `${d}/${m}/${y}` : dateStr;
+}
+
+export function formatLimit(limit: number | undefined): string | null {
+  if (limit === undefined || limit === null || limit <= 0) {
+    return null;
+  }
+  if (limit >= 1_000_000) {
+    return `$${(limit / 1_000_000).toFixed(0)} M`;
+  }
+  if (limit >= 1_000) {
+    return `$${(limit / 1_000).toFixed(0)} K`;
+  }
+  return `$${limit}`;
+}

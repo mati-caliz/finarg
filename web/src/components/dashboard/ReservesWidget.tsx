@@ -5,13 +5,17 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { formatReservesUSD } from "@/lib/utils";
 import type { Reserves } from "@/types";
 import { Landmark, Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { memo } from "react";
 
 interface ReservesWidgetProps {
   reserves: Reserves;
   label?: string;
 }
 
-export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
+export const ReservesWidget = memo(function ReservesWidget({
+  reserves,
+  label,
+}: ReservesWidgetProps) {
   const { translate } = useTranslation();
   const variation = reserves.dailyVariation || 0;
   const isPositive = variation > 0;
@@ -101,4 +105,4 @@ export function ReservesWidget({ reserves, label }: ReservesWidgetProps) {
       </CardContent>
     </Card>
   );
-}
+});

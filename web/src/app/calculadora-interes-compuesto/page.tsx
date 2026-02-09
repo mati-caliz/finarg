@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { compoundInterestApi } from "@/lib/api";
+import { formatCurrency } from "@/lib/utils";
 import type { CompoundInterestRequest, CompoundInterestResponse } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -63,10 +64,6 @@ export default function CompoundInterestCalculatorPage() {
     value: CompoundInterestRequest[keyof CompoundInterestRequest],
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value);
   };
 
   return (

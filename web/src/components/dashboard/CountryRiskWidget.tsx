@@ -5,12 +5,15 @@ import { useGovernments } from "@/hooks/useGovernments";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { CountryRisk } from "@/types";
 import { AlertTriangle, TrendingUp } from "lucide-react";
+import { memo } from "react";
 
 interface CountryRiskWidgetProps {
   countryRisk: CountryRisk;
 }
 
-export function CountryRiskWidget({ countryRisk }: CountryRiskWidgetProps) {
+export const CountryRiskWidget = memo(function CountryRiskWidget({
+  countryRisk,
+}: CountryRiskWidgetProps) {
   const { translate } = useTranslation();
   const { data: governments = [] } = useGovernments("ar");
 
@@ -99,4 +102,4 @@ export function CountryRiskWidget({ countryRisk }: CountryRiskWidgetProps) {
       </CardContent>
     </Card>
   );
-}
+});

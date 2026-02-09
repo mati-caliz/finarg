@@ -8,6 +8,7 @@ import { formatCurrencySimple } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import type { Quote } from "@/types";
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { memo } from "react";
 
 export interface QuoteCardProps {
   quote: Quote;
@@ -68,7 +69,7 @@ function getAccentForType(type: string) {
   return defaultAccent;
 }
 
-export function QuoteCard({ quote, country }: QuoteCardProps) {
+export const QuoteCard = memo(function QuoteCard({ quote, country }: QuoteCardProps) {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryToUse = country || (quote.country as CountryCode) || selectedCountry;
@@ -138,4 +139,4 @@ export function QuoteCard({ quote, country }: QuoteCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
