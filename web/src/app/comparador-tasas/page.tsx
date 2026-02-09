@@ -7,6 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { ratesApi } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
+import { formatDateSlash, formatLimit, formatPercent } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, ExternalLink, Home, Landmark, Wallet } from "lucide-react";
@@ -27,63 +29,8 @@ interface RateDTO {
   limit?: number;
   logo?: string;
   link?: string;
+  isBestRate?: boolean;
 }
-
-const WALLET_DOMAINS: Record<string, string> = {
-  Adcap: "ad-cap.com.ar",
-  Balanz: "balanz.com",
-  "Banco del Sol": "bancodelsol.com.ar",
-  Belo: "belo.app",
-  Brubank: "brubank.com",
-  Buenbit: "buenbit.com",
-  "Claro Pay": "claropay.com.ar",
-  Cresium: "cresium.com.ar",
-  Fiwind: "fiwind.io",
-  "IEB+": "ieb.com.ar",
-  "Lemon Cash": "lemon.me",
-  Lemon: "lemon.me",
-  "Let's Bit": "letsbit.io",
-  "Mercado Pago": "mercadopago.com.ar",
-  Naranja: "naranjax.com",
-  "Naranja X": "naranjax.com",
-  "Personal Pay": "personalpay.com.ar",
-  Prex: "prexcard.com.ar",
-  Reba: "reba.com.ar",
-  "Toronto Ahorro": "torontotrust.com.ar",
-  "Ual\u00E1": "uala.com.ar",
-  "Yacar\u00E9": "yacare.com",
-};
-
-const BANK_DOMAINS: Record<string, string> = {
-  ASTROPAY: "astropay.com",
-  LETSBIT: "letsbit.io",
-  BNA: "bna.com.ar",
-  "Banco Nación": "bna.com.ar",
-  "Banco de la Nación": "bna.com.ar",
-  GALICIA: "bancogalicia.com",
-  "Banco Galicia": "bancogalicia.com",
-  SUPERVIELLE: "supervielle.com.ar",
-  "Banco Supervielle": "supervielle.com.ar",
-  BBVA: "bbva.com.ar",
-  ICBC: "icbc.com.ar",
-  Santander: "santander.com.ar",
-  "Banco Santander": "santander.com.ar",
-  HSBC: "hsbc.com.ar",
-  Macro: "macro.com.ar",
-  "Banco Macro": "macro.com.ar",
-  "Banco Ciudad": "bancociudad.com.ar",
-  "Ciudad de Buenos Aires": "bancociudad.com.ar",
-  Patagonia: "bancopatagonia.com.ar",
-  "Banco Patagonia": "bancopatagonia.com.ar",
-  Comafi: "comafi.com.ar",
-  "Banco Comafi": "comafi.com.ar",
-  Itaú: "itau.com.ar",
-  "Banco Itaú": "itau.com.ar",
-  Credicoop: "bancocredicoop.coop",
-  "Banco Credicoop": "bancocredicoop.coop",
-};
-
-// --- Helper Functions ---
 
 function extractDomainFromFaviconUrl(url: string): string | null {
   const domainMatch = url.match(/[?&]domain=([^&]+)/);
@@ -103,49 +50,6 @@ function getFallbackLogoUrl(domain: string): string {
   return `https://icon.horse/icon/${domain}`;
 }
 
-function getLogoUrl(row: RateDTO): string {
-  const walletDomain = Object.entries(WALLET_DOMAINS).find(([key]) =>
-    row.name.toLowerCase().includes(key.toLowerCase()),
-  )?.[1];
-
-  if (walletDomain) {
-    return `https://www.google.com/s2/favicons?domain=${walletDomain}&sz=128`;
-  }
-
-  const bankDomain = Object.entries(BANK_DOMAINS).find(([key]) =>
-    row.name.toLowerCase().includes(key.toLowerCase()),
-  )?.[1];
-
-  if (bankDomain) {
-    return `https://www.google.com/s2/favicons?domain=${bankDomain}&sz=128`;
-  }
-
-  return row.logo || "";
-}
-
-const formatPercent = (value: number) => `${Number(value).toFixed(1)}%`;
-
-const formatDate = (dateStr: string | undefined) => {
-  if (!dateStr) {
-    return null;
-  }
-  const [y, m, d] = dateStr.split("-");
-  return d && m && y ? `${d}/${m}/${y}` : dateStr;
-};
-
-const formatLimit = (limit: number | undefined) => {
-  if (limit === undefined || limit === null || limit <= 0) {
-    return null;
-  }
-  if (limit >= 1_000_000) {
-    return `$${(limit / 1_000_000).toFixed(0)} M`;
-  }
-  if (limit >= 1_000) {
-    return `$${(limit / 1_000).toFixed(0)} K`;
-  }
-  return `$${limit}`;
-};
-
 interface RateSectionProps {
   title: string;
   disclaimer: string;
@@ -155,7 +59,6 @@ interface RateSectionProps {
   error: Error | null;
   refetch: () => void;
   emptyMessage: string;
-  maxTna: number;
   type: "wallet" | "bank" | "usd" | "mortgage";
   translate: (key: TranslationKey) => string;
 }
@@ -169,7 +72,6 @@ const RateSection = ({
   error,
   refetch,
   emptyMessage,
-  maxTna,
   type,
   translate,
 }: RateSectionProps) => {
@@ -232,12 +134,9 @@ const RateSection = ({
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((row) => {
-            const isBest =
-              type === "mortgage"
-                ? row.tna <= maxTna && maxTna > 0
-                : row.tna >= maxTna && maxTna > 0;
+            const isBest = row.isBestRate === true;
             const limitStr = formatLimit(row.limit);
-            const logoUrl = getLogoUrl(row);
+            const logoUrl = row.logo || "";
 
             return (
               <Card
@@ -352,18 +251,18 @@ const RateSection = ({
                     {/* Rates Section */}
                     <div className="flex shrink-0 flex-col items-end">
                       <span className="text-2xl font-bold text-primary">
-                        {row.tna > 0 ? formatPercent(row.tna) : "-"}
+                        {row.tna > 0 ? formatPercent(row.tna, 1) : "-"}
                       </span>
                       <span className="text-xs text-muted-foreground">TNA</span>
                       {row.tea !== undefined && row.tea !== null && (
                         <span className="mt-1 text-sm text-muted-foreground">
-                          TEA {formatPercent(row.tea)}
+                          TEA {formatPercent(row.tea, 1)}
                         </span>
                       )}
                       {row.date && (
                         <div className="mt-1 text-xs text-muted-foreground text-right leading-tight">
                           <span className="block">{translate("tnaValidSince")}</span>
-                          <span className="block">{formatDate(row.date)}</span>
+                          <span className="block">{formatDateSlash(row.date)}</span>
                         </div>
                       )}
                     </div>
@@ -391,7 +290,7 @@ export default function RatesPage() {
     error: banksErrorData,
     refetch: refetchBanks,
   } = useQuery({
-    queryKey: ["rates", "fixed-term", selectedCountry],
+    queryKey: queryKeys.rates.fixedTerm(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getFixedTerm(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -405,7 +304,7 @@ export default function RatesPage() {
     error: walletsErrorData,
     refetch: refetchWallets,
   } = useQuery({
-    queryKey: ["rates", "wallets", selectedCountry],
+    queryKey: queryKeys.rates.wallets(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getWallets(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -419,7 +318,7 @@ export default function RatesPage() {
     error: usdAccountsErrorData,
     refetch: refetchUsdAccounts,
   } = useQuery({
-    queryKey: ["rates", "usd-accounts", selectedCountry],
+    queryKey: queryKeys.rates.usdAccounts(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getUsdAccounts(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -433,7 +332,7 @@ export default function RatesPage() {
     error: uvaMortgagesErrorData,
     refetch: refetchUvaMortgages,
   } = useQuery({
-    queryKey: ["rates", "uva-mortgages", selectedCountry],
+    queryKey: queryKeys.rates.uvaMortgages(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getUvaMortgages(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -443,13 +342,6 @@ export default function RatesPage() {
 
   const showWallets = selectedCountry === "ar";
   const showBanks = selectedCountry === "ar";
-
-  const maxBankTna = bankRates.length > 0 ? Math.max(...bankRates.map((r) => r.tna)) : 0;
-  const maxWalletTna = walletRates.length > 0 ? Math.max(...walletRates.map((r) => r.tna)) : 0;
-  const maxUsdAccountTna =
-    usdAccountRates.length > 0 ? Math.max(...usdAccountRates.map((r) => r.tna)) : 0;
-  const minUvaMortgageTna =
-    uvaMortgageRates.length > 0 ? Math.min(...uvaMortgageRates.map((r) => r.tna)) : 0;
 
   if (!showWallets && !showBanks) {
     return (
@@ -535,7 +427,6 @@ export default function RatesPage() {
           error={walletsErrorData as Error}
           refetch={refetchWallets}
           emptyMessage={translate("noWalletRates")}
-          maxTna={maxWalletTna}
           type="wallet"
           translate={translate}
         />
@@ -551,7 +442,6 @@ export default function RatesPage() {
           error={banksErrorData as Error}
           refetch={refetchBanks}
           emptyMessage={translate("noBankRates")}
-          maxTna={maxBankTna}
           type="bank"
           translate={translate}
         />
@@ -567,7 +457,6 @@ export default function RatesPage() {
           error={usdAccountsErrorData as Error}
           refetch={refetchUsdAccounts}
           emptyMessage="No hay datos disponibles"
-          maxTna={maxUsdAccountTna}
           type="usd"
           translate={translate}
         />
@@ -583,7 +472,6 @@ export default function RatesPage() {
           error={uvaMortgagesErrorData as Error}
           refetch={refetchUvaMortgages}
           emptyMessage="No hay datos disponibles"
-          maxTna={minUvaMortgageTna}
           type="mortgage"
           translate={translate}
         />

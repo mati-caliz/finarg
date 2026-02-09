@@ -38,7 +38,21 @@
       "Bash(docker-compose logs:*)",
       "Bash(python:*)",
       "WebFetch(domain:datos.gob.ar)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(test:*)",
+      "Bash(./mvnw.cmd clean compile:*)",
+      "Bash(find:*)",
+      "Bash(docker system prune:*)",
+      "Bash(docker-compose build:*)",
+      "Bash(npx lighthouse:*)",
+      "Bash(npm install:*)",
+      "Bash(node -e:*)",
+      "Bash(node parse-lighthouse.js:*)",
+      "Bash(npm view:*)",
+      "Bash(node analyze-lighthouse.js:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(trivy fs:*)",
+      "Bash(npm run security:*)"
     ]
   }
 }

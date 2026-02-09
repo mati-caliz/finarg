@@ -21,4 +21,6 @@ public class QuoteDTO implements Serializable {
     private BigDecimal spread;
     private BigDecimal variation;
     private LocalDateTime lastUpdate;
+    private String baseCurrency;
+    private Boolean hasHistory;
 }

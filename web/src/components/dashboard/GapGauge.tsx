@@ -5,12 +5,13 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { getGapClass, getGapColor } from "@/lib/utils";
 import type { Gap } from "@/types";
 import { Activity } from "lucide-react";
+import { memo } from "react";
 
 export interface GapGaugeProps {
   gap: Gap;
 }
 
-export function GapGauge({ gap }: GapGaugeProps) {
+export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
   const { translate } = useTranslation();
   const color = getGapColor(gap.level);
   const animationClass = getGapClass(gap.level);
@@ -98,4 +99,4 @@ export function GapGauge({ gap }: GapGaugeProps) {
       </CardContent>
     </Card>
   );
-}
+});

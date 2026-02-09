@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
-import { formatReservesUSD } from "@/lib/utils";
+import { formatDateDayShort, formatReservesUSD, generateReferenceAreas } from "@/lib/utils";
 import type { Reserves } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, Landmark, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
@@ -58,11 +58,6 @@ export default function ReservesPage() {
       );
     },
   });
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
-  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend?.toUpperCase()) {
@@ -368,7 +363,7 @@ export default function ReservesPage() {
               const reversedRaw = [...historicalReserves].reverse();
               const chartData = reversedRaw.map((r: { fecha: string; valor: number }, idx) => ({
                 index: idx,
-                fecha: formatDate(r.fecha),
+                fecha: formatDateDayShort(r.fecha),
                 fechaOriginal: r.fecha,
                 valor: Number(r.valor),
               }));
@@ -377,45 +372,13 @@ export default function ReservesPage() {
               const maxVal = Math.max(...values);
               const padding = Math.max((maxVal - minVal) * 0.05, 500);
 
-              const firstDataDate = new Date(reversedRaw[0]?.fecha || "");
-              const lastDataDate = new Date(reversedRaw[reversedRaw.length - 1]?.fecha || "");
-
-              const referenceAreas = governments
-                .filter((gov) => {
-                  const govStart = new Date(gov.startDate);
-                  const govEnd = new Date(gov.endDate);
-                  return govStart <= lastDataDate && govEnd >= firstDataDate;
-                })
-                .map((gov) => {
-                  const govStart = new Date(gov.startDate);
-                  const govEnd = new Date(gov.endDate);
-
-                  let x1Idx = 0;
-                  let x2Idx = chartData.length - 1;
-
-                  for (let i = 0; i < chartData.length; i++) {
-                    const date = new Date(chartData[i].fechaOriginal);
-                    if (date >= govStart) {
-                      x1Idx = i;
-                      break;
-                    }
-                  }
-
-                  for (let i = chartData.length - 1; i >= 0; i--) {
-                    const date = new Date(chartData[i].fechaOriginal);
-                    if (date <= govEnd) {
-                      x2Idx = i;
-                      break;
-                    }
-                  }
-
-                  return {
-                    x1: chartData[x1Idx]?.index,
-                    x2: chartData[x2Idx]?.index,
-                    fill: gov.color,
-                    label: gov.label,
-                  };
-                });
+              const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
+                (area) => ({
+                  ...area,
+                  x1: chartData[area.x1 as number]?.index,
+                  x2: chartData[area.x2 as number]?.index,
+                }),
+              );
 
               const visibleGovs = getVisibleGovernments(historicalReserves);
 

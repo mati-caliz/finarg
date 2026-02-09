@@ -4,10 +4,18 @@ import { BarChart } from "@/components/charts";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useAdjustInflation } from "@/hooks/useInflation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
+import {
+  formatCurrency,
+  formatDateShort,
+  formatPercent,
+  generateReferenceAreas,
+} from "@/lib/utils";
 import type { Inflation, InflationAdjustment } from "@/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -32,7 +40,7 @@ export default function InflationPage() {
   );
 
   const { data: currentInflation } = useQuery({
-    queryKey: ["inflation-current"],
+    queryKey: queryKeys.inflation.current(),
     queryFn: async () => {
       const response = await inflationApi.getCurrent();
       return response.data as Inflation;
@@ -40,7 +48,7 @@ export default function InflationPage() {
   });
 
   const { data: monthlyInflation } = useQuery({
-    queryKey: ["inflation-monthly", chartMonthsLimit],
+    queryKey: queryKeys.inflation.monthly(chartMonthsLimit),
     queryFn: async () => {
       const response = await inflationApi.getMonthly(chartMonthsLimit);
       return response.data as Inflation[];
@@ -48,7 +56,7 @@ export default function InflationPage() {
   });
 
   const { data: governments = [] } = useQuery({
-    queryKey: ["inflation-governments", "ar"],
+    queryKey: queryKeys.inflation.governments("ar"),
     queryFn: async () => {
       const response = await inflationApi.getGovernments("ar");
       return (
@@ -58,29 +66,18 @@ export default function InflationPage() {
     },
   });
 
-  const adjustMutation = useMutation({
-    mutationFn: async () => {
-      const response = await inflationApi.adjust(originalAmount, startDate, endDate);
-      return response.data as InflationAdjustment;
-    },
-    onSuccess: (data) => {
-      setAdjustmentResult(data);
-    },
-  });
+  const adjustMutation = useAdjustInflation();
 
   const handleAdjust = (e: React.FormEvent) => {
     e.preventDefault();
-    adjustMutation.mutate();
-  };
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value);
-
-  const formatPercent = (value: number | string) => `${Number(value).toFixed(2)}%`;
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
+    adjustMutation.mutate(
+      { amount: originalAmount, fromDate: startDate, toDate: endDate },
+      {
+        onSuccess: (data) => {
+          setAdjustmentResult(data);
+        },
+      },
+    );
   };
 
   const getVisibleGovernments = (inflationData: Inflation[]) => {
@@ -323,50 +320,12 @@ export default function InflationPage() {
                 (() => {
                   const reversedData = [...monthlyInflation].reverse();
                   const chartData = reversedData.map((i) => ({
-                    fecha: formatDate(i.date),
+                    fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.value,
                   }));
 
-                  const firstDataDate = new Date(reversedData[0]?.date || "");
-                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
-
-                  const referenceAreas = governments
-                    .filter((gov) => {
-                      const govStart = new Date(gov.startDate);
-                      const govEnd = new Date(gov.endDate);
-                      return govStart <= lastDataDate && govEnd >= firstDataDate;
-                    })
-                    .map((gov) => {
-                      const govStart = new Date(gov.startDate);
-                      const govEnd = new Date(gov.endDate);
-
-                      let x1 = chartData[0]?.fecha;
-                      let x2 = chartData[chartData.length - 1]?.fecha;
-
-                      for (let i = 0; i < chartData.length; i++) {
-                        const date = new Date(chartData[i].fechaOriginal);
-                        if (date >= govStart) {
-                          x1 = chartData[i].fecha;
-                          break;
-                        }
-                      }
-
-                      for (let i = chartData.length - 1; i >= 0; i--) {
-                        const date = new Date(chartData[i].fechaOriginal);
-                        if (date <= govEnd) {
-                          x2 = chartData[i].fecha;
-                          break;
-                        }
-                      }
-
-                      return {
-                        x1,
-                        x2,
-                        fill: gov.color,
-                        label: gov.label,
-                      };
-                    });
+                  const referenceAreas = generateReferenceAreas(chartData, governments);
 
                   const visibleGovs = getVisibleGovernments(monthlyInflation);
 
@@ -429,50 +388,12 @@ export default function InflationPage() {
                   const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
                   const reversedData = [...filteredData].reverse();
                   const chartData = reversedData.map((i) => ({
-                    fecha: formatDate(i.date),
+                    fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.yearOverYear as number,
                   }));
 
-                  const firstDataDate = new Date(reversedData[0]?.date || "");
-                  const lastDataDate = new Date(reversedData[reversedData.length - 1]?.date || "");
-
-                  const referenceAreas = governments
-                    .filter((gov) => {
-                      const govStart = new Date(gov.startDate);
-                      const govEnd = new Date(gov.endDate);
-                      return govStart <= lastDataDate && govEnd >= firstDataDate;
-                    })
-                    .map((gov) => {
-                      const govStart = new Date(gov.startDate);
-                      const govEnd = new Date(gov.endDate);
-
-                      let x1 = chartData[0]?.fecha;
-                      let x2 = chartData[chartData.length - 1]?.fecha;
-
-                      for (let i = 0; i < chartData.length; i++) {
-                        const date = new Date(chartData[i].fechaOriginal);
-                        if (date >= govStart) {
-                          x1 = chartData[i].fecha;
-                          break;
-                        }
-                      }
-
-                      for (let i = chartData.length - 1; i >= 0; i--) {
-                        const date = new Date(chartData[i].fechaOriginal);
-                        if (date <= govEnd) {
-                          x2 = chartData[i].fecha;
-                          break;
-                        }
-                      }
-
-                      return {
-                        x1,
-                        x2,
-                        fill: gov.color,
-                        label: gov.label,
-                      };
-                    });
+                  const referenceAreas = generateReferenceAreas(chartData, governments);
 
                   const visibleGovs = getVisibleGovernments(filteredData);
 

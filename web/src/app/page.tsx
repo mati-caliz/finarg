@@ -26,7 +26,7 @@ import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import { ArrowRight, Calculator, ChevronDown, Loader2, Percent, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export default function DashboardPage() {
   const { translate } = useTranslation();
@@ -41,52 +41,62 @@ export default function DashboardPage() {
   const { data: socialIndicators } = useSocialIndicators(selectedCountry);
   const { data: countryRisk } = useCountryRisk();
 
-  const otherQuotes = quotes?.filter(
-    (q) =>
-      q.type.startsWith("eur_") ||
-      q.type.startsWith("brl_") ||
-      q.type.startsWith("clp_") ||
-      q.type.startsWith("uyu_") ||
-      q.type.startsWith("pyg_") ||
-      q.type.startsWith("bob_") ||
-      q.type.startsWith("cny_"),
+  const otherQuotes = useMemo(
+    () =>
+      quotes?.filter(
+        (q) =>
+          q.type.startsWith("eur_") ||
+          q.type.startsWith("brl_") ||
+          q.type.startsWith("clp_") ||
+          q.type.startsWith("uyu_") ||
+          q.type.startsWith("pyg_") ||
+          q.type.startsWith("bob_") ||
+          q.type.startsWith("cny_"),
+      ),
+    [quotes],
   );
 
-  const currencyToTranslationKey: Record<string, TranslationKey> = {
-    eur: "currencyEuro",
-    brl: "currencyReal",
-    clp: "currencyClp",
-    uyu: "currencyUyu",
-    cop: "currencyCop",
-    pyg: "currencyPyg",
-    bob: "currencyBob",
-    cny: "currencyCny",
-  };
+  const currencyToTranslationKey: Record<string, TranslationKey> = useMemo(
+    () => ({
+      eur: "currencyEuro",
+      brl: "currencyReal",
+      clp: "currencyClp",
+      uyu: "currencyUyu",
+      cop: "currencyCop",
+      pyg: "currencyPyg",
+      bob: "currencyBob",
+      cny: "currencyCny",
+    }),
+    [],
+  );
 
-  const availableCurrencies = Array.from(
-    new Set(otherQuotes?.map((q) => q.type.split("_")[0]) ?? []),
-  ).sort((a, b) => {
-    if (a === "eur") {
-      return -1;
-    }
-    if (b === "eur") {
-      return 1;
-    }
-    if (a === "brl") {
-      return -1;
-    }
-    if (b === "brl") {
-      return 1;
-    }
-    const nameA = translate(currencyToTranslationKey[a] ?? "currencyDollar");
-    const nameB = translate(currencyToTranslationKey[b] ?? "currencyDollar");
-    return nameA.localeCompare(nameB, "es");
-  });
+  const availableCurrencies = useMemo(
+    () =>
+      Array.from(new Set(otherQuotes?.map((q) => q.type.split("_")[0]) ?? [])).sort((a, b) => {
+        if (a === "eur") {
+          return -1;
+        }
+        if (b === "eur") {
+          return 1;
+        }
+        if (a === "brl") {
+          return -1;
+        }
+        if (b === "brl") {
+          return 1;
+        }
+        const nameA = translate(currencyToTranslationKey[a] ?? "currencyDollar");
+        const nameB = translate(currencyToTranslationKey[b] ?? "currencyDollar");
+        return nameA.localeCompare(nameB, "es");
+      }),
+    [otherQuotes, translate, currencyToTranslationKey],
+  );
 
   const [selectedCurrency, setSelectedCurrency] = useState<string>("eur");
 
-  const filteredQuotesByCurrency = otherQuotes?.filter((q) =>
-    q.type.startsWith(`${selectedCurrency}_`),
+  const filteredQuotesByCurrency = useMemo(
+    () => otherQuotes?.filter((q) => q.type.startsWith(`${selectedCurrency}_`)),
+    [otherQuotes, selectedCurrency],
   );
 
   if (loadingQuotes || loadingGap || (selectedCountry === "ar" && loadingReserves)) {
@@ -106,7 +116,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{translate("dashboard")}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-success-accessible">
               {countryConfig.flag} {translate(selectedCountry)}
             </span>
             <span className="text-sm text-muted-foreground">{translate("marketSummary")}</span>
@@ -275,7 +285,7 @@ export default function DashboardPage() {
                     </div>
                     <Link
                       href="/calculadora-sueldo-neto"
-                      className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                      className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
                     >
                       {translate("incomeTaxCalculator")}
                       <ArrowRight className="h-3.5 w-3.5" />
@@ -314,7 +324,7 @@ export default function DashboardPage() {
                   </div>
                   <Link
                     href="/inflacion"
-                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                    className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
                   >
                     {translate("viewHistory")}
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -347,7 +357,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 href="/inflacion"
-                className="inline-flex items-center gap-1 text-sm text-primary hover:underline mt-4"
+                className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
               >
                 {translate("viewHistory")}
                 <ArrowRight className="h-3.5 w-3.5" />

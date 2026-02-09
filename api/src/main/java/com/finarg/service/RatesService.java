@@ -108,12 +108,13 @@ public class RatesService {
         if (raw == null) {
             return List.of();
         }
-        return raw.stream()
+        List<RateDTO> sorted = raw.stream()
                 .filter(r -> r.getEntity() != null && !r.getEntity().contains(ROW_SEPARATOR_LABEL))
                 .filter(this::hasValidTna)
                 .map(this::mapToRateDTO)
                 .sorted((a, b) -> b.getTna().compareTo(a.getTna()))
                 .toList();
+        return markBestRate(sorted);
     }
 
     @Cacheable(value = "rates", key = "'wallets_' + #country + '_v13'")
@@ -147,7 +148,7 @@ public class RatesService {
         }
 
         result.sort((a, b) -> b.getTna().compareTo(a.getTna()));
-        return result;
+        return markBestRate(result);
     }
 
     private RateDTO createFciRateDTO(String walletName, BigDecimal tnaDecimal) {
@@ -198,7 +199,7 @@ public class RatesService {
         }
 
         result.sort((a, b) -> b.getTna().compareTo(a.getTna()));
-        return result;
+        return markBestRate(result);
     }
 
     @Cacheable(value = "rates", key = "'uvaMortgages_' + #country + '_v3'")
@@ -210,11 +211,18 @@ public class RatesService {
         if (mortgages == null) {
             return List.of();
         }
-        return mortgages.stream()
+        List<RateDTO> sorted = mortgages.stream()
                 .filter(r -> r.getCommercialName() != null && r.getTna() != null && r.getTna().compareTo(BigDecimal.ZERO) > 0)
                 .map(this::mapUvaMortgageToRateDTO)
                 .sorted(Comparator.comparing(RateDTO::getTna))
                 .toList();
+        if (!sorted.isEmpty()) {
+            BigDecimal minTna = sorted.get(0).getTna();
+            for (RateDTO rate : sorted) {
+                rate.setIsBestRate(rate.getTna().compareTo(minTna) == 0);
+            }
+        }
+        return sorted;
     }
 
     private RateDTO mapFciToRateDTO(FciRateResponse r) {
@@ -420,6 +428,20 @@ public class RatesService {
                 .replaceAll("[^a-z0-9]", "_")
                 .replaceAll("_+", "_")
                 .replaceAll("^_|_$", "");
+    }
+
+    private List<RateDTO> markBestRate(List<RateDTO> rates) {
+        if (rates.isEmpty()) {
+            return rates;
+        }
+        BigDecimal maxTna = rates.stream()
+                .map(RateDTO::getTna)
+                .max(BigDecimal::compareTo)
+                .orElse(BigDecimal.ZERO);
+        for (RateDTO rate : rates) {
+            rate.setIsBestRate(rate.getTna().compareTo(maxTna) == 0);
+        }
+        return rates;
     }
 
     private RateDTO mapUsdAccountToRateDTO(ArgentinaDatosClient.UsdAccountResponse r) {

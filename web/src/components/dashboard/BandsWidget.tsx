@@ -13,16 +13,19 @@ interface BandsWidgetProps {
 
 export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   const { translate } = useTranslation();
-  const { data: bands } = useQuery({
+  const { data: bands, isLoading } = useQuery({
     queryKey: ["exchangeBands"],
     queryFn: async () => {
       const response = await exchangeBandsApi.getCurrent();
       return response.data as ExchangeBands;
     },
-    staleTime: 3600000,
+    staleTime: 86400000,
+    gcTime: 86400000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
-  if (!bands) {
+  if (isLoading || !bands) {
     return null;
   }
 
@@ -63,20 +66,20 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
 
   const colorClasses = {
     green: {
-      bg: "bg-green-500",
-      text: "text-green-500",
+      bg: "bg-green-600",
+      text: "text-success-accessible",
       border: "border-green-500/50",
       light: "bg-green-500/20",
     },
     yellow: {
-      bg: "bg-yellow-500",
-      text: "text-yellow-500",
-      border: "border-yellow-500/50",
-      light: "bg-yellow-500/20",
+      bg: "bg-amber-600",
+      text: "text-warning-accessible",
+      border: "border-amber-500/50",
+      light: "bg-amber-500/20",
     },
     red: {
-      bg: "bg-red-500",
-      text: "text-red-500",
+      bg: "bg-red-600",
+      text: "text-destructive-accessible",
       border: "border-red-500/50",
       light: "bg-red-500/20",
     },
