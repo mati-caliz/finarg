@@ -77,6 +77,10 @@ export const ratesApi = {
   getUvaMortgages: (country = "ar") => api.get("/rates/uva-mortgages", { params: { country } }),
 };
 
+export const exchangeRateComparisonApi = {
+  compareRates: (country: CountryCode) => api.get(`/${country}/exchange-rates/comparison`),
+};
+
 export const reposApi = {
   optimize: (amount: number, termDays: number) =>
     api.post("/repos/optimize", null, { params: { amount, termDays } }),

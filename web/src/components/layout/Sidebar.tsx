@@ -7,6 +7,7 @@ import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
+  ArrowLeftRight,
   BarChart2,
   Building2,
   Calculator,
@@ -35,6 +36,12 @@ const baseNavigation = [
     key: "exchangeBands" as TranslationKey,
     href: "/bandas-cambiarias",
     icon: Gauge,
+    feature: "quotes" as const,
+  },
+  {
+    key: "exchangeRatesComparator" as TranslationKey,
+    href: "/comparador-tipos-cambio",
+    icon: ArrowLeftRight,
     feature: "quotes" as const,
   },
   {
