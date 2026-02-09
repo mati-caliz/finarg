@@ -73,23 +73,23 @@
 
 @layer utilities {
   .text-success-accessible {
-    color: hsl(152 69% 36%);
+    color: hsl(152 80% 18%);
   }
   .text-destructive-accessible {
-    color: hsl(0 72% 45%);
+    color: hsl(0 75% 35%);
   }
   .text-warning-accessible {
-    color: hsl(38 92% 40%);
+    color: hsl(38 92% 20%);
   }
 
   .dark .text-success-accessible {
-    color: hsl(152 60% 50%);
+    color: hsl(152 60% 55%);
   }
   .dark .text-destructive-accessible {
-    color: hsl(0 84% 60%);
+    color: hsl(0 84% 65%);
   }
   .dark .text-warning-accessible {
-    color: hsl(45 93% 55%);
+    color: hsl(45 93% 60%);
   }
 }
 
