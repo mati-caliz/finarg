@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
+import { formatCurrency, formatDateShort, formatPercent } from "@/lib/utils";
 import type { Inflation, InflationAdjustment } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from "lucide-react";
@@ -71,16 +72,6 @@ export default function InflationPage() {
   const handleAdjust = (e: React.FormEvent) => {
     e.preventDefault();
     adjustMutation.mutate();
-  };
-
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value);
-
-  const formatPercent = (value: number | string) => `${Number(value).toFixed(2)}%`;
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });
   };
 
   const getVisibleGovernments = (inflationData: Inflation[]) => {
@@ -323,7 +314,7 @@ export default function InflationPage() {
                 (() => {
                   const reversedData = [...monthlyInflation].reverse();
                   const chartData = reversedData.map((i) => ({
-                    fecha: formatDate(i.date),
+                    fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.value,
                   }));
@@ -429,7 +420,7 @@ export default function InflationPage() {
                   const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
                   const reversedData = [...filteredData].reverse();
                   const chartData = reversedData.map((i) => ({
-                    fecha: formatDate(i.date),
+                    fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.yearOverYear as number,
                   }));

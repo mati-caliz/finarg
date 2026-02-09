@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
-import { formatReservesUSD } from "@/lib/utils";
+import { formatDateDayShort, formatReservesUSD } from "@/lib/utils";
 import type { Reserves } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, Landmark, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
@@ -58,11 +58,6 @@ export default function ReservesPage() {
       );
     },
   });
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
-  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend?.toUpperCase()) {
@@ -368,7 +363,7 @@ export default function ReservesPage() {
               const reversedRaw = [...historicalReserves].reverse();
               const chartData = reversedRaw.map((r: { fecha: string; valor: number }, idx) => ({
                 index: idx,
-                fecha: formatDate(r.fecha),
+                fecha: formatDateDayShort(r.fecha),
                 fechaOriginal: r.fecha,
                 valor: Number(r.valor),
               }));

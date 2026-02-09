@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { incomeTaxApi } from "@/lib/api";
+import { formatCurrency, formatPercent } from "@/lib/utils";
 import type { IncomeTaxRequest, IncomeTaxResponse } from "@/types";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -73,16 +74,6 @@ export default function IncomeTaxPage() {
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
-  const formatCurrency = (value: number | undefined | null) => {
-    const n = Number(value);
-    if (!Number.isFinite(n)) {
-      return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(0);
-    }
-    return new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(n);
-  };
-
-  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
   return (
     <div className="space-y-6">

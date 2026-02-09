@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -165,27 +165,30 @@ public class QuoteService {
     }
 
     private List<QuoteDTO> enrichQuotesWithVariation(List<QuoteDTO> quotes) {
+        LocalDate today = LocalDate.now();
+        List<CurrencyType> types = quotes.stream()
+                .map(QuoteDTO::getType)
+                .collect(Collectors.toList());
+
+        Map<CurrencyType, QuoteHistory> previousByType = quoteHistoryRepository
+                .findLatestByTypesBeforeDate(types, today)
+                .stream()
+                .collect(Collectors.toMap(QuoteHistory::getType, q -> q, (a, b) -> a));
+
         return quotes.stream()
                 .peek(quote -> {
-                    BigDecimal variation = calculateVariation(quote.getType(), quote.getSell());
+                    BigDecimal variation = computeVariation(quote.getSell(), previousByType.get(quote.getType()));
                     quote.setVariation(variation);
                 })
                 .collect(Collectors.toList());
     }
 
-    private BigDecimal calculateVariation(CurrencyType type, BigDecimal currentSell) {
-        if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0) {
+    private BigDecimal computeVariation(BigDecimal currentSell, QuoteHistory previous) {
+        if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0 || previous == null) {
             return BigDecimal.ZERO;
         }
 
-        LocalDate today = LocalDate.now();
-        Optional<QuoteHistory> previousQuote = quoteHistoryRepository.findLatestByTypeBeforeDate(type, today);
-
-        if (previousQuote.isEmpty()) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal previousSell = previousQuote.get().getSell();
+        BigDecimal previousSell = previous.getSell();
         if (previousSell.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
@@ -195,5 +198,15 @@ public class QuoteService {
                 .multiply(BigDecimal.valueOf(100));
 
         return variation.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calculateVariation(CurrencyType type, BigDecimal currentSell) {
+        if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        LocalDate today = LocalDate.now();
+        return quoteHistoryRepository.findLatestByTypeBeforeDate(type, today)
+                .map(prev -> computeVariation(currentSell, prev))
+                .orElse(BigDecimal.ZERO);
     }
 }
