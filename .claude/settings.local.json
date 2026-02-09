@@ -38,7 +38,8 @@
       "Bash(docker-compose logs:*)",
       "Bash(python:*)",
       "WebFetch(domain:datos.gob.ar)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(test:*)"
     ]
   }
 }

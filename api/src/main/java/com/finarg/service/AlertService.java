@@ -1,5 +1,7 @@
 package com.finarg.service;
 
+import com.finarg.exception.AlertNotFoundException;
+import com.finarg.exception.UserNotFoundException;
 import com.finarg.model.dto.AlertRequestDTO;
 import com.finarg.model.dto.AlertResponseDTO;
 import com.finarg.model.entity.Alert;
@@ -31,7 +33,7 @@ public class AlertService {
 
     public AlertResponseDTO createAlert(Long userId, AlertRequestDTO request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
 
         Alert alert = Alert.builder()
                 .user(user)
@@ -51,7 +53,7 @@ public class AlertService {
 
     public void deleteAlert(Long alertId, Long userId) {
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(AlertNotFoundException::new);
 
         if (!alert.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Access denied");
@@ -63,7 +65,7 @@ public class AlertService {
 
     public AlertResponseDTO toggleAlert(Long alertId, Long userId) {
         Alert alert = alertRepository.findById(alertId)
-                .orElseThrow(() -> new RuntimeException("Alert not found"));
+                .orElseThrow(AlertNotFoundException::new);
 
         if (!alert.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Access denied");

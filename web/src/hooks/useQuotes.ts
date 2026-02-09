@@ -2,6 +2,7 @@
 
 import type { CountryCode } from "@/config/countries";
 import { quotesApi } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import { useAppStore } from "@/store/useStore";
 import type { Gap, Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -11,11 +12,12 @@ export function useQuotes(country?: CountryCode) {
   const countryToUse = country || selectedCountry;
 
   return useQuery<Quote[]>({
-    queryKey: ["quotes", countryToUse],
+    queryKey: queryKeys.quotes.all(countryToUse),
     queryFn: async () => {
       const response = await quotesApi.getAllByCountry(countryToUse);
       return response.data;
     },
+    staleTime: 30000,
     refetchInterval: 180000,
   });
 }
@@ -25,7 +27,7 @@ export function useQuote(type: string, country?: CountryCode) {
   const countryToUse = country || selectedCountry;
 
   return useQuery<Quote>({
-    queryKey: ["quote", countryToUse, type],
+    queryKey: queryKeys.quotes.byType(countryToUse, type),
     queryFn: async () => {
       const response = await quotesApi.getByCountryAndType(countryToUse, type);
       return response.data;
@@ -39,11 +41,12 @@ export function useGap(country?: CountryCode) {
   const countryToUse = country || selectedCountry;
 
   return useQuery<Gap>({
-    queryKey: ["gap", countryToUse],
+    queryKey: queryKeys.quotes.gap(countryToUse),
     queryFn: async () => {
       const response = await quotesApi.getGapByCountry(countryToUse);
       return response.data;
     },
+    staleTime: 30000,
     refetchInterval: 180000,
   });
 }

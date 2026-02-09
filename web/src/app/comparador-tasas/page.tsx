@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { ratesApi } from "@/lib/api";
+import { queryKeys } from "@/lib/queryKeys";
 import { formatDateSlash, formatLimit, formatPercent } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
@@ -293,7 +294,7 @@ export default function RatesPage() {
     error: banksErrorData,
     refetch: refetchBanks,
   } = useQuery({
-    queryKey: ["rates", "fixed-term", selectedCountry],
+    queryKey: queryKeys.rates.fixedTerm(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getFixedTerm(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -307,7 +308,7 @@ export default function RatesPage() {
     error: walletsErrorData,
     refetch: refetchWallets,
   } = useQuery({
-    queryKey: ["rates", "wallets", selectedCountry],
+    queryKey: queryKeys.rates.wallets(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getWallets(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -321,7 +322,7 @@ export default function RatesPage() {
     error: usdAccountsErrorData,
     refetch: refetchUsdAccounts,
   } = useQuery({
-    queryKey: ["rates", "usd-accounts", selectedCountry],
+    queryKey: queryKeys.rates.usdAccounts(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getUsdAccounts(selectedCountry);
       return (res.data as RateDTO[]) ?? [];
@@ -335,7 +336,7 @@ export default function RatesPage() {
     error: uvaMortgagesErrorData,
     refetch: refetchUvaMortgages,
   } = useQuery({
-    queryKey: ["rates", "uva-mortgages", selectedCountry],
+    queryKey: queryKeys.rates.uvaMortgages(selectedCountry),
     queryFn: async () => {
       const res = await ratesApi.getUvaMortgages(selectedCountry);
       return (res.data as RateDTO[]) ?? [];

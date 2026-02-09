@@ -309,7 +309,6 @@ public class ArgentinaDatosClient {
 
     private static CurrencyType mapExchangeToCurrencyType(String exchangeType) {
         return switch (exchangeType) {
-            case "oficial" -> CurrencyType.AR_OFFICIAL;
             case "blue" -> CurrencyType.AR_BLUE;
             case "bolsa" -> CurrencyType.AR_MEP;
             case "contadoconliqui" -> CurrencyType.AR_CCL;

@@ -21,14 +21,26 @@ public class WebClientConfig {
     @Value("${external.apis.dolar-api.base-url}")
     private String dolarApiBaseUrl;
 
+    @Value("${external.apis.dolar-api.timeout:10000}")
+    private int dolarApiTimeout;
+
     @Value("${external.apis.argentina-datos.base-url}")
     private String argentinaDatosBaseUrl;
+
+    @Value("${external.apis.argentina-datos.timeout:10000}")
+    private int argentinaDatosTimeout;
 
     @Value("${external.apis.ambito.base-url:https://mercados.ambito.com}")
     private String ambitoBaseUrl;
 
+    @Value("${external.apis.ambito.timeout:10000}")
+    private int ambitoTimeout;
+
     @Value("${external.apis.exchangerate.base-url:https://open.er-api.com/v6}")
     private String exchangerateBaseUrl;
+
+    @Value("${external.apis.exchangerate.timeout:10000}")
+    private int exchangerateTimeout;
 
     @Value("${external.apis.datos-gob-ar.base-url}")
     private String datosGobArBaseUrl;
@@ -45,14 +57,26 @@ public class WebClientConfig {
     @Value("${external.apis.colombia.base-url:https://www.datos.gov.co/api}")
     private String colombiaApiBaseUrl;
 
+    @Value("${external.apis.colombia.timeout:10000}")
+    private int colombiaApiTimeout;
+
     @Value("${external.apis.brasil.base-url:https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata}")
     private String brasilApiBaseUrl;
+
+    @Value("${external.apis.brasil.timeout:10000}")
+    private int brasilApiTimeout;
 
     @Value("${external.apis.chile.base-url:https://mindicador.cl/api}")
     private String chileApiBaseUrl;
 
+    @Value("${external.apis.chile.timeout:10000}")
+    private int chileApiTimeout;
+
     @Value("${external.apis.uruguay.base-url:https://www.bcu.gub.uy/api}")
     private String uruguayApiBaseUrl;
+
+    @Value("${external.apis.uruguay.timeout:10000}")
+    private int uruguayApiTimeout;
 
     @Value("${external.apis.wikidata.base-url:https://query.wikidata.org}")
     private String wikidataBaseUrl;
@@ -68,7 +92,10 @@ public class WebClientConfig {
 
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(dolarApiTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(dolarApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -77,7 +104,10 @@ public class WebClientConfig {
 
     @Bean("exchangerateWebClient")
     public WebClient exchangerateWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(exchangerateTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(exchangerateBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -86,7 +116,10 @@ public class WebClientConfig {
 
     @Bean("ambitoWebClient")
     public WebClient ambitoWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(ambitoTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(ambitoBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -97,7 +130,7 @@ public class WebClientConfig {
     public WebClient argentinaDatosWebClient() {
         HttpClient httpClient = HttpClient.create()
                 .followRedirect(true)
-                .responseTimeout(Duration.ofSeconds(30));
+                .responseTimeout(Duration.ofMillis(argentinaDatosTimeout));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(argentinaDatosBaseUrl)
@@ -146,7 +179,10 @@ public class WebClientConfig {
 
     @Bean("colombiaApiWebClient")
     public WebClient colombiaApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(colombiaApiTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(colombiaApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -155,7 +191,10 @@ public class WebClientConfig {
 
     @Bean("brasilApiWebClient")
     public WebClient brasilApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(brasilApiTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(brasilApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -164,7 +203,10 @@ public class WebClientConfig {
 
     @Bean("chileApiWebClient")
     public WebClient chileApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(chileApiTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(chileApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -173,7 +215,10 @@ public class WebClientConfig {
 
     @Bean("uruguayApiWebClient")
     public WebClient uruguayApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(uruguayApiTimeout));
         return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .baseUrl(uruguayApiBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
