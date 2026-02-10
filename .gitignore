@@ -31,6 +31,9 @@ api/target/
 .env.production.local
 *.pem
 
+# Maven settings (can contain local repository configs)
+api/settings.xml
+
 # =========================
 # IDE & Editors
 # =========================
