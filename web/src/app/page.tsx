@@ -161,6 +161,45 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {selectedCountry === "ar" && (
+          <div className="flex flex-col gap-4 h-full min-h-0">
+            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
+
+            {countryConfig.features.inflation && (
+              <Card className="shrink-0 border-t-[3px] border-t-red-400">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <Percent className="h-3.5 w-3.5" />
+                    {translate("monthlyInflation")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 pb-6">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-3xl font-bold text-red-500">
+                        {inflation?.value?.toFixed(1) ?? "0"}%
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {translate("last12Months")}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                      <TrendingUp className="h-5 w-5 text-red-500" />
+                    </div>
+                  </div>
+                  <Link
+                    href="/inflacion"
+                    className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
+                  >
+                    {translate("viewHistory")}
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
         {(countryConfig.features.gap || countryConfig.features.exchangeBands) && (
           <div className="flex flex-col gap-4 h-full min-h-0">
             {countryConfig.features.gap && gap && (
@@ -338,45 +377,6 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               )}
-          </div>
-        )}
-
-        {selectedCountry === "ar" && (
-          <div className="flex flex-col gap-4 h-full min-h-0">
-            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
-
-            {countryConfig.features.inflation && (
-              <Card className="shrink-0 border-t-[3px] border-t-red-400">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <Percent className="h-3.5 w-3.5" />
-                    {translate("monthlyInflation")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 pb-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-red-500">
-                        {inflation?.value?.toFixed(1) ?? "0"}%
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {translate("last12Months")}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
-                      <TrendingUp className="h-5 w-5 text-red-500" />
-                    </div>
-                  </div>
-                  <Link
-                    href="/inflacion"
-                    className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
-                  >
-                    {translate("viewHistory")}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </CardContent>
-              </Card>
-            )}
           </div>
         )}
 
