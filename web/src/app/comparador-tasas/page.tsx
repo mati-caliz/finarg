@@ -144,7 +144,7 @@ const RateSection = ({
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {data.map((row) => {
+          {data.map((row, index) => {
             const isBest = row.isBestRate === true;
             const limitStr = formatLimit(row.limit);
             const originalLogoUrl = row.logo || "";
@@ -152,7 +152,7 @@ const RateSection = ({
 
             return (
               <Card
-                key={row.id}
+                key={`${type}-${row.id}-${index}`}
                 className={`overflow-hidden transition-colors ${
                   isBest ? "border-primary/50 bg-primary/5" : ""
                 }`}
