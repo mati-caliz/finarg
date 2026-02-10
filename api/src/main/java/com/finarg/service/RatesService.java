@@ -34,6 +34,8 @@ public class RatesService {
             Map.entry("BALANZ", "balanz.com"),
             Map.entry("BELO", "belo.app"),
             Map.entry("BNA", "bna.com.ar"),
+            Map.entry("BANCO NACIÓN", "bna.com.ar"),
+            Map.entry("BANCO NACION", "bna.com.ar"),
             Map.entry("BRUBANK", "brubank.com"),
             Map.entry("CARREFOUR BANCO", "carrefour.com.ar"),
             Map.entry("CLARO PAY", "claropay.com.ar"),
@@ -61,7 +63,9 @@ public class RatesService {
 
     private static final Map<String, String> BANK_DOMAINS = Map.ofEntries(
             Map.entry("BANCO NACIÓN", "bna.com.ar"),
+            Map.entry("BANCO NACION", "bna.com.ar"),
             Map.entry("NACIÓN", "bna.com.ar"),
+            Map.entry("NACION", "bna.com.ar"),
             Map.entry("BNA", "bna.com.ar"),
             Map.entry("GALICIA", "galicia.com.ar"),
             Map.entry("BANCO GALICIA", "galicia.com.ar"),
@@ -124,7 +128,7 @@ public class RatesService {
         return markBestRate(sorted);
     }
 
-    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v13'")
+    @Cacheable(value = "rates", key = "'wallets_' + #country + '_v14'")
     public List<RateDTO> getWalletRates(Country country) {
         if (country != Country.ARGENTINA) {
             return List.of();
@@ -162,11 +166,12 @@ public class RatesService {
         BigDecimal teaPct = teaFromTna(tnaDecimal.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP))
                 .multiply(BigDecimal.valueOf(100));
 
+        String normalizedName = normalizeWalletName(walletName);
         String logo = walletLogoUrl(walletName);
 
         return RateDTO.builder()
-                .id(sanitizeId(walletName))
-                .name(walletName.toUpperCase())
+                .id(sanitizeId(normalizedName))
+                .name(normalizedName)
                 .tna(tnaDecimal.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
                 .product("Fondo Común de Inversión")
@@ -257,7 +262,19 @@ public class RatesService {
         if (fund == null || fund.isBlank()) {
             return "";
         }
-        return fixMojibake(fund.trim()).toUpperCase();
+        return normalizeWalletName(fund.trim());
+    }
+
+    private static String normalizeWalletName(String name) {
+        if (name == null || name.isBlank()) {
+            return "";
+        }
+        String fixed = fixMojibake(name).trim();
+        String upper = fixed.toUpperCase();
+        if (upper.contains("BNA") || upper.contains("NACION") || upper.contains("NACIÓN")) {
+            return "BANCO NACIÓN";
+        }
+        return upper;
     }
 
     private static String walletLogoUrl(String fund) {

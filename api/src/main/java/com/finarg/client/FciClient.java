@@ -9,6 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,17 +69,22 @@ public class FciClient {
         }
     }
 
-    public BigDecimal calculateTna(BigDecimal currentVcp, BigDecimal previousVcp) {
+    public BigDecimal calculateTna(BigDecimal currentVcp, BigDecimal previousVcp, String currentDate, String previousDate) {
         if (currentVcp == null || previousVcp == null || previousVcp.compareTo(BigDecimal.ZERO) == 0) {
             return null;
         }
 
-        BigDecimal dailyReturn = currentVcp.divide(previousVcp, 10, RoundingMode.HALF_UP)
-                .subtract(BigDecimal.ONE);
+        long daysBetween = resolveDaysBetween(previousDate, currentDate);
+        if (daysBetween <= 0) {
+            return null;
+        }
 
-        BigDecimal annualizedReturn = dailyReturn
-                .multiply(new BigDecimal("365"))
-                .multiply(new BigDecimal("100"));
+        double ratio = currentVcp.divide(previousVcp, 10, RoundingMode.HALF_UP).doubleValue();
+        double dailyRate = Math.pow(ratio, 1.0 / daysBetween) - 1.0;
+
+        BigDecimal annualizedReturn = BigDecimal.valueOf(dailyRate)
+                .multiply(BigDecimal.valueOf(365))
+                .multiply(BigDecimal.valueOf(100));
 
         return annualizedReturn.setScale(2, RoundingMode.HALF_UP);
     }
@@ -142,14 +149,26 @@ public class FciClient {
                         FciFundData::getFondo,
                         latest -> {
                             FciFundData previous = previousMap.get(latest.getFondo());
-                            return calculateTna(latest.getVcp(), previous.getVcp());
+                            return calculateTna(latest.getVcp(), previous.getVcp(), latest.getFecha(), previous.getFecha());
                         },
                         (a, b) -> a
                 ))
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getValue() != null)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static long resolveDaysBetween(String previousDate, String currentDate) {
+        if (previousDate == null || currentDate == null) {
+            return 0;
+        }
+        try {
+            LocalDate prev = LocalDate.parse(previousDate);
+            LocalDate current = LocalDate.parse(currentDate);
+            return ChronoUnit.DAYS.between(prev, current);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Data
