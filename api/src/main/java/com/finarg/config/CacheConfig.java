@@ -2,6 +2,7 @@ package com.finarg.config;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.interceptor.CacheErrorHandler;
@@ -30,7 +31,7 @@ public class CacheConfig implements CachingConfigurer {
     public CacheErrorHandler errorHandler() {
         return new CacheErrorHandler() {
             @Override
-            public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
+            public void handleCacheGetError(@NonNull RuntimeException exception, @NonNull Cache cache, @NonNull Object key) {
                 if (isDeserializationError(exception)) {
                     log.warn("Cache deserialization error for {} key {}, evicting and treating as cache miss: {}",
                             cache.getName(), key, exception.getMessage());
@@ -45,17 +46,17 @@ public class CacheConfig implements CachingConfigurer {
             }
 
             @Override
-            public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
+            public void handleCachePutError(@NonNull RuntimeException exception, @NonNull Cache cache, @NonNull Object key, Object value) {
                 log.warn("Cache put error for {} key {}: {}", cache.getName(), key, exception.getMessage());
             }
 
             @Override
-            public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
+            public void handleCacheEvictError(@NonNull RuntimeException exception, @NonNull Cache cache, @NonNull Object key) {
                 log.warn("Cache evict error for {} key {}: {}", cache.getName(), key, exception.getMessage());
             }
 
             @Override
-            public void handleCacheClearError(RuntimeException exception, Cache cache) {
+            public void handleCacheClearError(@NonNull RuntimeException exception, @NonNull Cache cache) {
                 log.warn("Cache clear error for {}: {}", cache.getName(), exception.getMessage());
             }
         };

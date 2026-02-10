@@ -3,7 +3,6 @@ package com.finarg.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finarg.model.dto.GovernmentDTO;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GovernmentsService {
 
     private static final Map<String, String> COUNTRY_TO_POSITION = Map.of(
@@ -31,11 +29,14 @@ public class GovernmentsService {
             "#06b6d4", "#eab308", "#a855f7", "#6b7280", "#ec4899"
     };
 
-    @Qualifier("wikidataWebClient")
     private final WebClient wikidataWebClient;
     private final ObjectMapper objectMapper;
+    private final Map<String, List<GovernmentDTO>> cache = new ConcurrentHashMap<>();
 
-    private final ConcurrentHashMap<String, List<GovernmentDTO>> cache = new ConcurrentHashMap<>();
+    public GovernmentsService(@Qualifier("wikidataWebClient") WebClient wikidataWebClient, ObjectMapper objectMapper) {
+        this.wikidataWebClient = wikidataWebClient;
+        this.objectMapper = objectMapper;
+    }
 
     public List<GovernmentDTO> getGovernments(String country) {
         return cache.computeIfAbsent(country, this::fetchFromWikidata);
@@ -44,31 +45,15 @@ public class GovernmentsService {
     private List<GovernmentDTO> fetchFromWikidata(String country) {
         String positionQid = COUNTRY_TO_POSITION.get(country.toLowerCase());
         if (positionQid == null) {
-            log.warn("No Wikidata position configured for country: {}", country);
             return List.of();
         }
 
         try {
-            String query = """
-                SELECT ?item ?itemLabel ?start ?end WHERE {
-                  ?item p:P39 ?stmt .
-                  ?stmt ps:P39 wd:%s .
-                  ?stmt pq:P580 ?start .
-                  OPTIONAL { ?stmt pq:P582 ?end . }
-                  SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
-                }
-                ORDER BY ASC(?start)
-                """.formatted(positionQid);
-
-            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-            formData.add("query", query.trim());
-            formData.add("format", "json");
-
             String responseBody = wikidataWebClient.post()
                     .uri("/sparql")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .accept(MediaType.parseMediaType("application/sparql-results+json"))
-                    .bodyValue(formData)
+                    .bodyValue(buildSparqlRequest(positionQid))
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -80,9 +65,27 @@ public class GovernmentsService {
             List<GovernmentDTO> parsed = parseSparqlResponse(responseBody);
             return parsed.isEmpty() ? getFallbackGovernments(country) : parsed;
         } catch (Exception e) {
-            log.error("Error fetching governments from Wikidata for country {}: {}", country, e.getMessage());
+            log.error("Error fetching governments from Wikidata for {}: {}", country, e.getMessage());
             return getFallbackGovernments(country);
         }
+    }
+
+    private MultiValueMap<String, String> buildSparqlRequest(String positionQid) {
+        String query = """
+            SELECT ?item ?itemLabel ?start ?end WHERE {
+              ?item p:P39 ?stmt .
+              ?stmt ps:P39 wd:%s .
+              ?stmt pq:P580 ?start .
+              OPTIONAL { ?stmt pq:P582 ?end . }
+              SERVICE wikibase:label { bd:serviceParam wikibase:language "es,en". }
+            }
+            ORDER BY ASC(?start)
+            """.formatted(positionQid);
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("query", query.trim());
+        formData.add("format", "json");
+        return formData;
     }
 
     private List<GovernmentDTO> parseSparqlResponse(String json) {
@@ -90,6 +93,7 @@ public class GovernmentsService {
         try {
             JsonNode root = objectMapper.readTree(json);
             JsonNode bindings = root.path("results").path("bindings");
+
             if (!bindings.isArray()) {
                 return List.of();
             }
@@ -98,74 +102,62 @@ public class GovernmentsService {
             for (JsonNode binding : bindings) {
                 String label = getStringValue(binding, "itemLabel");
                 String start = getStringValue(binding, "start");
-                String end = getStringValue(binding, "end");
 
                 if (label == null || start == null) {
                     continue;
                 }
 
+                String end = getStringValue(binding, "end");
                 String startDate = start.substring(0, Math.min(10, start.length()));
-                String endDate = end != null && end.length() >= 10
-                        ? end.substring(0, 10)
-                        : "2099-12-31";
-
-                String shortLabel = shortenLabel(label);
-                String color = COLOR_PALETTE[colorIndex % COLOR_PALETTE.length];
+                String endDate = (end != null && end.length() >= 10) ? end.substring(0, 10) : "2099-12-31";
 
                 result.add(GovernmentDTO.builder()
                         .startDate(startDate)
                         .endDate(endDate)
-                        .label(shortLabel)
-                        .color(color)
+                        .label(cleanLabel(label))
+                        .color(COLOR_PALETTE[colorIndex % COLOR_PALETTE.length])
                         .build());
                 colorIndex++;
             }
-
-            log.info("Fetched {} governments from Wikidata", result.size());
         } catch (Exception e) {
-            log.error("Error parsing Wikidata SPARQL response: {}", e.getMessage());
+            log.error("Error parsing Wikidata response: {}", e.getMessage());
         }
         return result;
     }
 
+    private String cleanLabel(String label) {
+        return label == null ? "?" : label.replaceAll("\\s*\\([^)]*\\)", "").trim();
+    }
+
     private String getStringValue(JsonNode binding, String key) {
-        JsonNode node = binding.path(key);
-        if (node.isMissingNode()) {
-            return null;
-        }
-        JsonNode value = node.path("value");
-        return value.isMissingNode() ? null : value.asText();
+        return binding.has(key) && binding.get(key).has("value")
+                ? binding.get(key).get("value").asText()
+                : null;
     }
 
     private List<GovernmentDTO> getFallbackGovernments(String country) {
         if (!"ar".equalsIgnoreCase(country)) {
             return List.of();
         }
+
         return List.of(
-                GovernmentDTO.builder().startDate("1989-07-08").endDate("1999-12-10").label("Menem").color("#3b82f6").build(),
-                GovernmentDTO.builder().startDate("1999-12-10").endDate("2001-12-21").label("De la Rúa").color("#10b981").build(),
-                GovernmentDTO.builder().startDate("2002-01-02").endDate("2003-05-25").label("Duhalde").color("#f59e0b").build(),
-                GovernmentDTO.builder().startDate("2003-05-25").endDate("2007-12-10").label("Kirchner").color("#ef4444").build(),
-                GovernmentDTO.builder().startDate("2007-12-10").endDate("2015-12-10").label("Fernández").color("#8b5cf6").build(),
-                GovernmentDTO.builder().startDate("2015-12-10").endDate("2019-12-10").label("Macri").color("#06b6d4").build(),
-                GovernmentDTO.builder().startDate("2019-12-10").endDate("2023-12-10").label("Fernández").color("#a855f7").build(),
-                GovernmentDTO.builder().startDate("2023-12-10").endDate("2099-12-31").label("Milei").color("#6b7280").build()
+                createGov("1989-07-08", "1999-12-10", "Menem", "#3b82f6"),
+                createGov("1999-12-10", "2001-12-21", "De la Rúa", "#10b981"),
+                createGov("2002-01-02", "2003-05-25", "Duhalde", "#f59e0b"),
+                createGov("2003-05-25", "2007-12-10", "Kirchner", "#ef4444"),
+                createGov("2007-12-10", "2015-12-10", "Fernández", "#8b5cf6"),
+                createGov("2015-12-10", "2019-12-10", "Macri", "#06b6d4"),
+                createGov("2019-12-10", "2023-12-10", "Fernández", "#a855f7"),
+                createGov("2023-12-10", "2099-12-31", "Milei", "#6b7280")
         );
     }
 
-    private String shortenLabel(String fullLabel) {
-        if (fullLabel == null) {
-            return "?";
-        }
-        return fullLabel
-                .replace(" (Presidente de Argentina)", "")
-                .replace(" (President of Argentina)", "")
-                .replace(" (político)", "")
-                .replace(" (militar)", "")
-                .replace(" (abogado)", "")
-                .replace(" (lawyer)", "")
-                .replace(" (politician)", "")
-                .replace(" (military personnel)", "")
-                .trim();
+    private GovernmentDTO createGov(String start, String end, String label, String color) {
+        return GovernmentDTO.builder()
+                .startDate(start)
+                .endDate(end)
+                .label(label)
+                .color(color)
+                .build();
     }
 }

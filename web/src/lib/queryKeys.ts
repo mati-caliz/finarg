@@ -3,7 +3,6 @@ import type { CountryCode } from "@/config/countries";
 export const queryKeys = {
   quotes: {
     all: (country: CountryCode) => ["quotes", country] as const,
-    byType: (country: CountryCode, type: string) => ["quotes", country, type] as const,
     gap: (country: CountryCode) => ["quotes", "gap", country] as const,
     history: (country: CountryCode, type: string, period: string) =>
       ["quotes", "history", country, type, period] as const,
@@ -20,12 +19,6 @@ export const queryKeys = {
   },
   countryRisk: {
     current: () => ["country-risk", "current"] as const,
-  },
-  socialIndicators: {
-    byCountry: (country: CountryCode) => ["social-indicators", country] as const,
-  },
-  governments: {
-    byCountry: (country: CountryCode) => ["governments", country] as const,
   },
   exchangeBands: {
     current: () => ["exchange-bands", "current"] as const,

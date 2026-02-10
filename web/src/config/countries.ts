@@ -206,9 +206,7 @@ export const COUNTRIES: Record<CountryCode, CountryConfig> = {
     reservesLabelKey: "bcuReserves",
   },
 };
-
-export const COUNTRIES_LIST = Object.values(COUNTRIES);
-
+Object.values(COUNTRIES);
 export function getCountryConfig(code: CountryCode): CountryConfig {
   return COUNTRIES[code];
 }
