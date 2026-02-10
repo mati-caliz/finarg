@@ -10,6 +10,7 @@ export const translations = {
 
     inflation: "Inflación",
     reserves: "Reservas",
+    tools: "Herramientas",
 
     // Countries
     ar: "Argentina",
@@ -20,6 +21,8 @@ export const translations = {
 
     // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparación de todos los tipos de cambio disponibles",
+    exchangeRateComparator: "Comparador de Tipos de Cambio",
+    exchangeRateComparatorSubtitle: "Compará precios de compra y venta",
     cheapestToBuy: "Más barato para comprar",
     mostExpensiveToBuy: "Más caro para comprar",
     bestPriceToSell: "Mejor precio para vender",
@@ -29,7 +32,9 @@ export const translations = {
 
     // Tasas / Comparador
     ratesComparator: "Comparador de Tasas",
+    rateComparator: "Comparador de Tasas",
     ratesComparatorDesc: "Compará TNA de billeteras virtuales y plazos fijos de bancos",
+    rateComparatorSubtitle: "Compará TNA de inversiones",
     walletRates: "Billeteras virtuales",
     fixedTermRates: "Plazos fijos",
     usdAccounts: "Cuentas USD",
@@ -443,6 +448,7 @@ export const translations = {
 
     inflation: "Inflação",
     reserves: "Reservas",
+    tools: "Ferramentas",
 
     // Countries
     ar: "Argentina",
@@ -453,6 +459,8 @@ export const translations = {
 
     // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparação de todas as taxas de câmbio disponíveis",
+    exchangeRateComparator: "Comparador de Taxas de Câmbio",
+    exchangeRateComparatorSubtitle: "Compare preços de compra e venda",
     cheapestToBuy: "Mais barato para comprar",
     mostExpensiveToBuy: "Mais caro para comprar",
     bestPriceToSell: "Melhor preço para vender",
@@ -461,7 +469,9 @@ export const translations = {
     exchangeRateType: "Tipo de Câmbio",
 
     ratesComparator: "Comparador de Taxas",
+    rateComparator: "Comparador de Taxas",
     ratesComparatorDesc: "Compare TNA de carteiras virtuais e prazos fixos de bancos",
+    rateComparatorSubtitle: "Compare TNA de investimentos",
     walletRates: "Carteiras virtuais",
     fixedTermRates: "Prazos fixos",
     usdAccounts: "Contas USD",
@@ -771,6 +781,7 @@ export const translations = {
 
     inflation: "Inflation",
     reserves: "Reserves",
+    tools: "Tools",
 
     // Countries
     ar: "Argentina",
@@ -781,6 +792,8 @@ export const translations = {
 
     // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparison of all available exchange rates",
+    exchangeRateComparator: "Exchange Rates Comparator",
+    exchangeRateComparatorSubtitle: "Compare buy and sell prices",
     cheapestToBuy: "Cheapest to buy",
     mostExpensiveToBuy: "Most expensive to buy",
     bestPriceToSell: "Best price to sell",
@@ -789,7 +802,9 @@ export const translations = {
     exchangeRateType: "Exchange Rate Type",
 
     ratesComparator: "Rates Comparator",
+    rateComparator: "Rates Comparator",
     ratesComparatorDesc: "Compare TNA rates from digital wallets and bank fixed-term deposits",
+    rateComparatorSubtitle: "Compare TNA investment rates",
     walletRates: "Digital wallets",
     fixedTermRates: "Fixed-term deposits",
     usdAccounts: "USD Accounts",

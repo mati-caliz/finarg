@@ -4,6 +4,9 @@
   "private": true,
   "description": "Monorepo for FinArg - Frontend and Backend",
   "scripts": {
+    "dev": "./scripts/run-local.sh",
+    "dev:docker": "./scripts/run-docker.sh",
+    "dev:infra": "./scripts/dev-infra.sh",
     "format": "npm run format:frontend",
     "format:frontend": "cd web && npm run format",
     "format:backend": "cd api && mvn spotless:apply",
@@ -24,8 +27,6 @@
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
-    "web/**/*.{js,jsx,ts,tsx,json,css}": [
-      "npx biome check --write --no-errors-on-unmatched"
-    ]
+    "web/**/*.{js,jsx,ts,tsx,json,css}": ["npx biome check --write --no-errors-on-unmatched"]
   }
 }

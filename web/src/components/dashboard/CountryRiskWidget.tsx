@@ -55,8 +55,7 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
     }
     return "bg-red-100 dark:bg-red-500/15";
   };
-
-  const currentGovernment = governments.find((gov) => {
+  governments.find((gov) => {
     const riskDate = new Date(countryRisk.date);
     const startDate = new Date(gov.startDate);
     const endDate = new Date(gov.endDate);
@@ -85,20 +84,6 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
             <TrendingUp className={`h-5 w-5 ${getRiskColor(countryRisk.value)}`} />
           </div>
         </div>
-        {currentGovernment && (
-          <div className="mt-4 pt-4 border-t border-border/50">
-            <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/50">
-              <div
-                className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: currentGovernment.color }}
-              />
-              <p className="text-sm text-muted-foreground">
-                {translate("government")}:{" "}
-                <span className="font-medium text-foreground">{currentGovernment.label}</span>
-              </p>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

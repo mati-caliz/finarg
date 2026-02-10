@@ -2,6 +2,11 @@
 
 # Script to run FinArg full stack locally (backend + frontend)
 # Usage: ./scripts/run-local.sh
+# 
+# This runs WITHOUT Docker for fast development with hot-reload
+# Changes to code will be reflected automatically
+
+set -e
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -16,8 +21,9 @@ API_DIR="${PROJECT_ROOT}/api"
 WEB_DIR="${PROJECT_ROOT}/web"
 
 echo -e "${BLUE}================================${NC}"
-echo -e "${GREEN}[FinArg]${NC} Starting Full Stack Development"
+echo -e "${GREEN}[FinArg]${NC} Starting Full Stack Development (Local Mode)"
 echo -e "${BLUE}================================${NC}"
+echo -e "${YELLOW}💡 Hot-reload enabled - changes will be reflected automatically${NC}"
 echo ""
 
 # ========================================
@@ -63,15 +69,26 @@ echo -e "${GREEN}[✓]${NC} Backend environment loaded"
 echo ""
 
 # ========================================
-# 3. Stop Docker backend if running
+# 3. Check Docker and start infrastructure
 # ========================================
 echo -e "${GREEN}[3/5]${NC} Checking Docker services..."
 cd "${PROJECT_ROOT}" || exit 1
 
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
+    exit 1
+fi
+
+# Stop Docker backend/frontend if running (we'll run them locally)
 if docker compose ps | grep -q "backend.*Up"; then
     echo -e "${YELLOW}[WARN]${NC} Docker backend is running on port 8080. Stopping it..."
     docker compose stop backend
-    echo -e "${GREEN}[✓]${NC} Docker backend stopped"
+fi
+
+if docker compose ps | grep -q "frontend.*Up"; then
+    echo -e "${YELLOW}[WARN]${NC} Docker frontend is running on port 3000. Stopping it..."
+    docker compose stop frontend
 fi
 
 # Start PostgreSQL and Redis if not running
@@ -80,9 +97,11 @@ if ! docker compose ps | grep -q "postgres.*Up"; then
     docker compose up -d postgres redis
     echo -e "${GREEN}[INFO]${NC} Waiting for services to be ready..."
     sleep 5
+else
+    echo -e "${GREEN}[✓]${NC} PostgreSQL and Redis already running"
 fi
 
-echo -e "${GREEN}[✓]${NC} Docker services ready"
+echo -e "${GREEN}[✓]${NC} Infrastructure ready (PostgreSQL + Redis)"
 echo ""
 
 # ========================================
@@ -115,6 +134,7 @@ echo ""
 cleanup() {
     echo ""
     echo -e "${YELLOW}[INFO]${NC} Stopping services..."
+    # shellcheck disable=SC2046
     kill $(jobs -p) 2>/dev/null
     wait
     echo -e "${GREEN}[✓]${NC} All services stopped"
