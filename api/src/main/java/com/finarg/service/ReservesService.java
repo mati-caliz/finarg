@@ -80,7 +80,7 @@ public class ReservesService {
         }
 
         DatosGobArClient.SeriesDataPoint latest = reserves.get(0);
-        BigDecimal grossReserves = latest.getValor();
+        BigDecimal grossReserves = latest.valor();
 
         BigDecimal totalBCRA = liabilitiesBCRA.stream()
                 .map(ReserveLiabilityDTO::getAmount)
@@ -97,7 +97,7 @@ public class ReservesService {
 
         if (reserves.size() > 1) {
             DatosGobArClient.SeriesDataPoint previous = reserves.get(1);
-            variation = grossReserves.subtract(previous.getValor());
+            variation = grossReserves.subtract(previous.valor());
 
             if (variation.compareTo(BigDecimal.ZERO) > 0) {
                 trend = "rising";
@@ -114,7 +114,7 @@ public class ReservesService {
                 .liabilitiesBCRA(liabilitiesBCRA)
                 .liabilitiesFMI(liabilitiesFMI)
                 .liabilities(allLiabilities)
-                .date(latest.getFecha())
+                .date(latest.fecha())
                 .dailyVariation(variation.setScale(0, RoundingMode.HALF_UP))
                 .trend(trend)
                 .build();
@@ -128,8 +128,8 @@ public class ReservesService {
         }
         DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
         if (datosGob != null) {
-            overrides.put("leliq_pases", datosGob.getPasivosLetrasUsd().setScale(0, RoundingMode.HALF_UP));
-            overrides.put("gov_deposits", datosGob.getDepositosGobiernoUsd().setScale(0, RoundingMode.HALF_UP));
+            overrides.put("leliq_pases", datosGob.pasivosLetrasUsd().setScale(0, RoundingMode.HALF_UP));
+            overrides.put("gov_deposits", datosGob.depositosGobiernoUsd().setScale(0, RoundingMode.HALF_UP));
         }
         return overrides;
     }

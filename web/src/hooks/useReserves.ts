@@ -16,13 +16,3 @@ export function useReserves(country: CountryCode = "ar") {
     refetchInterval: 300000,
   });
 }
-
-export function useReservesHistory(days = 30) {
-  return useQuery({
-    queryKey: ["reserves", "history", days],
-    queryFn: async () => {
-      const response = await reservesApi.getHistory(days);
-      return response.data;
-    },
-  });
-}

@@ -1,6 +1,5 @@
 import type { CountryCode } from "@/config/countries";
 import type { User } from "@/types";
-import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -68,21 +67,3 @@ export const useAppStore = create<AppState>()(
     },
   ),
 );
-
-export function useHydration() {
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    const unsubFinishHydration = useAppStore.persist.onFinishHydration(() => {
-      setHydrated(true);
-    });
-
-    setHydrated(useAppStore.persist.hasHydrated());
-
-    return () => {
-      unsubFinishHydration();
-    };
-  }, []);
-
-  return hydrated;
-}

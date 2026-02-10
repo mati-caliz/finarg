@@ -22,20 +22,6 @@ export function useQuotes(country?: CountryCode) {
   });
 }
 
-export function useQuote(type: string, country?: CountryCode) {
-  const selectedCountry = useAppStore((state) => state.selectedCountry);
-  const countryToUse = country || selectedCountry;
-
-  return useQuery<Quote>({
-    queryKey: queryKeys.quotes.byType(countryToUse, type),
-    queryFn: async () => {
-      const response = await quotesApi.getByCountryAndType(countryToUse, type);
-      return response.data;
-    },
-    enabled: !!type,
-  });
-}
-
 export function useGap(country?: CountryCode) {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryToUse = country || selectedCountry;
