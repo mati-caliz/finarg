@@ -21,7 +21,15 @@ import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
-import { ArrowRight, Calculator, ChevronDown, Percent, TrendingUp } from "lucide-react";
+import {
+  ArrowLeftRight,
+  ArrowRight,
+  BarChart3,
+  Calculator,
+  ChevronDown,
+  Percent,
+  TrendingUp,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -442,44 +450,103 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {countryConfig.features.incomeTax && (
-          <Link href="/calculadora-sueldo-neto">
-            <Card className="group cursor-pointer border-l-[3px] border-l-primary hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{translate("incomeTaxCalculator")}</p>
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold">{translate("tools")}</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {countryConfig.features.incomeTax && (
+            <Link href="/calculadora-sueldo-neto">
+              <Card className="group cursor-pointer border-l-[3px] border-l-primary hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 h-[140px]">
+                <CardContent className="pt-6 h-full flex items-center">
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{translate("incomeTaxCalculator")}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {translate("incomeTaxSubtitle")}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors shrink-0">
+                      <Calculator className="h-6 w-6 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
+          {countryConfig.features.inflation && (
+            <Link href="/inflacion">
+              <Card className="group cursor-pointer border-l-[3px] border-l-accent hover:shadow-lg hover:shadow-accent/5 transition-all duration-300 h-[140px]">
+                <CardContent className="pt-6 h-full flex items-center">
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{translate("adjustmentCalculator")}</p>
+                      <p className="text-sm text-muted-foreground">{translate("updateValues")}</p>
+                    </div>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-accent/10 group-hover:bg-accent/20 transition-colors shrink-0">
+                      <Percent className="h-6 w-6 text-accent" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
+          {countryConfig.features.rates && (
+            <Link href="/comparador-tasas">
+              <Card className="group cursor-pointer border-l-[3px] border-l-emerald-500 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 h-[140px]">
+                <CardContent className="pt-6 h-full flex items-center">
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">{translate("rateComparator")}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {translate("rateComparatorSubtitle")}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors shrink-0">
+                      <BarChart3 className="h-6 w-6 text-emerald-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
+          <Link href="/comparador-tipos-cambio">
+            <Card className="group cursor-pointer border-l-[3px] border-l-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 h-[140px]">
+              <CardContent className="pt-6 h-full flex items-center">
+                <div className="flex items-center justify-between w-full gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">{translate("exchangeRateComparator")}</p>
                     <p className="text-sm text-muted-foreground">
-                      {translate("incomeTaxSubtitle")}
+                      {translate("exchangeRateComparatorSubtitle")}
                     </p>
                   </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                    <Calculator className="h-5 w-5 text-primary" />
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors shrink-0">
+                    <ArrowLeftRight className="h-6 w-6 text-blue-500" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </Link>
-        )}
 
-        {countryConfig.features.inflation && (
-          <Link href="/inflacion">
-            <Card className="group cursor-pointer border-l-[3px] border-l-accent hover:shadow-lg hover:shadow-accent/5 transition-all duration-300">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{translate("adjustmentCalculator")}</p>
-                    <p className="text-sm text-muted-foreground">{translate("updateValues")}</p>
+          <Link href="/calculadora-interes-compuesto">
+            <Card className="group cursor-pointer border-l-[3px] border-l-violet-500 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-300 h-[140px]">
+              <CardContent className="pt-6 h-full flex items-center">
+                <div className="flex items-center justify-between w-full gap-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">{translate("compoundInterestCalculator")}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {translate("compoundInterestSubtitle")}
+                    </p>
                   </div>
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10 group-hover:bg-accent/20 transition-colors">
-                    <Percent className="h-5 w-5 text-accent" />
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-violet-500/10 group-hover:bg-violet-500/20 transition-colors shrink-0">
+                    <TrendingUp className="h-6 w-6 text-violet-500" />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </Link>
-        )}
+        </div>
       </div>
     </div>
   );

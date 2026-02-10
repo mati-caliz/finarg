@@ -2,6 +2,46 @@
 
 Aplicación financiera para seguimiento de cotizaciones, inflación y análisis de mercado argentino.
 
+## 🚀 Quick Start
+
+### Desarrollo Local (Recomendado) ⭐
+
+```bash
+# Inicia todo con hot-reload activado
+npm run dev
+# o
+./scripts/run-local.sh
+```
+
+Esto levanta PostgreSQL/Redis en Docker, y Backend/Frontend localmente. **Los cambios se reflejan automáticamente.**
+
+**URLs:**
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8080
+- Swagger: http://localhost:8080/swagger-ui.html
+
+### Modo Docker (Testing/Producción)
+
+```bash
+npm run dev:docker
+# o
+./scripts/run-docker.sh
+```
+
+⚠️ **Nota:** Sin hot-reload, necesitas reconstruir después de cambios.
+
+### Otros comandos
+
+```bash
+npm run dev:infra     # Solo PostgreSQL + Redis
+npm run lint          # Lint frontend + backend
+npm run format        # Format código
+```
+
+📚 **Documentación completa:** Ver [CLAUDE.md](./CLAUDE.md) para detalles técnicos.
+
+---
+
 ## Stack Tecnológico
 
 ### Backend
