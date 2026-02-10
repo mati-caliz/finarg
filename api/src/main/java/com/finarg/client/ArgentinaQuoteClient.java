@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -145,21 +146,31 @@ public class ArgentinaQuoteClient implements QuoteClient {
             return;
         }
 
-        findCotizacion(data.cotizaciones, "CLP").ifPresent(clp ->
-                result.add(calculateDerivedRate(baseDollar, officialDollar, clp, clpType,
-                        "Peso Chileno " + capitalize(baseTypeStr)))
-        );
-        findCotizacion(data.cotizaciones, "UYU").ifPresent(uyu ->
-                result.add(calculateDerivedRate(baseDollar, officialDollar, uyu, uyuType,
-                        "Peso Uruguayo " + capitalize(baseTypeStr)))
-        );
+        findCotizacion(data.cotizaciones, "CLP").ifPresent(clp -> {
+            QuoteDTO derivedClp = calculateDerivedRate(baseDollar, officialDollar, clp, clpType,
+                    "Peso Chileno " + capitalize(baseTypeStr));
+            if (derivedClp != null) {
+                result.add(derivedClp);
+            }
+        });
+        findCotizacion(data.cotizaciones, "UYU").ifPresent(uyu -> {
+            QuoteDTO derivedUyu = calculateDerivedRate(baseDollar, officialDollar, uyu, uyuType,
+                    "Peso Uruguayo " + capitalize(baseTypeStr));
+            if (derivedUyu != null) {
+                result.add(derivedUyu);
+            }
+        });
     }
 
     private QuoteDTO findDerivedQuote(MarketDataSnapshot data, String baseTypeStr, CurrencyType clpType,
                                       CurrencyType uyuType, CurrencyType target) {
         List<QuoteDTO> temp = new ArrayList<>();
         addDerivedQuotes(temp, data, baseTypeStr, clpType, uyuType);
-        return temp.stream().filter(q -> q.getType() == target).findFirst().orElse(null);
+        return temp.stream()
+                .filter(Objects::nonNull)
+                .filter(q -> q.getType() == target)
+                .findFirst()
+                .orElse(null);
     }
 
     private QuoteDTO calculateDerivedRate(DolarApiResponse base, DolarApiResponse official,
