@@ -94,14 +94,18 @@ public class GovernmentsService {
             JsonNode root = objectMapper.readTree(json);
             JsonNode bindings = root.path("results").path("bindings");
 
-            if (!bindings.isArray()) return List.of();
+            if (!bindings.isArray()) {
+                return List.of();
+            }
 
             int colorIndex = 0;
             for (JsonNode binding : bindings) {
                 String label = getStringValue(binding, "itemLabel");
                 String start = getStringValue(binding, "start");
 
-                if (label == null || start == null) continue;
+                if (label == null || start == null) {
+                    continue;
+                }
 
                 String end = getStringValue(binding, "end");
                 String startDate = start.substring(0, Math.min(10, start.length()));
@@ -132,7 +136,9 @@ public class GovernmentsService {
     }
 
     private List<GovernmentDTO> getFallbackGovernments(String country) {
-        if (!"ar".equalsIgnoreCase(country)) return List.of();
+        if (!"ar".equalsIgnoreCase(country)) {
+            return List.of();
+        }
 
         return List.of(
                 createGov("1989-07-08", "1999-12-10", "Menem", "#3b82f6"),

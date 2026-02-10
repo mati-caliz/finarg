@@ -138,10 +138,14 @@ public class DatosGobArClient {
                     .bodyToMono(String.class)
                     .block();
 
-            if (csvContent == null || csvContent.isEmpty()) return null;
+            if (csvContent == null || csvContent.isEmpty()) {
+                return null;
+            }
 
             String[] lines = csvContent.split("\n");
-            if (lines.length < 2) return null;
+            if (lines.length < 2) {
+                return null;
+            }
 
             String[] headers = lines[0].split(",");
             String[] values = lines[lines.length - 1].split(",");
@@ -154,7 +158,9 @@ public class DatosGobArClient {
                 }
             }
 
-            if (columnIndex == -1 || columnIndex >= values.length) return null;
+            if (columnIndex == -1 || columnIndex >= values.length) {
+                return null;
+            }
 
             String value = values[columnIndex].trim();
             return value.isEmpty() ? null : new BigDecimal(value);
@@ -175,13 +181,13 @@ public class DatosGobArClient {
             BigDecimal pasivosLetrasUsd,
             BigDecimal depositosGobiernoUsd,
             BigDecimal posicionNetaPasesUsd
-    ) {}
+    ) { }
 
-    public record SeriesApiResponse(List<List<Object>> data, List<SeriesMeta> meta) {}
+    public record SeriesApiResponse(List<List<Object>> data, List<SeriesMeta> meta) { }
 
-    public record SeriesMeta(SeriesField field) {}
+    public record SeriesMeta(SeriesField field) { }
 
-    public record SeriesField(String description, String units) {}
+    public record SeriesField(String description, String units) { }
 
-    public record SeriesDataPoint(LocalDate fecha, BigDecimal valor) {}
+    public record SeriesDataPoint(LocalDate fecha, BigDecimal valor) { }
 }

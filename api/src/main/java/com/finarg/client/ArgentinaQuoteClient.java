@@ -14,7 +14,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Component
@@ -68,8 +72,12 @@ public class ArgentinaQuoteClient implements QuoteClient {
 
     @Override
     public QuoteDTO getQuote(CurrencyType type) {
-        if (type == CurrencyType.AR_EUR_OFICIAL) return ambitoClient.getEuroOficialQuote().orElseGet(this::fetchEuroOficialFromDolarApi);
-        if (type == CurrencyType.AR_EUR_BLUE) return ambitoClient.getEuroBlueQuote().orElse(null);
+        if (type == CurrencyType.AR_EUR_OFICIAL) {
+            return ambitoClient.getEuroOficialQuote().orElseGet(this::fetchEuroOficialFromDolarApi);
+        }
+        if (type == CurrencyType.AR_EUR_BLUE) {
+            return ambitoClient.getEuroBlueQuote().orElse(null);
+        }
 
         if (isDerivedType(type)) {
             MarketDataSnapshot marketData = fetchMarketData();
@@ -117,32 +125,46 @@ public class ArgentinaQuoteClient implements QuoteClient {
     }
 
     private void addOfficialCotizaciones(List<QuoteDTO> result, List<CotizacionApiResponse> cotizaciones) {
-        if (cotizaciones == null) return;
-        findCotizacion(cotizaciones, "CLP").ifPresent(c -> result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_CLP_OFICIAL, "Peso Chileno")));
-        findCotizacion(cotizaciones, "UYU").ifPresent(c -> result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_UYU_OFICIAL, "Peso Uruguayo")));
+        if (cotizaciones == null) {
+            return;
+        }
+        findCotizacion(cotizaciones, "CLP").ifPresent(c ->
+                result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_CLP_OFICIAL, "Peso Chileno"))
+        );
+        findCotizacion(cotizaciones, "UYU").ifPresent(c ->
+                result.add(mapCotizacionToQuoteDTO(c, CurrencyType.AR_UYU_OFICIAL, "Peso Uruguayo"))
+        );
     }
 
-    private void addDerivedQuotes(List<QuoteDTO> result, MarketDataSnapshot data, String baseTypeStr, CurrencyType clpType, CurrencyType uyuType) {
-        DolarApiResponse baseDollar = findDolar(data.dollarResponses, baseTypeStr); // e.g., Blue or Tarjeta
+    private void addDerivedQuotes(List<QuoteDTO> result, MarketDataSnapshot data, String baseTypeStr,
+                                  CurrencyType clpType, CurrencyType uyuType) {
+        DolarApiResponse baseDollar = findDolar(data.dollarResponses, baseTypeStr);
         DolarApiResponse officialDollar = findDolar(data.dollarResponses, "oficial");
 
-        if (baseDollar == null || officialDollar == null) return;
+        if (baseDollar == null || officialDollar == null) {
+            return;
+        }
 
         findCotizacion(data.cotizaciones, "CLP").ifPresent(clp ->
-                result.add(calculateDerivedRate(baseDollar, officialDollar, clp, clpType, "Peso Chileno " + capitalize(baseTypeStr)))
+                result.add(calculateDerivedRate(baseDollar, officialDollar, clp, clpType,
+                        "Peso Chileno " + capitalize(baseTypeStr)))
         );
         findCotizacion(data.cotizaciones, "UYU").ifPresent(uyu ->
-                result.add(calculateDerivedRate(baseDollar, officialDollar, uyu, uyuType, "Peso Uruguayo " + capitalize(baseTypeStr)))
+                result.add(calculateDerivedRate(baseDollar, officialDollar, uyu, uyuType,
+                        "Peso Uruguayo " + capitalize(baseTypeStr)))
         );
     }
 
-    private QuoteDTO findDerivedQuote(MarketDataSnapshot data, String baseTypeStr, CurrencyType clpType, CurrencyType uyuType, CurrencyType target) {
+    private QuoteDTO findDerivedQuote(MarketDataSnapshot data, String baseTypeStr, CurrencyType clpType,
+                                      CurrencyType uyuType, CurrencyType target) {
         List<QuoteDTO> temp = new ArrayList<>();
         addDerivedQuotes(temp, data, baseTypeStr, clpType, uyuType);
         return temp.stream().filter(q -> q.getType() == target).findFirst().orElse(null);
     }
 
-    private QuoteDTO calculateDerivedRate(DolarApiResponse base, DolarApiResponse official, CotizacionApiResponse targetOfficial, CurrencyType type, String name) {
+    private QuoteDTO calculateDerivedRate(DolarApiResponse base, DolarApiResponse official,
+                                          CotizacionApiResponse targetOfficial,
+                                          CurrencyType type, String name) {
         BigDecimal officialSell = safeValue(official.getVenta(), BigDecimal.ONE);
         BigDecimal officialBuy = safeValue(official.getCompra(), BigDecimal.ONE);
         BigDecimal targetSell = safeValue(targetOfficial.getVenta(), BigDecimal.ZERO);
@@ -150,7 +172,9 @@ public class ArgentinaQuoteClient implements QuoteClient {
         BigDecimal baseSell = safeValue(base.getVenta(), BigDecimal.ZERO);
         BigDecimal baseBuy = safeValue(base.getCompra(), BigDecimal.ZERO);
 
-        if (targetSell.compareTo(BigDecimal.ZERO) == 0 || targetBuy.compareTo(BigDecimal.ZERO) == 0) return null;
+        if (targetSell.compareTo(BigDecimal.ZERO) == 0 || targetBuy.compareTo(BigDecimal.ZERO) == 0) {
+            return null;
+        }
 
         BigDecimal usdPerTargetSell = officialSell.divide(targetSell, 6, RoundingMode.HALF_UP);
         BigDecimal derivedSell = baseSell.divide(usdPerTargetSell, 4, RoundingMode.HALF_UP);
@@ -194,18 +218,29 @@ public class ArgentinaQuoteClient implements QuoteClient {
         });
     }
 
-    private void processCrossGroup(List<QuoteDTO> result, DolarApiResponse baseDollar, Map<String, BigDecimal> rates, Map<String, CurrencyType> typeMap, String suffix) {
-        if (baseDollar == null) return;
-        typeMap.forEach((code, type) -> addCrossQuote(result, baseDollar, rates, code, type, getCurrencyName(code) + suffix));
+    private void processCrossGroup(List<QuoteDTO> result, DolarApiResponse baseDollar,
+                                   Map<String, BigDecimal> rates, Map<String, CurrencyType> typeMap, String suffix) {
+        if (baseDollar == null) {
+            return;
+        }
+        typeMap.forEach((code, type) ->
+                addCrossQuote(result, baseDollar, rates, code, type, getCurrencyName(code) + suffix)
+        );
     }
 
-    private void addCrossQuote(List<QuoteDTO> result, DolarApiResponse dollarResponse, Map<String, BigDecimal> rates, String currencyCode, CurrencyType type, String name) {
+    private void addCrossQuote(List<QuoteDTO> result, DolarApiResponse dollarResponse,
+                               Map<String, BigDecimal> rates, String currencyCode,
+                               CurrencyType type, String name) {
         BigDecimal unitsPerUsd = rates.get(currencyCode);
-        if (unitsPerUsd == null || unitsPerUsd.compareTo(BigDecimal.ZERO) <= 0) return;
+        if (unitsPerUsd == null || unitsPerUsd.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
 
         BigDecimal usdPerUnit = BigDecimal.ONE.divide(unitsPerUsd, 10, RoundingMode.HALF_UP);
-        BigDecimal sell = usdPerUnit.multiply(safeValue(dollarResponse.getVenta(), BigDecimal.ZERO)).setScale(4, RoundingMode.HALF_UP);
-        BigDecimal buy = usdPerUnit.multiply(safeValue(dollarResponse.getCompra(), BigDecimal.ZERO)).setScale(4, RoundingMode.HALF_UP);
+        BigDecimal sell = usdPerUnit.multiply(safeValue(dollarResponse.getVenta(), BigDecimal.ZERO))
+                .setScale(4, RoundingMode.HALF_UP);
+        BigDecimal buy = usdPerUnit.multiply(safeValue(dollarResponse.getCompra(), BigDecimal.ZERO))
+                .setScale(4, RoundingMode.HALF_UP);
 
         result.add(QuoteDTO.builder()
                 .type(type).country(Country.ARGENTINA).name(name)
@@ -217,22 +252,33 @@ public class ArgentinaQuoteClient implements QuoteClient {
 
     private QuoteDTO mapToQuoteDTO(DolarApiResponse response) {
         CurrencyType type = CurrencyType.AR_OFFICIAL;
-        try { type = CurrencyType.fromCode(response.getCasa(), Country.ARGENTINA); } catch (Exception ignored) {}
+        try {
+            type = CurrencyType.fromCode(response.getCasa(), Country.ARGENTINA);
+        } catch (Exception ignored) {
+        }
 
-        return buildBasicQuote(type, response.getNombre(), response.getCompra(), response.getVenta(), response.getFechaActualizacion());
+        return buildBasicQuote(type, response.getNombre(), response.getCompra(),
+                response.getVenta(), response.getFechaActualizacion());
     }
 
     private QuoteDTO mapCotizacionToQuoteDTO(CotizacionApiResponse c, CurrencyType type, String name) {
         return buildBasicQuote(type, name, c.getCompra(), c.getVenta(), c.getFechaActualizacion());
     }
 
-    private QuoteDTO buildBasicQuote(CurrencyType type, String name, BigDecimal buyRaw, BigDecimal sellRaw, String dateStr) {
+    private QuoteDTO buildBasicQuote(CurrencyType type, String name,
+                                     BigDecimal buyRaw, BigDecimal sellRaw, String dateStr) {
         BigDecimal buy = safeValue(buyRaw, BigDecimal.ZERO);
         BigDecimal sell = safeValue(sellRaw, BigDecimal.ZERO);
         return QuoteDTO.builder()
-                .type(type).country(Country.ARGENTINA).name(name)
-                .buy(buy).sell(sell).spread(sell.subtract(buy))
-                .variation(BigDecimal.ZERO).lastUpdate(parseDate(dateStr)).build();
+                .type(type)
+                .country(Country.ARGENTINA)
+                .name(name)
+                .buy(buy)
+                .sell(sell)
+                .spread(sell.subtract(buy))
+                .variation(BigDecimal.ZERO)
+                .lastUpdate(parseDate(dateStr))
+                .build();
     }
 
     private QuoteDTO fetchEuroOficialFromDolarApi() {
@@ -240,31 +286,48 @@ public class ArgentinaQuoteClient implements QuoteClient {
     }
 
     private LocalDateTime parseDate(String dateStr) {
-        if (dateStr == null) return LocalDateTime.now();
-        try { return ZonedDateTime.parse(dateStr).toLocalDateTime(); } catch (Exception e) { return LocalDateTime.now(); }
+        if (dateStr == null) {
+            return LocalDateTime.now();
+        }
+        try {
+            return ZonedDateTime.parse(dateStr).toLocalDateTime();
+        } catch (Exception e) {
+            return LocalDateTime.now();
+        }
     }
 
-    private BigDecimal safeValue(BigDecimal val, BigDecimal defaultVal) { return val != null ? val : defaultVal; }
+    private BigDecimal safeValue(BigDecimal val, BigDecimal defaultVal) {
+        return val != null ? val : defaultVal;
+    }
 
     private DolarApiResponse findDolar(List<DolarApiResponse> list, String casa) {
-        return list == null ? null : list.stream().filter(d -> casa.equalsIgnoreCase(d.getCasa())).findFirst().orElse(null);
+        return list == null ? null
+                : list.stream().filter(d -> casa.equalsIgnoreCase(d.getCasa())).findFirst().orElse(null);
     }
 
     private Optional<CotizacionApiResponse> findCotizacion(List<CotizacionApiResponse> list, String moneda) {
-        return list == null ? Optional.empty() : list.stream().filter(c -> moneda.equalsIgnoreCase(c.getMoneda())).findFirst();
+        return list == null ? Optional.empty()
+                : list.stream().filter(c -> moneda.equalsIgnoreCase(c.getMoneda())).findFirst();
     }
 
     private String getCurrencyName(String code) {
         return switch (code) {
-            case "BRL" -> "Real"; case "PYG" -> "Guaraní Paraguayo"; case "BOB" -> "Boliviano"; case "CNY" -> "Yuan"; case "EUR" -> "Euro";
+            case "BRL" -> "Real";
+            case "PYG" -> "Guaraní Paraguayo";
+            case "BOB" -> "Boliviano";
+            case "CNY" -> "Yuan";
+            case "EUR" -> "Euro";
             default -> code;
         };
     }
 
-    private String capitalize(String str) { return str.substring(0, 1).toUpperCase() + str.substring(1); }
+    private String capitalize(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
 
     private boolean isDerivedType(CurrencyType type) {
-        return Set.of(CurrencyType.AR_CLP_BLUE, CurrencyType.AR_UYU_BLUE, CurrencyType.AR_CLP_TARJETA, CurrencyType.AR_UYU_TARJETA).contains(type);
+        return Set.of(CurrencyType.AR_CLP_BLUE, CurrencyType.AR_UYU_BLUE,
+                CurrencyType.AR_CLP_TARJETA, CurrencyType.AR_UYU_TARJETA).contains(type);
     }
 
     private boolean isBlueDerived(CurrencyType type) {
@@ -276,17 +339,30 @@ public class ArgentinaQuoteClient implements QuoteClient {
                 || type.name().contains("_CNY_") || type == CurrencyType.AR_EUR_TARJETA;
     }
 
-    private record MarketDataSnapshot(List<DolarApiResponse> dollarResponses, List<CotizacionApiResponse> cotizaciones) {}
+    private record MarketDataSnapshot(
+            List<DolarApiResponse> dollarResponses,
+            List<CotizacionApiResponse> cotizaciones
+    ) { }
 
     @Data
     public static class DolarApiResponse {
-        private String moneda; private String casa; private String nombre; private BigDecimal compra; private BigDecimal venta;
-        @JsonProperty("fechaActualizacion") private String fechaActualizacion;
+        private String moneda;
+        private String casa;
+        private String nombre;
+        private BigDecimal compra;
+        private BigDecimal venta;
+        @JsonProperty("fechaActualizacion")
+        private String fechaActualizacion;
     }
 
     @Data
     public static class CotizacionApiResponse {
-        private String moneda; private String casa; private String nombre; private BigDecimal compra; private BigDecimal venta;
-        @JsonProperty("fechaActualizacion") private String fechaActualizacion;
+        private String moneda;
+        private String casa;
+        private String nombre;
+        private BigDecimal compra;
+        private BigDecimal venta;
+        @JsonProperty("fechaActualizacion")
+        private String fechaActualizacion;
     }
 }
