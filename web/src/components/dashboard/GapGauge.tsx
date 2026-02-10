@@ -15,6 +15,11 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
   const { translate } = useTranslation();
   const color = getGapColor(gap.level);
   const animationClass = getGapClass(gap.level);
+  const gapPercentage = Number.isFinite(gap.gapPercentage) ? gap.gapPercentage : null;
+  const officialRate = Number.isFinite(gap.officialRate) ? gap.officialRate : null;
+  const parallelRate = Number.isFinite(gap.parallelRate) ? gap.parallelRate : null;
+  const formatValue = (value: number | null, decimals: number) =>
+    value === null ? "-" : value.toFixed(decimals);
 
   const getGapLabel = () => {
     switch (gap.level) {
@@ -72,7 +77,7 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
             >
               <div className="w-20 h-20 rounded-full bg-card flex items-center justify-center">
                 <span className="text-2xl font-bold" style={{ color }}>
-                  {gap.gapPercentage.toFixed(1)}%
+                  {formatValue(gapPercentage, 1)}%
                 </span>
               </div>
             </div>
@@ -88,11 +93,11 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
           <div className="w-full mt-4 pt-4 border-t border-border/50 space-y-2">
             <div className="flex justify-between items-center text-sm px-2 py-1.5 rounded-lg bg-muted/50">
               <span className="text-muted-foreground">{translate("official")}</span>
-              <span className="font-medium">${gap.officialRate.toFixed(2)}</span>
+              <span className="font-medium">${formatValue(officialRate, 2)}</span>
             </div>
             <div className="flex justify-between items-center text-sm px-2 py-1.5 rounded-lg bg-muted/50">
               <span className="text-muted-foreground">{translate("parallel")}</span>
-              <span className="font-medium">${gap.parallelRate.toFixed(2)}</span>
+              <span className="font-medium">${formatValue(parallelRate, 2)}</span>
             </div>
           </div>
         </div>
