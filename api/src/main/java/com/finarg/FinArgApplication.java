@@ -1,9 +1,9 @@
 package com.finarg;
 
-import com.finarg.config.ExternalApisProperties;
-import com.finarg.config.LoggingProperties;
-import com.finarg.config.ReservesConfig;
-import com.finarg.config.SchedulerProperties;
+import com.finarg.core.config.ExternalApisProperties;
+import com.finarg.core.config.LoggingProperties;
+import com.finarg.reserves.config.ReservesConfig;
+import com.finarg.core.config.SchedulerProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
