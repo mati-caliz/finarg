@@ -93,7 +93,7 @@ export const QuoteCard = memo(function QuoteCard({ quote, country }: QuoteCardPr
   return (
     <Card className={`border-t-[3px] ${accent.border} overflow-hidden`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${accent.border.replace("border-t-", "bg-")}`} />
           {displayName}
         </CardTitle>

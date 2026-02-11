@@ -63,7 +63,7 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
   return (
     <Card className={`border-t-[3px] ${getBorderColor()}`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <Activity className="h-3.5 w-3.5" />
           {translate("gapIndicator")}
         </CardTitle>

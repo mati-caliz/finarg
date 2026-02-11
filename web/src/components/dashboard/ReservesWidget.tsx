@@ -22,7 +22,7 @@ export const ReservesWidget = memo(function ReservesWidget({
   return (
     <Card className="h-full border-t-[3px] border-t-cyan-500 transition-all hover:shadow-lg hover:border-cyan-400 cursor-pointer">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+        <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <Landmark className="h-3.5 w-3.5" />
           {label || translate("bcraReserves")}
         </CardTitle>
