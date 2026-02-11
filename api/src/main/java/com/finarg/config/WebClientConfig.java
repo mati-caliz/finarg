@@ -90,6 +90,12 @@ public class WebClientConfig {
     @Value("${external.apis.fci.timeout:30000}")
     private int fciTimeout;
 
+    @Value("${external.apis.coingecko.base-url:https://api.coingecko.com/api/v3}")
+    private String coinGeckoBaseUrl;
+
+    @Value("${external.apis.coingecko.timeout:10000}")
+    private int coinGeckoTimeout;
+
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
         HttpClient httpClient = HttpClient.create()
@@ -249,6 +255,19 @@ public class WebClientConfig {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
                 .defaultHeader("User-Agent", "Finarg/1.0")
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+    }
+
+    @Bean("coinGeckoWebClient")
+    public WebClient coinGeckoWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(coinGeckoTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(coinGeckoBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader("User-Agent", "Finarg/1.0")
                 .build();
     }
 }

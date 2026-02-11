@@ -197,3 +197,11 @@ export interface ExchangeRateComparison {
   mostExpensiveToBuy: ExchangeRateItem | null;
   mostExpensiveToSell: ExchangeRateItem | null;
 }
+
+export interface Crypto {
+  symbol: string;
+  name: string;
+  priceUsd: number;
+  change24h: number;
+  lastUpdate: string;
+}

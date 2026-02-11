@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useCountryRisk } from "@/hooks/useCountryRisk";
+import { useCrypto } from "@/hooks/useCrypto";
 import { useCurrentInflation } from "@/hooks/useInflation";
 import { useGap, useQuotes } from "@/hooks/useQuotes";
 import { useReserves } from "@/hooks/useReserves";
@@ -68,6 +69,16 @@ const CountryRiskWidget = dynamic(
   },
 );
 
+const CryptoWidget = dynamic(
+  () =>
+    import("@/components/dashboard/CryptoWidget").then((mod) => ({
+      default: mod.CryptoWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
 export default function DashboardPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
@@ -80,6 +91,7 @@ export default function DashboardPage() {
   const { data: inflation } = useCurrentInflation();
   const { data: socialIndicators } = useSocialIndicators(selectedCountry);
   const { data: countryRisk } = useCountryRisk();
+  const { data: cryptoList } = useCrypto();
 
   const otherQuotes = useMemo(
     () =>
@@ -172,6 +184,7 @@ export default function DashboardPage() {
         {selectedCountry === "ar" && (
           <div className="flex flex-col gap-4 h-full min-h-0">
             {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
+            {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
             {countryConfig.features.inflation && (
               <Card className="shrink-0 border-t-[3px] border-t-red-400">
                 <CardHeader className="pb-2">
