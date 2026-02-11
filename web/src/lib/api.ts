@@ -86,3 +86,7 @@ export const authApi = {
     api.post("/auth/register", { email, password, name }),
   loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
 };
+
+export const cryptoApi = {
+  getCurrent: () => api.get("/crypto"),
+};

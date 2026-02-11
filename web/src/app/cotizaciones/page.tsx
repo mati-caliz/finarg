@@ -283,7 +283,7 @@ export default function QuotesPage() {
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-foreground">
                         {translate(quote.type as TranslationKey)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
