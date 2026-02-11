@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </Providers>
         <ServiceWorkerRegistration />
+        <GoogleAnalytics />
       </body>
     </html>
   );
