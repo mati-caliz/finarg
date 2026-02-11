@@ -122,9 +122,9 @@ export default function InflationPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground">{translate("monthlyInflation")}</p>
                 <p className="text-2xl font-bold text-foreground mt-1 min-h-[2rem] flex items-center">
-                  {currentInflation ? formatPercent(currentInflation.value) : "-"}
+                  {currentInflation ? `${currentInflation.value.toFixed(1)}%` : "-"}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
+                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem] capitalize">
                   {currentInflation?.date
                     ? new Date(currentInflation.date).toLocaleDateString("es-AR", {
                         month: "long",
@@ -147,7 +147,7 @@ export default function InflationPage() {
                 <p className="text-xs text-muted-foreground">{translate("yearOverYear")}</p>
                 <p className="text-2xl font-bold text-red-500 mt-1 min-h-[2rem] flex items-center">
                   {currentInflation?.yearOverYear
-                    ? formatPercent(currentInflation.yearOverYear)
+                    ? `${currentInflation.yearOverYear.toFixed(1)}%`
                     : "-"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
@@ -167,7 +167,9 @@ export default function InflationPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-muted-foreground">{translate("yearToDate")}</p>
                 <p className="text-2xl font-bold text-yellow-500 mt-1 min-h-[2rem] flex items-center">
-                  {currentInflation?.yearToDate ? formatPercent(currentInflation.yearToDate) : "-"}
+                  {currentInflation?.yearToDate
+                    ? `${currentInflation.yearToDate.toFixed(1)}%`
+                    : "-"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
                   {translate("sinceJan")} {new Date().getFullYear()}

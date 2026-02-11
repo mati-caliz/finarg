@@ -172,11 +172,10 @@ export default function DashboardPage() {
         {selectedCountry === "ar" && (
           <div className="flex flex-col gap-4 h-full min-h-0">
             {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
-
             {countryConfig.features.inflation && (
               <Card className="shrink-0 border-t-[3px] border-t-red-400">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
                     <Percent className="h-3.5 w-3.5" />
                     {translate("monthlyInflation")}
                   </CardTitle>
@@ -255,7 +254,7 @@ export default function DashboardPage() {
                 (socialIndicators.cer !== undefined && socialIndicators.cer !== null)) && (
                 <Card className="shrink-0 border-t-[3px] border-t-indigo-400">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <CardTitle className="text-sm font-medium text-foreground">
                       {translate("socialIndicators")}
                     </CardTitle>
                   </CardHeader>
@@ -391,7 +390,7 @@ export default function DashboardPage() {
         {countryConfig.features.inflation && selectedCountry !== "ar" && (
           <Card className="border-t-[3px] border-t-red-400">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Percent className="h-3.5 w-3.5" />
                 {translate("monthlyInflation")}
               </CardTitle>

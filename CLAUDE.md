@@ -408,6 +408,35 @@ All with:
 - Tooltips and legends
 - Theme-aware colors
 
+### Analytics (Google Analytics 4)
+
+**Component** (`components/GoogleAnalytics.tsx`)
+- Automatic page view tracking on route changes
+- Configured via `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
+- Uses `afterInteractive` strategy for optimal performance
+
+**Configuration:**
+```bash
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+**Usage:**
+- Automatically included in `layout.tsx`
+- Tracks all navigation without additional code
+- Triggers on pathname and search params changes
+
+**Custom Event Tracking:**
+```typescript
+// In any client component
+if (typeof window !== "undefined" && window.gtag) {
+  window.gtag("event", "event_name", {
+    event_category: "category",
+    event_label: "label",
+    value: 1,
+  });
+}
+```
+
 ### Dependencies (package.json)
 
 ```json
@@ -493,6 +522,7 @@ JAVA_OPTS=-Xmx512m -Xms256m
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 ---
@@ -912,9 +942,9 @@ npm install --save-dev @types/{package}
 - [ ] UX 2.0 improvements
 
 ### Technical Debt
+- [x] Add analytics (Google Analytics 4)
 - [ ] Add E2E tests (Playwright)
 - [ ] Improve error boundaries
-- [ ] Add analytics (Vercel Analytics)
 - [ ] Implement rate limiting on frontend
 - [ ] Add request retry logic
 - [ ] Optimize bundle size
