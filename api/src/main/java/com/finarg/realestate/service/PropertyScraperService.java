@@ -62,6 +62,19 @@ public class PropertyScraperService {
                  totalScraped, totalSaved);
     }
 
+    @Transactional
+    public int scrapeByNeighborhoodCode(String neighborhoodCode) {
+        log.info("Starting manual scraping for neighborhood: {}", neighborhoodCode);
+
+        Neighborhood neighborhood = neighborhoodRepository.findByCode(neighborhoodCode)
+            .orElseThrow(() -> new IllegalArgumentException("Neighborhood not found: " + neighborhoodCode));
+
+        int scraped = scrapeNeighborhood(neighborhood);
+        log.info("Manual scraping completed for {}: {} properties scraped", neighborhoodCode, scraped);
+
+        return scraped;
+    }
+
     private int scrapeNeighborhood(Neighborhood neighborhood) {
         log.info("Scraping neighborhood: {}", neighborhood.getName());
 

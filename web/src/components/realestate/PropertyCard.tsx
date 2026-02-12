@@ -9,7 +9,10 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard = memo(function PropertyCard({ property }: PropertyCardProps) {
-  const formatCurrency = (value: number, currency: string) => {
+  const formatCurrency = (value: number | null | undefined, currency: string) => {
+    if (value === null || value === undefined || !Number.isFinite(value)) {
+      return `${currency} -`;
+    }
     return `${currency} ${value.toLocaleString("es-AR", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   };
 

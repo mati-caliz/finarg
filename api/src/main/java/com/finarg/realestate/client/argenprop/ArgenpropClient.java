@@ -11,10 +11,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,16 +23,12 @@ import java.util.Set;
 @Component
 public class ArgenpropClient implements PropertyClient {
 
-    private final WebClient webClient;
     private final SeleniumScraperClient seleniumClient;
     private static final Set<String> SUPPORTED_CITIES = Set.of("caba");
     private static final String PORTAL_NAME = "argenprop";
     private static final String BASE_URL = "https://www.argenprop.com";
 
-    public ArgenpropClient(
-            @Qualifier("argenpropWebClient") WebClient webClient,
-            SeleniumScraperClient seleniumClient) {
-        this.webClient = webClient;
+    public ArgenpropClient(SeleniumScraperClient seleniumClient) {
         this.seleniumClient = seleniumClient;
     }
 
@@ -65,37 +58,17 @@ public class ArgenpropClient implements PropertyClient {
         String fullUrl = BASE_URL + relativeUrl;
         String html;
 
+        log.info("Scraping Argenprop with Selenium: {}", fullUrl);
+        if (!seleniumClient.isAvailable()) {
+            log.error("Selenium not available for Argenprop scraping");
+            return List.of();
+        }
+
         try {
-            log.info("Scraping Argenprop with WebClient: {}", relativeUrl);
-            html = webClient.get()
-                .uri(relativeUrl)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-            if (html != null && html.length() < 200000) {
-                log.warn("Argenprop HTML too small ({} bytes), likely blocked. Trying Selenium...", html.length());
-                if (seleniumClient.isAvailable()) {
-                    html = seleniumClient.fetchPageSource(fullUrl);
-                }
-            }
-
-        } catch (WebClientResponseException e) {
-            log.warn("WebClient error ({}), trying with Selenium: {}", e.getStatusCode(), relativeUrl);
-            if (seleniumClient.isAvailable()) {
-                html = seleniumClient.fetchPageSource(fullUrl);
-            } else {
-                log.error("Selenium not available, cannot retry");
-                return List.of();
-            }
+            html = seleniumClient.fetchPageSource(fullUrl);
         } catch (Exception e) {
-            log.error("Error with WebClient for {}: {}", neighborhoodCode, e.getMessage());
-            if (seleniumClient.isAvailable()) {
-                log.info("Retrying with Selenium...");
-                html = seleniumClient.fetchPageSource(fullUrl);
-            } else {
-                return List.of();
-            }
+            log.error("Error scraping Argenprop for {}: {}", neighborhoodCode, e.getMessage());
+            return List.of();
         }
 
         if (html == null || html.isEmpty()) {
@@ -264,31 +237,65 @@ public class ArgenpropClient implements PropertyClient {
 
     private BigDecimal extractPrice(Element listing) {
         try {
-            Elements priceElements = listing.select(".card__price, .price, [class*='price']");
+            Elements priceAmountElements = listing.select(".card__price-amount");
+            if (!priceAmountElements.isEmpty()) {
+                String priceText = Objects.requireNonNull(priceAmountElements.first()).text();
+                log.debug("Found price-amount element: '{}'", priceText);
+
+                String cleaned = priceText.replaceAll("[^0-9]", "");
+                if (cleaned.length() >= 4) {
+                    log.debug("Extracted price from price-amount: {}", cleaned);
+                    return new BigDecimal(cleaned);
+                }
+            }
+
+            Elements priceElements = listing.select(".card__price");
             for (Element priceEl : priceElements) {
-                String priceText = priceEl.text();
-                if (!priceText.isEmpty()) {
-                    String cleaned = priceText.replaceAll("[^0-9]", "");
-                    if (!cleaned.isEmpty()) {
-                        return new BigDecimal(cleaned);
+                String fullText = priceEl.text();
+                log.debug("Full price element text: '{}'", fullText);
+
+                String priceText = fullText;
+                if (fullText.contains("+")) {
+                    priceText = fullText.split("\\+")[0];
+                    log.debug("Text before '+': '{}'", priceText);
+                } else if (fullText.toLowerCase().contains("expensas")) {
+                    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
+                            "([\\d.]+).*expensas",
+                        java.util.regex.Pattern.CASE_INSENSITIVE
+                    );
+                    java.util.regex.Matcher matcher = pattern.matcher(fullText);
+                    if (matcher.find()) {
+                        priceText = matcher.group(1);
+                        log.debug("Text before 'expensas': '{}'", priceText);
                     }
+                }
+
+                String cleaned = priceText.replaceAll("[^0-9]", "");
+                if (cleaned.length() >= 4) {
+                    log.debug("Extracted price: {}", cleaned);
+                    return new BigDecimal(cleaned);
                 }
             }
         } catch (Exception e) {
-            log.debug("Error extracting price: {}", e.getMessage());
+            log.error("Error extracting price: {}", e.getMessage(), e);
         }
         return null;
     }
 
     private BigDecimal extractSurface(Element listing) {
         try {
-            Elements mainFeatures = listing.select(".card__main-features");
-            if (!mainFeatures.isEmpty()) {
-                String text = mainFeatures.first().text();
-                if (text.contains("m")) {
-                    String cleaned = text.replaceAll("[^0-9]", "");
-                    if (!cleaned.isEmpty()) {
-                        return new BigDecimal(cleaned);
+            Elements mainFeatures = listing.select(".card__main-features li");
+            log.debug("Found {} main feature items", mainFeatures.size());
+
+            for (Element feature : mainFeatures) {
+                String text = feature.text().toLowerCase();
+                log.debug("Checking feature: '{}'", text);
+
+                if (text.contains("m²") || text.contains("m2") || text.contains("cubie")) {
+                    BigDecimal surface = extractSurfaceFromText(text);
+                    if (surface != null) {
+                        log.debug("Extracted surface: {}", surface);
+                        return surface;
                     }
                 }
             }
@@ -297,14 +304,29 @@ public class ArgenpropClient implements PropertyClient {
             for (Element surfaceEl : surfaceElements) {
                 String surfaceText = surfaceEl.text();
                 if (surfaceText.contains("m")) {
-                    String cleaned = surfaceText.replaceAll("[^0-9]", "");
-                    if (!cleaned.isEmpty()) {
-                        return new BigDecimal(cleaned);
+                    BigDecimal surface = extractSurfaceFromText(surfaceText);
+                    if (surface != null) {
+                        log.debug("Extracted surface from fallback: {}", surface);
+                        return surface;
                     }
                 }
             }
         } catch (Exception e) {
-            log.debug("Error extracting surface: {}", e.getMessage());
+            log.error("Error extracting surface: {}", e.getMessage(), e);
+        }
+        return null;
+    }
+
+    private BigDecimal extractSurfaceFromText(String text) {
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)(?:,\\d+)?\\s*m[²2]?");
+        java.util.regex.Matcher matcher = pattern.matcher(text.toLowerCase());
+        if (matcher.find()) {
+            String surfaceStr = matcher.group(1);
+            try {
+                return new BigDecimal(surfaceStr);
+            } catch (NumberFormatException e) {
+                log.debug("Error parsing surface: {}", surfaceStr);
+            }
         }
         return null;
     }
@@ -315,19 +337,21 @@ public class ArgenpropClient implements PropertyClient {
             if (!mainFeatures.isEmpty()) {
                 String text = Objects.requireNonNull(mainFeatures.first()).text().toLowerCase();
                 if (text.contains("dormitorio") || text.contains("amb")) {
-                    String cleaned = text.replaceAll("[^0-9]", "");
-                    if (!cleaned.isEmpty()) {
-                        return Integer.parseInt(cleaned.substring(0, 1));
+                    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)\\s*(amb|dormitorio)");
+                    java.util.regex.Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        return Integer.parseInt(matcher.group(1));
                     }
                 }
             }
 
             Elements bedroomElements = listing.select("[class*='bedroom'], [class*='dormitorio']");
             for (Element bedroomEl : bedroomElements) {
-                String text = bedroomEl.text();
-                String cleaned = text.replaceAll("[^0-9]", "");
-                if (!cleaned.isEmpty()) {
-                    return Integer.parseInt(cleaned);
+                String text = bedroomEl.text().toLowerCase();
+                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)");
+                java.util.regex.Matcher matcher = pattern.matcher(text);
+                if (matcher.find()) {
+                    return Integer.parseInt(matcher.group(1));
                 }
             }
         } catch (Exception e) {
@@ -342,19 +366,21 @@ public class ArgenpropClient implements PropertyClient {
             if (!mainFeatures.isEmpty()) {
                 String text = Objects.requireNonNull(mainFeatures.first()).text().toLowerCase();
                 if (text.contains("baño")) {
-                    String cleaned = text.replaceAll("[^0-9]", "");
-                    if (cleaned.length() > 1) {
-                        return Integer.parseInt(cleaned.substring(1, 2));
+                    java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)\\s*baño");
+                    java.util.regex.Matcher matcher = pattern.matcher(text);
+                    if (matcher.find()) {
+                        return Integer.parseInt(matcher.group(1));
                     }
                 }
             }
 
             Elements bathroomElements = listing.select("[class*='bathroom'], [class*='baño']");
             for (Element bathroomEl : bathroomElements) {
-                String text = bathroomEl.text();
-                String cleaned = text.replaceAll("[^0-9]", "");
-                if (!cleaned.isEmpty()) {
-                    return Integer.parseInt(cleaned);
+                String text = bathroomEl.text().toLowerCase();
+                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+)");
+                java.util.regex.Matcher matcher = pattern.matcher(text);
+                if (matcher.find()) {
+                    return Integer.parseInt(matcher.group(1));
                 }
             }
         } catch (Exception e) {
@@ -373,11 +399,11 @@ public class ArgenpropClient implements PropertyClient {
 
     private BigDecimal extractExpenses(Element listing) {
         try {
-            Elements expensesElements = listing.select(".card__expenses, .expenses, [class*='expenses'], [class*='expensas']");
+            Elements expensesElements = listing.select(".card__expenses");
             for (Element expensesEl : expensesElements) {
                 String text = expensesEl.text();
                 String cleaned = text.replaceAll("[^0-9]", "");
-                if (!cleaned.isEmpty()) {
+                if (cleaned.length() >= 4) {
                     return new BigDecimal(cleaned);
                 }
             }

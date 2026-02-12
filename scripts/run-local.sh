@@ -1,12 +1,60 @@
 #!/bin/bash
 
 # Script to run FinArg full stack locally (backend + frontend)
-# Usage: ./scripts/run-local.sh
-# 
+# Usage:
+#   ./scripts/run-local.sh              # Start without scraping
+#   ./scripts/run-local.sh --palermo    # Start + scrape Palermo
+#   ./scripts/run-local.sh --belgrano   # Start + scrape Belgrano
+#   ./scripts/run-local.sh --all        # Start + scrape all neighborhoods
+#
 # This runs WITHOUT Docker for fast development with hot-reload
 # Changes to code will be reflected automatically
 
 set -e
+
+# Parse arguments
+SCRAPE_NEIGHBORHOOD=""
+SCRAPE_ALL=false
+CLEAN_DB=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --all)
+            SCRAPE_ALL=true
+            shift
+            ;;
+        --clean)
+            CLEAN_DB=true
+            shift
+            ;;
+        --palermo|--belgrano|--recoleta|--puerto-madero|--san-telmo|--caballito|--villa-crespo|--nunez|--colegiales|--villa-urquiza)
+            SCRAPE_NEIGHBORHOOD="${1:2}"
+            shift
+            ;;
+        --help|-h)
+            echo "Usage: $0 [OPTIONS]"
+            echo ""
+            echo "Options:"
+            echo "  (no args)       Start backend and frontend without scraping"
+            echo "  --clean         Clean PostgreSQL + Redis (fixes serialization errors)"
+            echo "  --palermo       Start + scrape Palermo only"
+            echo "  --belgrano      Start + scrape Belgrano only"
+            echo "  --recoleta      Start + scrape Recoleta only"
+            echo "  --all           Start + scrape all neighborhoods"
+            echo "  --help, -h      Show this help message"
+            echo ""
+            echo "Examples:"
+            echo "  $0 --clean --belgrano    # Clean DB + scrape Belgrano"
+            echo "  $0 --clean               # Just clean and start"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -29,7 +77,7 @@ echo ""
 # ========================================
 # 1. Check .env files
 # ========================================
-echo -e "${GREEN}[1/6]${NC} Checking environment files..."
+echo -e "${GREEN}[1/7]${NC} Checking environment files..."
 
 # Backend .env
 if [ ! -f "${API_DIR}/.env" ]; then
@@ -61,7 +109,7 @@ echo ""
 # ========================================
 # 2. Load backend environment variables
 # ========================================
-echo -e "${GREEN}[2/6]${NC} Loading backend environment variables..."
+echo -e "${GREEN}[2/7]${NC} Loading backend environment variables..."
 set -a
 source "${API_DIR}/.env"
 set +a
@@ -71,28 +119,79 @@ echo ""
 # ========================================
 # 3. Check Docker and start infrastructure
 # ========================================
-echo -e "${GREEN}[3/6]${NC} Checking Docker services..."
+echo -e "${GREEN}[3/7]${NC} Checking Docker services..."
 cd "${PROJECT_ROOT}" || exit 1
 
 # Check if Docker is running
+echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
 if ! docker info > /dev/null 2>&1; then
     echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
     exit 1
 fi
+echo -e "${GREEN}[✓]${NC} Docker daemon is running"
 
 # Stop Docker backend/frontend if running (we'll run them locally)
-if docker compose ps | grep -q "backend.*Up"; then
+echo -e "${YELLOW}[DEBUG]${NC} Checking Docker Compose services..."
+if docker compose ps 2>/dev/null | grep -q "backend.*Up"; then
     echo -e "${YELLOW}[WARN]${NC} Docker backend is running on port 8080. Stopping it..."
     docker compose stop backend
 fi
 
-if docker compose ps | grep -q "frontend.*Up"; then
+if docker compose ps 2>/dev/null | grep -q "frontend.*Up"; then
     echo -e "${YELLOW}[WARN]${NC} Docker frontend is running on port 3000. Stopping it..."
     docker compose stop frontend
 fi
 
+# Stop any Maven/Java processes running the backend
+echo -e "${YELLOW}[DEBUG]${NC} Checking for backend processes..."
+
+# Check and kill Maven processes
+MAVEN_PIDS=$(pgrep -f "spring-boot:run" 2>/dev/null || true)
+if [ -n "$MAVEN_PIDS" ]; then
+    echo -e "${YELLOW}[WARN]${NC} Found Maven processes, stopping them..."
+    echo "$MAVEN_PIDS" | xargs kill -15 2>/dev/null || true
+    sleep 2
+    # Force kill if still running
+    echo "$MAVEN_PIDS" | xargs kill -9 2>/dev/null || true
+fi
+
+# Check and kill FinArg Java processes
+FINARG_PIDS=$(pgrep -f "FinArgApplication" 2>/dev/null || true)
+if [ -n "$FINARG_PIDS" ]; then
+    echo -e "${YELLOW}[WARN]${NC} Found FinArg processes, stopping them..."
+    echo "$FINARG_PIDS" | xargs kill -15 2>/dev/null || true
+    sleep 2
+    echo "$FINARG_PIDS" | xargs kill -9 2>/dev/null || true
+fi
+
+# Force kill anything on port 8080
+PORT_8080_PIDS=$(lsof -ti:8080 2>/dev/null || true)
+if [ -n "$PORT_8080_PIDS" ]; then
+    echo -e "${YELLOW}[WARN]${NC} Found processes on port 8080, killing them..."
+    echo "$PORT_8080_PIDS" | xargs kill -9 2>/dev/null || true
+fi
+
+# Wait for database connections to close
+if [ "$CLEAN_DB" = true ]; then
+    echo -e "${YELLOW}[INFO]${NC} Waiting for database connections to close..."
+    sleep 5
+fi
+
+echo -e "${GREEN}[✓]${NC} Backend cleanup complete"
+
+# Stop any Node processes on port 3000
+echo -e "${YELLOW}[DEBUG]${NC} Checking port 3000..."
+PORT_3000_PIDS=$(lsof -ti:3000 2>/dev/null || true)
+if [ -n "$PORT_3000_PIDS" ]; then
+    echo -e "${YELLOW}[WARN]${NC} Found processes on port 3000, killing them..."
+    echo "$PORT_3000_PIDS" | xargs kill -9 2>/dev/null || true
+    sleep 2
+fi
+echo -e "${GREEN}[✓]${NC} Frontend cleanup complete"
+
 # Start PostgreSQL and Redis if not running
-if ! docker compose ps | grep -q "postgres.*Up"; then
+echo -e "${YELLOW}[DEBUG]${NC} Checking PostgreSQL and Redis..."
+if ! docker compose ps 2>/dev/null | grep -q "postgres.*Up"; then
     echo -e "${YELLOW}[INFO]${NC} Starting PostgreSQL and Redis..."
     docker compose up -d postgres redis
     echo -e "${GREEN}[INFO]${NC} Waiting for services to be ready..."
@@ -105,9 +204,53 @@ echo -e "${GREEN}[✓]${NC} Infrastructure ready (PostgreSQL + Redis)"
 echo ""
 
 # ========================================
-# 4. Check npm dependencies
+# 4. Clear Redis cache + PostgreSQL (optional)
 # ========================================
-echo -e "${GREEN}[4/6]${NC} Checking frontend dependencies..."
+echo -e "${GREEN}[4/7]${NC} Clearing cache to prevent serialization errors..."
+
+# Clear Redis
+REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
+
+if [ -n "$REDIS_CONTAINER" ]; then
+    KEYS_BEFORE=$(docker exec "$REDIS_CONTAINER" redis-cli DBSIZE 2>/dev/null | grep -oP '\d+' || echo "0")
+    if docker exec "$REDIS_CONTAINER" redis-cli FLUSHDB > /dev/null 2>&1; then
+        echo -e "${GREEN}[✓]${NC} Redis cache cleared (removed $KEYS_BEFORE keys)"
+    else
+        echo -e "${YELLOW}[WARN]${NC} Could not clear Redis cache"
+    fi
+else
+    echo -e "${YELLOW}[WARN]${NC} Redis container not found, skipping cache clear"
+fi
+
+# Clear PostgreSQL if --clean flag
+if [ "$CLEAN_DB" = true ]; then
+    echo -e "${YELLOW}[INFO]${NC} Cleaning PostgreSQL tables (--clean flag enabled)..."
+
+    POSTGRES_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i postgres | head -1)
+
+    if [ -n "$POSTGRES_CONTAINER" ]; then
+        echo -e "${YELLOW}[DEBUG]${NC} Using PostgreSQL container: $POSTGRES_CONTAINER"
+
+        # Use TRUNCATE CASCADE for faster cleanup (doesn't require locks)
+        docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -c "TRUNCATE TABLE property_price, property, neighborhood, city CASCADE;" 2>&1 | grep -v "NOTICE" || true
+
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}[✓]${NC} PostgreSQL tables cleaned (properties will be re-seeded)"
+        else
+            echo -e "${YELLOW}[WARN]${NC} Could not clean PostgreSQL tables (may already be empty)"
+        fi
+    else
+        echo -e "${YELLOW}[WARN]${NC} PostgreSQL container not found, skipping DB cleanup"
+    fi
+fi
+
+echo -e "${GREEN}[✓]${NC} Cache cleanup complete"
+echo ""
+
+# ========================================
+# 5. Check npm dependencies
+# ========================================
+echo -e "${GREEN}[5/7]${NC} Checking frontend dependencies..."
 if [ ! -d "${WEB_DIR}/node_modules" ]; then
     echo -e "${YELLOW}[INFO]${NC} Installing frontend dependencies..."
     cd "${WEB_DIR}" || exit 1
@@ -119,7 +262,7 @@ echo ""
 # ========================================
 # 5. Run Checkstyle validation
 # ========================================
-echo -e "${GREEN}[5/6]${NC} Running checkstyle validation..."
+echo -e "${GREEN}[6/7]${NC} Running checkstyle validation..."
 cd "${API_DIR}" || exit 1
 
 CHECKSTYLE_OUTPUT=$(mktemp)
@@ -153,7 +296,7 @@ echo ""
 # ========================================
 # 6. Start backend and frontend
 # ========================================
-echo -e "${GREEN}[6/6]${NC} Starting services..."
+echo -e "${GREEN}[7/7]${NC} Starting services..."
 echo ""
 echo -e "${BLUE}================================${NC}"
 echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
@@ -161,6 +304,14 @@ echo -e "${GREEN}Frontend:${NC} http://localhost:3000"
 echo -e "${GREEN}Swagger:${NC}  http://localhost:8080/swagger-ui.html"
 echo -e "${BLUE}================================${NC}"
 echo ""
+
+# Show scraping plan
+if [ "$SCRAPE_ALL" = true ]; then
+    echo -e "${YELLOW}[INFO]${NC} Will scrape ALL neighborhoods after backend is ready"
+elif [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
+    echo -e "${YELLOW}[INFO]${NC} Will scrape $SCRAPE_NEIGHBORHOOD after backend is ready"
+fi
+
 echo -e "${YELLOW}[INFO]${NC} Press Ctrl+C to stop all services"
 echo ""
 
@@ -194,7 +345,7 @@ cd "${WEB_DIR}" || exit 1
 npm run dev 2>&1 | sed "s/^/[FRONTEND] /" &
 FRONTEND_PID=$!
 
-# Wait for frontend to start and show final message
+# Wait for frontend to start
 sleep 5
 
 echo ""
@@ -204,6 +355,57 @@ echo -e "${GREEN}Frontend:${NC} http://localhost:3000"
 echo -e "${GREEN}Swagger:${NC}  http://localhost:8080/swagger-ui.html"
 echo -e "${BLUE}================================${NC}"
 echo ""
+
+# ========================================
+# 8. Run property scraper if requested
+# ========================================
+if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
+    echo -e "${GREEN}[8/8]${NC} Running property scraper..."
+    echo ""
+
+    # Wait for backend to be fully ready
+    echo -e "${YELLOW}[INFO]${NC} Waiting for backend to be fully ready..."
+    for i in {1..30}; do
+        if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
+            echo -e "${GREEN}[✓]${NC} Backend is ready"
+            break
+        fi
+        if [ $i -eq 30 ]; then
+            echo -e "${RED}[ERROR]${NC} Backend not ready after 30 seconds, skipping scraper"
+            break
+        fi
+        sleep 1
+    done
+
+    echo ""
+
+    # Run scraper
+    if [ "$SCRAPE_ALL" = true ]; then
+        echo -e "${YELLOW}[INFO]${NC} Starting scraper for ALL neighborhoods..."
+        echo -e "${YELLOW}[INFO]${NC} This will take 30-50 minutes (3-5 min per neighborhood)"
+        echo ""
+
+        curl -X POST "http://localhost:8080/api/v1/real-estate/scraper/run" \
+            -H "Content-Type: application/json" \
+            2>&1 | grep -v "%" || true
+
+        echo ""
+        echo -e "${GREEN}[✓]${NC} Scraping completed"
+    elif [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
+        echo -e "${YELLOW}[INFO]${NC} Starting scraper for neighborhood: $SCRAPE_NEIGHBORHOOD..."
+        echo -e "${YELLOW}[INFO]${NC} This will take 3-5 minutes"
+        echo ""
+
+        curl -X POST "http://localhost:8080/api/v1/real-estate/scraper/run?neighborhoodCode=$SCRAPE_NEIGHBORHOOD" \
+            -H "Content-Type: application/json" \
+            2>&1 | grep -v "%" || true
+
+        echo ""
+        echo -e "${GREEN}[✓]${NC} Scraping completed for $SCRAPE_NEIGHBORHOOD"
+    fi
+
+    echo ""
+fi
 
 # Wait for both processes
 wait $BACKEND_PID $FRONTEND_PID

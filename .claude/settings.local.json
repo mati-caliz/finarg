@@ -65,7 +65,8 @@
       "WebFetch(domain:argenstats.com)",
       "Bash(jq:*)",
       "Bash(mvn compile:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(docker ps:*)"
     ]
   }
 }

@@ -4,16 +4,34 @@ import { PriceStatistics } from "@/components/realestate/PriceStatistics";
 import { PropertyCard } from "@/components/realestate/PropertyCard";
 import { PropertyFilters } from "@/components/realestate/PropertyFilters";
 import { ROICalculator } from "@/components/realestate/ROICalculator";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePropertyPrices } from "@/hooks/usePropertyPrices";
 import type { PropertyFilter } from "@/types";
-import { Building2, Calculator } from "lucide-react";
+import { Building2, Calculator, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 export default function RealEstatePage() {
   const [filters, setFilters] = useState<PropertyFilter | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
   const { data, isLoading, error } = usePropertyPrices(filters);
+
+  const handleFiltersChange = (newFilters: PropertyFilter | null) => {
+    setCurrentPage(0);
+    if (newFilters) {
+      setFilters({ ...newFilters, page: 0, size: 20 });
+    } else {
+      setFilters(null);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    if (filters) {
+      setFilters({ ...filters, page: newPage });
+    }
+  };
 
   return (
     <div className="container py-8">
@@ -39,7 +57,7 @@ export default function RealEstatePage() {
         <TabsContent value="prices">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <aside className="lg:col-span-1">
-              <PropertyFilters onFiltersChange={setFilters} />
+              <PropertyFilters onFiltersChange={handleFiltersChange} />
             </aside>
 
             <main className="lg:col-span-3 space-y-6">
@@ -70,8 +88,11 @@ export default function RealEstatePage() {
                     <>
                       <div className="flex justify-between items-center">
                         <h2 className="text-xl font-semibold">
-                          Propiedades Encontradas ({data.properties.length})
+                          Propiedades Encontradas ({data.totalElements})
                         </h2>
+                        <p className="text-sm text-muted-foreground">
+                          Página {data.currentPage + 1} de {data.totalPages}
+                        </p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -79,6 +100,61 @@ export default function RealEstatePage() {
                           <PropertyCard key={property.id} property={property} />
                         ))}
                       </div>
+
+                      {data.totalPages > 1 && (
+                        <Card className="p-4">
+                          <div className="flex items-center justify-between">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 0}
+                            >
+                              <ChevronLeft className="w-4 h-4 mr-1" />
+                              Anterior
+                            </Button>
+
+                            <div className="flex items-center gap-2">
+                              {Array.from({ length: data.totalPages }, (_, i) => i)
+                                .filter(
+                                  (page) =>
+                                    page === 0 ||
+                                    page === data.totalPages - 1 ||
+                                    Math.abs(page - currentPage) <= 1,
+                                )
+                                .map((page, index, array) => (
+                                  <div key={`page-${page}`} className="flex items-center gap-2">
+                                    {index > 0 && array[index - 1] !== page - 1 && (
+                                      <span className="text-muted-foreground">...</span>
+                                    )}
+                                    <Button
+                                      variant={currentPage === page ? "default" : "outline"}
+                                      size="sm"
+                                      onClick={() => handlePageChange(page)}
+                                      className="min-w-[40px]"
+                                    >
+                                      {page + 1}
+                                    </Button>
+                                  </div>
+                                ))}
+                            </div>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={currentPage === data.totalPages - 1}
+                            >
+                              Siguiente
+                              <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                          </div>
+
+                          <p className="text-xs text-center text-muted-foreground mt-3">
+                            Mostrando {data.properties.length} de {data.totalElements} propiedades
+                          </p>
+                        </Card>
+                      )}
                     </>
                   )}
                 </>
