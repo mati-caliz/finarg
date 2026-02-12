@@ -12,7 +12,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 @Slf4j
 @Component
@@ -89,12 +95,13 @@ public class SeleniumScraperClient {
                 currentProxyIndex = (currentProxyIndex + 1) % proxies.size();
             }
 
+            options.addArguments("--headless");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
-            options.addArguments("--start-maximized");
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--disable-web-security");
             options.addArguments("--disable-features=IsolateOrigins,site-per-process");
+            options.addArguments("--window-size=1920,1080");
 
             List<String> excludeSwitches = Arrays.asList("enable-automation", "enable-logging");
             options.setExperimentalOption("excludeSwitches", excludeSwitches);

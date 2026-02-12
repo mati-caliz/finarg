@@ -334,3 +334,60 @@ export interface ROIResponse {
   recommendation: string;
   calculatedAt: string;
 }
+
+export type PriceType = "BUY" | "SELL";
+
+export interface CurrencyConversionRequest {
+  fromCountry: string;
+  fromCurrency: string;
+  toCountry: string;
+  toCurrency: string;
+  amount: number;
+  fromPriceType: PriceType;
+  toPriceType: PriceType;
+}
+
+export interface ConversionRate {
+  rate: number;
+  fromPriceType: string;
+  toPriceType: string;
+  fromQuotePrice: number;
+  toQuotePrice: number;
+  isDirectConversion: boolean;
+  intermediaryCurrency?: string;
+}
+
+export interface ConversionMetadata {
+  fromSpread: number;
+  toSpread: number;
+  fromSpreadPercentage: number;
+  toSpreadPercentage: number;
+  totalSpreadPercentage: number;
+  estimatedCommission: number;
+  effectiveRate: number;
+}
+
+export interface CurrencyConversionResponse {
+  fromAmount: number;
+  toAmount: number;
+  fromCurrency: string;
+  toCurrency: string;
+  fromCountry: string;
+  toCountry: string;
+  conversionRate: ConversionRate;
+  metadata: ConversionMetadata;
+  timestamp: string;
+}
+
+export interface ConversionHistory extends CurrencyConversionResponse {
+  id: string;
+}
+
+export interface CurrencyOption {
+  country: CountryCode;
+  countryName: string;
+  currencyCode: string;
+  currencyName: string;
+  baseCurrency: string;
+  flag: string;
+}

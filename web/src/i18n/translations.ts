@@ -3,7 +3,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
-    exchangeRatesComparator: "Comparador de Tipos de Cambio",
+    exchangeRatesComparator: "Conversor Universal",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
     realEstateIntelligence: "Real Estate Intelligence",
@@ -29,6 +29,44 @@ export const translations = {
     worstPriceToSell: "Peor precio para vender",
     allQuotes: "Todas las Cotizaciones",
     exchangeRateType: "Tipo de Cambio",
+
+    // Universal Currency Converter
+    universalConverter: "Conversor Universal",
+    universalConverterDesc: "Convertí entre más de 46 monedas de 5 países",
+    convertCurrency: "Convertir Moneda",
+    fromCurrency: "Desde",
+    toCurrency: "Hacia",
+    buying: "Comprando",
+    selling: "Vendiendo",
+    enterAmount: "Ingresá el monto",
+    searchCurrency: "Buscar moneda...",
+    swapCurrencies: "Intercambiar monedas",
+    conversionResult: "Resultado de Conversión",
+    conversionRate: "Tasa de Conversión",
+    appliedRate: "Tasa Aplicada",
+    estimatedCommission: "Comisión Estimada",
+    totalSpread: "Spread Total",
+    effectiveConversionRate: "Tasa Efectiva",
+    conversionHistory: "Historial de Conversiones",
+    clearHistory: "Limpiar Historial",
+    noConversionsYet: "No hay conversiones aún",
+    addToHistory: "Agregar al Historial",
+    timeAgo: "Hace",
+    showAllRates: "Mostrar Todas las Tasas",
+    hideRates: "Ocultar Tasas",
+    selectFromCurrency: "Seleccioná la moneda de origen",
+    selectToCurrency: "Seleccioná la moneda de destino",
+    conversionDetails: "Detalles de Conversión",
+    directConversion: "Conversión Directa",
+    triangulatedConversion: "Conversión Triangulada",
+    intermediaryCurrency: "Moneda Intermediaria",
+    priceType: "Tipo de Precio",
+    buyPrice: "Precio de Compra",
+    sellPrice: "Precio de Venta",
+    convertButton: "Convertir",
+    amount: "Monto",
+    result: "Resultado",
+    replayConversion: "Repetir Conversión",
 
     // Tasas / Comparador
     ratesComparator: "Comparador de Tasas",
@@ -1225,4 +1263,4 @@ export const translations = {
 };
 
 export type Language = keyof typeof translations;
-export type TranslationKey = keyof typeof translations.en;
+export type TranslationKey = keyof typeof translations.es;
