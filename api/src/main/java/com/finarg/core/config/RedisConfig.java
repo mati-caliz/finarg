@@ -62,6 +62,9 @@ public class RedisConfig {
         cacheConfigurations.put("history", defaultConfig.entryTtl(Duration.ofHours(6)));
         cacheConfigurations.put("rates", defaultConfig.entryTtl(Duration.ofHours(1)));
         cacheConfigurations.put("indicators", defaultConfig.entryTtl(Duration.ofHours(1)));
+        cacheConfigurations.put("propertyPrices", defaultConfig.entryTtl(Duration.ofHours(6)));
+        cacheConfigurations.put("cities", defaultConfig.entryTtl(Duration.ofHours(24)));
+        cacheConfigurations.put("neighborhoods", defaultConfig.entryTtl(Duration.ofHours(24)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
