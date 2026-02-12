@@ -2,6 +2,8 @@ import type { CountryCode } from "@/config/countries";
 import type {
   City,
   CompoundInterestRequest,
+  CurrencyConversionRequest,
+  CurrencyConversionResponse,
   ExchangeRateComparison,
   IncomeTaxRequest,
   Neighborhood,
@@ -90,6 +92,12 @@ export const exchangeRateComparisonApi = {
   compareRates: (country: CountryCode) =>
     api.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
 };
+
+export const currencyConversionApi = {
+  convert: (data: CurrencyConversionRequest) =>
+    api.post<CurrencyConversionResponse>("/currency/convert", data),
+};
+
 export const authApi = {
   login: (email: string, password: string) => api.post("/auth/login", { email, password }),
   register: (email: string, password: string, name: string) =>

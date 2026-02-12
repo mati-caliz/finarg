@@ -40,7 +40,7 @@ const baseNavigation = [
   },
   {
     key: "exchangeRatesComparator" as TranslationKey,
-    href: "/comparador-tipos-cambio",
+    href: "/conversor-universal",
     icon: ArrowLeftRight,
     feature: "quotes" as const,
   },
