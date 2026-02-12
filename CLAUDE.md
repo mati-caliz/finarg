@@ -211,18 +211,18 @@ Controllers → Services → Clients → External APIs
 
 ### Pages (App Router)
 
-| Route | File | Description | Auth Required |
-|-------|------|-------------|---------------|
-| `/` | `app/page.tsx` | Dashboard with widgets | No |
-| `/login` | `app/login/page.tsx` | Login (email/password + Google) | No |
-| `/register` | `app/register/page.tsx` | User registration | No |
-| `/cotizaciones` | `app/cotizaciones/page.tsx` | Historical quotes & charts | No |
-| `/inflacion` | `app/inflacion/page.tsx` | Inflation data & calculator | No |
-| `/reservas-bcra` | `app/reservas-bcra/page.tsx` | BCRA reserves | No |
-| `/bandas-cambiarias` | `app/bandas-cambiarias/page.tsx` | Exchange bands | No |
-| `/comparador-tasas` | `app/comparador-tasas/page.tsx` | Rate comparison (TNA) | No |
-| `/comparador-tipos-cambio` | `app/comparador-tipos-cambio/page.tsx` | Exchange rate comparison | No |
-| `/calculadora-sueldo-neto` | `app/calculadora-sueldo-neto/page.tsx` | Income tax calculator | No |
+| Route                            | File                                         | Description | Auth Required |
+|----------------------------------|----------------------------------------------|-------------|---------------|
+| `/`                              | `app/page.tsx`                               | Dashboard with widgets | No |
+| `/login`                         | `app/login/page.tsx`                         | Login (email/password + Google) | No |
+| `/register`                      | `app/register/page.tsx`                      | User registration | No |
+| `/cotizaciones`                  | `app/cotizaciones/page.tsx`                  | Historical quotes & charts | No |
+| `/inflacion`                     | `app/inflacion/page.tsx`                     | Inflation data & calculator | No |
+| `/reservas-bcra`                 | `app/reservas-bcra/page.tsx`                 | BCRA reserves | No |
+| `/bandas-cambiarias`             | `app/bandas-cambiarias/page.tsx`             | Exchange bands | No |
+| `/comparador-tasas`              | `app/comparador-tasas/page.tsx`              | Rate comparison (TNA) | No |
+| `/conversor-universal`           | `app/conversor-universal/page.tsx`           | Exchange rate comparison | No |
+| `/calculadora-sueldo-neto`       | `app/calculadora-sueldo-neto/page.tsx`       | Income tax calculator | No |
 | `/calculadora-interes-compuesto` | `app/calculadora-interes-compuesto/page.tsx` | Compound interest calculator | No |
 
 ### Dashboard Widgets

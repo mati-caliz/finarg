@@ -18,6 +18,10 @@ public record PropertyPriceResponseDTO(
     String currency,
     PriceStatisticsDTO statistics,
     List<PropertyDTO> properties,
-    LocalDateTime calculatedAt
+    LocalDateTime calculatedAt,
+    Integer currentPage,
+    Integer pageSize,
+    Long totalElements,
+    Integer totalPages
 ) {
 }

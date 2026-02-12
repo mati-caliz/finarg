@@ -220,6 +220,8 @@ export interface PropertyFilter {
   minSurfaceM2?: number;
   maxSurfaceM2?: number;
   currency?: string;
+  page?: number;
+  size?: number;
 }
 
 export interface City {
@@ -279,6 +281,10 @@ export interface PropertyPriceResponse {
   statistics: PriceStatistics;
   properties: Property[];
   calculatedAt: string;
+  currentPage: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface ROIRequest {

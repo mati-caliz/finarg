@@ -29,7 +29,6 @@ public class RedisConfig {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         return GenericJackson2JsonRedisSerializer.builder()
                 .objectMapper(mapper)
-                .defaultTyping(true)
                 .build();
     }
 

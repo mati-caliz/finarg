@@ -48,8 +48,20 @@ public class PropertyPriceService {
 
         List<PropertyPrice> latestPrices = getLatestPricesForProperties(properties, filters.currency());
 
-        PriceStatisticsDTO statistics = calculateStatistics(latestPrices, filters);
-        List<PropertyDTO> propertyDTOs = mapToPropertyDTOs(properties, latestPrices);
+        List<PropertyPrice> filteredPrices = applyPriceAndSurfaceFilters(latestPrices, filters);
+
+        PriceStatisticsDTO statistics = calculateStatistics(filteredPrices, filters);
+
+        long totalElements = filteredPrices.size();
+        int totalPages = (int) Math.ceil((double) totalElements / filters.size());
+
+        List<PropertyPrice> paginatedPrices = applyPagination(filteredPrices, filters.page(), filters.size());
+
+        List<Property> paginatedProperties = paginatedPrices.stream()
+            .map(PropertyPrice::getProperty)
+            .toList();
+
+        List<PropertyDTO> propertyDTOs = mapToPropertyDTOs(paginatedProperties, paginatedPrices);
 
         String neighborhoodName = filters.neighborhoodCode() != null
             ? getNeighborhoodName(filters.neighborhoodCode())
@@ -66,6 +78,10 @@ public class PropertyPriceService {
             .statistics(statistics)
             .properties(propertyDTOs)
             .calculatedAt(LocalDateTime.now())
+            .currentPage(filters.page())
+            .pageSize(filters.size())
+            .totalElements(totalElements)
+            .totalPages(totalPages)
             .build();
     }
 
@@ -268,5 +284,42 @@ public class PropertyPriceService {
         return neighborhoodRepository.findByCode(neighborhoodCode)
             .map(Neighborhood::getName)
             .orElse(null);
+    }
+
+    private List<PropertyPrice> applyPriceAndSurfaceFilters(
+            List<PropertyPrice> prices,
+            PropertyFilterDTO filters) {
+
+        return prices.stream()
+            .filter(price -> {
+                boolean priceMatch = isWithinRange(
+                    price.getPriceTotal(),
+                    filters.minPrice(),
+                    filters.maxPrice()
+                );
+
+                boolean surfaceMatch = isWithinRange(
+                    price.getProperty().getSurfaceM2(),
+                    filters.minSurfaceM2(),
+                    filters.maxSurfaceM2()
+                );
+
+                return priceMatch && surfaceMatch;
+            })
+            .toList();
+    }
+
+    private List<PropertyPrice> applyPagination(
+            List<PropertyPrice> prices,
+            int page,
+            int size) {
+
+        int startIndex = page * size;
+        if (startIndex >= prices.size()) {
+            return List.of();
+        }
+
+        int endIndex = Math.min(startIndex + size, prices.size());
+        return prices.subList(startIndex, endIndex);
     }
 }
