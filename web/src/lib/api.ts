@@ -1,5 +1,15 @@
 import type { CountryCode } from "@/config/countries";
-import type { CompoundInterestRequest, ExchangeRateComparison, IncomeTaxRequest } from "@/types";
+import type {
+  City,
+  CompoundInterestRequest,
+  ExchangeRateComparison,
+  IncomeTaxRequest,
+  Neighborhood,
+  PropertyFilter,
+  PropertyPriceResponse,
+  ROIRequest,
+  ROIResponse,
+} from "@/types";
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
@@ -89,4 +99,14 @@ export const authApi = {
 
 export const cryptoApi = {
   getCurrent: () => api.get("/crypto"),
+};
+
+export const realEstateApi = {
+  getPropertyPrices: (filters: PropertyFilter) =>
+    api.post<PropertyPriceResponse>("/real-estate/prices", filters),
+  getCities: () => api.get<City[]>("/real-estate/cities"),
+  getNeighborhoods: (cityCode: string) =>
+    api.get<Neighborhood[]>(`/real-estate/cities/${cityCode}/neighborhoods`),
+  calculateROI: (request: ROIRequest) =>
+    api.post<ROIResponse>("/real-estate/roi/calculate", request),
 };

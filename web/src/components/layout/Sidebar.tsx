@@ -76,7 +76,7 @@ const baseNavigation = [
   },
   {
     key: "realEstateIntelligence" as TranslationKey,
-    href: "#",
+    href: "/bienes-raices",
     icon: Building2,
     feature: null,
   },

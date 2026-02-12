@@ -270,4 +270,54 @@ public class WebClientConfig {
                 .defaultHeader("User-Agent", "Finarg/1.0")
                 .build();
     }
+
+    @Bean("zonapropWebClient")
+    public WebClient zonapropWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .followRedirect(true)
+                .responseTimeout(Duration.ofMillis(20000));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl("https://www.zonaprop.com.ar")
+                .defaultHeader(HttpHeaders.USER_AGENT,
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                    + "Chrome/131.0.0.0 Safari/537.36")
+                .defaultHeader(HttpHeaders.ACCEPT,
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "es-AR,es;q=0.9,en;q=0.8")
+                .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br")
+                .defaultHeader(HttpHeaders.CONNECTION, "keep-alive")
+                .defaultHeader(HttpHeaders.REFERER, "https://www.zonaprop.com.ar/")
+                .defaultHeader("Upgrade-Insecure-Requests", "1")
+                .defaultHeader("Sec-Fetch-Dest", "document")
+                .defaultHeader("Sec-Fetch-Mode", "navigate")
+                .defaultHeader("Sec-Fetch-Site", "same-origin")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+    }
+
+    @Bean("argenpropWebClient")
+    public WebClient argenpropWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .followRedirect(true)
+                .responseTimeout(Duration.ofMillis(20000));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl("https://www.argenprop.com")
+                .defaultHeader(HttpHeaders.USER_AGENT,
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                    + "Chrome/131.0.0.0 Safari/537.36")
+                .defaultHeader(HttpHeaders.ACCEPT,
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "es-AR,es;q=0.9,en;q=0.8")
+                .defaultHeader(HttpHeaders.ACCEPT_ENCODING, "gzip, deflate, br")
+                .defaultHeader(HttpHeaders.CONNECTION, "keep-alive")
+                .defaultHeader(HttpHeaders.REFERER, "https://www.argenprop.com/")
+                .defaultHeader("Upgrade-Insecure-Requests", "1")
+                .defaultHeader("Sec-Fetch-Dest", "document")
+                .defaultHeader("Sec-Fetch-Mode", "navigate")
+                .defaultHeader("Sec-Fetch-Site", "same-origin")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+    }
 }

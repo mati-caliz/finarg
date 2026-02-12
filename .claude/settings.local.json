@@ -62,7 +62,10 @@
       "WebFetch(domain:api.argentinadatos.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:argentinadatos.com)",
-      "WebFetch(domain:argenstats.com)"
+      "WebFetch(domain:argenstats.com)",
+      "Bash(jq:*)",
+      "Bash(mvn compile:*)",
+      "Bash(grep:*)"
     ]
   }
 }
