@@ -29,7 +29,7 @@ echo ""
 # ========================================
 # 1. Check .env files
 # ========================================
-echo -e "${GREEN}[1/5]${NC} Checking environment files..."
+echo -e "${GREEN}[1/6]${NC} Checking environment files..."
 
 # Backend .env
 if [ ! -f "${API_DIR}/.env" ]; then
@@ -61,7 +61,7 @@ echo ""
 # ========================================
 # 2. Load backend environment variables
 # ========================================
-echo -e "${GREEN}[2/5]${NC} Loading backend environment variables..."
+echo -e "${GREEN}[2/6]${NC} Loading backend environment variables..."
 set -a
 source "${API_DIR}/.env"
 set +a
@@ -71,7 +71,7 @@ echo ""
 # ========================================
 # 3. Check Docker and start infrastructure
 # ========================================
-echo -e "${GREEN}[3/5]${NC} Checking Docker services..."
+echo -e "${GREEN}[3/6]${NC} Checking Docker services..."
 cd "${PROJECT_ROOT}" || exit 1
 
 # Check if Docker is running
@@ -107,7 +107,7 @@ echo ""
 # ========================================
 # 4. Check npm dependencies
 # ========================================
-echo -e "${GREEN}[4/5]${NC} Checking frontend dependencies..."
+echo -e "${GREEN}[4/6]${NC} Checking frontend dependencies..."
 if [ ! -d "${WEB_DIR}/node_modules" ]; then
     echo -e "${YELLOW}[INFO]${NC} Installing frontend dependencies..."
     cd "${WEB_DIR}" || exit 1
@@ -117,9 +117,43 @@ echo -e "${GREEN}[✓]${NC} Frontend dependencies ready"
 echo ""
 
 # ========================================
-# 5. Start backend and frontend
+# 5. Run Checkstyle validation
 # ========================================
-echo -e "${GREEN}[5/5]${NC} Starting services..."
+echo -e "${GREEN}[5/6]${NC} Running checkstyle validation..."
+cd "${API_DIR}" || exit 1
+
+CHECKSTYLE_OUTPUT=$(mktemp)
+if mvn checkstyle:check > "$CHECKSTYLE_OUTPUT" 2>&1; then
+    echo -e "${GREEN}[✓]${NC} Checkstyle validation passed"
+else
+    echo -e "${RED}[✗]${NC} Checkstyle validation failed"
+    echo ""
+    echo -e "${YELLOW}Checkstyle Errors:${NC}"
+    echo -e "${RED}==================${NC}"
+
+    grep -A 5 "\[ERROR\]" "$CHECKSTYLE_OUTPUT" | grep -v "^\[INFO\]" | sed 's/^\[ERROR\]/  /' || cat "$CHECKSTYLE_OUTPUT"
+
+    echo -e "${RED}==================${NC}"
+    echo ""
+    echo -e "${YELLOW}[WARN]${NC} Code style issues detected. Please fix them before continuing."
+    echo -e "${YELLOW}[INFO]${NC} You can run 'mvn spotless:apply' to auto-format the code."
+    echo ""
+
+    read -p "Do you want to continue anyway? (y/N): " -n 1 -r
+    echo ""
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        rm "$CHECKSTYLE_OUTPUT"
+        echo -e "${RED}[ABORTED]${NC} Please fix checkstyle errors and try again."
+        exit 1
+    fi
+fi
+rm "$CHECKSTYLE_OUTPUT"
+echo ""
+
+# ========================================
+# 6. Start backend and frontend
+# ========================================
+echo -e "${GREEN}[6/6]${NC} Starting services..."
 echo ""
 echo -e "${BLUE}================================${NC}"
 echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
