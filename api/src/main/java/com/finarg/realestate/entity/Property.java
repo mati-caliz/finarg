@@ -55,10 +55,10 @@ public class Property {
     @Column(name = "address", length = 255)
     private String address;
 
-    @Column(name = "surface_m2", precision = 10, scale = 2)
+    @Column(name = "surface_m2", precision = 12, scale = 2)
     private BigDecimal surfaceM2;
 
-    @Column(name = "covered_surface_m2", precision = 10, scale = 2)
+    @Column(name = "covered_surface_m2", precision = 12, scale = 2)
     private BigDecimal coveredSurfaceM2;
 
     @Column(name = "bedrooms")
