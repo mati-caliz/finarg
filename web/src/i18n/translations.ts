@@ -190,6 +190,7 @@ export const translations = {
     last12Months: "Últimos 12 meses",
     sinceJan: "Desde enero",
     adjustmentCalculator: "Calculadora de Ajuste por Inflación",
+    adjustmentCalculatorDesc: "Calculá cuánto debería valer un monto ajustado por inflación",
     originalAmount: "Monto Original",
     startDate: "Fecha de Inicio",
     endDate: "Fecha de Fin",
@@ -198,6 +199,21 @@ export const translations = {
     cumulativeInflation: "Inflación Acumulada",
     adjustedAmount: "Monto Ajustado",
     maintainPurchasingPower: "Para mantener el mismo poder adquisitivo",
+    howItWorks: "¿Cómo funciona?",
+    whatIsInflationAdjustment: "¿Qué es el ajuste por inflación?",
+    inflationAdjustmentExplanation:
+      "El ajuste por inflación permite calcular cuánto debería valer un monto de dinero en el presente, considerando la pérdida de poder adquisitivo causada por la inflación durante un período determinado.",
+    howToUse: "¿Cómo usar esta calculadora?",
+    adjustmentStep1: "Ingresá el monto original que querés ajustar",
+    adjustmentStep2: "Seleccioná la fecha de inicio (cuando tenías ese monto)",
+    adjustmentStep3:
+      "Seleccioná la fecha de fin (hasta cuándo querés calcular el ajuste) y presioná Calcular",
+    practicalExample: "Ejemplo Práctico",
+    adjustmentExample:
+      "Si en enero 2023 tenías $100.000 y la inflación acumulada hasta febrero 2026 fue del 300%, ese dinero debería valer $400.000 para mantener el mismo poder adquisitivo.",
+    dataSource: "Fuente de Datos",
+    inflationDataSource:
+      "Los datos de inflación provienen del INDEC (Instituto Nacional de Estadística y Censos de Argentina) y son actualizados mensualmente.",
     monthlyEvolution: "Inflación Mensual - Evolución",
     yearOverYearEvolution: "Inflación Interanual - Evolución",
     monthlyData: "Datos Mensuales",
@@ -635,6 +651,7 @@ export const translations = {
     last12Months: "Últimos 12 meses",
     sinceJan: "Desde janeiro",
     adjustmentCalculator: "Calculadora de Ajuste de inflação",
+    adjustmentCalculatorDesc: "Calcule quanto deveria valer um valor ajustado pela inflação",
     originalAmount: "Valor Original",
     startDate: "Data de Início",
     endDate: "Data de Término",
@@ -642,6 +659,21 @@ export const translations = {
     monthsElapsed: "Meses Decorridos",
     cumulativeInflation: "Inflação Acumulada",
     adjustedAmount: "Valor Ajustado",
+    howItWorks: "Como funciona?",
+    whatIsInflationAdjustment: "O que é o ajuste por inflação?",
+    inflationAdjustmentExplanation:
+      "O ajuste por inflação permite calcular quanto deveria valer um valor em dinheiro no presente, considerando a perda de poder aquisitivo causada pela inflação durante um período determinado.",
+    howToUse: "Como usar esta calculadora?",
+    adjustmentStep1: "Digite o valor original que deseja ajustar",
+    adjustmentStep2: "Selecione a data de início (quando tinha esse valor)",
+    adjustmentStep3:
+      "Selecione a data de término (até quando deseja calcular o ajuste) e pressione Calcular",
+    practicalExample: "Exemplo Prático",
+    adjustmentExample:
+      "Se em janeiro de 2023 você tinha R$ 100.000 e a inflação acumulada até fevereiro de 2026 foi de 300%, esse dinheiro deveria valer R$ 400.000 para manter o mesmo poder aquisitivo.",
+    dataSource: "Fonte de Dados",
+    inflationDataSource:
+      "Os dados de inflação provêm do INDEC (Instituto Nacional de Estatística e Censos da Argentina) e são atualizados mensalmente.",
     maintainPurchasingPower: "Para manter o mesmo poder de compra",
     monthlyEvolution: "Inflação Mensal - Evolução",
     yearOverYearEvolution: "Inflação Interanual - Evolução",
@@ -966,12 +998,28 @@ export const translations = {
     last12Months: "Last 12 months",
     sinceJan: "Since January",
     adjustmentCalculator: "Inflation Adjustment Calculator",
+    adjustmentCalculatorDesc: "Calculate how much an amount should be worth adjusted for inflation",
     originalAmount: "Original Amount",
     startDate: "Start Date",
     endDate: "End Date",
     calculateAdjustment: "Calculate Adjustment",
     monthsElapsed: "Months Elapsed",
     cumulativeInflation: "Cumulative Inflation",
+    howItWorks: "How does it work?",
+    whatIsInflationAdjustment: "What is inflation adjustment?",
+    inflationAdjustmentExplanation:
+      "Inflation adjustment allows you to calculate how much an amount of money should be worth in the present, considering the loss of purchasing power caused by inflation over a specific period.",
+    howToUse: "How to use this calculator?",
+    adjustmentStep1: "Enter the original amount you want to adjust",
+    adjustmentStep2: "Select the start date (when you had that amount)",
+    adjustmentStep3:
+      "Select the end date (up to when you want to calculate the adjustment) and press Calculate",
+    practicalExample: "Practical Example",
+    adjustmentExample:
+      "If in January 2023 you had $100,000 and the cumulative inflation until February 2026 was 300%, that money should be worth $400,000 to maintain the same purchasing power.",
+    dataSource: "Data Source",
+    inflationDataSource:
+      "Inflation data comes from INDEC (National Institute of Statistics and Census of Argentina) and is updated monthly.",
     adjustedAmount: "Adjusted Amount",
     maintainPurchasingPower: "To maintain the same purchasing power",
     monthlyEvolution: "Monthly Inflation - Evolution",
