@@ -2,21 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdjustInflation } from "@/hooks/useInflation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import {
-  formatCurrency,
-  formatDateShort,
-  formatPercent,
-  generateReferenceAreas,
-} from "@/lib/utils";
-import type { Inflation, InflationAdjustment } from "@/types";
+import { formatDateShort, formatPercent, generateReferenceAreas } from "@/lib/utils";
+import type { Inflation } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from "lucide-react";
+import { BarChart3, Calendar, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
@@ -34,10 +27,6 @@ const LineChart = dynamic(
 
 export default function InflationPage() {
   const { translate } = useTranslation();
-  const [originalAmount, setOriginalAmount] = useState<number>(100000);
-  const [startDate, setStartDate] = useState<string>("2023-01-01");
-  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split("T")[0]);
-  const [adjustmentResult, setAdjustmentResult] = useState<InflationAdjustment | null>(null);
   const [chartMonthsLimit, setChartMonthsLimit] = useState(24);
 
   const chartPeriods = useMemo(
@@ -78,20 +67,6 @@ export default function InflationPage() {
       );
     },
   });
-
-  const adjustMutation = useAdjustInflation();
-
-  const handleAdjust = (e: React.FormEvent) => {
-    e.preventDefault();
-    adjustMutation.mutate(
-      { amount: originalAmount, fromDate: startDate, toDate: endDate },
-      {
-        onSuccess: (data) => {
-          setAdjustmentResult(data);
-        },
-      },
-    );
-  };
 
   const getVisibleGovernments = (inflationData: Inflation[]) => {
     if (!inflationData || inflationData.length === 0) {
@@ -183,341 +158,212 @@ export default function InflationPage() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <Card className="bg-card lg:self-start">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Calculator className="h-5 w-5 text-primary" />
-              {translate("adjustmentCalculator")}
-            </CardTitle>
+      <div className="space-y-6">
+        <Card className="bg-card">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <CardTitle className="text-lg">{translate("monthlyEvolution")}</CardTitle>
+              <div className="flex flex-wrap gap-2">
+                {chartPeriods.map((p) => (
+                  <Button
+                    key={p.value}
+                    variant={chartMonthsLimit === p.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setChartMonthsLimit(p.value)}
+                  >
+                    {translate(p.labelKey)}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="pt-0">
-            <form onSubmit={handleAdjust} className="space-y-3">
-              <div>
-                <label
-                  htmlFor="originalAmount"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("originalAmount")}
-                </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="originalAmount"
-                    type="number"
-                    placeholder="100000"
-                    value={originalAmount || ""}
-                    onChange={(e) => setOriginalAmount(Number.parseFloat(e.target.value) || 0)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+          <CardContent>
+            {monthlyInflation && monthlyInflation.length > 0 ? (
+              (() => {
+                const reversedData = [...monthlyInflation].reverse();
+                const chartData = reversedData.map((i, idx) => ({
+                  index: idx,
+                  fecha: formatDateShort(i.date),
+                  fechaOriginal: i.date,
+                  valor: i.value,
+                }));
 
-              <div>
-                <label
-                  htmlFor="startDate"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("startDate")}
-                </label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  max={endDate}
-                />
-              </div>
+                const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
+                  (area) => ({
+                    ...area,
+                    x1: chartData[area.x1 as number]?.index,
+                    x2: chartData[area.x2 as number]?.index,
+                  }),
+                );
 
-              <div>
-                <label
-                  htmlFor="endDate"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("endDate")}
-                </label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  min={startDate}
-                  max={new Date().toISOString().split("T")[0]}
-                />
-              </div>
+                const visibleGovs = getVisibleGovernments(monthlyInflation);
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={adjustMutation.isPending || originalAmount <= 0}
-              >
-                {adjustMutation.isPending ? (
+                return (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {translate("calculating")}
+                    <LineChart
+                      data={chartData}
+                      xKey="index"
+                      yKey="valor"
+                      height={250}
+                      formatX={(v) => chartData[Number(v)]?.fecha || ""}
+                      formatY={(v) => `${Number(v).toFixed(1)}%`}
+                      colors={["#10b981"]}
+                      referenceAreas={referenceAreas}
+                    />
+                    {visibleGovs.length > 0 && (
+                      <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                        {visibleGovs.map((gov) => (
+                          <div key={gov.label} className="flex items-center gap-1.5">
+                            <div
+                              className="w-3 h-3 rounded-sm"
+                              style={{ backgroundColor: gov.color }}
+                            />
+                            <span className="text-xs text-muted-foreground">{gov.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </>
-                ) : (
-                  translate("calculateAdjustment")
-                )}
-              </Button>
-            </form>
-
-            {adjustmentResult && (
-              <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("originalAmount")}
-                    </span>
-                    <span className="text-foreground">
-                      {formatCurrency(adjustmentResult.originalAmount)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("monthsElapsed")}
-                    </span>
-                    <span className="text-foreground">{adjustmentResult.monthsElapsed}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("cumulativeInflation")}
-                    </span>
-                    <span className="text-red-500">
-                      +
-                      {formatPercent(
-                        adjustmentResult.cumulativeInflation ??
-                          adjustmentResult.accumulatedInflation ??
-                          0,
-                      )}
-                    </span>
-                  </div>
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground font-medium">
-                        {translate("adjustedAmount")}
-                      </span>
-                      <span className="text-2xl font-bold text-primary">
-                        {formatCurrency(adjustmentResult.adjustedAmount)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {translate("maintainPurchasingPower")}
-                    </p>
-                  </div>
-                </div>
+                );
+              })()
+            ) : (
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                Loading data...
               </div>
             )}
           </CardContent>
         </Card>
 
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-card">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">{translate("monthlyEvolution")}</CardTitle>
-                <div className="flex flex-wrap gap-2">
-                  {chartPeriods.map((p) => (
-                    <Button
-                      key={p.value}
-                      variant={chartMonthsLimit === p.value ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setChartMonthsLimit(p.value)}
-                    >
-                      {translate(p.labelKey)}
-                    </Button>
-                  ))}
-                </div>
+        <Card className="bg-card">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <CardTitle className="text-lg">{translate("yearOverYearEvolution")}</CardTitle>
+              <div className="flex flex-wrap gap-2">
+                {chartPeriods.map((p) => (
+                  <Button
+                    key={p.value}
+                    variant={chartMonthsLimit === p.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setChartMonthsLimit(p.value)}
+                  >
+                    {translate(p.labelKey)}
+                  </Button>
+                ))}
               </div>
-            </CardHeader>
-            <CardContent>
-              {monthlyInflation && monthlyInflation.length > 0 ? (
-                (() => {
-                  const reversedData = [...monthlyInflation].reverse();
-                  const chartData = reversedData.map((i, idx) => ({
-                    index: idx,
-                    fecha: formatDateShort(i.date),
-                    fechaOriginal: i.date,
-                    valor: i.value,
-                  }));
+            </div>
+          </CardHeader>
+          <CardContent>
+            {monthlyInflation && monthlyInflation.length > 0 ? (
+              (() => {
+                const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
+                const reversedData = [...filteredData].reverse();
+                const chartData = reversedData.map((i, idx) => ({
+                  index: idx,
+                  fecha: formatDateShort(i.date),
+                  fechaOriginal: i.date,
+                  valor: i.yearOverYear as number,
+                }));
 
-                  const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
-                    (area) => ({
-                      ...area,
-                      x1: chartData[area.x1 as number]?.index,
-                      x2: chartData[area.x2 as number]?.index,
-                    }),
-                  );
+                const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
+                  (area) => ({
+                    ...area,
+                    x1: chartData[area.x1 as number]?.index,
+                    x2: chartData[area.x2 as number]?.index,
+                  }),
+                );
 
-                  const visibleGovs = getVisibleGovernments(monthlyInflation);
+                const visibleGovs = getVisibleGovernments(filteredData);
 
-                  return (
-                    <>
-                      <LineChart
-                        data={chartData}
-                        xKey="index"
-                        yKey="valor"
-                        height={250}
-                        formatX={(v) => chartData[Number(v)]?.fecha || ""}
-                        formatY={(v) => `${Number(v).toFixed(1)}%`}
-                        colors={["#10b981"]}
-                        referenceAreas={referenceAreas}
-                      />
-                      {visibleGovs.length > 0 && (
-                        <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                          {visibleGovs.map((gov) => (
-                            <div key={gov.label} className="flex items-center gap-1.5">
-                              <div
-                                className="w-3 h-3 rounded-sm"
-                                style={{ backgroundColor: gov.color }}
-                              />
-                              <span className="text-xs text-muted-foreground">{gov.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  );
-                })()
-              ) : (
-                <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                  Loading data...
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <CardTitle className="text-lg">{translate("yearOverYearEvolution")}</CardTitle>
-                <div className="flex flex-wrap gap-2">
-                  {chartPeriods.map((p) => (
-                    <Button
-                      key={p.value}
-                      variant={chartMonthsLimit === p.value ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setChartMonthsLimit(p.value)}
-                    >
-                      {translate(p.labelKey)}
-                    </Button>
-                  ))}
-                </div>
+                return (
+                  <>
+                    <LineChart
+                      data={chartData}
+                      xKey="index"
+                      yKey="valor"
+                      height={250}
+                      formatX={(v) => chartData[Number(v)]?.fecha || ""}
+                      formatY={(v) => `${Number(v).toFixed(1)}%`}
+                      colors={["#ef4444"]}
+                      referenceAreas={referenceAreas}
+                    />
+                    {visibleGovs.length > 0 && (
+                      <div className="flex flex-wrap gap-3 mt-4 justify-center">
+                        {visibleGovs.map((gov) => (
+                          <div key={gov.label} className="flex items-center gap-1.5">
+                            <div
+                              className="w-3 h-3 rounded-sm"
+                              style={{ backgroundColor: gov.color }}
+                            />
+                            <span className="text-xs text-muted-foreground">{gov.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()
+            ) : (
+              <div className="h-[250px] flex items-center justify-center text-muted-foreground">
+                Loading data...
               </div>
-            </CardHeader>
-            <CardContent>
-              {monthlyInflation && monthlyInflation.length > 0 ? (
-                (() => {
-                  const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
-                  const reversedData = [...filteredData].reverse();
-                  const chartData = reversedData.map((i, idx) => ({
-                    index: idx,
-                    fecha: formatDateShort(i.date),
-                    fechaOriginal: i.date,
-                    valor: i.yearOverYear as number,
-                  }));
+            )}
+          </CardContent>
+        </Card>
 
-                  const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
-                    (area) => ({
-                      ...area,
-                      x1: chartData[area.x1 as number]?.index,
-                      x2: chartData[area.x2 as number]?.index,
-                    }),
-                  );
-
-                  const visibleGovs = getVisibleGovernments(filteredData);
-
-                  return (
-                    <>
-                      <LineChart
-                        data={chartData}
-                        xKey="index"
-                        yKey="valor"
-                        height={250}
-                        formatX={(v) => chartData[Number(v)]?.fecha || ""}
-                        formatY={(v) => `${Number(v).toFixed(1)}%`}
-                        colors={["#ef4444"]}
-                        referenceAreas={referenceAreas}
-                      />
-                      {visibleGovs.length > 0 && (
-                        <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                          {visibleGovs.map((gov) => (
-                            <div key={gov.label} className="flex items-center gap-1.5">
-                              <div
-                                className="w-3 h-3 rounded-sm"
-                                style={{ backgroundColor: gov.color }}
-                              />
-                              <span className="text-xs text-muted-foreground">{gov.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  );
-                })()
-              ) : (
-                <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                  Loading data...
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="text-lg">{translate("monthlyData")}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-auto max-h-[300px] pr-2">
-                <div className="pr-4">
-                  <table className="w-full text-sm">
-                    <thead className="sticky top-0 bg-card z-10">
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 text-muted-foreground font-medium">
-                          {translate("period")}
-                        </th>
-                        <th className="text-right py-2 text-muted-foreground font-medium">
-                          {translate("monthlyInflation")}
-                        </th>
-                        <th className="text-right py-2 text-muted-foreground font-medium">
-                          {translate("yearOverYear")}
-                        </th>
-                        <th className="text-right py-2 text-muted-foreground font-medium pr-2">
-                          {translate("yearToDate")}
-                        </th>
+        <Card className="bg-card">
+          <CardHeader>
+            <CardTitle className="text-lg">{translate("monthlyData")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-auto max-h-[300px] pr-2">
+              <div className="pr-4">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-card z-10">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-2 text-muted-foreground font-medium">
+                        {translate("period")}
+                      </th>
+                      <th className="text-right py-2 text-muted-foreground font-medium">
+                        {translate("monthlyInflation")}
+                      </th>
+                      <th className="text-right py-2 text-muted-foreground font-medium">
+                        {translate("yearOverYear")}
+                      </th>
+                      <th className="text-right py-2 text-muted-foreground font-medium pr-2">
+                        {translate("yearToDate")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthlyInflation?.map((inflation) => (
+                      <tr key={inflation.date} className="border-b border-border/50">
+                        <td className="py-2 text-foreground">
+                          {new Date(inflation.date).toLocaleDateString("es-AR", {
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td className="text-right py-2 text-foreground">
+                          {formatPercent(inflation.value)}
+                        </td>
+                        <td className="text-right py-2 text-red-500">
+                          {typeof inflation.yearOverYear === "number"
+                            ? formatPercent(inflation.yearOverYear)
+                            : "-"}
+                        </td>
+                        <td className="text-right py-2 text-yellow-500 pr-2">
+                          {typeof inflation.yearToDate === "number"
+                            ? formatPercent(inflation.yearToDate)
+                            : "-"}
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {monthlyInflation?.map((inflation) => (
-                        <tr key={inflation.date} className="border-b border-border/50">
-                          <td className="py-2 text-foreground">
-                            {new Date(inflation.date).toLocaleDateString("es-AR", {
-                              month: "long",
-                              year: "numeric",
-                            })}
-                          </td>
-                          <td className="text-right py-2 text-foreground">
-                            {formatPercent(inflation.value)}
-                          </td>
-                          <td className="text-right py-2 text-red-500">
-                            {typeof inflation.yearOverYear === "number"
-                              ? formatPercent(inflation.yearOverYear)
-                              : "-"}
-                          </td>
-                          <td className="text-right py-2 text-yellow-500 pr-2">
-                            {typeof inflation.yearToDate === "number"
-                              ? formatPercent(inflation.yearToDate)
-                              : "-"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
