@@ -15,8 +15,5 @@ export function useReserves(country: CountryCode = "ar") {
     enabled: country === "ar",
     staleTime: 1800000,
     gcTime: 604800000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }

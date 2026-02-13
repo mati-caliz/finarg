@@ -19,9 +19,6 @@ export function useQuotes(country?: CountryCode) {
     },
     staleTime: 300000,
     gcTime: 86400000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }
 
@@ -37,8 +34,5 @@ export function useGap(country?: CountryCode) {
     },
     staleTime: 300000,
     gcTime: 86400000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }

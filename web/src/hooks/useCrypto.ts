@@ -13,8 +13,5 @@ export function useCrypto() {
     },
     staleTime: 300000,
     gcTime: 86400000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }

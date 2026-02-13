@@ -14,8 +14,5 @@ export function useSocialIndicators(country = "ar") {
     enabled: country === "ar",
     staleTime: 3600000,
     gcTime: 604800000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }
