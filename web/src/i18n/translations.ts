@@ -294,6 +294,7 @@ export const translations = {
     year10: "10 años",
     year15: "15 años",
     year20: "20 años",
+    year25: "25 años",
     years1: "1Y",
     years3: "3Y",
     years5: "5Y",

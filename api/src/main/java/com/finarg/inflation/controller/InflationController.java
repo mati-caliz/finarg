@@ -42,7 +42,7 @@ public class InflationController {
     @GetMapping("/monthly")
     @Operation(summary = "Get monthly historical inflation")
     public ResponseEntity<List<InflationDTO>> getMonthlyInflation(
-            @RequestParam(defaultValue = "12") @Min(1) @Max(120) int months) {
+            @RequestParam(defaultValue = "12") @Min(1) @Max(600) int months) {
         return ResponseEntity.ok(inflationService.getMonthlyInflation(months));
     }
 

@@ -37,6 +37,7 @@ export default function InflationPage() {
       { value: 60, labelKey: "year5" as const },
       { value: 120, labelKey: "year10" as const },
       { value: 240, labelKey: "year20" as const },
+      { value: 300, labelKey: "year25" as const },
       { value: 600, labelKey: "max" as const },
     ],
     [],
@@ -56,7 +57,7 @@ export default function InflationPage() {
     if (!allMonthlyInflation || allMonthlyInflation.length === 0) {
       return [];
     }
-    return allMonthlyInflation.slice(-chartMonthsLimit);
+    return allMonthlyInflation.slice(0, chartMonthsLimit);
   }, [allMonthlyInflation, chartMonthsLimit]);
 
   const { data: governments = [] } = useQuery({
