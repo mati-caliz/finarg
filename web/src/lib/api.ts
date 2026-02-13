@@ -25,6 +25,14 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+export const cachedApi = axios.create({
+  baseURL: "/api/data",
+  timeout: 15000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -38,27 +46,29 @@ api.interceptors.response.use(
 );
 
 export const quotesApi = {
-  getAllByCountry: (country: CountryCode) => api.get(`/${country}/quotes`),
+  getAllByCountry: (country: CountryCode) => cachedApi.get(`/${country}/quotes`),
   getByCountryAndType: (country: CountryCode, type: string) =>
-    api.get(`/${country}/quotes/${type}`),
-  getGap: () => api.get("/quotes/gap"),
-  getGapByCountry: (country: CountryCode) => api.get(`/${country}/quotes/gap`),
+    cachedApi.get(`/${country}/quotes/${type}`),
+  getGap: () => cachedApi.get("/quotes/gap"),
+  getGapByCountry: (country: CountryCode) => cachedApi.get(`/${country}/quotes/gap`),
   getHistory: (type: string, from: string, to: string, country: CountryCode = "ar") =>
-    api.get(`/quotes/history/${type}`, { params: { country, from, to } }),
+    cachedApi.get(`/quotes/history/${type}`, { params: { country, from, to } }),
 };
 
 export const inflationApi = {
-  getCurrent: () => api.get("/inflation/current"),
-  getMonthly: (months = 12) => api.get("/inflation/monthly", { params: { months } }),
-  getGovernments: (country = "ar") => api.get("/inflation/governments", { params: { country } }),
+  getCurrent: () => cachedApi.get("/inflation/current"),
+  getMonthly: (months = 12) => cachedApi.get("/inflation/monthly", { params: { months } }),
+  getGovernments: (country = "ar") =>
+    cachedApi.get("/inflation/governments", { params: { country } }),
   adjust: (amount: number, fromDate: string, toDate: string) =>
     api.post("/inflation/adjust", null, { params: { amount, fromDate, toDate } }),
 };
 
 export const reservesApi = {
-  getCurrent: (country = "ar") => api.get("/reserves", { params: { country } }),
-  getHistory: (days = 30) => api.get("/reserves/history", { params: { days } }),
-  getGovernments: (country = "ar") => api.get("/reserves/governments", { params: { country } }),
+  getCurrent: (country = "ar") => cachedApi.get("/reserves", { params: { country } }),
+  getHistory: (days = 30) => cachedApi.get("/reserves/history", { params: { days } }),
+  getGovernments: (country = "ar") =>
+    cachedApi.get("/reserves/governments", { params: { country } }),
 };
 
 export const incomeTaxApi = {
@@ -70,29 +80,31 @@ export const compoundInterestApi = {
 };
 
 export const exchangeBandsApi = {
-  getCurrent: () => api.get("/exchange-bands"),
+  getCurrent: () => cachedApi.get("/exchange-bands"),
 };
 
 export const indicatorsApi = {
-  getSocial: (country = "ar") => api.get("/indicators/social", { params: { country } }),
+  getSocial: (country = "ar") => cachedApi.get("/indicators/social", { params: { country } }),
 };
 
 export const countryRiskApi = {
-  getCurrent: () => api.get("/country-risk"),
-  getHistory: () => api.get("/country-risk/history"),
-  getGovernments: (country = "ar") => api.get("/country-risk/governments", { params: { country } }),
+  getCurrent: () => cachedApi.get("/country-risk"),
+  getHistory: () => cachedApi.get("/country-risk/history"),
+  getGovernments: (country = "ar") =>
+    cachedApi.get("/country-risk/governments", { params: { country } }),
 };
 
 export const ratesApi = {
-  getFixedTerm: (country = "ar") => api.get("/rates/fixed-term", { params: { country } }),
-  getWallets: (country = "ar") => api.get("/rates/wallets", { params: { country } }),
-  getUsdAccounts: (country = "ar") => api.get("/rates/usd-accounts", { params: { country } }),
-  getUvaMortgages: (country = "ar") => api.get("/rates/uva-mortgages", { params: { country } }),
+  getFixedTerm: (country = "ar") => cachedApi.get("/rates/fixed-term", { params: { country } }),
+  getWallets: (country = "ar") => cachedApi.get("/rates/wallets", { params: { country } }),
+  getUsdAccounts: (country = "ar") => cachedApi.get("/rates/usd-accounts", { params: { country } }),
+  getUvaMortgages: (country = "ar") =>
+    cachedApi.get("/rates/uva-mortgages", { params: { country } }),
 };
 
 export const exchangeRateComparisonApi = {
   compareRates: (country: CountryCode) =>
-    api.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
+    cachedApi.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
 };
 
 export const currencyConversionApi = {
@@ -108,15 +120,15 @@ export const authApi = {
 };
 
 export const cryptoApi = {
-  getCurrent: () => api.get("/crypto"),
+  getCurrent: () => cachedApi.get("/crypto"),
 };
 
 export const realEstateApi = {
   getPropertyPrices: (filters: PropertyFilter) =>
     api.post<PropertyPriceResponse>("/real-estate/prices", filters),
-  getCities: () => api.get<City[]>("/real-estate/cities"),
+  getCities: () => cachedApi.get<City[]>("/real-estate/cities"),
   getNeighborhoods: (cityCode: string) =>
-    api.get<Neighborhood[]>(`/real-estate/cities/${cityCode}/neighborhoods`),
+    cachedApi.get<Neighborhood[]>(`/real-estate/cities/${cityCode}/neighborhoods`),
   calculateROI: (request: ROIRequest) =>
     api.post<ROIResponse>("/real-estate/roi/calculate", request),
 };

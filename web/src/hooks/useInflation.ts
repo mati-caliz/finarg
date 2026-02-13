@@ -13,9 +13,6 @@ export function useCurrentInflation() {
     },
     staleTime: 3600000,
     gcTime: 604800000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }
 
@@ -28,9 +25,6 @@ export function useMonthlyInflation() {
     },
     staleTime: 3600000,
     gcTime: 604800000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    retry: 3,
   });
 }
 
