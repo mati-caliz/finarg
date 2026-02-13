@@ -187,11 +187,13 @@ public class ArgenpropClient implements PropertyClient {
 
         String externalId = extractExternalId(listing);
 
+        String priceText = extractPriceText(listing);
         BigDecimal price = extractPrice(listing);
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             return null;
         }
 
+        String currency = detectCurrency(priceText, price, operationType);
         BigDecimal surfaceM2 = extractSurface(listing);
         Integer bedrooms = extractBedrooms(listing);
         Integer bathrooms = extractBathrooms(listing);
@@ -210,7 +212,7 @@ public class ArgenpropClient implements PropertyClient {
             .bedrooms(bedrooms)
             .bathrooms(bathrooms)
             .price(price)
-            .currency("USD")
+            .currency(currency)
             .expenses(expenses)
             .condition(PropertyCondition.GOOD)
             .build();
@@ -407,10 +409,60 @@ public class ArgenpropClient implements PropertyClient {
                     return new BigDecimal(cleaned);
                 }
             }
+
+            Elements priceElements = listing.select(".card__price");
+            for (Element priceEl : priceElements) {
+                String fullText = priceEl.text().toLowerCase();
+                if (fullText.contains("expensas") || fullText.contains("exp.")) {
+                    String[] parts = fullText.split("\\+");
+                    if (parts.length > 1) {
+                        String expText = parts[1];
+                        String cleaned = expText.replaceAll("[^0-9]", "");
+                        if (cleaned.length() >= 3) {
+                            return new BigDecimal(cleaned);
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
             log.debug("Error extracting expenses: {}", e.getMessage());
         }
         return null;
+    }
+
+    private String extractPriceText(Element listing) {
+        Elements priceElements = listing.select(".card__price, .card__price-amount");
+        if (!priceElements.isEmpty()) {
+            return Objects.requireNonNull(priceElements.first()).text();
+        }
+        return "";
+    }
+
+    private String detectCurrency(String priceText, BigDecimal price, OperationType operationType) {
+        if (priceText == null || priceText.isEmpty()) {
+            return operationType == OperationType.SALE ? "USD" : "ARS";
+        }
+
+        String lowerText = priceText.toLowerCase();
+
+        if (lowerText.contains("us$") || lowerText.contains("usd") || lowerText.contains("u$s")) {
+            return "USD";
+        }
+
+        if (lowerText.contains("$") || lowerText.contains("ars") || lowerText.contains("pesos")) {
+            if (price.compareTo(new BigDecimal("500000")) > 0 && operationType == OperationType.RENT) {
+                return "ARS";
+            }
+            if (lowerText.contains("ars") || lowerText.contains("pesos")) {
+                return "ARS";
+            }
+        }
+
+        if (operationType == OperationType.RENT && price.compareTo(new BigDecimal("10000")) > 0) {
+            return "ARS";
+        }
+
+        return operationType == OperationType.SALE ? "USD" : "ARS";
     }
 
     private String mapPropertyType(PropertyType type) {

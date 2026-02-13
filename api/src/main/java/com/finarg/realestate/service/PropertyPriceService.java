@@ -50,12 +50,14 @@ public class PropertyPriceService {
 
         List<PropertyPrice> filteredPrices = applyPriceAndSurfaceFilters(latestPrices, filters);
 
-        PriceStatisticsDTO statistics = calculateStatistics(filteredPrices, filters);
+        List<PropertyPrice> sortedPrices = applySorting(filteredPrices, filters.sortBy());
 
-        long totalElements = filteredPrices.size();
+        PriceStatisticsDTO statistics = calculateStatistics(sortedPrices, filters);
+
+        long totalElements = sortedPrices.size();
         int totalPages = (int) Math.ceil((double) totalElements / filters.size());
 
-        List<PropertyPrice> paginatedPrices = applyPagination(filteredPrices, filters.page(), filters.size());
+        List<PropertyPrice> paginatedPrices = applyPagination(sortedPrices, filters.page(), filters.size());
 
         List<Property> paginatedProperties = paginatedPrices.stream()
             .map(PropertyPrice::getProperty)
@@ -141,6 +143,12 @@ public class PropertyPriceService {
                 filters.propertyType(),
                 filters.operationType()
             );
+        }
+
+        if (filters.portalSource() != null && !filters.portalSource().isEmpty()) {
+            properties = properties.stream()
+                .filter(p -> p.getPortalSource().equalsIgnoreCase(filters.portalSource()))
+                .toList();
         }
 
         return properties;
@@ -230,6 +238,7 @@ public class PropertyPriceService {
                             .currentPrice(latestPrice.getPriceTotal())
                             .pricePerM2(latestPrice.getPricePerM2())
                             .currency(latestPrice.getCurrency())
+                            .expenses(latestPrice.getExpenses())
                             .condition(property.getPropertyCondition())
                             .priceDate(latestPrice.getDate())
                             .lastSeenAt(property.getLastSeenAt())
@@ -321,5 +330,47 @@ public class PropertyPriceService {
 
         int endIndex = Math.min(startIndex + size, prices.size());
         return prices.subList(startIndex, endIndex);
+    }
+
+    private List<PropertyPrice> applySorting(List<PropertyPrice> prices, String sortBy) {
+        if (sortBy == null || sortBy.isEmpty()) {
+            return prices;
+        }
+
+        return switch (sortBy) {
+            case "price_asc" -> prices.stream()
+                .sorted((p1, p2) -> {
+                    BigDecimal price1 = p1.getPriceTotal() != null ? p1.getPriceTotal() : BigDecimal.ZERO;
+                    BigDecimal price2 = p2.getPriceTotal() != null ? p2.getPriceTotal() : BigDecimal.ZERO;
+                    return price1.compareTo(price2);
+                })
+                .toList();
+
+            case "price_desc" -> prices.stream()
+                .sorted((p1, p2) -> {
+                    BigDecimal price1 = p1.getPriceTotal() != null ? p1.getPriceTotal() : BigDecimal.ZERO;
+                    BigDecimal price2 = p2.getPriceTotal() != null ? p2.getPriceTotal() : BigDecimal.ZERO;
+                    return price2.compareTo(price1);
+                })
+                .toList();
+
+            case "price_m2_asc" -> prices.stream()
+                .sorted((p1, p2) -> {
+                    BigDecimal pricePerM2First = p1.getPricePerM2() != null ? p1.getPricePerM2() : BigDecimal.ZERO;
+                    BigDecimal pricePerM2Second = p2.getPricePerM2() != null ? p2.getPricePerM2() : BigDecimal.ZERO;
+                    return pricePerM2First.compareTo(pricePerM2Second);
+                })
+                .toList();
+
+            case "price_m2_desc" -> prices.stream()
+                .sorted((p1, p2) -> {
+                    BigDecimal pricePerM2First = p1.getPricePerM2() != null ? p1.getPricePerM2() : BigDecimal.ZERO;
+                    BigDecimal pricePerM2Second = p2.getPricePerM2() != null ? p2.getPricePerM2() : BigDecimal.ZERO;
+                    return pricePerM2Second.compareTo(pricePerM2First);
+                })
+                .toList();
+
+            default -> prices;
+        };
     }
 }
