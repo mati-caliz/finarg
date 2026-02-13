@@ -63,7 +63,9 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
   });
 
   return (
-    <Card className={`shrink-0 border-t-[3px] ${getRiskBorderColor(countryRisk.value)}`}>
+    <Card
+      className={`shrink-0 border-t-[3px] ${getRiskBorderColor(countryRisk.value)} transition-all hover:shadow-lg cursor-pointer`}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5" />
