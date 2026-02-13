@@ -165,7 +165,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {loadingQuotes ? (
           <>
             <Skeleton className="h-36 rounded-xl" />
@@ -453,7 +453,7 @@ export default function DashboardPage() {
             </DropdownMenu>
           </div>
           {filteredQuotesByCurrency && filteredQuotesByCurrency.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               {sortQuotesByVariant(filteredQuotesByCurrency).map((quote) => (
                 <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
               ))}
