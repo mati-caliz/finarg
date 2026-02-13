@@ -11,6 +11,10 @@ export function useCurrentInflation() {
       const response = await inflationApi.getCurrent();
       return response.data;
     },
+    staleTime: 86400000,
+    gcTime: 604800000,
+    refetchInterval: 86400000,
+    retry: 3,
   });
 }
 

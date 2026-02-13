@@ -3,7 +3,7 @@ export const translations = {
     // Navigation
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
-    exchangeRatesComparator: "Conversor de monedas",
+    exchangeRatesComparator: "Conversor de Monedas",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
     realEstateIntelligence: "Real Estate Intelligence",
@@ -31,7 +31,7 @@ export const translations = {
     exchangeRateType: "Tipo de Cambio",
 
     // Currency Converter
-    universalConverter: "Conversor de monedas",
+    universalConverter: "Conversor de Monedas",
     universalConverterDesc: "Convertí entre más de 46 monedas de 5 países",
     convertCurrency: "Convertir Moneda",
     fromCurrency: "Desde",

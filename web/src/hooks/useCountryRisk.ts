@@ -11,6 +11,9 @@ export function useCountryRisk() {
       const response = await countryRiskApi.getCurrent();
       return response.data;
     },
-    refetchInterval: 3600000,
+    staleTime: 1800000,
+    gcTime: 86400000,
+    refetchInterval: 1800000,
+    retry: 3,
   });
 }

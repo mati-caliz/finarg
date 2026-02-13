@@ -11,6 +11,9 @@ export function useCrypto() {
       const response = await cryptoApi.getCurrent();
       return response.data;
     },
-    refetchInterval: 60000,
+    staleTime: 180000,
+    gcTime: 86400000,
+    refetchInterval: 180000,
+    retry: 3,
   });
 }

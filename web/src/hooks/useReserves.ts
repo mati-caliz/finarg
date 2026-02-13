@@ -13,6 +13,9 @@ export function useReserves(country: CountryCode = "ar") {
       return response.data;
     },
     enabled: country === "ar",
-    refetchInterval: 300000,
+    staleTime: 86400000,
+    gcTime: 604800000,
+    refetchInterval: 86400000,
+    retry: 3,
   });
 }
