@@ -121,6 +121,12 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         feature: null,
         isNew: true,
       },
+      {
+        key: "adjustmentCalculator" as TranslationKey,
+        href: "/calculadora-ajuste-inflacion",
+        icon: Percent,
+        feature: "inflation" as const,
+      },
     ],
   },
   {

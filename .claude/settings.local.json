@@ -66,7 +66,15 @@
       "Bash(jq:*)",
       "Bash(mvn compile:*)",
       "Bash(grep:*)",
-      "Bash(docker ps:*)"
+      "Bash(docker ps:*)",
+      "Bash(docker exec:*)",
+      "Bash(sudo find:*)",
+      "Bash(sudo ls:*)",
+      "Bash(nslookup:*)",
+      "Bash(ssh:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(sshpass -p '9nRX9ukqHVs4' ssh -o StrictHostKeyChecking=accept-new root@178.156.210.71 \"pwd && ls -la\")",
+      "Bash(sudo apt-get install:*)"
     ]
   }
 }
