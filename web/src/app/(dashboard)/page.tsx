@@ -183,7 +183,11 @@ export default function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {selectedCountry === "ar" && (
           <div className="flex flex-col gap-4 h-full min-h-0">
-            {countryRisk && <CountryRiskWidget countryRisk={countryRisk} />}
+            {countryRisk && (
+              <Link href="/riesgo-pais" className="block">
+                <CountryRiskWidget countryRisk={countryRisk} />
+              </Link>
+            )}
             {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
             {countryConfig.features.inflation && (
               <Card className="shrink-0 border-t-[3px] border-t-red-400">
