@@ -159,15 +159,15 @@ export function generateReferenceAreas(
       const govStart = new Date(gov.startDate);
       const govEnd = new Date(gov.endDate);
 
-      let x1: string | number = useIndex ? 0 : chartData[0]?.fecha;
+      let x1: string | number = useIndex ? 0 : chartData[0]?.fechaOriginal || chartData[0]?.fecha;
       let x2: string | number = useIndex
         ? chartData.length - 1
-        : chartData[chartData.length - 1]?.fecha;
+        : chartData[chartData.length - 1]?.fechaOriginal || chartData[chartData.length - 1]?.fecha;
 
       for (let i = 0; i < chartData.length; i++) {
         const date = new Date(chartData[i].fechaOriginal);
         if (date >= govStart) {
-          x1 = useIndex ? i : chartData[i].fecha;
+          x1 = useIndex ? i : chartData[i].fechaOriginal || chartData[i].fecha;
           break;
         }
       }
@@ -175,7 +175,7 @@ export function generateReferenceAreas(
       for (let i = chartData.length - 1; i >= 0; i--) {
         const date = new Date(chartData[i].fechaOriginal);
         if (date <= govEnd) {
-          x2 = useIndex ? i : chartData[i].fecha;
+          x2 = useIndex ? i : chartData[i].fechaOriginal || chartData[i].fecha;
           break;
         }
       }

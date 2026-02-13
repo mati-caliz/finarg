@@ -61,6 +61,16 @@ export function BarChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RechartsBarChart data={data} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+        {referenceAreas.map((area, idx) => (
+          <ReferenceArea
+            key={`area-${idx}-${area.x1}-${area.x2}`}
+            x1={area.x1}
+            x2={area.x2}
+            fill={area.fill}
+            fillOpacity={0.15}
+            strokeOpacity={0}
+          />
+        ))}
         {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
         <XAxis
           dataKey={xKey}
@@ -86,16 +96,6 @@ export function BarChart({
           itemStyle={{ color: "#fff" }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
-        {referenceAreas.map((area) => (
-          <ReferenceArea
-            key={`${area.label}-${area.x1}-${area.x2}`}
-            x1={area.x1}
-            x2={area.x2}
-            fill={area.fill}
-            fillOpacity={0.2}
-            strokeOpacity={0}
-          />
-        ))}
         {referenceLines.map((line) => (
           <ReferenceLine
             key={line.label || String(line.x)}

@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -30,5 +31,23 @@ public class CountryRiskService {
                 .value(response.getValue())
                 .date(LocalDate.parse(response.getDate()))
                 .build();
+    }
+
+    @Cacheable(value = "countryRisk", key = "'history'")
+    public List<CountryRiskDTO> getCountryRiskHistory() {
+        log.info("Fetching country risk history");
+        List<ArgentinaDatosClient.CountryRiskResponse> responses = argentinaDatosClient.getCountryRiskHistory();
+
+        if (responses == null || responses.isEmpty()) {
+            log.warn("No country risk history available from API");
+            return List.of();
+        }
+
+        return responses.stream()
+                .map(response -> CountryRiskDTO.builder()
+                        .value(response.getValue())
+                        .date(LocalDate.parse(response.getDate()))
+                        .build())
+                .toList();
     }
 }

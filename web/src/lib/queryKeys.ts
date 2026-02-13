@@ -19,6 +19,7 @@ export const queryKeys = {
   },
   countryRisk: {
     current: () => ["country-risk", "current"] as const,
+    governments: (country: CountryCode) => ["country-risk", "governments", country] as const,
   },
   exchangeBands: {
     current: () => ["exchange-bands", "current"] as const,

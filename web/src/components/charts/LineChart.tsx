@@ -6,6 +6,7 @@ import {
   ComposedChart,
   Legend,
   Line,
+  ReferenceArea,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -24,6 +25,12 @@ interface LineChartProps {
   showGrid?: boolean;
   showLegend?: boolean;
   legendLabels?: Record<string, string>;
+  referenceAreas?: Array<{
+    x1: string | number;
+    x2: string | number;
+    fill: string;
+    fillOpacity?: number;
+  }>;
 }
 
 export function LineChart({
@@ -37,6 +44,7 @@ export function LineChart({
   showGrid = false,
   showLegend = false,
   legendLabels,
+  referenceAreas,
 }: LineChartProps) {
   const yKeys = Array.isArray(yKey) ? yKey : [yKey];
 
@@ -63,6 +71,16 @@ export function LineChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 20, left: 10, bottom: 8 }}>
+        {referenceAreas?.map((area, idx) => (
+          <ReferenceArea
+            key={`area-${idx}-${area.x1}-${area.x2}`}
+            x1={area.x1}
+            x2={area.x2}
+            fill={area.fill}
+            fillOpacity={area.fillOpacity ?? 0.15}
+            strokeOpacity={0}
+          />
+        ))}
         {showGrid && (
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
         )}
