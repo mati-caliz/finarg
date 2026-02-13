@@ -74,7 +74,9 @@
       "Bash(ssh:*)",
       "Bash(ssh-keygen:*)",
       "Bash(sshpass -p '9nRX9ukqHVs4' ssh -o StrictHostKeyChecking=accept-new root@178.156.210.71 \"pwd && ls -la\")",
-      "Bash(sudo apt-get install:*)"
+      "Bash(sudo apt-get install:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(./node_modules/.bin/tsc:*)"
     ]
   }
 }
