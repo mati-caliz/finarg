@@ -97,7 +97,7 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   return (
     <Link href="/bandas-cambiarias" className="block h-full">
       <Card
-        className={`h-full border-t-[3px] ${colors.border} ${colors.hoverBorder} transition-all hover:shadow-lg cursor-pointer`}
+        className={`h-full border-t-[3px] ${colors.border} transition-all hover:shadow-lg ${colors.hoverBorder} cursor-pointer`}
       >
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
