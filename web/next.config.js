@@ -33,13 +33,13 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       isProd
-        ? "script-src 'self' 'unsafe-inline' https://accounts.google.com"
-        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com",
+        ? "script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.googletagmanager.com"
+        : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.googletagmanager.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https://www.bcra.gob.ar https://icon.horse https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com",
+      "img-src 'self' data: https://www.bcra.gob.ar https://icon.horse https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com https://www.google-analytics.com",
       [
-        "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse",
+        "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
         !isProd && "http://localhost:8080",
         backendUrl.replace("/api/v1", ""),
       ]
