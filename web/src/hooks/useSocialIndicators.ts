@@ -12,9 +12,10 @@ export function useSocialIndicators(country = "ar") {
       return response.data;
     },
     enabled: country === "ar",
-    staleTime: 86400000,
+    staleTime: 3600000,
     gcTime: 604800000,
-    refetchInterval: 86400000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
   });
 }

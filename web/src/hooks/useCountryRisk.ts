@@ -13,7 +13,8 @@ export function useCountryRisk() {
     },
     staleTime: 1800000,
     gcTime: 86400000,
-    refetchInterval: 1800000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
   });
 }
@@ -27,7 +28,8 @@ export function useCountryRiskHistory() {
     },
     staleTime: 3600000,
     gcTime: 86400000,
-    refetchInterval: 3600000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
   });
 }
