@@ -76,7 +76,13 @@
       "Bash(sshpass -p '9nRX9ukqHVs4' ssh -o StrictHostKeyChecking=accept-new root@178.156.210.71 \"pwd && ls -la\")",
       "Bash(sudo apt-get install:*)",
       "Bash(npm run type-check:*)",
-      "Bash(./node_modules/.bin/tsc:*)"
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(for months in 200 300 400 500)",
+      "Bash(do echo \"Testing $months months:\")",
+      "Bash(done)",
+      "Bash(for months in 120 150)",
+      "Bash(for months in 130 135 140)",
+      "Bash(for months in 121 125 128)"
     ]
   }
 }

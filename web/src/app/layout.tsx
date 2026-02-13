@@ -7,7 +7,6 @@ import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistratio
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { EarlyHints } from "./early-hints";
-import { HeadPrefetch } from "./head-prefetch";
 import { Providers } from "./providers";
 
 const inter = Inter({
@@ -80,7 +79,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={inter.className}>
         <Providers>
-          <HeadPrefetch />
           <div className="min-h-screen bg-background">
             <Sidebar />
             <div className="lg:pl-64">

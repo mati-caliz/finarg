@@ -237,7 +237,7 @@ export const translations = {
     uva: "UVA",
     cer: "CER",
     countryRisk: "Riesgo País",
-    countryRiskTitle: "Riesgo País Argentina",
+    countryRiskTitle: "Riesgo País",
     countryRiskDescription: "Evolución histórica del riesgo país argentino",
     countryRiskHistory: "Evolución Histórica",
     currentCountryRisk: "Riesgo País Actual",
