@@ -3,6 +3,9 @@ import type { PropertyFilter } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
 export function usePropertyPrices(filters: PropertyFilter | null) {
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const cacheTime = isDevelopment ? 30 * 1000 : 6 * 60 * 60 * 1000;
+
   return useQuery({
     queryKey: ["propertyPrices", filters],
     queryFn: async () => {
@@ -13,7 +16,7 @@ export function usePropertyPrices(filters: PropertyFilter | null) {
       return response.data;
     },
     enabled: filters !== null && filters.cityCode !== "",
-    staleTime: 6 * 60 * 60 * 1000,
-    refetchInterval: 6 * 60 * 60 * 1000,
+    staleTime: cacheTime,
+    refetchInterval: cacheTime,
   });
 }

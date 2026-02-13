@@ -164,11 +164,13 @@ public class ZonapropClient implements PropertyClient {
             return null;
         }
 
+        String priceText = extractPriceText(listing);
         BigDecimal price = extractPrice(listing);
         if (price == null) {
             return null;
         }
 
+        String currency = detectCurrency(priceText, price, operationType);
         BigDecimal surfaceM2 = extractSurface(listing);
         Integer bedrooms = extractFeature(listing, "dorm"); // Busca texto "2 dorm."
         Integer bathrooms = extractFeature(listing, "baño"); // Busca texto "1 baño"
@@ -187,7 +189,7 @@ public class ZonapropClient implements PropertyClient {
                 .bedrooms(bedrooms)
                 .bathrooms(bathrooms)
                 .price(price)
-                .currency("USD") // Asumimos USD para venta, habría que detectar símbolo
+                .currency(currency)
                 .expenses(expenses)
                 .condition(PropertyCondition.GOOD)
                 .build();
@@ -264,9 +266,61 @@ public class ZonapropClient implements PropertyClient {
         return null;
     }
 
+    private String extractPriceText(Element listing) {
+        Element priceEl = listing.selectFirst("[data-qa='POSTING_CARD_PRICE']");
+        if (priceEl != null) {
+            return priceEl.text();
+        }
+        Element priceAlt = listing.selectFirst(".price");
+        return (priceAlt != null) ? priceAlt.text() : "";
+    }
+
+    private String detectCurrency(String priceText, BigDecimal price, OperationType operationType) {
+        if (priceText == null || priceText.isEmpty()) {
+            return operationType == OperationType.SALE ? "USD" : "ARS";
+        }
+
+        String lowerText = priceText.toLowerCase();
+
+        if (lowerText.contains("us$") || lowerText.contains("usd") || lowerText.contains("u$s")) {
+            return "USD";
+        }
+
+        if (lowerText.contains("$") || lowerText.contains("ars") || lowerText.contains("pesos")) {
+            if (price.compareTo(new BigDecimal("500000")) > 0 && operationType == OperationType.RENT) {
+                return "ARS";
+            }
+            if (lowerText.contains("ars") || lowerText.contains("pesos")) {
+                return "ARS";
+            }
+        }
+
+        if (operationType == OperationType.RENT && price.compareTo(new BigDecimal("10000")) > 0) {
+            return "ARS";
+        }
+
+        return operationType == OperationType.SALE ? "USD" : "ARS";
+    }
+
     private BigDecimal extractExpenses(Element listing) {
         Element expEl = listing.selectFirst("[data-qa='POSTING_CARD_EXPENSES']");
-        String text = (expEl != null) ? expEl.text() : listing.select(".expenses").text();
+        String text = (expEl != null) ? expEl.text() : "";
+
+        if (text.isEmpty()) {
+            expEl = listing.selectFirst(".expenses");
+            text = (expEl != null) ? expEl.text() : "";
+        }
+
+        if (text.isEmpty()) {
+            Elements features = listing.select("[data-qa='POSTING_CARD_FEATURES'] span");
+            for (Element f : features) {
+                String txt = f.text().toLowerCase();
+                if (txt.contains("expensa") || txt.contains("exp.")) {
+                    text = txt;
+                    break;
+                }
+            }
+        }
 
         if (!text.isEmpty()) {
             String cleaned = text.replaceAll("[^0-9]", "");

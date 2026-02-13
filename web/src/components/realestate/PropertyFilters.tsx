@@ -174,6 +174,46 @@ export function PropertyFilters({ onFiltersChange }: PropertyFiltersProps) {
             </Select>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="portal">Portal</Label>
+            <Select
+              value={filters.portalSource || "_all"}
+              onValueChange={(value: string) =>
+                setFilters({ ...filters, portalSource: value === "_all" ? undefined : value })
+              }
+            >
+              <SelectTrigger id="portal">
+                <SelectValue placeholder="Todos los portales" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_all">Todos los portales</SelectItem>
+                <SelectItem value="argenprop">Argenprop</SelectItem>
+                <SelectItem value="zonaprop">Zonaprop</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sortBy">Ordenar por</Label>
+            <Select
+              value={filters.sortBy || "_default"}
+              onValueChange={(value: string) =>
+                setFilters({ ...filters, sortBy: value === "_default" ? undefined : value })
+              }
+            >
+              <SelectTrigger id="sortBy">
+                <SelectValue placeholder="Sin ordenar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_default">Sin ordenar</SelectItem>
+                <SelectItem value="price_asc">Menor precio</SelectItem>
+                <SelectItem value="price_desc">Mayor precio</SelectItem>
+                <SelectItem value="price_m2_asc">Menor precio/m²</SelectItem>
+                <SelectItem value="price_m2_desc">Mayor precio/m²</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="minPrice">Precio Mín</Label>

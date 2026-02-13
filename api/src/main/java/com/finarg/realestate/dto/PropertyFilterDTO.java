@@ -32,6 +32,10 @@ public record PropertyFilterDTO(
 
     String currency,
 
+    String portalSource,
+
+    String sortBy,
+
     @Min(value = 0, message = "Page must be 0 or greater")
     Integer page,
 

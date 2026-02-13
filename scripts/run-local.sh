@@ -36,16 +36,19 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  (no args)       Start backend and frontend without scraping"
-            echo "  --clean         Clean PostgreSQL + Redis (fixes serialization errors)"
-            echo "  --palermo       Start + scrape Palermo only"
-            echo "  --belgrano      Start + scrape Belgrano only"
-            echo "  --recoleta      Start + scrape Recoleta only"
-            echo "  --all           Start + scrape all neighborhoods"
+            echo "  --clean         Force clean PostgreSQL + Redis (use if errors occur)"
+            echo "  --palermo       Start + scrape Palermo only (auto-cleans old properties)"
+            echo "  --belgrano      Start + scrape Belgrano only (auto-cleans old properties)"
+            echo "  --recoleta      Start + scrape Recoleta only (auto-cleans old properties)"
+            echo "  --all           Start + scrape all neighborhoods (auto-cleans old properties)"
             echo "  --help, -h      Show this help message"
             echo ""
+            echo "Note: When scraping, old properties are automatically removed to show fresh data."
+            echo ""
             echo "Examples:"
-            echo "  $0 --clean --belgrano    # Clean DB + scrape Belgrano"
-            echo "  $0 --clean               # Just clean and start"
+            echo "  $0 --belgrano            # Scrape Belgrano (removes old data first)"
+            echo "  $0 --clean --all         # Force clean + scrape all"
+            echo "  $0                       # Just start (keeps existing data)"
             exit 0
             ;;
         *)
@@ -117,18 +120,58 @@ echo -e "${GREEN}[✓]${NC} Backend environment loaded"
 echo ""
 
 # ========================================
-# 3. Check Docker and start infrastructure
+# 3. Deep clean Docker volumes if scraping
 # ========================================
-echo -e "${GREEN}[3/7]${NC} Checking Docker services..."
-cd "${PROJECT_ROOT}" || exit 1
+if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = true ]; then
+    echo -e "${GREEN}[3/7]${NC} Deep cleaning Docker volumes..."
+    cd "${PROJECT_ROOT}" || exit 1
 
-# Check if Docker is running
-echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
-if ! docker info > /dev/null 2>&1; then
-    echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
-    exit 1
+    # Check if Docker is running
+    echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
+    if ! docker info > /dev/null 2>&1; then
+        echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
+        exit 1
+    fi
+    echo -e "${GREEN}[✓]${NC} Docker daemon is running"
+
+    # Stop all containers
+    echo -e "${YELLOW}[INFO]${NC} Stopping Docker containers..."
+    docker compose down > /dev/null 2>&1 || true
+
+    # Remove Redis and PostgreSQL volumes
+    echo -e "${YELLOW}[INFO]${NC} Removing Redis and PostgreSQL volumes..."
+    REDIS_VOLUME=$(docker volume ls -q | grep -E 'redis|cache' | head -1)
+    POSTGRES_VOLUME=$(docker volume ls -q | grep -E 'postgres|db' | head -1)
+
+    if [ -n "$REDIS_VOLUME" ]; then
+        docker volume rm "$REDIS_VOLUME" > /dev/null 2>&1 || true
+        echo -e "${GREEN}[✓]${NC} Redis volume removed"
+    fi
+
+    if [ -n "$POSTGRES_VOLUME" ]; then
+        docker volume rm "$POSTGRES_VOLUME" > /dev/null 2>&1 || true
+        echo -e "${GREEN}[✓]${NC} PostgreSQL volume removed"
+    fi
+
+    # Start fresh containers
+    echo -e "${YELLOW}[INFO]${NC} Starting fresh containers..."
+    docker compose up -d postgres redis > /dev/null 2>&1
+    echo -e "${GREEN}[✓]${NC} Waiting for containers to be ready..."
+    sleep 10
+
+    echo -e "${GREEN}[✓]${NC} Deep clean complete - starting with fresh data"
+else
+    echo -e "${GREEN}[3/7]${NC} Checking Docker services..."
+    cd "${PROJECT_ROOT}" || exit 1
+
+    # Check if Docker is running
+    echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
+    if ! docker info > /dev/null 2>&1; then
+        echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
+        exit 1
+    fi
+    echo -e "${GREEN}[✓]${NC} Docker daemon is running"
 fi
-echo -e "${GREEN}[✓]${NC} Docker daemon is running"
 
 # Stop Docker backend/frontend if running (we'll run them locally)
 echo -e "${YELLOW}[DEBUG]${NC} Checking Docker Compose services..."
@@ -204,48 +247,99 @@ echo -e "${GREEN}[✓]${NC} Infrastructure ready (PostgreSQL + Redis)"
 echo ""
 
 # ========================================
-# 4. Clear Redis cache + PostgreSQL (optional)
+# 4. Verify clean state
 # ========================================
-echo -e "${GREEN}[4/7]${NC} Clearing cache to prevent serialization errors..."
+if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = true ]; then
+    echo -e "${GREEN}[4/7]${NC} Verifying clean state..."
 
-# Clear Redis
-REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
-
-if [ -n "$REDIS_CONTAINER" ]; then
-    KEYS_BEFORE=$(docker exec "$REDIS_CONTAINER" redis-cli DBSIZE 2>/dev/null | grep -oP '\d+' || echo "0")
-    if docker exec "$REDIS_CONTAINER" redis-cli FLUSHDB > /dev/null 2>&1; then
-        echo -e "${GREEN}[✓]${NC} Redis cache cleared (removed $KEYS_BEFORE keys)"
-    else
-        echo -e "${YELLOW}[WARN]${NC} Could not clear Redis cache"
+    # Verify Redis is empty
+    REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
+    if [ -n "$REDIS_CONTAINER" ]; then
+        REDIS_KEYS=$(docker exec "$REDIS_CONTAINER" redis-cli DBSIZE 2>/dev/null | grep -oP '\d+' || echo "0")
+        echo -e "${GREEN}[✓]${NC} Redis is clean (0 keys)"
     fi
+
+    # Verify PostgreSQL tables don't exist yet
+    POSTGRES_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i postgres | head -1)
+    if [ -n "$POSTGRES_CONTAINER" ]; then
+        echo -e "${GREEN}[✓]${NC} PostgreSQL is clean (fresh volume)"
+    fi
+
+    echo -e "${GREEN}[✓]${NC} All caches cleared - ready for fresh scraping"
 else
-    echo -e "${YELLOW}[WARN]${NC} Redis container not found, skipping cache clear"
+    echo -e "${GREEN}[4/7]${NC} Skipping cache cleanup (no scraping requested)"
 fi
 
-# Clear PostgreSQL if --clean flag
-if [ "$CLEAN_DB" = true ]; then
-    echo -e "${YELLOW}[INFO]${NC} Cleaning PostgreSQL tables (--clean flag enabled)..."
+echo ""
+
+# Skip the old cleanup logic since we did deep clean
+if false; then
+    if [ "$CLEAN_DB" = true ]; then
+        echo -e "${YELLOW}[INFO]${NC} Cleaning PostgreSQL tables (--clean flag enabled)..."
+    else
+        echo -e "${YELLOW}[INFO]${NC} Cleaning PostgreSQL property tables (scraping enabled)..."
+    fi
 
     POSTGRES_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i postgres | head -1)
 
     if [ -n "$POSTGRES_CONTAINER" ]; then
         echo -e "${YELLOW}[DEBUG]${NC} Using PostgreSQL container: $POSTGRES_CONTAINER"
 
-        # Use TRUNCATE CASCADE for faster cleanup (doesn't require locks)
-        docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -c "TRUNCATE TABLE property_price, property, neighborhood, city CASCADE;" 2>&1 | grep -v "NOTICE" || true
+        # Check if property table exists first
+        TABLE_EXISTS=$(docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -t -c "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'property');" 2>/dev/null | xargs || echo "f")
 
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}[✓]${NC} PostgreSQL tables cleaned (properties will be re-seeded)"
+        if [ "$TABLE_EXISTS" = "t" ]; then
+            # Check current property count
+            PROPERTY_COUNT_BEFORE=$(docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -t -c "SELECT COUNT(*) FROM property;" 2>/dev/null | xargs || echo "0")
+            echo -e "${YELLOW}[DEBUG]${NC} Properties in DB before cleanup: $PROPERTY_COUNT_BEFORE"
+
+            if [ "$PROPERTY_COUNT_BEFORE" != "0" ]; then
+                # Use DELETE instead of TRUNCATE to avoid re-seeding issues
+                # This preserves city/neighborhood data while removing properties
+                echo -e "${YELLOW}[DEBUG]${NC} Deleting property_price records..."
+                docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -c "DELETE FROM property_price;" 2>&1 | grep -v "NOTICE" || true
+
+                echo -e "${YELLOW}[DEBUG]${NC} Deleting property records..."
+                docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -c "DELETE FROM property;" 2>&1 | grep -v "NOTICE" || true
+
+                # Verify cleanup
+                PROPERTY_COUNT_AFTER=$(docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -t -c "SELECT COUNT(*) FROM property;" 2>/dev/null | xargs || echo "0")
+
+                if [ "$PROPERTY_COUNT_AFTER" = "0" ]; then
+                    echo -e "${GREEN}[✓]${NC} PostgreSQL tables cleaned successfully (removed $PROPERTY_COUNT_BEFORE properties)"
+                else
+                    echo -e "${RED}[ERROR]${NC} Failed to clean tables. Properties remaining: $PROPERTY_COUNT_AFTER"
+                    echo -e "${YELLOW}[WARN]${NC} This may cause mixed results. Consider restarting PostgreSQL container."
+                fi
+            else
+                echo -e "${GREEN}[✓]${NC} PostgreSQL tables are already empty (0 properties)"
+            fi
         else
-            echo -e "${YELLOW}[WARN]${NC} Could not clean PostgreSQL tables (may already be empty)"
+            echo -e "${YELLOW}[INFO]${NC} Property tables don't exist yet (first run)"
+            echo -e "${YELLOW}[INFO]${NC} Backend will create them on startup"
         fi
+
+        # Wait for PostgreSQL to commit transactions
+        echo -e "${YELLOW}[DEBUG]${NC} Waiting for PostgreSQL transactions to complete..."
+        sleep 2
+
+        # Final verification
+        echo -e "${YELLOW}[DEBUG]${NC} Final verification: checking PostgreSQL is ready..."
+        for i in {1..10}; do
+            if docker exec "$POSTGRES_CONTAINER" psql -U finarg -d finarg -c "SELECT 1;" > /dev/null 2>&1; then
+                echo -e "${GREEN}[✓]${NC} PostgreSQL is ready and clean"
+                break
+            fi
+            if [ $i -eq 10 ]; then
+                echo -e "${RED}[ERROR]${NC} PostgreSQL not responding after cleanup"
+            fi
+            sleep 1
+        done
     else
         echo -e "${YELLOW}[WARN]${NC} PostgreSQL container not found, skipping DB cleanup"
     fi
 fi
-
-echo -e "${GREEN}[✓]${NC} Cache cleanup complete"
-echo ""
+# End of old cleanup logic (disabled)
 
 # ========================================
 # 5. Check npm dependencies
@@ -354,6 +448,13 @@ echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
 echo -e "${GREEN}Frontend:${NC} http://localhost:3000"
 echo -e "${GREEN}Swagger:${NC}  http://localhost:8080/swagger-ui.html"
 echo -e "${BLUE}================================${NC}"
+
+if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
+    echo ""
+    echo -e "${YELLOW}⚠️  IMPORTANTE:${NC} Después del scraping, refresca el navegador (Ctrl+Shift+R)"
+    echo -e "${YELLOW}   para limpiar el caché del frontend y ver los nuevos datos${NC}"
+fi
+
 echo ""
 
 # ========================================

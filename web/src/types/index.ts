@@ -220,6 +220,8 @@ export interface PropertyFilter {
   minSurfaceM2?: number;
   maxSurfaceM2?: number;
   currency?: string;
+  portalSource?: string;
+  sortBy?: string;
   page?: number;
   size?: number;
 }
@@ -254,6 +256,7 @@ export interface Property {
   currentPrice: number;
   pricePerM2: number;
   currency: string;
+  expenses?: number;
   condition?: PropertyCondition;
   priceDate: string;
   lastSeenAt: string;

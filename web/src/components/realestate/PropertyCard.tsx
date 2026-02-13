@@ -22,6 +22,30 @@ export const PropertyCard = memo(function PropertyCard({ property }: PropertyCar
     return "bg-gray-100 text-gray-800";
   };
 
+  const capitalizePortal = (portal: string) => {
+    return portal.charAt(0).toUpperCase() + portal.slice(1).toLowerCase();
+  };
+
+  const normalizeAddress = (address: string) => {
+    return address
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const translatePropertyType = (type: string) => {
+    const translations: Record<string, string> = {
+      APARTMENT: "Departamento",
+      HOUSE: "Casa",
+      PH: "PH",
+      LAND: "Terreno",
+      OFFICE: "Oficina",
+      WAREHOUSE: "Depósito",
+    };
+    return translations[type] || type;
+  };
+
   return (
     <Card className="hover:shadow-lg transition-shadow border-t-[3px] border-t-blue-500">
       <CardHeader>
@@ -31,11 +55,11 @@ export const PropertyCard = memo(function PropertyCard({ property }: PropertyCar
             {property.neighborhoodName}
           </CardTitle>
           <Badge className={getPortalBadgeColor(property.portalSource)}>
-            {property.portalSource}
+            {capitalizePortal(property.portalSource)}
           </Badge>
         </div>
         {property.address && (
-          <p className="text-sm text-muted-foreground mt-1">{property.address}</p>
+          <p className="text-sm text-muted-foreground mt-1">{normalizeAddress(property.address)}</p>
         )}
       </CardHeader>
       <CardContent className="space-y-3">
@@ -46,6 +70,13 @@ export const PropertyCard = memo(function PropertyCard({ property }: PropertyCar
           <div className="text-sm text-muted-foreground">
             {formatCurrency(property.pricePerM2, property.currency)} / m²
           </div>
+          {property.expenses !== null &&
+            property.expenses !== undefined &&
+            property.expenses > 0 && (
+              <div className="text-xs text-muted-foreground mt-1">
+                + Expensas: {formatCurrency(property.expenses, "ARS")}
+              </div>
+            )}
         </div>
 
         <div className="flex items-center gap-4 text-sm">
@@ -70,7 +101,7 @@ export const PropertyCard = memo(function PropertyCard({ property }: PropertyCar
         </div>
 
         <div className="flex justify-between items-center text-xs text-muted-foreground pt-2 border-t">
-          <span>{property.propertyType}</span>
+          <span>{translatePropertyType(property.propertyType)}</span>
           <span>{property.operationType === "SALE" ? "Venta" : "Alquiler"}</span>
         </div>
       </CardContent>

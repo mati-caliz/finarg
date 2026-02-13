@@ -25,6 +25,7 @@ public record PropertyDTO(
     BigDecimal currentPrice,
     BigDecimal pricePerM2,
     String currency,
+    BigDecimal expenses,
     PropertyCondition condition,
     LocalDate priceDate,
     LocalDateTime lastSeenAt
