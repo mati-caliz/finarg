@@ -190,36 +190,31 @@ export default function DashboardPage() {
             )}
             {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
             {countryConfig.features.inflation && (
-              <Card className="shrink-0 border-t-[3px] border-t-red-400">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
-                    <Percent className="h-3.5 w-3.5" />
-                    {translate("monthlyInflation")}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 pb-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-3xl font-bold text-red-500">
-                        {inflation?.value?.toFixed(1) ?? "0"}%
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {translate("last12Months")}
-                      </p>
+              <Link href="/inflacion" className="block shrink-0">
+                <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Percent className="h-3.5 w-3.5" />
+                      {translate("monthlyInflation")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0 pb-6">
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <p className="text-3xl font-bold text-red-500">
+                          {inflation?.value?.toFixed(1) ?? "0"}%
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {translate("last12Months")}
+                        </p>
+                      </div>
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                        <TrendingUp className="h-5 w-5 text-red-500" />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
-                      <TrendingUp className="h-5 w-5 text-red-500" />
-                    </div>
-                  </div>
-                  <Link
-                    href="/inflacion"
-                    className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
-                  >
-                    {translate("viewHistory")}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             )}
           </div>
         )}
@@ -405,34 +400,31 @@ export default function DashboardPage() {
         )}
 
         {countryConfig.features.inflation && selectedCountry !== "ar" && (
-          <Card className="border-t-[3px] border-t-red-400">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Percent className="h-3.5 w-3.5" />
-                {translate("monthlyInflation")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end justify-between">
-                <div>
-                  <p className="text-3xl font-bold text-red-500">
-                    {inflation?.value?.toFixed(1) ?? "0"}%
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">{translate("last12Months")}</p>
+          <Link href="/inflacion" className="block">
+            <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Percent className="h-3.5 w-3.5" />
+                  {translate("monthlyInflation")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end justify-between">
+                  <div>
+                    <p className="text-3xl font-bold text-red-500">
+                      {inflation?.value?.toFixed(1) ?? "0"}%
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {translate("last12Months")}
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
+                    <TrendingUp className="h-5 w-5 text-red-500" />
+                  </div>
                 </div>
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-500/15">
-                  <TrendingUp className="h-5 w-5 text-red-500" />
-                </div>
-              </div>
-              <Link
-                href="/inflacion"
-                className="inline-flex items-center gap-1 text-sm text-success-accessible hover:underline mt-4"
-              >
-                {translate("viewHistory")}
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         )}
       </div>
 

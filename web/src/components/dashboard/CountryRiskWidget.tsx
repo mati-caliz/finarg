@@ -43,6 +43,19 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
     return "border-t-red-500";
   };
 
+  const getRiskHoverBorderColor = (value: number) => {
+    if (value < 500) {
+      return "hover:border-emerald-400";
+    }
+    if (value < 800) {
+      return "hover:border-yellow-400";
+    }
+    if (value < 1200) {
+      return "hover:border-orange-400";
+    }
+    return "hover:border-red-400";
+  };
+
   const getRiskBgColor = (value: number) => {
     if (value < 500) {
       return "bg-emerald-100 dark:bg-emerald-500/15";
@@ -64,7 +77,7 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
 
   return (
     <Card
-      className={`shrink-0 border-t-[3px] ${getRiskBorderColor(countryRisk.value)} transition-all hover:shadow-lg cursor-pointer`}
+      className={`shrink-0 border-t-[3px] ${getRiskBorderColor(countryRisk.value)} transition-all hover:shadow-lg ${getRiskHoverBorderColor(countryRisk.value)} cursor-pointer`}
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
