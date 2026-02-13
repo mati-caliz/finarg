@@ -20,7 +20,7 @@ export function useMonthlyInflation() {
   return useQuery<Inflation[]>({
     queryKey: ["inflation", "monthly"],
     queryFn: async () => {
-      const response = await inflationApi.getMonthly(600);
+      const response = await inflationApi.getMonthly(120);
       return response.data;
     },
     staleTime: 3600000,
