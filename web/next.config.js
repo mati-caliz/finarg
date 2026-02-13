@@ -154,6 +154,7 @@ const nextConfig = {
       { source: "/simulador", destination: "/simulador-de-inversiones", permanent: true },
       { source: "/reservas", destination: "/reservas-bcra", permanent: true },
       { source: "/tasas", destination: "/comparador-tasas", permanent: true },
+      { source: "/conversor-universal", destination: "/conversor-monedas", permanent: true },
     ];
   },
   async rewrites() {

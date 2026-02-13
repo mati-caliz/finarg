@@ -523,7 +523,7 @@ export default function DashboardPage() {
             </Link>
           )}
 
-          <Link href="/conversor-universal">
+          <Link href="/conversor-monedas">
             <Card className="group cursor-pointer border-l-[3px] border-l-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 h-[140px]">
               <CardContent className="pt-6 h-full flex items-center">
                 <div className="flex items-center justify-between w-full gap-4">

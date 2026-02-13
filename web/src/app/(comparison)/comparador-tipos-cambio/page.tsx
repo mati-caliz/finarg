@@ -8,7 +8,7 @@ export default function ExchangeRateComparatorRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/conversor-universal");
+    router.replace("/conversor-monedas");
   }, [router]);
 
   return (
