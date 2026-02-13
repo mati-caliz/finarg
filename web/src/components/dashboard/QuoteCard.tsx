@@ -100,17 +100,19 @@ export const QuoteCard = memo(function QuoteCard({ quote, country }: QuoteCardPr
       </CardHeader>
       <CardContent>
         <div className="flex items-end justify-between">
-          <div>
-            <p className="text-2xl font-bold tracking-tight">
+          <div className="min-w-0 flex-1">
+            <p className="text-xl sm:text-2xl font-bold tracking-tight whitespace-nowrap">
               {formatCurrencySimple(quote.sell, countryToUse)}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1 whitespace-nowrap">
               {translate("buy")}: {formatCurrencySimple(quote.buy, countryToUse)}
             </p>
           </div>
-          {isDollarQuote && <VariationBadge variation={quote.variation || 0} />}
+          {isDollarQuote && (
+            <VariationBadge variation={quote.variation || 0} className="ml-2 shrink-0" />
+          )}
         </div>
-        <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
+        <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground whitespace-nowrap">
           {translate("spread")}: {formatCurrencySimple(quote.spread, countryToUse)}
         </div>
       </CardContent>
