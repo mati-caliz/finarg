@@ -202,6 +202,8 @@ export const translations = {
     yearOverYearEvolution: "Inflación Interanual - Evolución",
     monthlyData: "Datos Mensuales",
     period: "Período",
+    date: "Fecha",
+    value: "Valor",
     monthly: "Mensual",
     months: "meses",
     year: "año",
