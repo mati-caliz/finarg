@@ -88,8 +88,8 @@ export default function CountryRiskPage() {
     if (!riskData || riskData.length === 0) {
       return [];
     }
-    const firstDate = new Date(riskData[0]?.date || "");
-    const lastDate = new Date(riskData[riskData.length - 1]?.date || "");
+    const firstDate = new Date(riskData[0]?.fechaOriginal || "");
+    const lastDate = new Date(riskData[riskData.length - 1]?.fechaOriginal || "");
 
     return governments.filter((gov) => {
       const govStart = new Date(gov.startDate);
