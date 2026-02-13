@@ -79,6 +79,8 @@ export const indicatorsApi = {
 
 export const countryRiskApi = {
   getCurrent: () => api.get("/country-risk"),
+  getHistory: () => api.get("/country-risk/history"),
+  getGovernments: (country = "ar") => api.get("/country-risk/governments", { params: { country } }),
 };
 
 export const ratesApi = {

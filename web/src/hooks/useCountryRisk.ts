@@ -17,3 +17,17 @@ export function useCountryRisk() {
     retry: 3,
   });
 }
+
+export function useCountryRiskHistory() {
+  return useQuery<CountryRisk[]>({
+    queryKey: ["countryRisk", "history"],
+    queryFn: async () => {
+      const response = await countryRiskApi.getHistory();
+      return response.data;
+    },
+    staleTime: 3600000,
+    gcTime: 86400000,
+    refetchInterval: 3600000,
+    retry: 3,
+  });
+}

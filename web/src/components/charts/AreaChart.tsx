@@ -54,6 +54,16 @@ export function AreaChart({
             <stop offset="95%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
+        {referenceAreas.map((area, idx) => (
+          <ReferenceArea
+            key={`area-${idx}-${area.x1}-${area.x2}`}
+            x1={area.x1}
+            x2={area.x2}
+            fill={area.fill}
+            fillOpacity={0.15}
+            strokeOpacity={0}
+          />
+        ))}
         {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
         <XAxis
           dataKey={xKey}
@@ -81,16 +91,6 @@ export function AreaChart({
           itemStyle={{ color: "#fff" }}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
-        {referenceAreas.map((area) => (
-          <ReferenceArea
-            key={`${area.label}-${area.x1}-${area.x2}`}
-            x1={area.x1}
-            x2={area.x2}
-            fill={area.fill}
-            fillOpacity={0.2}
-            strokeOpacity={0}
-          />
-        ))}
         <Area
           type="monotone"
           dataKey={yKey}

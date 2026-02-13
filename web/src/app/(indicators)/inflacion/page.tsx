@@ -20,8 +20,8 @@ import { BarChart3, Calculator, Calendar, DollarSign, Loader2, TrendingUp } from
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
-const BarChart = dynamic(
-  () => import("@/components/charts").then((mod) => ({ default: mod.BarChart })),
+const LineChart = dynamic(
+  () => import("@/components/charts").then((mod) => ({ default: mod.LineChart })),
   {
     ssr: false,
     loading: () => (
@@ -334,25 +334,33 @@ export default function InflationPage() {
               {monthlyInflation && monthlyInflation.length > 0 ? (
                 (() => {
                   const reversedData = [...monthlyInflation].reverse();
-                  const chartData = reversedData.map((i) => ({
+                  const chartData = reversedData.map((i, idx) => ({
+                    index: idx,
                     fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.value,
                   }));
 
-                  const referenceAreas = generateReferenceAreas(chartData, governments);
+                  const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
+                    (area) => ({
+                      ...area,
+                      x1: chartData[area.x1 as number]?.index,
+                      x2: chartData[area.x2 as number]?.index,
+                    }),
+                  );
 
                   const visibleGovs = getVisibleGovernments(monthlyInflation);
 
                   return (
                     <>
-                      <BarChart
+                      <LineChart
                         data={chartData}
-                        xKey="fecha"
+                        xKey="index"
                         yKey="valor"
                         height={250}
+                        formatX={(v) => chartData[Number(v)]?.fecha || ""}
                         formatY={(v) => `${Number(v).toFixed(1)}%`}
-                        color="#10b981"
+                        colors={["#10b981"]}
                         referenceAreas={referenceAreas}
                       />
                       {visibleGovs.length > 0 && (
@@ -402,25 +410,33 @@ export default function InflationPage() {
                 (() => {
                   const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
                   const reversedData = [...filteredData].reverse();
-                  const chartData = reversedData.map((i) => ({
+                  const chartData = reversedData.map((i, idx) => ({
+                    index: idx,
                     fecha: formatDateShort(i.date),
                     fechaOriginal: i.date,
                     valor: i.yearOverYear as number,
                   }));
 
-                  const referenceAreas = generateReferenceAreas(chartData, governments);
+                  const referenceAreas = generateReferenceAreas(chartData, governments, true).map(
+                    (area) => ({
+                      ...area,
+                      x1: chartData[area.x1 as number]?.index,
+                      x2: chartData[area.x2 as number]?.index,
+                    }),
+                  );
 
                   const visibleGovs = getVisibleGovernments(filteredData);
 
                   return (
                     <>
-                      <BarChart
+                      <LineChart
                         data={chartData}
-                        xKey="fecha"
+                        xKey="index"
                         yKey="valor"
                         height={250}
+                        formatX={(v) => chartData[Number(v)]?.fecha || ""}
                         formatY={(v) => `${Number(v).toFixed(1)}%`}
-                        color="#ef4444"
+                        colors={["#ef4444"]}
                         referenceAreas={referenceAreas}
                       />
                       {visibleGovs.length > 0 && (

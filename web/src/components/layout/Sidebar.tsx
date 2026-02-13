@@ -7,14 +7,18 @@ import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
+  AlertTriangle,
   ArrowLeftRight,
   BarChart2,
   Building2,
   Calculator,
+  ChevronDown,
+  ChevronRight,
   DollarSign,
   Gauge,
   Landmark,
   LayoutDashboard,
+  LineChart,
   Menu,
   Percent,
   TrendingUp,
@@ -22,63 +26,115 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-const baseNavigation = [
-  { key: "dashboard" as TranslationKey, href: "/", icon: LayoutDashboard, feature: null },
+interface NavigationItem {
+  key: TranslationKey;
+  href: string;
+  icon: React.ElementType;
+  feature: "quotes" | "inflation" | "reserves" | "rates" | "incomeTax" | null;
+  isNew?: boolean;
+  isComingSoon?: boolean;
+}
+
+interface NavigationCategory {
+  key: TranslationKey;
+  icon: React.ElementType;
+  items: NavigationItem[];
+}
+
+const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
   {
-    key: "quotes" as TranslationKey,
-    href: "/cotizaciones",
+    key: "dashboard" as TranslationKey,
+    href: "/",
+    icon: LayoutDashboard,
+    feature: null,
+  },
+  {
+    key: "market" as TranslationKey,
     icon: DollarSign,
-    feature: "quotes" as const,
+    items: [
+      {
+        key: "quotes" as TranslationKey,
+        href: "/cotizaciones",
+        icon: DollarSign,
+        feature: "quotes" as const,
+      },
+      {
+        key: "exchangeBands" as TranslationKey,
+        href: "/bandas-cambiarias",
+        icon: Gauge,
+        feature: "quotes" as const,
+      },
+      {
+        key: "exchangeRatesComparator" as TranslationKey,
+        href: "/conversor-monedas",
+        icon: ArrowLeftRight,
+        feature: "quotes" as const,
+      },
+      {
+        key: "ratesComparator" as TranslationKey,
+        href: "/comparador-tasas",
+        icon: BarChart2,
+        feature: "rates" as const,
+      },
+    ],
   },
   {
-    key: "exchangeBands" as TranslationKey,
-    href: "/bandas-cambiarias",
-    icon: Gauge,
-    feature: "quotes" as const,
+    key: "indicators" as TranslationKey,
+    icon: LineChart,
+    items: [
+      {
+        key: "inflation" as TranslationKey,
+        href: "/inflacion",
+        icon: Percent,
+        feature: "inflation" as const,
+      },
+      {
+        key: "reserves" as TranslationKey,
+        href: "/reservas-bcra",
+        icon: Landmark,
+        feature: "reserves" as const,
+      },
+      {
+        key: "countryRisk" as TranslationKey,
+        href: "/riesgo-pais",
+        icon: AlertTriangle,
+        feature: null,
+      },
+    ],
   },
   {
-    key: "exchangeRatesComparator" as TranslationKey,
-    href: "/conversor-monedas",
-    icon: ArrowLeftRight,
-    feature: "quotes" as const,
-  },
-  {
-    key: "inflation" as TranslationKey,
-    href: "/inflacion",
-    icon: Percent,
-    feature: "inflation" as const,
-  },
-  {
-    key: "reserves" as TranslationKey,
-    href: "/reservas-bcra",
-    icon: Landmark,
-    feature: "reserves" as const,
-  },
-  {
-    key: "ratesComparator" as TranslationKey,
-    href: "/comparador-tasas",
-    icon: BarChart2,
-    feature: "rates" as const,
-  },
-  {
-    key: "incomeTaxCalculator" as TranslationKey,
-    href: "/calculadora-sueldo-neto",
+    key: "calculators" as TranslationKey,
     icon: Calculator,
-    feature: "incomeTax" as const,
+    items: [
+      {
+        key: "incomeTaxCalculator" as TranslationKey,
+        href: "/calculadora-sueldo-neto",
+        icon: Calculator,
+        feature: "incomeTax" as const,
+      },
+      {
+        key: "compoundInterestCalculator" as TranslationKey,
+        href: "/calculadora-interes-compuesto",
+        icon: TrendingUp,
+        feature: null,
+        isNew: true,
+      },
+    ],
   },
   {
-    key: "compoundInterestCalculator" as TranslationKey,
-    href: "/calculadora-interes-compuesto",
-    icon: TrendingUp,
-    feature: null,
-  },
-  {
-    key: "realEstateIntelligence" as TranslationKey,
-    href: "/bienes-raices",
+    key: "investments" as TranslationKey,
     icon: Building2,
-    feature: null,
+    items: [
+      {
+        key: "realEstateIntelligence" as TranslationKey,
+        href: "/bienes-raices",
+        icon: Building2,
+        feature: null,
+        isComingSoon: true,
+      },
+    ],
   },
 ];
 
@@ -98,6 +154,129 @@ function CountrySelector() {
         <span className="text-white/90">{translate(countryConfig.code as TranslationKey)}</span>
       </div>
       <p className="text-xs text-white/40 px-1">{translate("otherCountriesComingSoon")}</p>
+    </div>
+  );
+}
+
+interface NavItemProps {
+  item: NavigationItem;
+  pathname: string;
+  toggleSidebar: () => void;
+  translate: (key: TranslationKey) => string;
+  selectedCountry: string;
+  reservesKeyMap: Record<string, TranslationKey>;
+}
+
+function NavItem({
+  item,
+  pathname,
+  toggleSidebar,
+  translate,
+  selectedCountry,
+  reservesKeyMap,
+}: NavItemProps) {
+  const isActive = pathname === item.href;
+  const isComingSoon = item.isComingSoon || item.href === "#";
+  const displayName =
+    item.feature === "reserves"
+      ? translate(reservesKeyMap[selectedCountry] || "reserves")
+      : translate(item.key);
+
+  return (
+    <Link
+      href={item.href}
+      onClick={(e) => {
+        if (isComingSoon) {
+          e.preventDefault();
+          return;
+        }
+        if (window.innerWidth < 1024) {
+          toggleSidebar();
+        }
+      }}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
+        isActive
+          ? "bg-[hsl(152_69%_24%)] text-white shadow-lg shadow-primary/25"
+          : "text-white/60 hover:bg-white/10 hover:text-white",
+        isComingSoon && "cursor-default",
+      )}
+    >
+      <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
+      <span className={cn("flex-1", isComingSoon && "opacity-50")}>{displayName}</span>
+      {item.isNew && (
+        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
+          Nuevo
+        </span>
+      )}
+      {isComingSoon && (
+        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-700 text-white uppercase tracking-wide">
+          {translate("comingSoon")}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+interface NavCategoryProps {
+  category: NavigationCategory;
+  pathname: string;
+  toggleSidebar: () => void;
+  translate: (key: TranslationKey) => string;
+  selectedCountry: string;
+  countryConfig: ReturnType<typeof getCountryConfig>;
+  reservesKeyMap: Record<string, TranslationKey>;
+}
+
+function NavCategory({
+  category,
+  pathname,
+  toggleSidebar,
+  translate,
+  selectedCountry,
+  countryConfig,
+  reservesKeyMap,
+}: NavCategoryProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const filteredItems = category.items.filter((item) => {
+    if (!item.feature) {
+      return true;
+    }
+    return countryConfig.features[item.feature];
+  });
+
+  if (filteredItems.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-1">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-white/70 hover:text-white/90 hover:bg-white/5 rounded-lg transition-all duration-200"
+        type="button"
+      >
+        <category.icon className="h-4 w-4 shrink-0" />
+        <span className="flex-1 text-left">{translate(category.key)}</span>
+        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+      </button>
+
+      {isOpen && (
+        <div className="ml-2 space-y-0.5 border-l border-white/10 pl-2">
+          {filteredItems.map((item) => (
+            <NavItem
+              key={item.key}
+              item={item}
+              pathname={pathname}
+              toggleSidebar={toggleSidebar}
+              translate={translate}
+              selectedCountry={selectedCountry}
+              reservesKeyMap={reservesKeyMap}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -147,20 +326,9 @@ export function Sidebar() {
     uy: "bcuReserves",
   };
 
-  const navigation = baseNavigation
-    .filter((item) => {
-      if (!item.feature) {
-        return true;
-      }
-      return countryConfig.features[item.feature];
-    })
-    .map((item) => ({
-      ...item,
-      name:
-        item.feature === "reserves"
-          ? translate(reservesKeyMap[selectedCountry] || "reserves")
-          : translate(item.key),
-    }));
+  const isCategory = (item: NavigationItem | NavigationCategory): item is NavigationCategory => {
+    return "items" in item;
+  };
 
   return (
     <>
@@ -209,45 +377,37 @@ export function Sidebar() {
           </div>
 
           <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href;
-              const isNew = item.href === "/calculadora-interes-compuesto";
-              const isComingSoon = item.href === "#";
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  onClick={(e) => {
-                    if (isComingSoon) {
-                      e.preventDefault();
-                      return;
-                    }
-                    if (window.innerWidth < 1024) {
-                      toggleSidebar();
-                    }
-                  }}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
-                    isActive
-                      ? "bg-[hsl(152_69%_24%)] text-white shadow-lg shadow-primary/25"
-                      : "text-white/60 hover:bg-white/10 hover:text-white",
-                    isComingSoon && "cursor-default",
-                  )}
-                >
-                  <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
-                  <span className={cn("flex-1", isComingSoon && "opacity-50")}>{item.name}</span>
-                  {isNew && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
-                      Nuevo
-                    </span>
-                  )}
-                  {isComingSoon && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-700 text-white uppercase tracking-wide">
-                      {translate("comingSoon")}
-                    </span>
-                  )}
-                </Link>
-              );
+            {baseNavigationCategories.map((item) => {
+              if (isCategory(item)) {
+                return (
+                  <NavCategory
+                    key={item.key}
+                    category={item}
+                    pathname={pathname}
+                    toggleSidebar={toggleSidebar}
+                    translate={translate}
+                    selectedCountry={selectedCountry}
+                    countryConfig={countryConfig}
+                    reservesKeyMap={reservesKeyMap}
+                  />
+                );
+              }
+
+              if (!item.feature || countryConfig.features[item.feature]) {
+                return (
+                  <NavItem
+                    key={item.key}
+                    item={item}
+                    pathname={pathname}
+                    toggleSidebar={toggleSidebar}
+                    translate={translate}
+                    selectedCountry={selectedCountry}
+                    reservesKeyMap={reservesKeyMap}
+                  />
+                );
+              }
+
+              return null;
             })}
           </nav>
 

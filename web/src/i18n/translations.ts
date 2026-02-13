@@ -12,6 +12,13 @@ export const translations = {
     reserves: "Reservas",
     tools: "Herramientas",
 
+    // Navigation Categories
+    market: "Mercado",
+    indicators: "Indicadores",
+    comparators: "Comparadores",
+    calculators: "Calculadoras",
+    investments: "Inversiones",
+
     // Countries
     ar: "Argentina",
     co: "Colombia",
@@ -212,8 +219,17 @@ export const translations = {
     uva: "UVA",
     cer: "CER",
     countryRisk: "Riesgo País",
+    countryRiskTitle: "Riesgo País Argentina",
+    countryRiskDescription: "Evolución histórica del riesgo país argentino",
+    countryRiskHistory: "Evolución Histórica",
+    currentCountryRisk: "Riesgo País Actual",
+    dailyVariation: "Variación Diaria",
+    vsYesterday: "vs. ayer",
+    historicalData: "Datos Históricos",
+    noDataAvailable: "No hay datos disponibles",
     crypto: "Criptomonedas",
-    basisPoints: "puntos básicos",
+    basisPoint: "Punto Básico",
+    basisPoints: "Puntos Básicos",
     government: "Gobierno",
     otherQuotes: "Otras Cotizaciones",
     viewHistory: "Ver historial y ajustar valores",

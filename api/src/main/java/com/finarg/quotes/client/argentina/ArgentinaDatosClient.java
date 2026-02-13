@@ -191,6 +191,28 @@ public class ArgentinaDatosClient {
         }
     }
 
+    public List<CountryRiskResponse> getCountryRiskHistory() {
+        try {
+            log.debug("Fetching country risk history from ArgentinaDatos API");
+
+            List<CountryRiskResponse> responses = webClient.get()
+                    .uri("/finanzas/indices/riesgo-pais")
+                    .retrieve()
+                    .bodyToFlux(CountryRiskResponse.class)
+                    .collectList()
+                    .block();
+
+            if (responses != null && !responses.isEmpty()) {
+                log.info("Fetched {} country risk historical records", responses.size());
+            }
+
+            return responses != null ? responses : List.of();
+        } catch (Exception e) {
+            log.error("Error fetching country risk history from ArgentinaDatos: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
     private InflationDTO mapToInflationDTO(InflationResponse response) {
         return InflationDTO.builder()
                 .date(LocalDate.parse(response.getDate()))
