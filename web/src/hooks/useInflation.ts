@@ -18,6 +18,20 @@ export function useCurrentInflation() {
   });
 }
 
+export function useMonthlyInflation() {
+  return useQuery<Inflation[]>({
+    queryKey: ["inflation", "monthly"],
+    queryFn: async () => {
+      const response = await inflationApi.getMonthly(600);
+      return response.data;
+    },
+    staleTime: 86400000,
+    gcTime: 604800000,
+    refetchInterval: 86400000,
+    retry: 3,
+  });
+}
+
 export function useAdjustInflation() {
   return useMutation<
     InflationAdjustment,
