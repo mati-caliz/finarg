@@ -55,6 +55,50 @@ public class CryptoService {
                     .build());
         }
 
+        if (response.containsKey("binancecoin")) {
+            CoinGeckoClient.CryptoPriceData bnbData = response.get("binancecoin");
+            cryptoList.add(CryptoDTO.builder()
+                    .symbol("BNB")
+                    .name("Binance Coin")
+                    .priceUsd(bnbData.getUsd() != null ? bnbData.getUsd() : BigDecimal.ZERO)
+                    .change24h(bnbData.getUsd24hChange() != null ? bnbData.getUsd24hChange() : BigDecimal.ZERO)
+                    .lastUpdate(now)
+                    .build());
+        }
+
+        if (response.containsKey("ripple")) {
+            CoinGeckoClient.CryptoPriceData xrpData = response.get("ripple");
+            cryptoList.add(CryptoDTO.builder()
+                    .symbol("XRP")
+                    .name("Ripple")
+                    .priceUsd(xrpData.getUsd() != null ? xrpData.getUsd() : BigDecimal.ZERO)
+                    .change24h(xrpData.getUsd24hChange() != null ? xrpData.getUsd24hChange() : BigDecimal.ZERO)
+                    .lastUpdate(now)
+                    .build());
+        }
+
+        if (response.containsKey("cardano")) {
+            CoinGeckoClient.CryptoPriceData adaData = response.get("cardano");
+            cryptoList.add(CryptoDTO.builder()
+                    .symbol("ADA")
+                    .name("Cardano")
+                    .priceUsd(adaData.getUsd() != null ? adaData.getUsd() : BigDecimal.ZERO)
+                    .change24h(adaData.getUsd24hChange() != null ? adaData.getUsd24hChange() : BigDecimal.ZERO)
+                    .lastUpdate(now)
+                    .build());
+        }
+
+        if (response.containsKey("solana")) {
+            CoinGeckoClient.CryptoPriceData solData = response.get("solana");
+            cryptoList.add(CryptoDTO.builder()
+                    .symbol("SOL")
+                    .name("Solana")
+                    .priceUsd(solData.getUsd() != null ? solData.getUsd() : BigDecimal.ZERO)
+                    .change24h(solData.getUsd24hChange() != null ? solData.getUsd24hChange() : BigDecimal.ZERO)
+                    .lastUpdate(now)
+                    .build());
+        }
+
         return cryptoList;
     }
 }

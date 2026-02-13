@@ -27,7 +27,7 @@ public class CoinGeckoClient {
             Map<String, CryptoPriceData> response = webClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/simple/price")
-                            .queryParam("ids", "bitcoin,ethereum")
+                            .queryParam("ids", "bitcoin,ethereum,binancecoin,ripple,cardano,solana")
                             .queryParam("vs_currencies", "usd")
                             .queryParam("include_24hr_change", "true")
                             .build())

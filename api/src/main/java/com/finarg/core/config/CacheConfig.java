@@ -14,12 +14,12 @@ import org.springframework.data.redis.serializer.SerializationException;
 public class CacheConfig implements CachingConfigurer {
 
     private static boolean isDeserializationError(RuntimeException exception) {
-        if (exception instanceof SerializationException) {
+        if (exception instanceof SerializationException || exception instanceof ClassCastException) {
             return true;
         }
         Throwable cause = exception.getCause();
         while (cause != null) {
-            if (cause instanceof MismatchedInputException) {
+            if (cause instanceof MismatchedInputException || cause instanceof ClassCastException) {
                 return true;
             }
             cause = cause.getCause();
