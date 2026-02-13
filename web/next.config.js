@@ -39,7 +39,7 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://www.bcra.gob.ar https://icon.horse https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com https://www.google-analytics.com",
       [
-        "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com",
+        "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com",
         !isProd && "http://localhost:8080",
         backendUrl.replace("/api/v1", ""),
       ]

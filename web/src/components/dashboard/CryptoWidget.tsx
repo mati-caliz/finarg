@@ -35,31 +35,28 @@ export const CryptoWidget = memo(function CryptoWidget({ cryptoList }: CryptoWid
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 pb-6">
-        <div className="space-y-3">
+        <div className="grid grid-cols-3 gap-4">
           {cryptoList.map((crypto) => (
-            <div key={crypto.symbol} className="flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-foreground">{crypto.symbol}</p>
-                  <div
-                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium ${
-                      crypto.change24h >= 0
-                        ? "bg-success-accessible/10 text-success-accessible"
-                        : "bg-destructive-accessible/10 text-destructive-accessible"
-                    }`}
-                  >
-                    {crypto.change24h >= 0 ? (
-                      <TrendingUp className="h-3 w-3" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3" />
-                    )}
-                    {formatChange(crypto.change24h)}
-                  </div>
+            <div key={crypto.symbol} className="flex flex-col items-center text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <p className="text-xs font-medium text-foreground">{crypto.symbol}</p>
+                <div
+                  className={`inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[10px] font-medium ${
+                    crypto.change24h >= 0
+                      ? "bg-success-accessible/10 text-success-accessible"
+                      : "bg-destructive-accessible/10 text-destructive-accessible"
+                  }`}
+                >
+                  {crypto.change24h >= 0 ? (
+                    <TrendingUp className="h-2.5 w-2.5" />
+                  ) : (
+                    <TrendingDown className="h-2.5 w-2.5" />
+                  )}
+                  {formatChange(crypto.change24h)}
                 </div>
-                <p className="text-lg font-bold text-foreground mt-0.5">
-                  {formatPrice(crypto.priceUsd)}
-                </p>
               </div>
+              <p className="text-lg font-bold text-foreground">{formatPrice(crypto.priceUsd)}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">USD</p>
             </div>
           ))}
         </div>

@@ -63,15 +63,15 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
   });
 
   return (
-    <Card className={`flex-1 border-t-[3px] ${getRiskBorderColor(countryRisk.value)}`}>
-      <CardHeader className="pb-2 shrink-0">
+    <Card className={`shrink-0 border-t-[3px] ${getRiskBorderColor(countryRisk.value)}`}>
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5" />
           {translate("countryRisk")}
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col pt-0 pb-6">
-        <div className="flex items-end justify-between">
+      <CardContent className="pt-0 pb-6">
+        <div className="flex items-end justify-between mb-4">
           <div>
             <p className={`text-3xl font-bold ${getRiskColor(countryRisk.value)}`}>
               {countryRisk.value.toFixed(0)}
@@ -82,6 +82,34 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
             className={`flex items-center justify-center w-10 h-10 rounded-full ${getRiskBgColor(countryRisk.value)}`}
           >
             <TrendingUp className={`h-5 w-5 ${getRiskColor(countryRisk.value)}`} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Nivel de riesgo:</span>
+            <span className={`font-medium ${getRiskColor(countryRisk.value)}`}>
+              {countryRisk.value < 500
+                ? "Bajo"
+                : countryRisk.value < 800
+                  ? "Moderado"
+                  : countryRisk.value < 1200
+                    ? "Alto"
+                    : "Muy Alto"}
+            </span>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all ${
+                countryRisk.value < 500
+                  ? "bg-emerald-500"
+                  : countryRisk.value < 800
+                    ? "bg-yellow-500"
+                    : countryRisk.value < 1200
+                      ? "bg-orange-500"
+                      : "bg-red-500"
+              }`}
+              style={{ width: `${Math.min((countryRisk.value / 2000) * 100, 100)}%` }}
+            />
           </div>
         </div>
       </CardContent>

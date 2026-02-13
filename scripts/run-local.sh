@@ -80,7 +80,7 @@ echo ""
 # ========================================
 # 1. Check .env files
 # ========================================
-echo -e "${GREEN}[1/7]${NC} Checking environment files..."
+echo -e "${GREEN}[1/8]${NC} Checking environment files..."
 
 # Backend .env
 if [ ! -f "${API_DIR}/.env" ]; then
@@ -112,7 +112,7 @@ echo ""
 # ========================================
 # 2. Load backend environment variables
 # ========================================
-echo -e "${GREEN}[2/7]${NC} Loading backend environment variables..."
+echo -e "${GREEN}[2/8]${NC} Loading backend environment variables..."
 set -a
 source "${API_DIR}/.env"
 set +a
@@ -123,7 +123,7 @@ echo ""
 # 3. Deep clean Docker volumes if scraping
 # ========================================
 if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = true ]; then
-    echo -e "${GREEN}[3/7]${NC} Deep cleaning Docker volumes..."
+    echo -e "${GREEN}[3/8]${NC} Deep cleaning Docker volumes..."
     cd "${PROJECT_ROOT}" || exit 1
 
     # Check if Docker is running
@@ -161,7 +161,7 @@ if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = 
 
     echo -e "${GREEN}[✓]${NC} Deep clean complete - starting with fresh data"
 else
-    echo -e "${GREEN}[3/7]${NC} Checking Docker services..."
+    echo -e "${GREEN}[3/8]${NC} Checking Docker services..."
     cd "${PROJECT_ROOT}" || exit 1
 
     # Check if Docker is running
@@ -247,10 +247,24 @@ echo -e "${GREEN}[✓]${NC} Infrastructure ready (PostgreSQL + Redis)"
 echo ""
 
 # ========================================
-# 4. Verify clean state
+# 4. Clear Redis cache (prevents DevTools ClassCastException)
+# ========================================
+echo -e "${GREEN}[4/8]${NC} Clearing Redis cache..."
+REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
+if [ -n "$REDIS_CONTAINER" ]; then
+    echo -e "${YELLOW}[DEBUG]${NC} Flushing Redis cache to prevent DevTools class loader issues..."
+    docker exec "$REDIS_CONTAINER" redis-cli FLUSHALL > /dev/null 2>&1 || true
+    echo -e "${GREEN}[✓]${NC} Redis cache cleared (prevents ClassCastException on hot-reload)"
+else
+    echo -e "${YELLOW}[WARN]${NC} Redis container not found, skipping cache clear"
+fi
+echo ""
+
+# ========================================
+# 5. Verify clean state
 # ========================================
 if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = true ]; then
-    echo -e "${GREEN}[4/7]${NC} Verifying clean state..."
+    echo -e "${GREEN}[5/8]${NC} Verifying clean state..."
 
     # Verify Redis is empty
     REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
@@ -267,7 +281,7 @@ if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = 
 
     echo -e "${GREEN}[✓]${NC} All caches cleared - ready for fresh scraping"
 else
-    echo -e "${GREEN}[4/7]${NC} Skipping cache cleanup (no scraping requested)"
+    echo -e "${GREEN}[5/8]${NC} Skipping cache cleanup (no scraping requested)"
 fi
 
 echo ""
@@ -342,21 +356,28 @@ fi
 # End of old cleanup logic (disabled)
 
 # ========================================
-# 5. Check npm dependencies
+# 6. Check npm dependencies and clear Next.js cache
 # ========================================
-echo -e "${GREEN}[5/7]${NC} Checking frontend dependencies..."
+echo -e "${GREEN}[6/8]${NC} Checking frontend dependencies..."
 if [ ! -d "${WEB_DIR}/node_modules" ]; then
     echo -e "${YELLOW}[INFO]${NC} Installing frontend dependencies..."
     cd "${WEB_DIR}" || exit 1
     npm install
 fi
+
+# Clear Next.js cache to force recompilation
+echo -e "${YELLOW}[DEBUG]${NC} Clearing Next.js cache..."
+cd "${WEB_DIR}" || exit 1
+rm -rf .next 2>/dev/null || true
+echo -e "${GREEN}[✓]${NC} Frontend cache cleared"
+
 echo -e "${GREEN}[✓]${NC} Frontend dependencies ready"
 echo ""
 
 # ========================================
-# 5. Run Checkstyle validation
+# 7. Run Checkstyle validation
 # ========================================
-echo -e "${GREEN}[6/7]${NC} Running checkstyle validation..."
+echo -e "${GREEN}[7/8]${NC} Running checkstyle validation..."
 cd "${API_DIR}" || exit 1
 
 CHECKSTYLE_OUTPUT=$(mktemp)
@@ -388,9 +409,9 @@ rm "$CHECKSTYLE_OUTPUT"
 echo ""
 
 # ========================================
-# 6. Start backend and frontend
+# 8. Start backend and frontend
 # ========================================
-echo -e "${GREEN}[7/7]${NC} Starting services..."
+echo -e "${GREEN}[8/8]${NC} Starting services..."
 echo ""
 echo -e "${BLUE}================================${NC}"
 echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
@@ -422,12 +443,12 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM
 
-# Start backend in background
+# Start backend in background with 'local' profile
 cd "${API_DIR}" || exit 1
 if [ -f "${API_DIR}/settings.xml" ]; then
-    mvn spring-boot:run -s "${API_DIR}/settings.xml" 2>&1 | sed "s/^/[BACKEND] /" &
+    mvn spring-boot:run -Dspring-boot.run.profiles=local -s "${API_DIR}/settings.xml" 2>&1 | sed "s/^/[BACKEND] /" &
 else
-    mvn spring-boot:run 2>&1 | sed "s/^/[BACKEND] /" &
+    mvn spring-boot:run -Dspring-boot.run.profiles=local 2>&1 | sed "s/^/[BACKEND] /" &
 fi
 BACKEND_PID=$!
 
@@ -458,10 +479,10 @@ fi
 echo ""
 
 # ========================================
-# 8. Run property scraper if requested
+# 9. Run property scraper if requested
 # ========================================
 if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
-    echo -e "${GREEN}[8/8]${NC} Running property scraper..."
+    echo -e "${GREEN}[9/9]${NC} Running property scraper..."
     echo ""
 
     # Wait for backend to be fully ready
