@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMonthlyInflation } from "@/hooks/useInflation";
 import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
@@ -49,13 +50,14 @@ export default function InflationPage() {
     },
   });
 
-  const { data: monthlyInflation } = useQuery({
-    queryKey: queryKeys.inflation.monthly(chartMonthsLimit),
-    queryFn: async () => {
-      const response = await inflationApi.getMonthly(chartMonthsLimit);
-      return response.data as Inflation[];
-    },
-  });
+  const { data: allMonthlyInflation, isLoading: isLoadingMonthly } = useMonthlyInflation();
+
+  const monthlyInflation = useMemo(() => {
+    if (!allMonthlyInflation || allMonthlyInflation.length === 0) {
+      return [];
+    }
+    return allMonthlyInflation.slice(-chartMonthsLimit);
+  }, [allMonthlyInflation, chartMonthsLimit]);
 
   const { data: governments = [] } = useQuery({
     queryKey: queryKeys.inflation.governments("ar"),
@@ -178,7 +180,9 @@ export default function InflationPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {monthlyInflation && monthlyInflation.length > 0 ? (
+            {isLoadingMonthly ? (
+              <Skeleton className="h-[250px] w-full" />
+            ) : monthlyInflation && monthlyInflation.length > 0 ? (
               (() => {
                 const reversedData = [...monthlyInflation].reverse();
                 const chartData = reversedData.map((i, idx) => ({
@@ -228,7 +232,7 @@ export default function InflationPage() {
               })()
             ) : (
               <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                Loading data...
+                {translate("noDataAvailable")}
               </div>
             )}
           </CardContent>
@@ -253,7 +257,9 @@ export default function InflationPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {monthlyInflation && monthlyInflation.length > 0 ? (
+            {isLoadingMonthly ? (
+              <Skeleton className="h-[250px] w-full" />
+            ) : monthlyInflation && monthlyInflation.length > 0 ? (
               (() => {
                 const filteredData = monthlyInflation.filter((i) => i.yearOverYear !== null);
                 const reversedData = [...filteredData].reverse();
@@ -304,7 +310,7 @@ export default function InflationPage() {
               })()
             ) : (
               <div className="h-[250px] flex items-center justify-center text-muted-foreground">
-                Loading data...
+                {translate("noDataAvailable")}
               </div>
             )}
           </CardContent>

@@ -278,7 +278,13 @@ export default function CountryRiskPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {history && history.length > 0 ? (
+                  {isLoadingHistory ? (
+                    <tr>
+                      <td colSpan={2} className="py-4 text-center text-muted-foreground">
+                        {translate("loadingData")}
+                      </td>
+                    </tr>
+                  ) : history && history.length > 0 ? (
                     [...history].reverse().map((item) => (
                       <tr key={item.date} className="border-b border-border/50">
                         <td className="py-2 text-foreground">
