@@ -125,10 +125,10 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
 
           <div className="space-y-2">
             <div className="relative h-3 bg-muted rounded-full overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-emerald-400 to-red-400 opacity-60" />
+              <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-emerald-400 to-red-400 opacity-60 will-change-auto" />
 
               <div
-                className={`absolute top-1/2 -translate-y-1/2 h-4 w-1 rounded-full ${colors.indicator} shadow-md transition-all duration-500`}
+                className={`absolute top-1/2 -translate-y-1/2 h-4 w-1 rounded-full ${colors.indicator} shadow-md transition-transform duration-500 will-change-transform`}
                 style={{ left: `calc(${clampedPosition}% - 2px)` }}
               />
             </div>
