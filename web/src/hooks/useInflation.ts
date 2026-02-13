@@ -11,9 +11,10 @@ export function useCurrentInflation() {
       const response = await inflationApi.getCurrent();
       return response.data;
     },
-    staleTime: 86400000,
+    staleTime: 3600000,
     gcTime: 604800000,
-    refetchInterval: 86400000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
   });
 }
@@ -25,9 +26,10 @@ export function useMonthlyInflation() {
       const response = await inflationApi.getMonthly(600);
       return response.data;
     },
-    staleTime: 86400000,
+    staleTime: 3600000,
     gcTime: 604800000,
-    refetchInterval: 86400000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
     retry: 3,
   });
 }
