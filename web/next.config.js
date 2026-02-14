@@ -85,6 +85,7 @@ const nextConfig = {
         hostname: "*.gstatic.com",
       },
     ],
+    formats: ["image/avif", "image/webp"],
   },
   compiler: {
     removeConsole: isProd
@@ -107,6 +108,7 @@ const nextConfig = {
       "@radix-ui/react-toast",
     ],
     optimizeCss: true,
+    webpackBuildWorker: true,
   },
   modularizeImports: {
     "date-fns": {

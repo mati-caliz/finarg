@@ -51,7 +51,7 @@ export function Navbar() {
               </div>
             ) : (
               <Button variant="outline" size="sm" className="gap-2" asChild>
-                <Link href="/login">
+                <Link href="/login" aria-label={translate("login")}>
                   <LogIn className="h-4 w-4" />
                   <span className="hidden sm:inline">{translate("login")}</span>
                 </Link>

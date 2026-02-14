@@ -85,7 +85,8 @@
       "Bash(lsof:*)",
       "Bash(python3:*)",
       "Bash(pkill:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(./scripts/lighthouse-audit.sh:*)"
     ]
   }
 }

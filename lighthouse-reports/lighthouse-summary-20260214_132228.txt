@@ -1,0 +1,27 @@
+=========================================
+  FinArg Lighthouse Audit Summary
+=========================================
+
+Date: sáb 14 feb 2026 13:22:45 -03
+URL: http://localhost:3000
+
+Scores:
+  Performance:      86/100
+  Accessibility:    59/100
+  Best Practices:   89/100
+  SEO:              82/100
+
+  Average:          79/100
+
+=========================================
+
+Performance Issues:
+
+
+Accessibility Issues:
+1. Document doesn't have a `<title>` element
+2. `<html>` element does not have a `[lang]` attribute
+
+Report Files:
+  JSON: ./scripts/../lighthouse-reports/lighthouse-20260214_132228.report.json
+  HTML: ./scripts/../lighthouse-reports/lighthouse-20260214_132228.report.html

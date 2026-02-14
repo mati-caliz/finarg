@@ -1,0 +1,26 @@
+=========================================
+  FinArg Lighthouse Audit Summary
+=========================================
+
+Date: sáb 14 feb 2026 13:16:21 -03
+URL: http://localhost:3000
+
+Scores:
+  Performance:      49/100
+  Accessibility:    95/100
+  Best Practices:   93/100
+  SEO:              100/100
+
+  Average:          84/100
+
+=========================================
+
+Performance Issues:
+
+
+Accessibility Issues:
+1. Links do not have a discernible name
+
+Report Files:
+  JSON: ./scripts/../lighthouse-reports/lighthouse-20260214_131602.report.json
+  HTML: ./scripts/../lighthouse-reports/lighthouse-20260214_131602.report.html
