@@ -1,4 +1,4 @@
-package com.finarg.service;
+package com.finarg.auth.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

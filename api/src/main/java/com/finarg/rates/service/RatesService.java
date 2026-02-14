@@ -3,7 +3,7 @@ package com.finarg.rates.service;
 import com.finarg.quotes.client.argentina.ArgentinaDatosClient;
 import com.finarg.quotes.client.argentina.ArgentinaDatosClient.FciRateResponse;
 import com.finarg.quotes.client.argentina.ArgentinaDatosClient.FixedTermRateResponse;
-import com.finarg.client.FciClient;
+import com.finarg.rates.client.FciClient;
 import com.finarg.rates.dto.RateDTO;
 import com.finarg.shared.enums.Country;
 import lombok.RequiredArgsConstructor;

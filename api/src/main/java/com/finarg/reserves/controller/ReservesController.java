@@ -1,9 +1,9 @@
 package com.finarg.reserves.controller;
 
+import com.finarg.indicators.countryrisk.dto.GovernmentDTO;
+import com.finarg.indicators.countryrisk.service.GovernmentsService;
 import com.finarg.inflation.client.DatosGobArClient;
-import com.finarg.model.dto.GovernmentDTO;
 import com.finarg.reserves.dto.ReservesDTO;
-import com.finarg.service.GovernmentsService;
 import com.finarg.reserves.service.ReservesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

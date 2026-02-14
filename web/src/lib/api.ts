@@ -1,16 +1,10 @@
 import type { CountryCode } from "@/config/countries";
 import type {
-  City,
   CompoundInterestRequest,
   CurrencyConversionRequest,
   CurrencyConversionResponse,
   ExchangeRateComparison,
   IncomeTaxRequest,
-  Neighborhood,
-  PropertyFilter,
-  PropertyPriceResponse,
-  ROIRequest,
-  ROIResponse,
 } from "@/types";
 import axios from "axios";
 
@@ -129,14 +123,4 @@ export const investmentsApi = {
   getBonds: () => cachedApi.get("/investments/bonds"),
   getEtfs: () => cachedApi.get("/investments/etf/popular"),
   getMetals: () => cachedApi.get("/investments/metals"),
-};
-
-export const realEstateApi = {
-  getPropertyPrices: (filters: PropertyFilter) =>
-    api.post<PropertyPriceResponse>("/real-estate/prices", filters),
-  getCities: () => cachedApi.get<City[]>("/real-estate/cities"),
-  getNeighborhoods: (cityCode: string) =>
-    cachedApi.get<Neighborhood[]>(`/real-estate/cities/${cityCode}/neighborhoods`),
-  calculateROI: (request: ROIRequest) =>
-    api.post<ROIResponse>("/real-estate/roi/calculate", request),
 };

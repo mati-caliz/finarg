@@ -1,4 +1,4 @@
-package com.finarg.service;
+package com.finarg.auth.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;

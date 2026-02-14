@@ -140,13 +140,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         feature: null,
         isNew: true,
       },
-      {
-        key: "realEstateIntelligence" as TranslationKey,
-        href: "/bienes-raices",
-        icon: Building2,
-        feature: null,
-        isComingSoon: true,
-      },
     ],
   },
 ];

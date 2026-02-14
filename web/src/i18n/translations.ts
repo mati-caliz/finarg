@@ -6,7 +6,6 @@ export const translations = {
     exchangeRatesComparator: "Conversor de Monedas",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
-    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflación",
     reserves: "Reservas",
@@ -548,7 +547,6 @@ export const translations = {
     exchangeRatesComparator: "Comparador de Taxas de Câmbio",
     incomeTaxCalculator: "Calculadora de Imposto de Renda",
     compoundInterestCalculator: "Calculadora de Juros Compostos",
-    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflação",
     reserves: "Reservas",
@@ -898,7 +896,6 @@ export const translations = {
     exchangeRatesComparator: "Exchange Rates Comparator",
     incomeTaxCalculator: "Income Tax Calculator",
     compoundInterestCalculator: "Compound Interest Calculator",
-    realEstateIntelligence: "Real Estate Intelligence",
 
     inflation: "Inflation",
     reserves: "Reserves",

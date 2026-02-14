@@ -1,9 +1,9 @@
 package com.finarg.inflation.controller;
 
-import com.finarg.model.dto.GovernmentDTO;
+import com.finarg.indicators.countryrisk.dto.GovernmentDTO;
+import com.finarg.indicators.countryrisk.service.GovernmentsService;
 import com.finarg.inflation.dto.InflationAdjustmentDTO;
 import com.finarg.inflation.dto.InflationDTO;
-import com.finarg.service.GovernmentsService;
 import com.finarg.inflation.service.InflationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
