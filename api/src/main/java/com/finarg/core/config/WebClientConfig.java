@@ -1,8 +1,5 @@
 package com.finarg.core.config;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +9,6 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
 import java.time.Duration;
 
 @Configuration
@@ -31,11 +27,6 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-datos.timeout:10000}")
     private int argentinaDatosTimeout;
 
-    @Value("${external.apis.ambito.base-url:https://www.ambito.com}")
-    private String ambitoBaseUrl;
-    @Value("${external.apis.ambito.timeout:10000}")
-    private int ambitoTimeout;
-
     @Value("${external.apis.exchangerate.base-url:https://open.er-api.com/v6}")
     private String exchangerateBaseUrl;
     @Value("${external.apis.exchangerate.timeout:10000}")
@@ -45,11 +36,6 @@ public class WebClientConfig {
     private String datosGobArBaseUrl;
     @Value("${external.apis.datos-gob-ar.timeout:60000}")
     private int datosGobArTimeout;
-
-    @Value("${external.apis.bcra.base-url:https://api.bcra.gob.ar}")
-    private String bcraBaseUrl;
-    @Value("${external.apis.bcra.timeout:15000}")
-    private int bcraTimeout;
 
     @Value("${external.apis.colombia.base-url:https://www.datos.gov.co/api}")
     private String colombiaApiBaseUrl;
@@ -115,6 +101,11 @@ public class WebClientConfig {
     @Value("${external.apis.ollama.timeout:30000}")
     private int ollamaTimeout;
 
+    @Value("${external.apis.eleconomista.base-url:https://eleconomista.com.ar}")
+    private String eleconomistaBaseUrl;
+    @Value("${external.apis.eleconomista.timeout:10000}")
+    private int eleconomistaTimeout;
+
     private WebClient createStandardWebClient(String baseUrl, int timeout) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(timeout));
@@ -149,11 +140,6 @@ public class WebClientConfig {
     @Bean("exchangerateWebClient")
     public WebClient exchangerateWebClient() {
         return createStandardWebClient(exchangerateBaseUrl, exchangerateTimeout);
-    }
-
-    @Bean("ambitoWebClient")
-    public WebClient ambitoWebClient() {
-        return createStandardWebClient(ambitoBaseUrl, ambitoTimeout);
     }
 
     @Bean("datosGobArWebClient")
@@ -199,29 +185,6 @@ public class WebClientConfig {
     @Bean("fciWebClient")
     public WebClient fciWebClient() {
         return createWebClientWithRedirects(fciBaseUrl, fciTimeout);
-    }
-
-    @Bean("bcraWebClient")
-    public WebClient bcraWebClient() {
-        try {
-            SslContext sslContext = SslContextBuilder
-                    .forClient()
-                    .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                    .build();
-
-            HttpClient httpClient = HttpClient.create()
-                    .responseTimeout(Duration.ofMillis(bcraTimeout))
-                    .secure(sslSpec -> sslSpec.sslContext(sslContext));
-
-            return WebClient.builder()
-                    .clientConnector(new ReactorClientHttpConnector(httpClient))
-                    .baseUrl(bcraBaseUrl)
-                    .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                    .build();
-        } catch (SSLException e) {
-            throw new RuntimeException("Failed to create SSL context for BCRA client", e);
-        }
     }
 
     @Bean("wikidataWebClient")
@@ -304,5 +267,17 @@ public class WebClientConfig {
     @Bean("ollamaWebClient")
     public WebClient ollamaWebClient() {
         return createStandardWebClient(ollamaBaseUrl, ollamaTimeout);
+    }
+
+    @Bean("eleconomistaWebClient")
+    public WebClient eleconomistaWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(eleconomistaTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(eleconomistaBaseUrl)
+                .defaultHeader("Accept", "application/rss+xml, application/xml, text/xml")
+                .defaultHeader("User-Agent", USER_AGENT)
+                .build();
     }
 }
