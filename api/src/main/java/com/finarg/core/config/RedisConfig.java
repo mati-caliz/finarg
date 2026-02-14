@@ -64,6 +64,12 @@ public class RedisConfig {
         cacheConfigurations.put("propertyPrices", defaultConfig.entryTtl(Duration.ofHours(6)));
         cacheConfigurations.put("cities", defaultConfig.entryTtl(Duration.ofHours(24)));
         cacheConfigurations.put("neighborhoods", defaultConfig.entryTtl(Duration.ofHours(24)));
+        cacheConfigurations.put("crypto", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("bonds", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("stocks", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("etfs", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("cedears", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("metals", defaultConfig.entryTtl(Duration.ofMinutes(30)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
