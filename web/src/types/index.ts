@@ -343,3 +343,42 @@ export interface Caucion {
   maxRate: number;
   lastUpdate: string;
 }
+
+export type NewsCategory =
+  | "EXCHANGE_RATE"
+  | "MONETARY_POLICY"
+  | "INFLATION"
+  | "RESERVES"
+  | "FISCAL_POLICY"
+  | "FINANCIAL_MARKETS"
+  | "ECONOMY_GENERAL"
+  | "CRYPTO"
+  | "INTERNATIONAL"
+  | "BCRA_BULLETIN"
+  | "GOVERNMENT_BULLETIN";
+
+export type AiSentiment = "POSITIVE" | "NEUTRAL" | "NEGATIVE" | "MIXED";
+
+export interface NewsArticle {
+  id: number;
+  title: string;
+  summary: string;
+  aiSummary: string | null;
+  sentiment: AiSentiment | null;
+  category: NewsCategory;
+  source: string;
+  sourceUrl: string;
+  imageUrl: string | null;
+  isOfficial: boolean;
+  country: string;
+  publishedDate: string;
+  keyPoints: string[];
+}
+
+export interface NewsListResponse {
+  articles: NewsArticle[];
+  totalPages: number;
+  totalElements: number;
+  currentPage: number;
+  pageSize: number;
+}

@@ -30,4 +30,12 @@ export const queryKeys = {
     usdAccounts: (country: CountryCode) => ["rates", "usd-accounts", country] as const,
     uvaMortgages: (country: CountryCode) => ["rates", "uva-mortgages", country] as const,
   },
+  news: {
+    all: ["news"] as const,
+    list: (country: CountryCode, page: number, size: number) =>
+      ["news", "list", country, page, size] as const,
+    category: (category: string, country: CountryCode, page: number, size: number) =>
+      ["news", "category", category, country, page, size] as const,
+    detail: (id: number) => ["news", "detail", id] as const,
+  },
 };
