@@ -52,7 +52,7 @@ export function CaucionesSection() {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center justify-between">
               <span>{caucion.ticker}</span>
-              <VariationBadge value={caucion.changePercent} />
+              <VariationBadge variation={caucion.changePercent} />
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
