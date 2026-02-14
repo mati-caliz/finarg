@@ -162,6 +162,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: "/api/data/:path*",
+        destination: `${process.env.BACKEND_URL || "http://localhost:8080"}/api/v1/:path*`,
+      },
+      {
         source: "/api/backend/:path*",
         destination: `${process.env.BACKEND_URL || "http://localhost:8080"}/api/v1/:path*`,
       },
