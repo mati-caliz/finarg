@@ -60,53 +60,6 @@ app:
   cookie:
     secure: false
     domain:
-  reserves:
-    countries:
-      ar:
-        methodologies:
-          bcra:
-            liabilities:
-              - id: china_swap
-                name: Swap China
-                amount: 18291
-              - id: bank_deposits
-                name: Encajes Bancarios
-                amount: 15000
-              - id: usa_swap
-                name: Swap EEUU
-                amount: 2500
-              - id: sedesa_repo
-                name: REPO SEDESA y otros
-                amount: 3295
-              - id: other_bcra
-                name: Otros pasivos BCRA
-                amount: 100
-          fmi:
-            liabilities:
-              - id: china_swap
-                name: Swap China
-                amount: 18291
-              - id: bank_deposits
-                name: Encajes Bancarios
-                amount: 15000
-              - id: usa_swap
-                name: Swap EEUU
-                amount: 2500
-              - id: sedesa_repo
-                name: REPO SEDESA y otros
-                amount: 3295
-              - id: other_bcra
-                name: Otros pasivos corto plazo
-                amount: 100
-              - id: gov_deposits
-                name: Depósitos del Gobierno
-                amount: 300
-              - id: leliq_pases
-                name: LELIQs y pases (USD)
-                amount: 0
-              - id: other_fmi
-                name: Pasivos del Tesoro (programa FMI)
-                amount: 20000
   logging:
     request:
       enabled: true
