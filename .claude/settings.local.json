@@ -84,7 +84,8 @@
       "Bash(git mv:*)",
       "Bash(lsof:*)",
       "Bash(python3:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(wc:*)"
     ]
   }
 }

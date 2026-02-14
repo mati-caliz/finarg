@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,9 +45,12 @@ public class ReservesService {
                 countryConfig.getMethodologies().getOrDefault("fmi", new ReservesConfig.MethodologyConfig()),
                 apiOverrides);
 
+        Set<String> bcraIds = liabilitiesBCRA.stream()
+                .map(ReserveLiabilityDTO::getId)
+                .collect(Collectors.toSet());
         List<ReserveLiabilityDTO> allLiabilities = new ArrayList<>(liabilitiesBCRA);
         liabilitiesFMI.stream()
-                .filter(f -> liabilitiesBCRA.stream().noneMatch(b -> b.getId().equals(f.getId())))
+                .filter(f -> !bcraIds.contains(f.getId()))
                 .forEach(allLiabilities::add);
 
         if (!"ar".equals(country)) {
@@ -80,7 +84,7 @@ public class ReservesService {
         }
 
         DatosGobArClient.SeriesDataPoint latest = reserves.get(0);
-        BigDecimal grossReserves = latest.valor();
+        BigDecimal grossReserves = latest.value();
 
         BigDecimal totalBCRA = liabilitiesBCRA.stream()
                 .map(ReserveLiabilityDTO::getAmount)
@@ -97,7 +101,7 @@ public class ReservesService {
 
         if (reserves.size() > 1) {
             DatosGobArClient.SeriesDataPoint previous = reserves.get(1);
-            variation = grossReserves.subtract(previous.valor());
+            variation = grossReserves.subtract(previous.value());
 
             if (variation.compareTo(BigDecimal.ZERO) > 0) {
                 trend = "rising";
@@ -114,7 +118,7 @@ public class ReservesService {
                 .liabilitiesBCRA(liabilitiesBCRA)
                 .liabilitiesFMI(liabilitiesFMI)
                 .liabilities(allLiabilities)
-                .date(latest.fecha())
+                .date(latest.date())
                 .dailyVariation(variation.setScale(0, RoundingMode.HALF_UP))
                 .trend(trend)
                 .build();
@@ -128,8 +132,8 @@ public class ReservesService {
         }
         DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
         if (datosGob != null) {
-            overrides.put("leliq_pases", datosGob.pasivosLetrasUsd().setScale(0, RoundingMode.HALF_UP));
-            overrides.put("gov_deposits", datosGob.depositosGobiernoUsd().setScale(0, RoundingMode.HALF_UP));
+            overrides.put("leliq_pases", datosGob.letterLiabilitiesUsd().setScale(0, RoundingMode.HALF_UP));
+            overrides.put("gov_deposits", datosGob.governmentDepositsUsd().setScale(0, RoundingMode.HALF_UP));
         }
         return overrides;
     }

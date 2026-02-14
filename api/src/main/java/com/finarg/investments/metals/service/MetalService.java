@@ -2,15 +2,14 @@ package com.finarg.investments.metals.service;
 
 import com.finarg.investments.metals.client.MetalsAPIClient;
 import com.finarg.investments.metals.dto.MetalDTO;
+import com.finarg.shared.util.BigDecimalUtils;
+import com.finarg.shared.util.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,22 +49,14 @@ public class MetalService {
                 continue;
             }
 
-            String metalType = METAL_NAMES.getOrDefault(code, code);
-
-            LocalDateTime lastUpdate = quote.getTimestamp() != null
-                    ? LocalDateTime.ofInstant(Instant.ofEpochSecond(quote.getTimestamp()), ZoneId.systemDefault())
-                    : LocalDateTime.now();
-
-            MetalDTO metal = MetalDTO.builder()
-                    .metalType(metalType)
+            metals.add(MetalDTO.builder()
+                    .metalType(METAL_NAMES.getOrDefault(code, code))
                     .unit("oz")
                     .priceUsd(quote.getPrice())
-                    .change24h(quote.getChange() != null ? quote.getChange() : BigDecimal.ZERO)
-                    .changePercent24h(quote.getPercentChange() != null ? quote.getPercentChange() : BigDecimal.ZERO)
-                    .lastUpdate(lastUpdate)
-                    .build();
-
-            metals.add(metal);
+                    .change24h(BigDecimalUtils.orZero(quote.getChange()))
+                    .changePercent24h(BigDecimalUtils.orZero(quote.getPercentChange()))
+                    .lastUpdate(DateTimeUtils.fromEpochSeconds(quote.getTimestamp()))
+                    .build());
         }
 
         log.info("Fetched {} metals", metals.size());

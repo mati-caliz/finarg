@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.finarg.shared.constants.FinancialConstants;
 
 @RestController
 @RequestMapping("/api/v1/indicators")
@@ -22,8 +23,8 @@ public class SocialIndicatorsController {
     @GetMapping("/social")
     @Operation(summary = "Get social indicators by country")
     public ResponseEntity<SocialIndicatorsDTO> getSocialIndicators(
-            @RequestParam(defaultValue = "ar") String country) {
-        if (!"ar".equalsIgnoreCase(country)) {
+            @RequestParam(defaultValue = FinancialConstants.DEFAULT_COUNTRY_CODE) String country) {
+        if (!FinancialConstants.DEFAULT_COUNTRY_CODE.equalsIgnoreCase(country)) {
             return ResponseEntity.ok().build();
         }
         SocialIndicatorsDTO dto = socialIndicatorsService.getSocialIndicatorsArgentina();

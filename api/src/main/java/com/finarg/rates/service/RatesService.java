@@ -29,6 +29,7 @@ public class RatesService {
 
     private static final String ROW_SEPARATOR_LABEL = "Otros bancos que informan";
     private static final String GOOGLE_FAVICON_API = "https://www.google.com/s2/favicons?domain=%s&sz=128";
+    private static final String DEFAULT_FIXED_TERM = "30 dias";
     private static final Map<String, String> WALLET_DOMAINS = Map.ofEntries(
             Map.entry("ADCAP", "ad-cap.com.ar"),
             Map.entry("BALANZ", "balanz.com"),
@@ -337,7 +338,7 @@ public class RatesService {
                 .name(shortName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
-                .term("30 días")
+                .term(DEFAULT_FIXED_TERM)
                 .date(null)
                 .limit(null)
                 .logo(r.getLogo())
@@ -415,7 +416,7 @@ public class RatesService {
             if (count >= maxWords) {
                 break;
             }
-            if (sb.length() > "".length()) {
+            if (!sb.isEmpty()) {
                 sb.append(" ");
             }
             sb.append(w);

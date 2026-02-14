@@ -178,9 +178,9 @@ public class DatosGobArClient {
     }
 
     public record BCRALiabilitiesData(
-            BigDecimal pasivosLetrasUsd,
-            BigDecimal depositosGobiernoUsd,
-            BigDecimal posicionNetaPasesUsd
+            BigDecimal letterLiabilitiesUsd,
+            BigDecimal governmentDepositsUsd,
+            BigDecimal netPositionPassesUsd
     ) { }
 
     public record SeriesApiResponse(List<List<Object>> data, List<SeriesMeta> meta) { }
@@ -189,5 +189,5 @@ public class DatosGobArClient {
 
     public record SeriesField(String description, String units) { }
 
-    public record SeriesDataPoint(LocalDate fecha, BigDecimal valor) { }
+    public record SeriesDataPoint(LocalDate date, BigDecimal value) { }
 }
