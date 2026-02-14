@@ -94,7 +94,8 @@
       "WebFetch(domain:api.bcra.gob.ar)",
       "Bash(javac:*)",
       "Bash(mvn dependency:purge-local-repository:*)",
-      "Bash(mvn dependency:tree:*)"
+      "Bash(mvn dependency:tree:*)",
+      "WebFetch(domain:www.ambito.com)"
     ]
   }
 }

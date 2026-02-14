@@ -34,7 +34,7 @@ public class BcraNewsClient implements NewsScraperClient {
     public List<RawNewsDTO> fetchLatestNews() {
         try {
             String html = webClient.get()
-                    .uri("/Noticias/Comunicaciones.asp")
+                    .uri("/politica-monetaria/")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
