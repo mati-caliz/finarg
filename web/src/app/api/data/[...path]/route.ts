@@ -1,10 +1,5 @@
 import type { NextRequest } from "next/server";
 
-const BACKEND_URL =
-  process.env.BACKEND_INTERNAL_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080/api/v1";
-
 const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
   { pattern: /exchange-bands/, revalidate: 86400 },
   { pattern: /governments/, revalidate: 3600 },
@@ -23,7 +18,16 @@ const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
   { pattern: /investments\/etf/, revalidate: 300 },
   { pattern: /investments\/metals/, revalidate: 300 },
   { pattern: /rates/, revalidate: 1800 },
+  { pattern: /news/, revalidate: 300 },
 ];
+
+function getBackendUrl(): string {
+  return (
+    process.env.BACKEND_INTERNAL_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://localhost:8080/api/v1"
+  );
+}
 
 function getRevalidateTime(path: string): number {
   for (const rule of CACHE_RULES) {
@@ -42,7 +46,8 @@ export async function GET(
   const pathStr = path.join("/");
   const searchParams = request.nextUrl.searchParams.toString();
   const queryString = searchParams ? `?${searchParams}` : "";
-  const url = `${BACKEND_URL}/${pathStr}${queryString}`;
+  const backendUrl = getBackendUrl();
+  const url = `${backendUrl}/${pathStr}${queryString}`;
   const revalidate = getRevalidateTime(pathStr);
 
   const res = await fetch(url, {

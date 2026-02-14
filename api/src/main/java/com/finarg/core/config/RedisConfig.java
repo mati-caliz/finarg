@@ -2,6 +2,8 @@ package com.finarg.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
@@ -19,14 +21,22 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping.NON_FINAL;
+
 @Configuration
 @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis", matchIfMissing = true)
 public class RedisConfig {
 
     private static GenericJackson2JsonRedisSerializer createRedisSerializer() {
+        PolymorphicTypeValidator ptv = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType(Object.class)
+                .build();
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mapper.activateDefaultTyping(ptv, NON_FINAL);
+
         return GenericJackson2JsonRedisSerializer.builder()
                 .objectMapper(mapper)
                 .build();
@@ -72,6 +82,7 @@ public class RedisConfig {
         cacheConfigurations.put("metals", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("letras", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("cauciones", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("news", defaultConfig.entryTtl(Duration.ofMinutes(30)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
