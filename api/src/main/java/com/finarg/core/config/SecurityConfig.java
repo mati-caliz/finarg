@@ -60,7 +60,6 @@ public class SecurityConfig {
                                 "/api/v1/country-risk/**",
                                 "/api/v1/crypto/**",
                                 "/api/v1/currency/**",
-                                "/api/v1/real-estate/**",
                                 "/api/v1/investments/**",
                                 "/api/v1/countries",
                                 "/actuator/health"

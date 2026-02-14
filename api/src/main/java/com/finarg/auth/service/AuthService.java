@@ -8,8 +8,6 @@ import com.finarg.auth.dto.AuthResponseDTO;
 import com.finarg.user.dto.UserDTO;
 import com.finarg.user.entity.User;
 import com.finarg.user.repository.UserRepository;
-import com.finarg.service.GoogleIdTokenVerifierService;
-import com.finarg.service.JwtService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;

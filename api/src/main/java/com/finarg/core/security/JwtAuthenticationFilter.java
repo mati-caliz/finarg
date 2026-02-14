@@ -1,6 +1,6 @@
 package com.finarg.core.security;
 
-import com.finarg.service.JwtService;
+import com.finarg.auth.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

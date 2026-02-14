@@ -80,7 +80,8 @@
       "Bash(do echo \"Testing $months months:\")",
       "Bash(done)",
       "Bash(for months in:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

@@ -1,4 +1,4 @@
-package com.finarg.service;
+package com.finarg.auth.service;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;

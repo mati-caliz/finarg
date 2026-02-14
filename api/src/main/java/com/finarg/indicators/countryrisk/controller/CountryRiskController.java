@@ -1,9 +1,9 @@
 package com.finarg.indicators.countryrisk.controller;
 
 import com.finarg.indicators.countryrisk.dto.CountryRiskDTO;
+import com.finarg.indicators.countryrisk.dto.GovernmentDTO;
 import com.finarg.indicators.countryrisk.service.CountryRiskService;
-import com.finarg.model.dto.GovernmentDTO;
-import com.finarg.service.GovernmentsService;
+import com.finarg.indicators.countryrisk.service.GovernmentsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
-package com.finarg.service;
+package com.finarg.indicators.countryrisk.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finarg.model.dto.GovernmentDTO;
+import com.finarg.indicators.countryrisk.dto.GovernmentDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;

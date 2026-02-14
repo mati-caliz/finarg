@@ -1,4 +1,4 @@
-package com.finarg.model.dto;
+package com.finarg.indicators.countryrisk.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
