@@ -125,7 +125,7 @@ external:
 scheduler:
   enabled: true
   news:
-    cron: "0 0 * * * *"
+    cron: "0 0 8 * * *"
 
 logging:
   level:
