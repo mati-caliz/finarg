@@ -32,37 +32,36 @@ public class MetalService {
     public List<MetalDTO> getAllMetals() {
         log.info("Fetching all metals prices");
 
-        MetalsAPIClient.MetalsAPIResponse response = metalsAPIClient.getMetalsPrices();
+        Map<String, MetalsAPIClient.MetalQuote> metalsPrices = metalsAPIClient.getMetalsPrices();
 
-        if (response == null || response.getRates() == null || response.getRates().isEmpty()) {
+        if (metalsPrices == null || metalsPrices.isEmpty()) {
             log.warn("No metals data available");
             return List.of();
         }
 
         List<MetalDTO> metals = new ArrayList<>();
-        LocalDateTime lastUpdate = response.getTimestamp() != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochSecond(response.getTimestamp()), ZoneId.systemDefault())
-                : LocalDateTime.now();
 
-        for (Map.Entry<String, BigDecimal> entry : response.getRates().entrySet()) {
+        for (Map.Entry<String, MetalsAPIClient.MetalQuote> entry : metalsPrices.entrySet()) {
             String code = entry.getKey();
-            BigDecimal inverseRate = entry.getValue();
+            MetalsAPIClient.MetalQuote quote = entry.getValue();
 
-            if (inverseRate == null || inverseRate.compareTo(BigDecimal.ZERO) <= 0) {
-                log.warn("Invalid rate for metal {}: {}", code, inverseRate);
+            if (quote == null || quote.getPrice() == null || quote.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+                log.warn("Invalid quote for metal {}", code);
                 continue;
             }
 
             String metalType = METAL_NAMES.getOrDefault(code, code);
 
-            BigDecimal priceUsd = BigDecimal.ONE.divide(inverseRate, 2, java.math.RoundingMode.HALF_UP);
+            LocalDateTime lastUpdate = quote.getTimestamp() != null
+                    ? LocalDateTime.ofInstant(Instant.ofEpochSecond(quote.getTimestamp()), ZoneId.systemDefault())
+                    : LocalDateTime.now();
 
             MetalDTO metal = MetalDTO.builder()
                     .metalType(metalType)
                     .unit("oz")
-                    .priceUsd(priceUsd)
-                    .change24h(BigDecimal.ZERO)
-                    .changePercent24h(BigDecimal.ZERO)
+                    .priceUsd(quote.getPrice())
+                    .change24h(quote.getChange() != null ? quote.getChange() : BigDecimal.ZERO)
+                    .changePercent24h(quote.getPercentChange() != null ? quote.getPercentChange() : BigDecimal.ZERO)
                     .lastUpdate(lastUpdate)
                     .build();
 
