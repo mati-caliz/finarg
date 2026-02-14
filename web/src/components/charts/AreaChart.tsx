@@ -62,6 +62,17 @@ export function AreaChart({
             fill={area.fill}
             fillOpacity={0.15}
             strokeOpacity={0}
+            label={
+              area.label
+                ? {
+                    value: area.label,
+                    position: "top",
+                    fill: "#888",
+                    fontSize: 11,
+                    fontWeight: 500,
+                  }
+                : undefined
+            }
           />
         ))}
         {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
