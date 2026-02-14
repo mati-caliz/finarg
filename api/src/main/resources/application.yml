@@ -154,6 +154,15 @@ external:
     fci:
       base-url: https://api.argentinadatos.com
       timeout: 30000
+    metals-api:
+      base-url: https://api.metals.live/v1
+      timeout: 10000
+    yahoo-finance:
+      base-url: https://query1.finance.yahoo.com/v8/finance
+      timeout: 15000
+    iol:
+      base-url: https://api.invertironline.com
+      timeout: 15000
 
 logging:
   level:

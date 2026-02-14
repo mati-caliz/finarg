@@ -400,3 +400,61 @@ export interface CurrencyOption {
   baseCurrency: string;
   flag: string;
 }
+
+export interface Stock {
+  ticker: string;
+  companyName: string;
+  currentPrice: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap?: number;
+  currency: string;
+  lastUpdate: string;
+}
+
+export interface Cedear {
+  symbol: string;
+  ticker: string;
+  companyName: string;
+  lastPrice: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  currency: string;
+  lastUpdate: string;
+}
+
+export interface Bond {
+  ticker: string;
+  name: string;
+  issuer: string;
+  maturity: string;
+  yieldPercent: number;
+  price: number;
+  currency: string;
+  rating: string;
+  lastUpdate: string;
+}
+
+export interface Etf {
+  ticker: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  aum?: number;
+  expenseRatio?: number;
+  currency: string;
+  lastUpdate: string;
+}
+
+export interface Metal {
+  metalType: string;
+  unit: string;
+  priceUsd: number;
+  change24h: number;
+  changePercent24h: number;
+  lastUpdate: string;
+}

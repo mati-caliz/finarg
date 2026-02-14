@@ -134,6 +134,13 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
     icon: Building2,
     items: [
       {
+        key: "investmentsTitle" as TranslationKey,
+        href: "/inversiones",
+        icon: TrendingUp,
+        feature: null,
+        isNew: true,
+      },
+      {
         key: "realEstateIntelligence" as TranslationKey,
         href: "/bienes-raices",
         icon: Building2,
