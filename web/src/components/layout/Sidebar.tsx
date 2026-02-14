@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   ArrowLeftRight,
   BarChart2,
-  Building2,
   Calculator,
   ChevronDown,
   ChevronRight,
@@ -78,6 +77,13 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         icon: BarChart2,
         feature: "rates" as const,
       },
+      {
+        key: "investmentsTitle" as TranslationKey,
+        href: "/inversiones",
+        icon: TrendingUp,
+        feature: null,
+        isNew: true,
+      },
     ],
   },
   {
@@ -126,19 +132,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/calculadora-ajuste-inflacion",
         icon: Percent,
         feature: "inflation" as const,
-      },
-    ],
-  },
-  {
-    key: "investments" as TranslationKey,
-    icon: Building2,
-    items: [
-      {
-        key: "investmentsTitle" as TranslationKey,
-        href: "/inversiones",
-        icon: TrendingUp,
-        feature: null,
-        isNew: true,
       },
     ],
   },
