@@ -73,3 +73,31 @@ export function useMetals() {
     refetchOnReconnect: true,
   });
 }
+
+export function useLetras() {
+  return useQuery({
+    queryKey: ["investments", "letras"],
+    queryFn: async () => {
+      const response = await investmentsApi.getLetras();
+      return response.data;
+    },
+    staleTime: 300000,
+    gcTime: 3600000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+}
+
+export function useCauciones() {
+  return useQuery({
+    queryKey: ["investments", "cauciones"],
+    queryFn: async () => {
+      const response = await investmentsApi.getCauciones();
+      return response.data;
+    },
+    staleTime: 300000,
+    gcTime: 3600000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+  });
+}
