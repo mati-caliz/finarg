@@ -27,6 +27,11 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-datos.timeout:10000}")
     private int argentinaDatosTimeout;
 
+    @Value("${external.apis.ambito.base-url:https://www.ambito.com}")
+    private String ambitoBaseUrl;
+    @Value("${external.apis.ambito.timeout:10000}")
+    private int ambitoTimeout;
+
     @Value("${external.apis.exchangerate.base-url:https://open.er-api.com/v6}")
     private String exchangerateBaseUrl;
     @Value("${external.apis.exchangerate.timeout:10000}")
@@ -140,6 +145,11 @@ public class WebClientConfig {
     @Bean("exchangerateWebClient")
     public WebClient exchangerateWebClient() {
         return createStandardWebClient(exchangerateBaseUrl, exchangerateTimeout);
+    }
+
+    @Bean("ambitoWebClient")
+    public WebClient ambitoWebClient() {
+        return createStandardWebClient(ambitoBaseUrl, ambitoTimeout);
     }
 
     @Bean("datosGobArWebClient")
