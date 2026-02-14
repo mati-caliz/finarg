@@ -101,7 +101,25 @@ export function formatDateShort(dateStr: string): string {
 }
 
 export function formatDateDayShort(dateStr: string): string {
-  const date = new Date(dateStr);
+  if (!dateStr) {
+    return "Invalid Date";
+  }
+
+  let date: Date;
+
+  if (dateStr.includes("T") || dateStr.includes("Z")) {
+    date = new Date(dateStr);
+  } else if (dateStr.includes("-")) {
+    const [year, month, day] = dateStr.split("-").map(Number);
+    date = new Date(year, month - 1, day);
+  } else {
+    date = new Date(dateStr);
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+
   return date.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
 }
 
