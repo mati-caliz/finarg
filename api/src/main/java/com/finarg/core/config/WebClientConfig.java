@@ -96,6 +96,24 @@ public class WebClientConfig {
     @Value("${external.apis.coingecko.timeout:10000}")
     private int coinGeckoTimeout;
 
+    @Value("${external.apis.metals-api.base-url:https://api.metals.live/v1}")
+    private String metalsApiBaseUrl;
+
+    @Value("${external.apis.metals-api.timeout:10000}")
+    private int metalsApiTimeout;
+
+    @Value("${external.apis.yahoo-finance.base-url:https://query1.finance.yahoo.com/v8/finance}")
+    private String yahooFinanceBaseUrl;
+
+    @Value("${external.apis.yahoo-finance.timeout:15000}")
+    private int yahooFinanceTimeout;
+
+    @Value("${external.apis.iol.base-url:https://api.invertironline.com}")
+    private String iolBaseUrl;
+
+    @Value("${external.apis.iol.timeout:15000}")
+    private int iolTimeout;
+
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
         HttpClient httpClient = HttpClient.create()
@@ -293,6 +311,44 @@ public class WebClientConfig {
                 .defaultHeader("Sec-Fetch-Mode", "navigate")
                 .defaultHeader("Sec-Fetch-Site", "same-origin")
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+    }
+
+    @Bean("metalsApiWebClient")
+    public WebClient metalsApiWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(metalsApiTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(metalsApiBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean("yahooFinanceWebClient")
+    public WebClient yahooFinanceWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(yahooFinanceTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(yahooFinanceBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.USER_AGENT, "Finarg/1.0")
+                .build();
+    }
+
+    @Bean("iolWebClient")
+    public WebClient iolWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(iolTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(iolBaseUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.USER_AGENT, "Finarg/1.0")
                 .build();
     }
 }

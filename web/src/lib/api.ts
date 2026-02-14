@@ -123,6 +123,14 @@ export const cryptoApi = {
   getCurrent: () => cachedApi.get("/crypto"),
 };
 
+export const investmentsApi = {
+  getStocks: () => cachedApi.get("/investments/stocks/popular"),
+  getCedears: () => cachedApi.get("/investments/cedears"),
+  getBonds: () => cachedApi.get("/investments/bonds"),
+  getEtfs: () => cachedApi.get("/investments/etf/popular"),
+  getMetals: () => cachedApi.get("/investments/metals"),
+};
+
 export const realEstateApi = {
   getPropertyPrices: (filters: PropertyFilter) =>
     api.post<PropertyPriceResponse>("/real-estate/prices", filters),
