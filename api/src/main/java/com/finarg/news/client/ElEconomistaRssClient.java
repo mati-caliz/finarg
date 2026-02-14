@@ -37,7 +37,6 @@ public class ElEconomistaRssClient implements NewsScraperClient {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-
             return parseRss(rssXml);
         } catch (WebClientResponseException e) {
             log.error("Error fetching RSS from El Economista (HTTP {}): {}", e.getStatusCode(), e.getMessage());
