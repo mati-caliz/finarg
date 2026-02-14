@@ -32,6 +32,25 @@ services:
       retries: 5
     restart: always
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: finarg-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - finarg-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   backend:
     build:
       context: ./api
@@ -41,6 +60,8 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      ollama:
         condition: service_healthy
     environment:
       DB_HOST: postgres
@@ -115,6 +136,8 @@ volumes:
   postgres_data:
     driver: local
   redis_data:
+    driver: local
+  ollama_data:
     driver: local
 
 networks:
