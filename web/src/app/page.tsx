@@ -28,6 +28,7 @@ import {
   BarChart3,
   Calculator,
   ChevronDown,
+  CreditCard,
   Percent,
   TrendingUp,
 } from "lucide-react";
@@ -554,6 +555,24 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
           </Link>
+
+          {selectedCountry === "ar" && (
+            <Link href="/calculadora-cuotas-contado">
+              <Card className="group cursor-pointer border-l-[3px] border-l-orange-500 hover:shadow-lg hover:shadow-orange-500/5 transition-all duration-300 h-[140px]">
+                <CardContent className="pt-6 h-full flex items-center">
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium">¿Cuotas o Contado?</p>
+                      <p className="text-sm text-muted-foreground">Calculá qué te conviene más</p>
+                    </div>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors shrink-0">
+                      <CreditCard className="h-6 w-6 text-orange-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
         </div>
       </div>
     </div>
