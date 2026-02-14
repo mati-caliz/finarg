@@ -1,11 +1,9 @@
 const CACHE_VERSION = "v3";
-const CACHE_NAME = `finarg-${CACHE_VERSION}`;
 const STATIC_CACHE = `finarg-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `finarg-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `finarg-api-${CACHE_VERSION}`;
 const CHUNKS_CACHE = `finarg-chunks-${CACHE_VERSION}`;
 
-// Archivos estáticos para cachear
 const STATIC_ASSETS = [
   "/",
   "/cotizaciones",
@@ -20,29 +18,16 @@ const STATIC_ASSETS = [
   "/icon.svg",
 ];
 
-// Rutas de API para cachear con estrategia stale-while-revalidate
-const API_ROUTES = [
-  "/api/v1/cotizaciones",
-  "/api/v1/cotizaciones/brecha",
-  "/api/v1/inflacion/actual",
-  "/api/v1/reservas",
-];
-
-// Instalar Service Worker
 self.addEventListener("install", (event) => {
-  console.log("[SW] Installing service worker...");
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      console.log("[SW] Caching static assets");
       return cache.addAll(STATIC_ASSETS);
     }),
   );
   self.skipWaiting();
 });
 
-// Activar y limpiar caches antiguos
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activating service worker...");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -51,7 +36,6 @@ self.addEventListener("activate", (event) => {
             return name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== API_CACHE && name !== CHUNKS_CACHE;
           })
           .map((name) => {
-            console.log("[SW] Deleting old cache:", name);
             return caches.delete(name);
           }),
       );
@@ -60,9 +44,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Estrategias de cache
 const cacheStrategies = {
-  // Cache first, fallback to network
   cacheFirst: async (request) => {
     const cached = await caches.match(request);
     if (cached) {
@@ -80,7 +62,6 @@ const cacheStrategies = {
     }
   },
 
-  // Network first, fallback to cache
   networkFirst: async (request) => {
     try {
       const response = await fetch(request);
@@ -98,7 +79,6 @@ const cacheStrategies = {
     }
   },
 
-  // Stale while revalidate (ideal para APIs)
   staleWhileRevalidate: async (request) => {
     if (request.method !== "GET") {
       return fetch(request);
@@ -127,7 +107,6 @@ const cacheStrategies = {
   },
 };
 
-// Interceptar requests
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -140,13 +119,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // API requests - stale while revalidate
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(cacheStrategies.staleWhileRevalidate(request));
     return;
   }
 
-  // Static assets - cache first with longer TTL
   if (
     request.destination === "image" ||
     request.destination === "font" ||
@@ -156,7 +133,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Next.js chunks and static scripts - cache first in production
   if (request.destination === "script" && (url.pathname.includes("/_next/static/") || url.pathname.includes("/_next/chunks/"))) {
     event.respondWith(
       caches.open(CHUNKS_CACHE).then((cache) => {
@@ -176,39 +152,26 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Other scripts use network-first to avoid caching HMR modules
   if (request.destination === "script") {
     event.respondWith(cacheStrategies.networkFirst(request));
     return;
   }
 
-  // HTML pages - network first
   if (request.mode === "navigate") {
     event.respondWith(cacheStrategies.networkFirst(request));
     return;
   }
 
-  // Default - network first
   event.respondWith(cacheStrategies.networkFirst(request));
 });
 
-// Background sync para guardar datos offline
 self.addEventListener("sync", (event) => {
-  console.log("[SW] Background sync:", event.tag);
   if (event.tag === "sync-simulations") {
     event.waitUntil(syncSimulations());
   }
 });
 
-async function syncSimulations() {
-  // Implementar sincronización de simulaciones guardadas offline
-  console.log("[SW] Syncing offline simulations...");
-}
-
-// Push notifications
 self.addEventListener("push", (event) => {
-  console.log("[SW] Push received:", event);
-
   let data = { title: "FinArg", body: "Nueva actualización" };
 
   if (event.data) {
@@ -232,9 +195,7 @@ self.addEventListener("push", (event) => {
   event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-// Click en notificación
 self.addEventListener("notificationclick", (event) => {
-  console.log("[SW] Notification click:", event.action);
   event.notification.close();
 
   if (event.action === "close") {
@@ -243,13 +204,12 @@ self.addEventListener("notificationclick", (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: "window" }).then((clientList) => {
-      // Si ya hay una ventana abierta, enfocarla
       for (const client of clientList) {
         if (client.url === event.notification.data.url && "focus" in client) {
           return client.focus();
         }
       }
-      // Si no, abrir una nueva
+
       if (clients.openWindow) {
         return clients.openWindow(event.notification.data.url);
       }
