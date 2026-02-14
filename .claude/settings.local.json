@@ -83,7 +83,8 @@
       "Bash(cat:*)",
       "Bash(git mv:*)",
       "Bash(lsof:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
