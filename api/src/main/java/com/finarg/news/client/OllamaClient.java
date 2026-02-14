@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class OllamaClient {
 
     private final WebClient webClient;
-    private static final String DEFAULT_MODEL = "llama3.2:3b";
+    private static final String DEFAULT_MODEL = "llama3.2:1b";
     private static final int MAX_TOKENS = 500;
 
     public OllamaClient(@Qualifier("ollamaWebClient") WebClient webClient) {
