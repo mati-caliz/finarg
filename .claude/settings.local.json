@@ -90,7 +90,11 @@
       "Bash(for:*)",
       "Bash(do curl -s http://localhost:300)",
       "Bash(echo:*)",
-      "Bash(npx biome check:*)"
+      "Bash(npx biome check:*)",
+      "WebFetch(domain:api.bcra.gob.ar)",
+      "Bash(javac:*)",
+      "Bash(mvn dependency:purge-local-repository:*)",
+      "Bash(mvn dependency:tree:*)"
     ]
   }
 }

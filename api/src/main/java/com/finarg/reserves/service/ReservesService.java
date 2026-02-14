@@ -1,8 +1,9 @@
 package com.finarg.reserves.service;
 
 import com.finarg.reserves.client.BcraClient;
+import com.finarg.reserves.client.BcraExcelScraperClient;
 import com.finarg.inflation.client.DatosGobArClient;
-import com.finarg.reserves.config.ReservesConfig;
+import com.finarg.reserves.dto.BcraExcelLiabilitiesDTO;
 import com.finarg.reserves.dto.ReserveLiabilityDTO;
 import com.finarg.reserves.dto.ReservesDTO;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,31 +24,11 @@ public class ReservesService {
 
     private final DatosGobArClient datosGobArClient;
     private final BcraClient bcraClient;
-    private final ReservesConfig reservesConfig;
+    private final BcraExcelScraperClient bcraExcelScraperClient;
 
     @Cacheable(value = "reserves", key = "'current_' + #country")
     public ReservesDTO getCurrentReserves(String country) {
         log.info("Fetching reserves for country: {}", country);
-
-        ReservesConfig.CountryReservesConfig countryConfig = reservesConfig.getCountries()
-                .getOrDefault(country, new ReservesConfig.CountryReservesConfig());
-
-        Map<String, BigDecimal> apiOverrides = "ar".equals(country) ? fetchApiLiabilities() : Map.of();
-
-        List<ReserveLiabilityDTO> liabilitiesBCRA = mapLiabilitiesWithOverrides(
-                countryConfig.getMethodologies().getOrDefault("bcra", new ReservesConfig.MethodologyConfig()),
-                apiOverrides);
-        List<ReserveLiabilityDTO> liabilitiesFMI = mapLiabilitiesWithOverrides(
-                countryConfig.getMethodologies().getOrDefault("fmi", new ReservesConfig.MethodologyConfig()),
-                apiOverrides);
-
-        Set<String> bcraIds = liabilitiesBCRA.stream()
-                .map(ReserveLiabilityDTO::getId)
-                .collect(Collectors.toSet());
-        List<ReserveLiabilityDTO> allLiabilities = new ArrayList<>(liabilitiesBCRA);
-        liabilitiesFMI.stream()
-                .filter(f -> !bcraIds.contains(f.getId()))
-                .forEach(allLiabilities::add);
 
         if (!"ar".equals(country)) {
             return ReservesDTO.builder()
@@ -59,13 +36,24 @@ public class ReservesService {
                     .netReserves(BigDecimal.ZERO)
                     .netReservesBCRA(BigDecimal.ZERO)
                     .netReservesFMI(BigDecimal.ZERO)
-                    .liabilitiesBCRA(liabilitiesBCRA)
-                    .liabilitiesFMI(liabilitiesFMI)
-                    .liabilities(allLiabilities)
+                    .liabilitiesBCRA(List.of())
+                    .liabilitiesFMI(List.of())
+                    .liabilities(List.of())
                     .date(LocalDate.now())
                     .trend("no_data")
                     .build();
         }
+
+        BcraExcelLiabilitiesDTO excelLiabilities = fetchLiabilitiesFromExcel();
+
+        List<ReserveLiabilityDTO> liabilitiesBCRA = buildBcraLiabilities(excelLiabilities);
+        List<ReserveLiabilityDTO> liabilitiesFMI = buildFmiLiabilities(excelLiabilities);
+
+        List<ReserveLiabilityDTO> allLiabilities = new ArrayList<>(liabilitiesBCRA);
+        liabilitiesFMI.stream()
+                .filter(f -> liabilitiesBCRA.stream()
+                        .noneMatch(b -> b.getId().equals(f.getId())))
+                .forEach(allLiabilities::add);
 
         List<DatosGobArClient.SeriesDataPoint> reserves = datosGobArClient.getBCRAReserves(2);
 
@@ -124,38 +112,115 @@ public class ReservesService {
                 .build();
     }
 
-    private Map<String, BigDecimal> fetchApiLiabilities() {
-        Map<String, BigDecimal> overrides = new HashMap<>();
-        BigDecimal encajes = bcraClient.getDepositosEntidadesMonedaExtranjera();
-        if (encajes != null) {
-            overrides.put("bank_deposits", encajes.setScale(0, RoundingMode.HALF_UP));
+    @Cacheable(value = "reserves", key = "'excel_liabilities'")
+    public BcraExcelLiabilitiesDTO fetchLiabilitiesFromExcel() {
+        log.info("Fetching liabilities from BCRA Excel file");
+
+        BcraExcelLiabilitiesDTO excelData = bcraExcelScraperClient.fetchLiabilities();
+
+        if (excelData != null && excelData.getBankDeposits() != null && excelData.getBankDeposits().compareTo(BigDecimal.ZERO) > 0) {
+            log.info("Successfully fetched liabilities from Excel, using as primary source");
+            return excelData;
         }
-        DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
-        if (datosGob != null) {
-            overrides.put("leliq_pases", datosGob.letterLiabilitiesUsd().setScale(0, RoundingMode.HALF_UP));
-            overrides.put("gov_deposits", datosGob.governmentDepositsUsd().setScale(0, RoundingMode.HALF_UP));
-        }
-        return overrides;
+
+        log.warn("Excel scraping failed or returned incomplete data, falling back to API sources");
+        return buildFallbackLiabilities();
     }
 
-    private List<ReserveLiabilityDTO> mapLiabilitiesWithOverrides(
-            ReservesConfig.MethodologyConfig methodology,
-            Map<String, BigDecimal> overrides) {
-        if (methodology == null || methodology.getLiabilities() == null) {
-            return List.of();
+    private BcraExcelLiabilitiesDTO buildFallbackLiabilities() {
+        BcraExcelLiabilitiesDTO dto = BcraExcelLiabilitiesDTO.builder()
+                .lastUpdate(LocalDate.now())
+                .dataSource("BCRA APIs (fallback)")
+                .build();
+
+        BigDecimal encajes = bcraClient.getDepositosEntidadesMonedaExtranjera();
+        if (encajes != null) {
+            dto.setBankDeposits(encajes.setScale(0, RoundingMode.HALF_UP));
         }
-        return methodology.getLiabilities().stream()
-                .map(l -> {
-                    BigDecimal amount = overrides.containsKey(l.getId())
-                            ? overrides.get(l.getId())
-                            : (l.getAmount() != null ? l.getAmount() : BigDecimal.ZERO);
-                    return ReserveLiabilityDTO.builder()
-                            .id(l.getId())
-                            .name(l.getName())
-                            .amount(amount)
-                            .build();
-                })
-                .collect(Collectors.toList());
+
+        DatosGobArClient.BCRALiabilitiesData datosGob = datosGobArClient.fetchBCRALiabilities();
+        if (datosGob != null) {
+            dto.setLeliqPases(datosGob.letterLiabilitiesUsd().setScale(0, RoundingMode.HALF_UP));
+            dto.setGovernmentDeposits(datosGob.governmentDepositsUsd().setScale(0, RoundingMode.HALF_UP));
+        }
+
+        return dto;
+    }
+
+    private List<ReserveLiabilityDTO> buildBcraLiabilities(BcraExcelLiabilitiesDTO data) {
+        List<ReserveLiabilityDTO> liabilities = new ArrayList<>();
+
+        if (data.getSwapChina() != null && data.getSwapChina().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("china_swap")
+                    .name("Swap China")
+                    .amount(data.getSwapChina().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getBankDeposits() != null && data.getBankDeposits().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("bank_deposits")
+                    .name("Encajes Bancarios")
+                    .amount(data.getBankDeposits().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getSwapUsa() != null && data.getSwapUsa().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("usa_swap")
+                    .name("Swap EEUU")
+                    .amount(data.getSwapUsa().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getRepoSedesa() != null && data.getRepoSedesa().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("sedesa_repo")
+                    .name("REPO SEDESA y otros")
+                    .amount(data.getRepoSedesa().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getOtherShortTermBcra() != null && data.getOtherShortTermBcra().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("other_bcra")
+                    .name("Otros pasivos BCRA")
+                    .amount(data.getOtherShortTermBcra().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        return liabilities;
+    }
+
+    private List<ReserveLiabilityDTO> buildFmiLiabilities(BcraExcelLiabilitiesDTO data) {
+        List<ReserveLiabilityDTO> liabilities = new ArrayList<>(buildBcraLiabilities(data));
+
+        if (data.getGovernmentDeposits() != null && data.getGovernmentDeposits().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("gov_deposits")
+                    .name("Depósitos del Gobierno")
+                    .amount(data.getGovernmentDeposits().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getLeliqPases() != null && data.getLeliqPases().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("leliq_pases")
+                    .name("LELIQs y pases (USD)")
+                    .amount(data.getLeliqPases().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        if (data.getTreasuryLiabilitiesFmi() != null && data.getTreasuryLiabilitiesFmi().compareTo(BigDecimal.ZERO) > 0) {
+            liabilities.add(ReserveLiabilityDTO.builder()
+                    .id("other_fmi")
+                    .name("Pasivos del Tesoro (programa FMI)")
+                    .amount(data.getTreasuryLiabilitiesFmi().setScale(0, RoundingMode.HALF_UP))
+                    .build());
+        }
+
+        return liabilities;
     }
 
     private static final int MAX_HISTORY_DAYS = 3650;

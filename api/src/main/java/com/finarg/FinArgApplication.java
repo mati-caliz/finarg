@@ -2,7 +2,6 @@ package com.finarg;
 
 import com.finarg.core.config.ExternalApisProperties;
 import com.finarg.core.config.LoggingProperties;
-import com.finarg.reserves.config.ReservesConfig;
 import com.finarg.core.config.SchedulerProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling
 @EnableConfigurationProperties({
-    ReservesConfig.class,
     ExternalApisProperties.class,
     SchedulerProperties.class,
     LoggingProperties.class

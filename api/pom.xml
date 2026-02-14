@@ -24,6 +24,7 @@
         <checkstyle.version>10.9.2</checkstyle.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <spotless.version>2.44.4</spotless.version>
+        <poi.version>5.4.0</poi.version>
     </properties>
     
     <dependencyManagement>
@@ -33,6 +34,13 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <!-- Override transitive dependency from POI to fix CVE-2024-25710 and CVE-2024-26308 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.27.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -198,6 +206,18 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.18.1</version>
+        </dependency>
+
+        <!-- Apache POI for Excel parsing -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
         </dependency>
 
         <!-- Selenium for browser automation (scraping) -->
