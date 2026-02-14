@@ -2,7 +2,7 @@ package com.finarg.investments.cedear.service;
 
 import com.finarg.investments.cedear.client.CedearClient;
 import com.finarg.investments.cedear.dto.CedearDTO;
-import com.finarg.investments.stocks.client.YahooFinanceClient;
+import com.finarg.investments.stocks.client.FinnhubClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,7 +29,7 @@ public class CedearService {
     public List<CedearDTO> getAllCedears() {
         log.info("Fetching CEDEAR prices");
 
-        List<YahooFinanceClient.StockQuoteResponse> quotes = cedearClient.getCedearQuotes(POPULAR_CEDEARS);
+        List<FinnhubClient.StockQuoteResponse> quotes = cedearClient.getCedearQuotes(POPULAR_CEDEARS);
 
         if (quotes == null || quotes.isEmpty()) {
             log.warn("No CEDEAR data available");
@@ -41,7 +41,7 @@ public class CedearService {
                 .collect(Collectors.toList());
     }
 
-    private CedearDTO mapToCedearDTO(YahooFinanceClient.StockQuoteResponse response) {
+    private CedearDTO mapToCedearDTO(FinnhubClient.StockQuoteResponse response) {
         String ticker = response.getSymbol();
         String symbol = ticker != null && ticker.endsWith(".BA")
                 ? ticker.substring(0, ticker.length() - 3)

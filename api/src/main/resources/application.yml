@@ -155,10 +155,12 @@ external:
       base-url: https://api.argentinadatos.com
       timeout: 30000
     metals-api:
-      base-url: https://api.metals.live/v1
+      base-url: https://metals-api.com/api
+      api-key: ${METALS_API_KEY:}
       timeout: 10000
-    yahoo-finance:
-      base-url: https://query1.finance.yahoo.com/v8/finance
+    finnhub:
+      base-url: https://finnhub.io/api/v1
+      api-key: ${FINNHUB_API_KEY:}
       timeout: 15000
     iol:
       base-url: https://api.invertironline.com

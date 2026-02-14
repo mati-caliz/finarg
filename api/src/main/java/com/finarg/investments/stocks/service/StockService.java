@@ -1,6 +1,6 @@
 package com.finarg.investments.stocks.service;
 
-import com.finarg.investments.stocks.client.YahooFinanceClient;
+import com.finarg.investments.stocks.client.FinnhubClient;
 import com.finarg.investments.stocks.dto.StockDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class StockService {
-    private final YahooFinanceClient yahooFinanceClient;
+    private final FinnhubClient finnhubClient;
 
     private static final List<String> POPULAR_STOCKS = List.of(
             "AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "META", "NVDA", "NFLX"
@@ -28,7 +28,7 @@ public class StockService {
     public List<StockDTO> getPopularStocks() {
         log.info("Fetching popular stocks");
 
-        List<YahooFinanceClient.StockQuoteResponse> quotes = yahooFinanceClient.getQuotes(POPULAR_STOCKS);
+        List<FinnhubClient.StockQuoteResponse> quotes = finnhubClient.getQuotes(POPULAR_STOCKS);
 
         if (quotes == null || quotes.isEmpty()) {
             log.warn("No stock data available");
@@ -40,7 +40,7 @@ public class StockService {
                 .collect(Collectors.toList());
     }
 
-    private StockDTO mapToStockDTO(YahooFinanceClient.StockQuoteResponse response) {
+    private StockDTO mapToStockDTO(FinnhubClient.StockQuoteResponse response) {
         String companyName = response.getLongName() != null ? response.getLongName() : response.getShortName();
 
         LocalDateTime lastUpdate = response.getRegularMarketTime() != null
