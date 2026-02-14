@@ -90,17 +90,6 @@ public class QuoteService {
                 .multiply(BigDecimal.valueOf(100));
 
         GapLevel level = GapLevel.fromPercentage(gap.doubleValue());
-        String color = switch (level) {
-            case LOW -> "#22c55e";
-            case MEDIUM -> "#eab308";
-            case HIGH -> "#ef4444";
-        };
-
-        String description = switch (level) {
-            case LOW -> "Low gap - Stable market";
-            case MEDIUM -> "Moderate gap - Attention";
-            case HIGH -> "High gap - Exchange tension";
-        };
 
         return GapDTO.builder()
                 .country(country)
@@ -108,8 +97,8 @@ public class QuoteService {
                 .parallelRate(parallelSell)
                 .gapPercentage(gap.setScale(2, RoundingMode.HALF_UP))
                 .level(level)
-                .trafficLightColor(color)
-                .description(description)
+                .trafficLightColor(level.getColor())
+                .description(level.getDescription())
                 .build();
     }
 

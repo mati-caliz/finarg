@@ -2,17 +2,16 @@ package com.finarg.investments.letras.service;
 
 import com.finarg.investments.letras.dto.LetraDTO;
 import com.finarg.investments.stocks.client.DolaritoMervalClient;
+import com.finarg.shared.constants.FinancialConstants;
+import com.finarg.shared.util.BigDecimalUtils;
+import com.finarg.shared.util.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,28 +33,16 @@ public class LetraService {
         return mervalData.getLetras().stream()
                 .limit(20)
                 .map(this::mapToLetraDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private LetraDTO mapToLetraDTO(DolaritoMervalClient.LetraItem letra) {
-        LocalDateTime lastUpdate = letra.getTimestampCotizacion() != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(letra.getTimestampCotizacion()), ZoneId.systemDefault())
-                : LocalDateTime.now();
-
         BigDecimal price = letra.getUltOperado() != null
                 ? letra.getUltOperado()
                 : letra.getCierreAnterior();
 
-        BigDecimal changePercent = letra.getVariacion() != null
-                ? letra.getVariacion()
-                : BigDecimal.ZERO;
-
-        BigDecimal change = BigDecimal.ZERO;
-        if (letra.getCierreAnterior() != null && changePercent != null) {
-            change = letra.getCierreAnterior()
-                    .multiply(changePercent)
-                    .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
-        }
+        BigDecimal changePercent = BigDecimalUtils.orZero(letra.getVariacion());
+        BigDecimal change = BigDecimalUtils.percentageChange(letra.getCierreAnterior(), changePercent);
 
         BigDecimal volume = letra.getVolumen() != null
                 ? new BigDecimal(letra.getVolumen())
@@ -63,17 +50,17 @@ public class LetraService {
 
         String currency = letra.getMoneda() != null
                 ? letra.getMoneda().getSimbolo()
-                : "ARS";
+                : FinancialConstants.DEFAULT_CURRENCY;
 
         return LetraDTO.builder()
                 .ticker(letra.getTicker() != null ? letra.getTicker() : "")
                 .name(letra.getNombre() != null ? letra.getNombre() : letra.getTicker())
-                .price(price != null ? price : BigDecimal.ZERO)
+                .price(BigDecimalUtils.orZero(price))
                 .change(change)
-                .changePercent(changePercent != null ? changePercent : BigDecimal.ZERO)
+                .changePercent(changePercent)
                 .volume(volume)
                 .currency(currency)
-                .lastUpdate(lastUpdate)
+                .lastUpdate(DateTimeUtils.fromEpochMillis(letra.getTimestampCotizacion()))
                 .maturityDate(null)
                 .build();
     }

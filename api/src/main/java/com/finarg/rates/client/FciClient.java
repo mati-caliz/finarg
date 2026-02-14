@@ -1,5 +1,6 @@
 package com.finarg.rates.client;
 
+import com.finarg.shared.util.BigDecimalUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,45 +27,39 @@ public class FciClient {
     }
 
     public List<FciFundData> getLatestFciData() {
-        try {
-            List<FciFundData> response = webClient.get()
-                    .uri("/v1/finanzas/fci/mercadoDinero/ultimo/")
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<FciFundData>>() { })
-                    .block();
-
-            if (response == null) {
-                log.error("Empty response from FCI API (latest)");
-                return List.of();
-            }
-
-            return response.stream()
-                    .filter(fund -> fund.getVcp() != null && fund.getFecha() != null)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Error fetching latest FCI data: {}", e.getMessage());
-            return List.of();
-        }
+        return fetchFundData("/v1/finanzas/fci/mercadoDinero/ultimo/");
     }
 
     public List<FciFundData> getPreviousFciData() {
+        return fetchFundData("/v1/finanzas/fci/mercadoDinero/penultimo/");
+    }
+
+    public List<FciFundData> getLatestRentaFijaData() {
+        return fetchFundData("/v1/finanzas/fci/rentaFija/ultimo/");
+    }
+
+    public List<FciFundData> getPreviousRentaFijaData() {
+        return fetchFundData("/v1/finanzas/fci/rentaFija/penultimo/");
+    }
+
+    private List<FciFundData> fetchFundData(String uriPath) {
         try {
             List<FciFundData> response = webClient.get()
-                    .uri("/v1/finanzas/fci/mercadoDinero/penultimo/")
+                    .uri(uriPath)
                     .retrieve()
                     .bodyToMono(new ParameterizedTypeReference<List<FciFundData>>() { })
                     .block();
 
             if (response == null) {
-                log.error("Empty response from FCI API (previous)");
+                log.error("Empty response from FCI API: {}", uriPath);
                 return List.of();
             }
 
             return response.stream()
                     .filter(fund -> fund.getVcp() != null && fund.getFecha() != null)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (Exception e) {
-            log.error("Error fetching previous FCI data: {}", e.getMessage());
+            log.error("Error fetching FCI data from {}: {}", uriPath, e.getMessage());
             return List.of();
         }
     }
@@ -83,54 +78,10 @@ public class FciClient {
         double dailyRate = Math.pow(ratio, 1.0 / daysBetween) - 1.0;
 
         BigDecimal annualizedReturn = BigDecimal.valueOf(dailyRate)
-                .multiply(BigDecimal.valueOf(365))
-                .multiply(BigDecimal.valueOf(100));
+                .multiply(BigDecimal.valueOf(BigDecimalUtils.DAYS_PER_YEAR))
+                .multiply(BigDecimalUtils.ONE_HUNDRED);
 
         return annualizedReturn.setScale(2, RoundingMode.HALF_UP);
-    }
-
-    public List<FciFundData> getLatestRentaFijaData() {
-        try {
-            List<FciFundData> response = webClient.get()
-                    .uri("/v1/finanzas/fci/rentaFija/ultimo/")
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<FciFundData>>() { })
-                    .block();
-
-            if (response == null) {
-                log.error("Empty response from FCI API (latest renta fija)");
-                return List.of();
-            }
-
-            return response.stream()
-                    .filter(fund -> fund.getVcp() != null && fund.getFecha() != null)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Error fetching latest renta fija FCI data: {}", e.getMessage());
-            return List.of();
-        }
-    }
-
-    public List<FciFundData> getPreviousRentaFijaData() {
-        try {
-            List<FciFundData> response = webClient.get()
-                    .uri("/v1/finanzas/fci/rentaFija/penultimo/")
-                    .retrieve()
-                    .bodyToMono(new ParameterizedTypeReference<List<FciFundData>>() { })
-                    .block();
-
-            if (response == null) {
-                log.error("Empty response from FCI API (previous renta fija)");
-                return List.of();
-            }
-
-            return response.stream()
-                    .filter(fund -> fund.getVcp() != null && fund.getFecha() != null)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Error fetching previous renta fija FCI data: {}", e.getMessage());
-            return List.of();
-        }
     }
 
     public Map<String, BigDecimal> calculateAllTnas() {

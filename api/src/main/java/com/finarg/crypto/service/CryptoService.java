@@ -2,12 +2,12 @@ package com.finarg.crypto.service;
 
 import com.finarg.crypto.client.CoinGeckoClient;
 import com.finarg.crypto.dto.CryptoDTO;
+import com.finarg.shared.util.BigDecimalUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +20,17 @@ public class CryptoService {
 
     private final CoinGeckoClient coinGeckoClient;
 
+    private record CryptoDefinition(String apiKey, String symbol, String name) { }
+
+    private static final List<CryptoDefinition> SUPPORTED_CRYPTOS = List.of(
+            new CryptoDefinition("bitcoin", "BTC", "Bitcoin"),
+            new CryptoDefinition("ethereum", "ETH", "Ethereum"),
+            new CryptoDefinition("binancecoin", "BNB", "Binance Coin"),
+            new CryptoDefinition("ripple", "XRP", "Ripple"),
+            new CryptoDefinition("cardano", "ADA", "Cardano"),
+            new CryptoDefinition("solana", "SOL", "Solana")
+    );
+
     @Cacheable(value = "crypto", key = "'current'")
     public List<CryptoDTO> getCurrentCryptoPrices() {
         log.info("Fetching current crypto prices");
@@ -27,74 +38,22 @@ public class CryptoService {
 
         if (response == null || response.isEmpty()) {
             log.warn("No crypto data available from API");
-            return new ArrayList<>();
+            return List.of();
         }
 
-        List<CryptoDTO> cryptoList = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
+        List<CryptoDTO> cryptoList = new ArrayList<>();
 
-        if (response.containsKey("bitcoin")) {
-            CoinGeckoClient.CryptoPriceData btcData = response.get("bitcoin");
+        for (CryptoDefinition crypto : SUPPORTED_CRYPTOS) {
+            CoinGeckoClient.CryptoPriceData data = response.get(crypto.apiKey());
+            if (data == null) {
+                continue;
+            }
             cryptoList.add(CryptoDTO.builder()
-                    .symbol("BTC")
-                    .name("Bitcoin")
-                    .priceUsd(btcData.getUsd() != null ? btcData.getUsd() : BigDecimal.ZERO)
-                    .change24h(btcData.getUsd24hChange() != null ? btcData.getUsd24hChange() : BigDecimal.ZERO)
-                    .lastUpdate(now)
-                    .build());
-        }
-
-        if (response.containsKey("ethereum")) {
-            CoinGeckoClient.CryptoPriceData ethData = response.get("ethereum");
-            cryptoList.add(CryptoDTO.builder()
-                    .symbol("ETH")
-                    .name("Ethereum")
-                    .priceUsd(ethData.getUsd() != null ? ethData.getUsd() : BigDecimal.ZERO)
-                    .change24h(ethData.getUsd24hChange() != null ? ethData.getUsd24hChange() : BigDecimal.ZERO)
-                    .lastUpdate(now)
-                    .build());
-        }
-
-        if (response.containsKey("binancecoin")) {
-            CoinGeckoClient.CryptoPriceData bnbData = response.get("binancecoin");
-            cryptoList.add(CryptoDTO.builder()
-                    .symbol("BNB")
-                    .name("Binance Coin")
-                    .priceUsd(bnbData.getUsd() != null ? bnbData.getUsd() : BigDecimal.ZERO)
-                    .change24h(bnbData.getUsd24hChange() != null ? bnbData.getUsd24hChange() : BigDecimal.ZERO)
-                    .lastUpdate(now)
-                    .build());
-        }
-
-        if (response.containsKey("ripple")) {
-            CoinGeckoClient.CryptoPriceData xrpData = response.get("ripple");
-            cryptoList.add(CryptoDTO.builder()
-                    .symbol("XRP")
-                    .name("Ripple")
-                    .priceUsd(xrpData.getUsd() != null ? xrpData.getUsd() : BigDecimal.ZERO)
-                    .change24h(xrpData.getUsd24hChange() != null ? xrpData.getUsd24hChange() : BigDecimal.ZERO)
-                    .lastUpdate(now)
-                    .build());
-        }
-
-        if (response.containsKey("cardano")) {
-            CoinGeckoClient.CryptoPriceData adaData = response.get("cardano");
-            cryptoList.add(CryptoDTO.builder()
-                    .symbol("ADA")
-                    .name("Cardano")
-                    .priceUsd(adaData.getUsd() != null ? adaData.getUsd() : BigDecimal.ZERO)
-                    .change24h(adaData.getUsd24hChange() != null ? adaData.getUsd24hChange() : BigDecimal.ZERO)
-                    .lastUpdate(now)
-                    .build());
-        }
-
-        if (response.containsKey("solana")) {
-            CoinGeckoClient.CryptoPriceData solData = response.get("solana");
-            cryptoList.add(CryptoDTO.builder()
-                    .symbol("SOL")
-                    .name("Solana")
-                    .priceUsd(solData.getUsd() != null ? solData.getUsd() : BigDecimal.ZERO)
-                    .change24h(solData.getUsd24hChange() != null ? solData.getUsd24hChange() : BigDecimal.ZERO)
+                    .symbol(crypto.symbol())
+                    .name(crypto.name())
+                    .priceUsd(BigDecimalUtils.orZero(data.getUsd()))
+                    .change24h(BigDecimalUtils.orZero(data.getUsd24hChange()))
                     .lastUpdate(now)
                     .build());
         }

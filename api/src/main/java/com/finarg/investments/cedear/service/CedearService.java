@@ -2,6 +2,8 @@ package com.finarg.investments.cedear.service;
 
 import com.finarg.investments.cedear.dto.CedearDTO;
 import com.finarg.investments.stocks.client.DolaritoMervalClient;
+import com.finarg.shared.constants.FinancialConstants;
+import com.finarg.shared.util.BigDecimalUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -11,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,26 +41,16 @@ public class CedearService {
                         cedear -> POPULAR_CEDEARS.indexOf(cedear.getNombreCorto())
                 ))
                 .map(this::mapToCedearDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private CedearDTO mapToCedearDTO(DolaritoMervalClient.CedearItem cedear) {
-        LocalDateTime lastUpdate = LocalDateTime.now();
-
         BigDecimal lastPrice = cedear.getUltOperado() != null
                 ? cedear.getUltOperado()
                 : cedear.getCierreAnterior();
 
-        BigDecimal changePercent = cedear.getVariacion() != null
-                ? cedear.getVariacion()
-                : BigDecimal.ZERO;
-
-        BigDecimal change = BigDecimal.ZERO;
-        if (cedear.getCierreAnterior() != null && changePercent != null) {
-            change = cedear.getCierreAnterior()
-                    .multiply(changePercent)
-                    .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
-        }
+        BigDecimal changePercent = BigDecimalUtils.orZero(cedear.getVariacion());
+        BigDecimal change = BigDecimalUtils.percentageChange(cedear.getCierreAnterior(), changePercent);
 
         BigDecimal volume = cedear.getVolumen() != null
                 ? new BigDecimal(cedear.getVolumen())
@@ -67,18 +58,18 @@ public class CedearService {
 
         String currency = cedear.getMoneda() != null
                 ? cedear.getMoneda().getSimbolo()
-                : "ARS";
+                : FinancialConstants.DEFAULT_CURRENCY;
 
         return CedearDTO.builder()
                 .symbol(cedear.getNombreCorto() != null ? cedear.getNombreCorto() : "")
                 .ticker(cedear.getNombreCorto() != null ? cedear.getNombreCorto() : "")
                 .companyName(cedear.getNombre() != null ? cedear.getNombre() : cedear.getNombreCorto())
-                .lastPrice(lastPrice != null ? lastPrice : BigDecimal.ZERO)
+                .lastPrice(BigDecimalUtils.orZero(lastPrice))
                 .change(change)
-                .changePercent(changePercent != null ? changePercent : BigDecimal.ZERO)
+                .changePercent(changePercent)
                 .volume(volume)
                 .currency(currency)
-                .lastUpdate(lastUpdate)
+                .lastUpdate(LocalDateTime.now())
                 .build();
     }
 }
