@@ -94,12 +94,14 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
               Puntos clave
             </p>
             <ul className="space-y-1">
-              {article.keyPoints.map((point) => (
-                <li key={point} className="flex items-start gap-2 text-sm">
-                  <span className="text-violet-500 mt-1">•</span>
-                  <span className="flex-1">{point}</span>
-                </li>
-              ))}
+              {article.keyPoints
+                .filter((point) => point?.trim())
+                .map((point, index) => (
+                  <li key={`${article.id}-${index}`} className="flex items-start gap-2 text-sm">
+                    <span className="text-violet-500 mt-1">•</span>
+                    <span className="flex-1">{point.trim()}</span>
+                  </li>
+                ))}
             </ul>
           </div>
         )}

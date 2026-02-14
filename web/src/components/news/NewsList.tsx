@@ -13,8 +13,8 @@ export function NewsList() {
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((id) => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {[1, 2, 3, 4, 5, 6].map((id) => (
           <Skeleton key={id} className="h-64 w-full" />
         ))}
       </div>
@@ -39,7 +39,7 @@ export function NewsList() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {data.articles.map((article) => (
           <NewsCard key={article.id} article={article} />
         ))}
