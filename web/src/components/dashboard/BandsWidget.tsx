@@ -3,15 +3,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { exchangeBandsApi } from "@/lib/api";
+import { BANDS_COLOR_CLASSES } from "@/lib/constants";
 import type { ExchangeBands, Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
 interface BandsWidgetProps {
-  oficialQuote: Quote | undefined;
+  officialQuote: Quote | undefined;
 }
 
-export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
+export function BandsWidget({ officialQuote }: BandsWidgetProps) {
   const { translate } = useTranslation();
   const { data: bands, isLoading } = useQuery({
     queryKey: ["exchangeBands"],
@@ -29,7 +30,7 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
     return null;
   }
 
-  const currentValue = oficialQuote?.sell ?? 0;
+  const currentValue = officialQuote?.sell ?? 0;
   const { floor, ceiling } = bands;
   const range = ceiling - floor;
   const position = range > 0 ? ((currentValue - floor) / range) * 100 : 50;
@@ -64,33 +65,9 @@ export function BandsWidget({ oficialQuote }: BandsWidgetProps) {
   const zoneColor = getZoneColor();
   const zoneLabel = getZoneLabel();
 
-  const colorClasses = {
-    green: {
-      bg: "bg-emerald-500",
-      text: "text-emerald-700 dark:text-emerald-400",
-      border: "border-t-emerald-400",
-      hoverBorder: "hover:border-t-emerald-300",
-      indicator: "bg-emerald-500",
-    },
-    yellow: {
-      bg: "bg-amber-500",
-      text: "text-amber-700 dark:text-amber-400",
-      border: "border-t-amber-400",
-      hoverBorder: "hover:border-t-amber-300",
-      indicator: "bg-amber-500",
-    },
-    red: {
-      bg: "bg-red-500",
-      text: "text-red-700 dark:text-red-400",
-      border: "border-t-red-400",
-      hoverBorder: "hover:border-t-red-300",
-      indicator: "bg-red-500",
-    },
-  };
+  const colors = BANDS_COLOR_CLASSES[zoneColor];
 
-  const colors = colorClasses[zoneColor];
-
-  if (!oficialQuote) {
+  if (!officialQuote) {
     return null;
   }
 
