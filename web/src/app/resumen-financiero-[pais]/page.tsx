@@ -22,12 +22,19 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function CountryDashboardPage({ params }: { params: { pais: string } }) {
-  if (!params?.pais) {
+export default async function CountryDashboardPage({
+  params,
+}: {
+  params: Promise<{ pais: string }>;
+}) {
+  const { pais } = await params;
+  const paisSlug = pais?.toLowerCase();
+
+  if (!paisSlug) {
     notFound();
   }
 
-  const countryCode = COUNTRY_SLUG_MAP[params.pais.toLowerCase()];
+  const countryCode = COUNTRY_SLUG_MAP[paisSlug];
 
   if (!countryCode || !COUNTRIES[countryCode]) {
     notFound();

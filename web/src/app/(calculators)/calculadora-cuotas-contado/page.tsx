@@ -103,7 +103,7 @@ export default function InstallmentsVsCashCalculatorPage() {
   const { data: inflation, isLoading: loadingInflation } = useCurrentInflation();
 
   const [cashPrice, setCashPrice] = useState<string>("");
-  const [installmentValue, setInstallmentValue] = useState<string>("");
+  const [totalInstallmentPrice, setTotalInstallmentPrice] = useState<string>("");
   const [numberOfInstallments, setNumberOfInstallments] = useState<string>("12");
   const [customInflation, setCustomInflation] = useState<string>("");
   const [result, setResult] = useState<CalculationResult | null>(null);
@@ -165,7 +165,9 @@ export default function InstallmentsVsCashCalculatorPage() {
 
   const handleCalculate = () => {
     const cash = Number.parseFloat(cashPrice.replace(/\./g, "").replace(",", "."));
-    const installment = Number.parseFloat(installmentValue.replace(/\./g, "").replace(",", "."));
+    const totalInstallments = Number.parseFloat(
+      totalInstallmentPrice.replace(/\./g, "").replace(",", "."),
+    );
     const installments = Number.parseInt(numberOfInstallments);
 
     const monthlyInflation = customInflation
@@ -174,14 +176,14 @@ export default function InstallmentsVsCashCalculatorPage() {
 
     if (
       Number.isNaN(cash) ||
-      Number.isNaN(installment) ||
+      Number.isNaN(totalInstallments) ||
       Number.isNaN(installments) ||
       installments < 1
     ) {
       return;
     }
 
-    const totalInstallmentPrice = installment * installments;
+    const installment = totalInstallments / installments;
     const { presentValue, chartData } = calculatePresentValueWithData(
       installment,
       installments,
@@ -192,7 +194,7 @@ export default function InstallmentsVsCashCalculatorPage() {
 
     setResult({
       cashPrice: cash,
-      installmentPrice: totalInstallmentPrice,
+      installmentPrice: totalInstallments,
       numberOfInstallments: installments,
       installmentValue: installment,
       monthlyInflation,
@@ -232,7 +234,8 @@ export default function InstallmentsVsCashCalculatorPage() {
 
   const handleLoadCalculation = (calc: SavedCalculation) => {
     setCashPrice(calc.cashPrice.toString());
-    setInstallmentValue(calc.installmentValue.toString());
+    const total = calc.installmentValue * calc.numberOfInstallments;
+    setTotalInstallmentPrice(total.toString());
     setNumberOfInstallments(calc.numberOfInstallments.toString());
     setCustomInflation(calc.monthlyInflation.toString());
     setTimeout(() => handleCalculate(), 100);
@@ -311,7 +314,7 @@ export default function InstallmentsVsCashCalculatorPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="cashPrice">Precio de contado</Label>
+              <Label htmlFor="cashPrice">Ingresá el precio total al contado</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
@@ -328,17 +331,17 @@ export default function InstallmentsVsCashCalculatorPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="installmentValue">Valor de cada cuota</Label>
+              <Label htmlFor="totalInstallmentPrice">Ingresá el precio total en cuotas</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   $
                 </span>
                 <Input
-                  id="installmentValue"
+                  id="totalInstallmentPrice"
                   type="text"
-                  placeholder="10.000"
-                  value={installmentValue}
-                  onChange={(e) => setInstallmentValue(e.target.value)}
+                  placeholder="120.000"
+                  value={totalInstallmentPrice}
+                  onChange={(e) => setTotalInstallmentPrice(e.target.value)}
                   className="pl-8"
                 />
               </div>
