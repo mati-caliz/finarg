@@ -77,17 +77,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icon.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
-        <title>FinLatam</title>
       </head>
       <body className={inter.className}>
         {gaMeasurementId && (
           <>
             <Script
-              strategy="afterInteractive"
+              strategy="lazyOnload"
               src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
             />
-            <Script id="google-analytics" strategy="afterInteractive">
+            <Script id="google-analytics" strategy="lazyOnload">
               {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

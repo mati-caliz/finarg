@@ -192,7 +192,7 @@ export default function DashboardPage() {
             {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
             {countryConfig.features.inflation && (
               <Link href="/inflacion" className="block shrink-0">
-                <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer">
+                <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer min-h-[160px]">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
                       <Percent className="h-3.5 w-3.5" />
@@ -265,7 +265,7 @@ export default function DashboardPage() {
                   socialIndicators.averageSalary !== null) ||
                 (socialIndicators.uva !== undefined && socialIndicators.uva !== null) ||
                 (socialIndicators.cer !== undefined && socialIndicators.cer !== null)) && (
-                <Card className="shrink-0 border-t-[3px] border-t-indigo-400">
+                <Card className="shrink-0 border-t-[3px] border-t-indigo-400 min-h-[380px]">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-foreground">
                       {translate("socialIndicators")}
@@ -402,7 +402,7 @@ export default function DashboardPage() {
 
         {countryConfig.features.inflation && selectedCountry !== "ar" && (
           <Link href="/inflacion" className="block">
-            <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer">
+            <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer min-h-[160px]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
                   <Percent className="h-3.5 w-3.5" />
