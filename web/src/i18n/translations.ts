@@ -9,6 +9,7 @@ export const translations = {
 
     inflation: "Inflación",
     reserves: "Reservas",
+    news: "Noticias",
     tools: "Herramientas",
 
     market: "Mercado",
@@ -1398,6 +1399,23 @@ export const translations = {
     errorTimeOutTitle: "Time out",
     errorServerTitle: "Server error",
     retry: "Retry",
+
+    sentimentPositive: "Positivo",
+    sentimentNeutral: "Neutral",
+    sentimentNegative: "Negativo",
+    sentimentMixed: "Mixto",
+
+    newsCategoryExchangeRate: "Tipo de Cambio",
+    newsCategoryMonetaryPolicy: "Política Monetaria",
+    newsCategoryInflation: "Inflación",
+    newsCategoryReserves: "Reservas",
+    newsCategoryFiscalPolicy: "Política Fiscal",
+    newsCategoryFinancialMarkets: "Mercados Financieros",
+    newsCategoryEconomyGeneral: "Economía General",
+    newsCategoryCrypto: "Criptomonedas",
+    newsCategoryInternational: "Internacional",
+    newsCategoryBcraBulletin: "Boletín BCRA",
+    newsCategoryGovernmentBulletin: "Boletín Oficial",
   },
 };
 

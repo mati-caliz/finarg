@@ -5,6 +5,8 @@ import type {
   CurrencyConversionResponse,
   ExchangeRateComparison,
   IncomeTaxRequest,
+  NewsArticle,
+  NewsListResponse,
 } from "@/types";
 import axios from "axios";
 
@@ -125,4 +127,19 @@ export const investmentsApi = {
   getMetals: () => cachedApi.get("/investments/metals"),
   getLetras: () => cachedApi.get("/investments/letras"),
   getCauciones: () => cachedApi.get("/investments/cauciones"),
+};
+
+export const newsApi = {
+  getLatest: (country: CountryCode = "ar", page = 0, size = 20) =>
+    cachedApi.get<NewsListResponse>("/news", { params: { country, page, size } }),
+
+  getByCategory: (category: string, country: CountryCode = "ar", page = 0, size = 20) =>
+    cachedApi.get<NewsListResponse>(`/news/category/${category}`, {
+      params: { country, page, size },
+    }),
+
+  getOfficial: (country: CountryCode = "ar", page = 0, size = 20) =>
+    cachedApi.get<NewsListResponse>("/news/official", { params: { country, page, size } }),
+
+  getById: (id: number) => cachedApi.get<NewsArticle>(`/news/${id}`),
 };

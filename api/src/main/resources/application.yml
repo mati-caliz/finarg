@@ -118,6 +118,14 @@ external:
     iol:
       base-url: https://api.invertironline.com
       timeout: 15000
+    ollama:
+      base-url: http://localhost:11434
+      timeout: 30000
+
+scheduler:
+  enabled: true
+  news:
+    cron: "0 0 * * * *"
 
 logging:
   level:
