@@ -23,6 +23,10 @@ export async function generateStaticParams() {
 }
 
 export default function CountryDashboardPage({ params }: { params: { pais: string } }) {
+  if (!params?.pais) {
+    notFound();
+  }
+
   const countryCode = COUNTRY_SLUG_MAP[params.pais.toLowerCase()];
 
   if (!countryCode || !COUNTRIES[countryCode]) {
