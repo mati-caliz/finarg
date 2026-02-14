@@ -77,9 +77,7 @@ export default function UniversalConverterPage() {
 
   useEffect(() => {
     if (allQuotes.length > 0) {
-      // Set default currencies on first load
       if (!fromCurrency && !toCurrency) {
-        // FROM: Peso Argentino (local currency)
         setFromCurrency({
           country: "ar",
           countryName: "Argentina",
@@ -89,7 +87,6 @@ export default function UniversalConverterPage() {
           flag: "🇦🇷",
         });
 
-        // TO: Dólar Blue
         const defaultTo = allQuotes.find((q) => q.type === "blue" && q.country === "ar");
         if (defaultTo) {
           setToCurrency({

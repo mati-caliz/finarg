@@ -37,10 +37,7 @@ public class FinnhubClient {
                                 response.setCurrency("USD");
                                 return response;
                             })
-                            .onErrorResume(e -> {
-                                log.warn("Failed to fetch quote for symbol {}: {}", symbol, e.getMessage());
-                                return Mono.empty();
-                            })
+                            .onErrorResume(e -> Mono.empty())
                     )
                     .collectList()
                     .block();
@@ -52,18 +49,16 @@ public class FinnhubClient {
 
             Flux.fromIterable(symbols)
                     .flatMap(this::getProfile)
-                    .doOnNext(profile -> {
-                        quotes.stream()
-                                .filter(q -> q.getSymbol().equals(profile.getTicker()))
-                                .findFirst()
-                                .ifPresent(q -> {
-                                    q.setShortName(profile.getName());
-                                    q.setLongName(profile.getName());
-                                    q.setMarketCap(profile.getMarketCapitalization() != null
-                                        ? profile.getMarketCapitalization().multiply(new BigDecimal("1000000")).longValue()
-                                        : null);
-                                });
-                    })
+                    .doOnNext(profile -> quotes.stream()
+                            .filter(q -> q.getSymbol().equals(profile.getTicker()))
+                            .findFirst()
+                            .ifPresent(q -> {
+                                q.setShortName(profile.getName());
+                                q.setLongName(profile.getName());
+                                q.setMarketCap(profile.getMarketCapitalization() != null
+                                    ? profile.getMarketCapitalization().multiply(new BigDecimal("1000000")).longValue()
+                                    : null);
+                            }))
                     .collectList()
                     .block();
 

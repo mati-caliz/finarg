@@ -1,6 +1,5 @@
 export const translations = {
   es: {
-    // Navigation
     dashboard: "Dashboard",
     quotes: "Cotizaciones",
     exchangeRatesComparator: "Conversor de Monedas",
@@ -12,21 +11,18 @@ export const translations = {
     reserves: "Reservas",
     tools: "Herramientas",
 
-    // Navigation Categories
     market: "Mercado",
     indicators: "Indicadores",
     comparators: "Comparadores",
     calculators: "Calculadoras",
     investments: "Inversiones",
 
-    // Countries
     ar: "Argentina",
     co: "Colombia",
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguay",
 
-    // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparación de todos los tipos de cambio disponibles",
     exchangeRateComparator: "Comparador de Tipos de Cambio",
     exchangeRateComparatorSubtitle: "Compará precios de compra y venta",
@@ -37,7 +33,6 @@ export const translations = {
     allQuotes: "Todas las Cotizaciones",
     exchangeRateType: "Tipo de Cambio",
 
-    // Currency Converter
     universalConverter: "Conversor de Monedas",
     universalConverterDesc: "Convertí entre más de 46 monedas de 5 países",
     convertCurrency: "Convertir Moneda",
@@ -75,7 +70,6 @@ export const translations = {
     result: "Resultado",
     replayConversion: "Repetir Conversión",
 
-    // Tasas / Comparador
     ratesComparator: "Comparador de Tasas",
     rateComparator: "Comparador de Tasas",
     ratesComparatorDesc: "Compará TNA de billeteras virtuales y plazos fijos de bancos",
@@ -114,7 +108,6 @@ export const translations = {
       "No hay datos de plazos fijos disponibles. Las tasas se obtienen automáticamente del BCRA.",
     ratesUpdateNote: "Las tasas se actualizan según la fuente (BCRA y API de billeteras).",
 
-    // Calculadora de Interés Compuesto
     compoundInterestTitle: "Calculadora de Interés Compuesto",
     compoundInterestSubtitle:
       "Calculá cuánto podés ganar invirtiendo con interés compuesto a lo largo del tiempo.",
@@ -151,7 +144,6 @@ export const translations = {
     faqCompoundVsSimpleAnswer:
       "En el interés simple, los intereses se calculan solo sobre el capital inicial. En el interés compuesto, los intereses se calculan sobre el capital inicial más los intereses acumulados, generando un rendimiento mucho mayor a largo plazo.",
 
-    // Reservas
     bcraReservesTitle: "Reservas BCRA",
     bcraReservesDesc: "Reservas internacionales del Banco Central de la República Argentina",
     grossReserves: "Reservas Brutas",
@@ -181,7 +173,6 @@ export const translations = {
     publicUsdDeposits: "Depósitos USD del público",
     reservesUpdateNote: "Los datos se actualizan cada 5 minutos aproximadamente.",
 
-    // Inflacion
     inflationTitle: "Inflación",
     inflationDesc: "Datos del IPC y calculadora de ajuste por inflación",
     monthlyInflation: "Inflación Mensual",
