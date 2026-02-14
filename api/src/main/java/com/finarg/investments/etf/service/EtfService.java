@@ -1,7 +1,7 @@
 package com.finarg.investments.etf.service;
 
 import com.finarg.investments.etf.dto.EtfDTO;
-import com.finarg.investments.stocks.client.YahooFinanceClient;
+import com.finarg.investments.stocks.client.FinnhubClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class EtfService {
-    private final YahooFinanceClient yahooFinanceClient;
+    private final FinnhubClient finnhubClient;
 
     private static final List<String> POPULAR_ETFS = List.of(
             "SPY", "QQQ", "VOO", "VTI", "IWM", "EEM", "GLD", "TLT"
@@ -29,7 +29,7 @@ public class EtfService {
     public List<EtfDTO> getPopularEtfs() {
         log.info("Fetching popular ETF prices");
 
-        List<YahooFinanceClient.StockQuoteResponse> quotes = yahooFinanceClient.getQuotes(POPULAR_ETFS);
+        List<FinnhubClient.StockQuoteResponse> quotes = finnhubClient.getQuotes(POPULAR_ETFS);
 
         if (quotes == null || quotes.isEmpty()) {
             log.warn("No ETF data available");
@@ -42,7 +42,7 @@ public class EtfService {
                 .collect(Collectors.toList());
     }
 
-    private EtfDTO mapToEtfDTO(YahooFinanceClient.StockQuoteResponse response) {
+    private EtfDTO mapToEtfDTO(FinnhubClient.StockQuoteResponse response) {
         String name = response.getLongName() != null
                 ? response.getLongName()
                 : response.getShortName();

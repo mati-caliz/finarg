@@ -81,7 +81,9 @@
       "Bash(done)",
       "Bash(for months in:*)",
       "Bash(cat:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(lsof:*)",
+      "Bash(python3:*)"
     ]
   }
 }

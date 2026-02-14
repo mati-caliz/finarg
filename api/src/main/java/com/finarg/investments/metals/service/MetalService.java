@@ -32,43 +32,37 @@ public class MetalService {
     public List<MetalDTO> getAllMetals() {
         log.info("Fetching all metals prices");
 
-        Map<String, MetalsAPIClient.MetalPriceResponse> metalsPrices = metalsAPIClient.getMetalsPrices();
+        MetalsAPIClient.MetalsAPIResponse response = metalsAPIClient.getMetalsPrices();
 
-        if (metalsPrices == null || metalsPrices.isEmpty()) {
+        if (response == null || response.getRates() == null || response.getRates().isEmpty()) {
             log.warn("No metals data available");
             return List.of();
         }
 
         List<MetalDTO> metals = new ArrayList<>();
+        LocalDateTime lastUpdate = response.getTimestamp() != null
+                ? LocalDateTime.ofInstant(Instant.ofEpochSecond(response.getTimestamp()), ZoneId.systemDefault())
+                : LocalDateTime.now();
 
-        for (Map.Entry<String, MetalsAPIClient.MetalPriceResponse> entry : metalsPrices.entrySet()) {
+        for (Map.Entry<String, BigDecimal> entry : response.getRates().entrySet()) {
             String code = entry.getKey();
-            MetalsAPIClient.MetalPriceResponse response = entry.getValue();
+            BigDecimal inverseRate = entry.getValue();
 
-            if (response == null) {
+            if (inverseRate == null || inverseRate.compareTo(BigDecimal.ZERO) <= 0) {
+                log.warn("Invalid rate for metal {}: {}", code, inverseRate);
                 continue;
             }
 
             String metalType = METAL_NAMES.getOrDefault(code, code);
 
-            BigDecimal pricePerOunce = response.getPrice();
-            if (pricePerOunce == null || pricePerOunce.compareTo(BigDecimal.ZERO) <= 0) {
-                log.warn("Invalid price for metal {}: {}", code, pricePerOunce);
-                continue;
-            }
-
-            BigDecimal priceUsd = BigDecimal.ONE.divide(pricePerOunce, 2, java.math.RoundingMode.HALF_UP);
-
-            LocalDateTime lastUpdate = response.getTimestamp() != null
-                    ? LocalDateTime.ofInstant(Instant.ofEpochSecond(response.getTimestamp()), ZoneId.systemDefault())
-                    : LocalDateTime.now();
+            BigDecimal priceUsd = BigDecimal.ONE.divide(inverseRate, 2, java.math.RoundingMode.HALF_UP);
 
             MetalDTO metal = MetalDTO.builder()
                     .metalType(metalType)
                     .unit("oz")
                     .priceUsd(priceUsd)
-                    .change24h(response.getChange() != null ? response.getChange() : BigDecimal.ZERO)
-                    .changePercent24h(response.getChangePercent() != null ? response.getChangePercent() : BigDecimal.ZERO)
+                    .change24h(BigDecimal.ZERO)
+                    .changePercent24h(BigDecimal.ZERO)
                     .lastUpdate(lastUpdate)
                     .build();
 

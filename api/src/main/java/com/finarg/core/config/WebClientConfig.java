@@ -102,11 +102,17 @@ public class WebClientConfig {
     @Value("${external.apis.metals-api.timeout:10000}")
     private int metalsApiTimeout;
 
-    @Value("${external.apis.yahoo-finance.base-url:https://query1.finance.yahoo.com/v8/finance}")
-    private String yahooFinanceBaseUrl;
+    @Value("${external.apis.finnhub.base-url:https://finnhub.io/api/v1}")
+    private String finnhubBaseUrl;
 
-    @Value("${external.apis.yahoo-finance.timeout:15000}")
-    private int yahooFinanceTimeout;
+    @Value("${external.apis.finnhub.timeout:15000}")
+    private int finnhubTimeout;
+
+    @Value("${external.apis.finnhub.api-key:}")
+    private String finnhubApiKey;
+
+    @Value("${external.apis.metals-api.api-key:}")
+    private String metalsApiKey;
 
     @Value("${external.apis.iol.base-url:https://api.invertironline.com}")
     private String iolBaseUrl;
@@ -326,16 +332,16 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean("yahooFinanceWebClient")
-    public WebClient yahooFinanceWebClient() {
+    @Bean("finnhubWebClient")
+    public WebClient finnhubWebClient() {
         HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(yahooFinanceTimeout));
+                .responseTimeout(Duration.ofMillis(finnhubTimeout));
         return WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(yahooFinanceBaseUrl)
+                .baseUrl(finnhubBaseUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.USER_AGENT, "Finarg/1.0")
+                .defaultHeader("X-Finnhub-Token", finnhubApiKey)
                 .build();
     }
 
