@@ -373,13 +373,17 @@ export default function ReservesPage() {
             </div>
           ) : historicalReserves && historicalReserves.length > 0 ? (
             (() => {
+              console.log("🔍 DEBUG - historicalReserves:", historicalReserves.slice(0, 3));
               const reversedRaw = [...historicalReserves].reverse();
-              const chartData = reversedRaw.map((r: { fecha: string; valor: number }, idx) => ({
-                index: idx,
-                fecha: formatDateDayShort(r.fecha),
-                fechaOriginal: r.fecha,
-                valor: Number(r.valor),
-              }));
+              const chartData = reversedRaw.map((r: { date: string; value: number }, idx) => {
+                console.log(`🔍 DEBUG - fecha original: "${r.date}", tipo: ${typeof r.date}`);
+                return {
+                  index: idx,
+                  fecha: formatDateDayShort(r.date),
+                  fechaOriginal: r.date,
+                  valor: Number(r.value),
+                };
+              });
               const values = chartData.map((d) => d.valor);
               const minVal = Math.min(...values);
               const maxVal = Math.max(...values);
