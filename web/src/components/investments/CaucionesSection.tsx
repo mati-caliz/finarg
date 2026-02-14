@@ -1,11 +1,13 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { VariationBadge } from "@/components/ui/variation-badge";
 import { useCauciones } from "@/hooks/useInvestments";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { Caucion } from "@/types";
+import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
+
+const GRID_CLASS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
 
 export function CaucionesSection() {
   const { translate } = useTranslation();
@@ -15,39 +17,16 @@ export function CaucionesSection() {
     return `${rate.toFixed(2)}%`;
   };
 
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Array.from({ length: 6 }, (_, i) => `skeleton-${i}`).map((id) => (
-          <Skeleton key={id} className="h-40" />
-        ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-destructive">{translate("errorLoadingData")}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (cauciones === null || cauciones === undefined || cauciones.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-muted-foreground">{translate("noDataAvailable")}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {cauciones.map((caucion: Caucion) => (
+    <InvestmentSectionWrapper
+      isLoading={isLoading}
+      error={error}
+      isEmpty={cauciones === null || cauciones === undefined || cauciones.length === 0}
+      gridClassName={GRID_CLASS}
+      skeletonCount={6}
+      skeletonHeight="h-40"
+    >
+      {cauciones?.map((caucion: Caucion) => (
         <Card key={caucion.ticker} className="border-t-[3px] border-t-orange-500">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center justify-between">
@@ -58,11 +37,11 @@ export function CaucionesSection() {
           <CardContent className="pt-0">
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
-                {caucion.days} {caucion.days === 1 ? "día" : "días"}
+                {caucion.days} {caucion.days === 1 ? translate("day") : translate("days")}
               </p>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">Tasa TNA</p>
+                  <p className="text-xs text-muted-foreground">{translate("tnaRate")}</p>
                   <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                     {formatRate(caucion.rate)}
                   </p>
@@ -70,11 +49,11 @@ export function CaucionesSection() {
               </div>
               <div className="pt-2 border-t grid grid-cols-2 gap-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">Mínima</p>
+                  <p className="text-xs text-muted-foreground">{translate("minimum")}</p>
                   <p className="text-sm font-medium">{formatRate(caucion.minRate)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-muted-foreground">Máxima</p>
+                  <p className="text-xs text-muted-foreground">{translate("maximum")}</p>
                   <p className="text-sm font-medium">{formatRate(caucion.maxRate)}</p>
                 </div>
               </div>
@@ -82,6 +61,6 @@ export function CaucionesSection() {
           </CardContent>
         </Card>
       ))}
-    </div>
+    </InvestmentSectionWrapper>
   );
 }

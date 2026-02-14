@@ -2,6 +2,7 @@
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useAuthStore } from "@/store/useStore";
 import { Coffee, LogIn, LogOut, Sparkles, User } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +12,7 @@ import { useEffect, useState } from "react";
 export function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { isAuthenticated, user, logout } = useAuthStore();
+  const { translate } = useTranslation();
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +30,9 @@ export function Navbar() {
         <div className="flex-1 min-w-0 ml-12 lg:ml-0">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary hidden sm:block" />
-            <h1 className="text-base sm:text-lg font-semibold truncate">Panel Financiero</h1>
+            <h1 className="text-base sm:text-lg font-semibold truncate">
+              {translate("financialPanel")}
+            </h1>
           </div>
         </div>
 
@@ -42,14 +46,14 @@ export function Navbar() {
                 </div>
                 <Button variant="outline" size="sm" className="gap-2" onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Salir</span>
+                  <span className="hidden sm:inline">{translate("logout")}</span>
                 </Button>
               </div>
             ) : (
               <Button variant="outline" size="sm" className="gap-2" asChild>
                 <Link href="/login">
                   <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline">Ingresar</span>
+                  <span className="hidden sm:inline">{translate("login")}</span>
                 </Link>
               </Button>
             ))}
@@ -61,7 +65,7 @@ export function Navbar() {
           >
             <a href="https://cafecito.app/finlatam" target="_blank" rel="noopener noreferrer">
               <Coffee className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-              <span>Invitame un cafecito</span>
+              <span>{translate("buyCoffee")}</span>
             </a>
           </Button>
           <Button

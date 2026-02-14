@@ -74,6 +74,15 @@ export function sortQuotesByVariant<T extends { type: string }>(quotes: T[]): T[
   return [...quotes].sort((a, b) => quoteVariantOrder(a.type) - quoteVariantOrder(b.type));
 }
 
+export function formatPrice(price: number, currency: string): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(price);
+}
+
 export function formatCurrency(value: number | null | undefined): string {
   const n = Number(value);
   if (!Number.isFinite(n)) {

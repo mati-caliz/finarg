@@ -229,7 +229,7 @@ export default function DashboardPage() {
             )}
             {countryConfig.features.exchangeBands && (
               <div className="flex-1">
-                <BandsWidget oficialQuote={quotes?.find((q) => q.type === "oficial")} />
+                <BandsWidget officialQuote={quotes?.find((q) => q.type === "oficial")} />
               </div>
             )}
           </div>

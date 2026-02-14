@@ -77,9 +77,6 @@ export default function UniversalConverterPage() {
 
   useEffect(() => {
     if (allQuotes.length > 0) {
-      console.log("Quotes loaded:", allQuotes.length);
-      console.log("First quote:", allQuotes[0]);
-
       // Set default currencies on first load
       if (!fromCurrency && !toCurrency) {
         // FROM: Peso Argentino (local currency)
