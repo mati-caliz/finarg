@@ -86,7 +86,11 @@
       "Bash(python3:*)",
       "Bash(pkill:*)",
       "Bash(wc:*)",
-      "Bash(./scripts/lighthouse-audit.sh:*)"
+      "Bash(./scripts/lighthouse-audit.sh:*)",
+      "Bash(for:*)",
+      "Bash(do curl -s http://localhost:300)",
+      "Bash(echo:*)",
+      "Bash(npx biome check:*)"
     ]
   }
 }

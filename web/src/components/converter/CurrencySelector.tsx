@@ -37,7 +37,6 @@ export const CurrencySelector = memo(
         const countryCode = code as CountryCode;
         const countryQuotes = allQuotes.filter((q) => q.country === countryCode);
 
-        // Add local currency as first option
         if (countryCode === "ar") {
           options.push({
             country: countryCode,
@@ -117,7 +116,6 @@ export const CurrencySelector = memo(
         }
       }
 
-      console.log("Currency options generated:", options.length);
       return options;
     }, [allQuotes]);
 

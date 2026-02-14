@@ -283,8 +283,6 @@ const RateSection = ({
   );
 };
 
-// --- Main Page Component ---
-
 export default function RatesPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);

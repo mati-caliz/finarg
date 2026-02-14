@@ -60,7 +60,6 @@ public class AlertService {
         }
 
         alertRepository.delete(alert);
-        log.info("Alert deleted: {}", alertId);
     }
 
     public AlertResponseDTO toggleAlert(Long alertId, Long userId) {

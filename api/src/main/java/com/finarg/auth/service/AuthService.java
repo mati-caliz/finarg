@@ -51,7 +51,6 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponseDTO register(AuthRequestDTO request) {
         String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
-        log.info("Registering new user: {}", maskEmail(email));
 
         if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new EmailAlreadyRegisteredException();
@@ -76,7 +75,6 @@ public class AuthService implements UserDetailsService {
 
     public AuthResponseDTO login(AuthRequestDTO request) {
         String email = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : "";
-        log.info("User login: {}", maskEmail(email));
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, request.getPassword())
@@ -133,16 +131,6 @@ public class AuthService implements UserDetailsService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         return buildAuthResponse(user, accessToken, refreshToken);
-    }
-
-    private String maskEmail(String email) {
-        if (email == null || !email.contains("@")) {
-            return "***";
-        }
-        String[] parts = email.split("@");
-        String local = parts[0];
-        String masked = local.length() <= 2 ? "***" : local.charAt(0) + "***" + local.charAt(local.length() - 1);
-        return masked + "@" + parts[1];
     }
 
     private AuthResponseDTO buildAuthResponse(User user, String accessToken, String refreshToken) {

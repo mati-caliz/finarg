@@ -41,7 +41,6 @@ public class BcraClient {
             Object v = data.get(0).getV();
             return v != null ? new BigDecimal(v.toString()) : null;
         } catch (Exception e) {
-            log.warn("Could not fetch encajes (serie 4) from BCRA API: {}. Using fallback.", e.getMessage());
             return null;
         }
     }

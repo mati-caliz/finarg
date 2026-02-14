@@ -43,10 +43,7 @@ public class MetalsAPIClient {
                         String symbol = entry.getValue();
                         return getMetalQuote(symbol)
                                 .map(quote -> Map.entry(code, quote))
-                                .onErrorResume(e -> {
-                                    log.warn("Failed to fetch quote for metal {}: {}", code, e.getMessage());
-                                    return Flux.empty();
-                                });
+                                .onErrorResume(e -> Flux.empty());
                     })
                     .doOnNext(entry -> results.put(entry.getKey(), entry.getValue()))
                     .collectList()

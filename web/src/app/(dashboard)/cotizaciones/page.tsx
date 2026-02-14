@@ -261,9 +261,8 @@ export default function QuotesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading
-          ? Array.from({ length: currencyTypes.length || 4 }).map((_, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons have no unique ID
-              <DolarCardSkeleton key={i} />
+          ? Array.from({ length: currencyTypes.length || 4 }, (_, i) => i).map((index) => (
+              <DolarCardSkeleton key={`skeleton-${index}`} />
             ))
           : filteredQuotes?.map((quote) => (
               <Card
@@ -443,9 +442,8 @@ export default function QuotesPage() {
         <CardContent>
           {isLoading ? (
             <div className="space-y-3">
-              {Array.from({ length: currencyTypes.length || 4 }).map((_, i) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: Skeletons have no unique ID
-                <div key={i} className="flex gap-4 py-2">
+              {Array.from({ length: currencyTypes.length || 4 }, (_, i) => i).map((index) => (
+                <div key={`comparison-skeleton-${index}`} className="flex gap-4 py-2">
                   <Skeleton className="h-4 w-24" />
                   <Skeleton className="h-4 w-20 ml-auto" />
                   <Skeleton className="h-4 w-20" />

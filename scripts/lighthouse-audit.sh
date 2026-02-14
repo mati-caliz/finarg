@@ -14,11 +14,12 @@ NC='\033[0m' # No Color
 
 # Configuration
 URL="${1:-http://localhost:3000}"
+FORM_FACTOR="${2:-desktop}"
 OUTPUT_DIR="$(dirname "$0")/../lighthouse-reports"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-JSON_REPORT="$OUTPUT_DIR/lighthouse-$TIMESTAMP.report.json"
-HTML_REPORT="$OUTPUT_DIR/lighthouse-$TIMESTAMP.report.html"
-SUMMARY_REPORT="$OUTPUT_DIR/lighthouse-summary-$TIMESTAMP.txt"
+JSON_REPORT="$OUTPUT_DIR/lighthouse-$TIMESTAMP-$FORM_FACTOR.report.json"
+HTML_REPORT="$OUTPUT_DIR/lighthouse-$TIMESTAMP-$FORM_FACTOR.report.html"
+SUMMARY_REPORT="$OUTPUT_DIR/lighthouse-summary-$TIMESTAMP-$FORM_FACTOR.txt"
 
 # Create output directory
 mkdir -p "$OUTPUT_DIR"
@@ -28,6 +29,7 @@ echo -e "${BLUE}  FinArg Lighthouse Audit${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 echo -e "URL: ${YELLOW}$URL${NC}"
+echo -e "Device: ${YELLOW}$FORM_FACTOR${NC}"
 echo -e "Timestamp: ${YELLOW}$TIMESTAMP${NC}"
 echo ""
 
@@ -44,13 +46,28 @@ echo ""
 
 # Run Lighthouse
 echo -e "${BLUE}Running Lighthouse audit...${NC}"
-npx lighthouse "$URL" \
-    --output=json \
-    --output=html \
-    --output-path="$OUTPUT_DIR/lighthouse-$TIMESTAMP" \
-    --chrome-flags="--headless --no-sandbox --disable-gpu" \
-    --only-categories=performance,accessibility,best-practices,seo \
-    --quiet
+
+if [ "$FORM_FACTOR" = "mobile" ]; then
+    npx lighthouse "$URL" \
+        --output=json \
+        --output=html \
+        --output-path="$OUTPUT_DIR/lighthouse-$TIMESTAMP-$FORM_FACTOR" \
+        --chrome-flags="--headless --no-sandbox --disable-gpu" \
+        --only-categories=performance,accessibility,best-practices,seo \
+        --screenEmulation.mobile \
+        --form-factor=mobile \
+        --quiet
+else
+    npx lighthouse "$URL" \
+        --output=json \
+        --output=html \
+        --output-path="$OUTPUT_DIR/lighthouse-$TIMESTAMP-$FORM_FACTOR" \
+        --chrome-flags="--headless --no-sandbox --disable-gpu" \
+        --only-categories=performance,accessibility,best-practices,seo \
+        --form-factor=desktop \
+        --screenEmulation.mobile=false \
+        --quiet
+fi
 
 # Wait for files to be written
 sleep 2

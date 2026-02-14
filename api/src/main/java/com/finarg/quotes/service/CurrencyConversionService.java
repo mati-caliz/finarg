@@ -37,7 +37,6 @@ public class CurrencyConversionService {
         Country fromCountry = Country.fromCode(request.getFromCountry());
         Country toCountry = Country.fromCode(request.getToCountry());
 
-        // Check if converting from/to local currency
         boolean isFromLocalCurrency = isLocalCurrency(request.getFromCurrency());
         boolean isToLocalCurrency = isLocalCurrency(request.getToCurrency());
 

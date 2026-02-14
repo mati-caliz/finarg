@@ -34,8 +34,6 @@ public class IncomeTaxCalculatorService {
     );
 
     public IncomeTaxResponseDTO calculate(IncomeTaxRequestDTO request) {
-        log.info("Calculating income tax for salary: {}", request.getGrossMonthlySalary());
-
         BigDecimal grossAnnualSalary = request.getGrossMonthlySalary().multiply(BigDecimal.valueOf(13));
 
         LegalDeductions legalDeductions = calculateLegalDeductions(request, grossAnnualSalary);
