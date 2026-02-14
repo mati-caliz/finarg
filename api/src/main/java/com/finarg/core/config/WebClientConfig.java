@@ -31,7 +31,7 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-datos.timeout:10000}")
     private int argentinaDatosTimeout;
 
-    @Value("${external.apis.ambito.base-url:https://mercados.ambito.com}")
+    @Value("${external.apis.ambito.base-url:https://www.ambito.com}")
     private String ambitoBaseUrl;
     @Value("${external.apis.ambito.timeout:10000}")
     private int ambitoTimeout;

@@ -23,6 +23,7 @@ public class LaNacionEconomiaNewsClient implements NewsScraperClient {
 
     private final WebClient webClient;
     private static final String BASE_URL = "https://www.lanacion.com.ar";
+    private static final int MAX_IN_MEMORY_SIZE = 10 * 1024 * 1024;
 
     public LaNacionEconomiaNewsClient() {
         HttpClient httpClient = HttpClient.create()
@@ -34,6 +35,7 @@ public class LaNacionEconomiaNewsClient implements NewsScraperClient {
                 .baseUrl(BASE_URL)
                 .defaultHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
                 .defaultHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(MAX_IN_MEMORY_SIZE))
                 .build();
     }
 
