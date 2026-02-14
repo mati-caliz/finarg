@@ -6,6 +6,7 @@ export const translations = {
     exchangeRatesComparator: "Conversor de Monedas",
     incomeTaxCalculator: "Calculadora de Sueldo Neto",
     compoundInterestCalculator: "Calculadora de Interés Compuesto",
+    installmentsVsCashCalculator: "¿Cuotas o Contado?",
 
     inflation: "Inflación",
     reserves: "Reservas",

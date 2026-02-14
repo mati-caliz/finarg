@@ -4,13 +4,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://finlatamio.com";
   const lastModified = new Date();
 
-  const routes = [
+  const countries = [
+    "ar",
+    "argentina",
+    "co",
+    "colombia",
+    "br",
+    "brasil",
+    "cl",
+    "chile",
+    "uy",
+    "uruguay",
+  ];
+
+  return [
     {
       url: baseUrl,
       lastModified,
       changeFrequency: "hourly" as const,
       priority: 1,
     },
+    ...countries.map((country) => ({
+      url: `${baseUrl}/resumen-financiero-${country}`,
+      lastModified,
+      changeFrequency: "hourly" as const,
+      priority: 0.95,
+    })),
     {
       url: `${baseUrl}/cotizaciones`,
       lastModified,
@@ -60,6 +79,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     },
     {
+      url: `${baseUrl}/calculadora-cuotas-contado`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/simulador-de-inversiones`,
       lastModified,
       changeFrequency: "weekly" as const,
@@ -78,6 +103,4 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ];
-
-  return routes;
 }
