@@ -12,7 +12,7 @@ export function useSocialIndicators(country = "ar") {
       return response.data;
     },
     enabled: country === "ar",
-    staleTime: 3600000,
+    staleTime: 86400000,
     gcTime: 604800000,
   });
 }

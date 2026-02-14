@@ -120,6 +120,15 @@ public class WebClientConfig {
     @Value("${external.apis.iol.timeout:15000}")
     private int iolTimeout;
 
+    @Value("${external.apis.dolarito.base-url:https://api.dolarito.ar}")
+    private String dolaritoBaseUrl;
+
+    @Value("${external.apis.dolarito.timeout:10000}")
+    private int dolaritoTimeout;
+
+    @Value("${external.apis.dolarito.auth-client:f7d471ab0a4ff2b7947759d985ed1db0}")
+    private String dolaritoAuthClient;
+
     @Bean("dolarApiWebClient")
     public WebClient dolarApiWebClient() {
         HttpClient httpClient = HttpClient.create()
@@ -355,6 +364,20 @@ public class WebClientConfig {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.USER_AGENT, "Finarg/1.0")
+                .build();
+    }
+
+    @Bean("dolaritoWebClient")
+    public WebClient dolaritoWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(dolaritoTimeout));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(dolaritoBaseUrl)
+                .defaultHeader(HttpHeaders.ACCEPT, "application/json, text/plain, */*")
+                .defaultHeader("auth-client", dolaritoAuthClient)
+                .defaultHeader("origin", "https://www.dolarito.ar")
+                .defaultHeader("referer", "https://www.dolarito.ar/")
                 .build();
     }
 }

@@ -1,17 +1,35 @@
 "use client";
 
 import { BondsSection } from "@/components/investments/BondsSection";
+import { CaucionesSection } from "@/components/investments/CaucionesSection";
 import { CedearsSection } from "@/components/investments/CedearsSection";
 import { CryptoSection } from "@/components/investments/CryptoSection";
 import { EtfsSection } from "@/components/investments/EtfsSection";
+import { LetrasSection } from "@/components/investments/LetrasSection";
 import { MetalsSection } from "@/components/investments/MetalsSection";
 import { StocksSection } from "@/components/investments/StocksSection";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
-import { BarChart3, Bitcoin, Coins, FileText, TrendingUp } from "lucide-react";
+import {
+  BarChart3,
+  Bitcoin,
+  CircleDollarSign,
+  Coins,
+  FileText,
+  Receipt,
+  TrendingUp,
+} from "lucide-react";
 import { useState } from "react";
 
-type InvestmentTab = "crypto" | "stocks" | "cedears" | "bonds" | "etf" | "metals";
+type InvestmentTab =
+  | "crypto"
+  | "stocks"
+  | "cedears"
+  | "bonds"
+  | "etf"
+  | "metals"
+  | "letras"
+  | "cauciones";
 
 export default function InvestmentsPage() {
   const { translate } = useTranslation();
@@ -73,6 +91,22 @@ export default function InvestmentsPage() {
           <Coins className="h-4 w-4" />
           {translate("metals")}
         </Button>
+        <Button
+          variant={activeTab === "letras" ? "default" : "outline"}
+          onClick={() => setActiveTab("letras")}
+          className="flex items-center gap-2"
+        >
+          <Receipt className="h-4 w-4" />
+          Letras
+        </Button>
+        <Button
+          variant={activeTab === "cauciones" ? "default" : "outline"}
+          onClick={() => setActiveTab("cauciones")}
+          className="flex items-center gap-2"
+        >
+          <CircleDollarSign className="h-4 w-4" />
+          Cauciones
+        </Button>
       </div>
 
       {activeTab === "crypto" && <CryptoSection />}
@@ -81,6 +115,8 @@ export default function InvestmentsPage() {
       {activeTab === "bonds" && <BondsSection />}
       {activeTab === "etf" && <EtfsSection />}
       {activeTab === "metals" && <MetalsSection />}
+      {activeTab === "letras" && <LetrasSection />}
+      {activeTab === "cauciones" && <CaucionesSection />}
     </div>
   );
 }

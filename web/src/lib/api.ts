@@ -123,4 +123,6 @@ export const investmentsApi = {
   getBonds: () => cachedApi.get("/investments/bonds"),
   getEtfs: () => cachedApi.get("/investments/etf/popular"),
   getMetals: () => cachedApi.get("/investments/metals"),
+  getLetras: () => cachedApi.get("/investments/letras"),
+  getCauciones: () => cachedApi.get("/investments/cauciones"),
 };

@@ -1,17 +1,15 @@
 package com.finarg.investments.cedear.service;
 
-import com.finarg.investments.cedear.client.CedearClient;
 import com.finarg.investments.cedear.dto.CedearDTO;
-import com.finarg.investments.stocks.client.FinnhubClient;
+import com.finarg.investments.stocks.client.DolaritoMervalClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CedearService {
-    private final CedearClient cedearClient;
+    private final DolaritoMervalClient dolaritoMervalClient;
 
     private static final List<String> POPULAR_CEDEARS = List.of(
             "AAPL", "GOOGL", "MSFT", "TSLA", "AMZN", "KO", "DIS", "MELI"
@@ -27,49 +25,59 @@ public class CedearService {
 
     @Cacheable(value = "cedears", key = "'all'")
     public List<CedearDTO> getAllCedears() {
-        log.info("Fetching CEDEAR prices");
+        log.info("Fetching CEDEAR prices from dolarito.ar");
 
-        List<FinnhubClient.StockQuoteResponse> quotes = cedearClient.getCedearQuotes(POPULAR_CEDEARS);
+        DolaritoMervalClient.DolaritoMervalResponse mervalData = dolaritoMervalClient.getMervalData();
 
-        if (quotes == null || quotes.isEmpty()) {
+        if (mervalData.getCedears() == null || mervalData.getCedears().isEmpty()) {
             log.warn("No CEDEAR data available");
             return List.of();
         }
 
-        return quotes.stream()
+        return mervalData.getCedears().stream()
+                .filter(cedear -> POPULAR_CEDEARS.contains(cedear.getNombreCorto()))
+                .sorted(Comparator.comparing(
+                        cedear -> POPULAR_CEDEARS.indexOf(cedear.getNombreCorto())
+                ))
                 .map(this::mapToCedearDTO)
                 .collect(Collectors.toList());
     }
 
-    private CedearDTO mapToCedearDTO(FinnhubClient.StockQuoteResponse response) {
-        String ticker = response.getSymbol();
-        String symbol = ticker != null && ticker.endsWith(".BA")
-                ? ticker.substring(0, ticker.length() - 3)
-                : ticker;
+    private CedearDTO mapToCedearDTO(DolaritoMervalClient.CedearItem cedear) {
+        LocalDateTime lastUpdate = LocalDateTime.now();
 
-        String companyName = response.getLongName() != null
-                ? response.getLongName()
-                : response.getShortName();
+        BigDecimal lastPrice = cedear.getUltOperado() != null
+                ? cedear.getUltOperado()
+                : cedear.getCierreAnterior();
 
-        LocalDateTime lastUpdate = response.getRegularMarketTime() != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochSecond(response.getRegularMarketTime()), ZoneId.systemDefault())
-                : LocalDateTime.now();
-
-        BigDecimal volume = response.getRegularMarketVolume() != null
-                ? new BigDecimal(response.getRegularMarketVolume())
+        BigDecimal changePercent = cedear.getVariacion() != null
+                ? cedear.getVariacion()
                 : BigDecimal.ZERO;
 
+        BigDecimal change = BigDecimal.ZERO;
+        if (cedear.getCierreAnterior() != null && changePercent != null) {
+            change = cedear.getCierreAnterior()
+                    .multiply(changePercent)
+                    .divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+        }
+
+        BigDecimal volume = cedear.getVolumen() != null
+                ? new BigDecimal(cedear.getVolumen())
+                : BigDecimal.ZERO;
+
+        String currency = cedear.getMoneda() != null
+                ? cedear.getMoneda().getSimbolo()
+                : "ARS";
+
         return CedearDTO.builder()
-                .symbol(symbol != null ? symbol : "")
-                .ticker(ticker != null ? ticker : "")
-                .companyName(companyName != null ? companyName : symbol)
-                .lastPrice(response.getRegularMarketPrice() != null ? response.getRegularMarketPrice() : BigDecimal.ZERO)
-                .change(response.getRegularMarketChange() != null ? response.getRegularMarketChange() : BigDecimal.ZERO)
-                .changePercent(response.getRegularMarketChangePercent() != null
-                        ? response.getRegularMarketChangePercent()
-                        : BigDecimal.ZERO)
+                .symbol(cedear.getNombreCorto() != null ? cedear.getNombreCorto() : "")
+                .ticker(cedear.getNombreCorto() != null ? cedear.getNombreCorto() : "")
+                .companyName(cedear.getNombre() != null ? cedear.getNombre() : cedear.getNombreCorto())
+                .lastPrice(lastPrice != null ? lastPrice : BigDecimal.ZERO)
+                .change(change)
+                .changePercent(changePercent != null ? changePercent : BigDecimal.ZERO)
                 .volume(volume)
-                .currency("ARS")
+                .currency(currency)
                 .lastUpdate(lastUpdate)
                 .build();
     }

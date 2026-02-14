@@ -320,3 +320,26 @@ export interface Metal {
   changePercent24h: number;
   lastUpdate: string;
 }
+
+export interface Letra {
+  ticker: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  currency: string;
+  lastUpdate: string;
+  maturityDate?: string;
+}
+
+export interface Caucion {
+  days: number;
+  ticker: string;
+  rate: number;
+  change: number;
+  changePercent: number;
+  minRate: number;
+  maxRate: number;
+  lastUpdate: string;
+}
