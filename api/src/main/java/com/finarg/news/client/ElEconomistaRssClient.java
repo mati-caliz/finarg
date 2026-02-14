@@ -45,6 +45,7 @@ public class ElEconomistaRssClient implements NewsScraperClient {
             log.error("Error fetching RSS from El Economista: {}", e.getMessage());
             return List.of();
         }
+
     }
 
     private List<RawNewsDTO> parseRss(String rssXml) {
