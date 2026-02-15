@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function FeriadosPage() {
   return (
-    <div className="container py-8 max-w-6xl">
+    <div className="py-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <CalendarDays className="w-8 h-8 text-violet-600 dark:text-violet-400" />
