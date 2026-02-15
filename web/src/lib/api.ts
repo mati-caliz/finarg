@@ -156,13 +156,13 @@ export const holidaysApi = {
 };
 
 export const subscriptionsApi = {
-  getPricing: () => apiClient.get<PricingResponse>("/subscriptions/pricing"),
-  getCurrent: () => apiClient.get<SubscriptionResponse>("/subscriptions/current"),
+  getPricing: () => api.get<PricingResponse>("/subscriptions/pricing"),
+  getCurrent: () => api.get<SubscriptionResponse>("/subscriptions/current"),
   create: (data: CreateSubscriptionRequest) =>
-    apiClient.post<SubscriptionResponse>("/subscriptions", data),
+    api.post<SubscriptionResponse>("/subscriptions", data),
   createCheckout: (subscriptionId: number) =>
-    apiClient.post<{ checkoutUrl: string; subscriptionId: string }>(
+    api.post<{ checkoutUrl: string; subscriptionId: string }>(
       `/subscriptions/${subscriptionId}/checkout`,
     ),
-  cancel: () => apiClient.delete("/subscriptions"),
+  cancel: () => api.delete("/subscriptions"),
 };
