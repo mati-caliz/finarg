@@ -147,3 +147,7 @@ exchange-bands:
   ceiling: 1542.88
   crawling-peg-monthly: 0.01
   last-update: "2025-02-01"
+
+feedback:
+  notification:
+    email: ${FEEDBACK_NOTIFICATION_EMAIL:}
