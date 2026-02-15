@@ -1,5 +1,6 @@
 "use client";
 
+import { Paywall } from "@/components/Paywall";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,8 +9,9 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { countryRiskApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatDateShort, generateReferenceAreas } from "@/lib/utils";
+import { useAuthStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, TrendingUp } from "lucide-react";
+import { AlertTriangle, Crown, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
@@ -27,18 +29,22 @@ const LineChart = dynamic(
 
 export default function CountryRiskPage() {
   const { translate } = useTranslation();
+  const { subscription } = useAuthStore();
   const { data: currentRisk, isLoading: isLoadingCurrent } = useCountryRisk();
   const { data: history, isLoading: isLoadingHistory } = useCountryRiskHistory();
   const [daysLimit, setDaysLimit] = useState(365);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const chartPeriods = useMemo(
     () => [
-      { value: 365, labelKey: "year1" as const },
-      { value: 730, labelKey: "year2" as const },
-      { value: 1825, labelKey: "year5" as const },
-      { value: 3650, labelKey: "year10" as const },
-      { value: 7300, labelKey: "year20" as const },
-      { value: 999999, labelKey: "max" as const },
+      { value: 365, labelKey: "year1" as const, premium: false },
+      { value: 730, labelKey: "year2" as const, premium: false },
+      { value: 1825, labelKey: "year5" as const, premium: true },
+      { value: 3650, labelKey: "year10" as const, premium: true },
+      { value: 7300, labelKey: "year20" as const, premium: true },
+      { value: 999999, labelKey: "max" as const, premium: true },
     ],
     [],
   );
@@ -196,16 +202,27 @@ export default function CountryRiskPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">{translate("countryRiskHistory")}</CardTitle>
             <div className="flex flex-wrap gap-2">
-              {chartPeriods.map((p) => (
-                <Button
-                  key={p.value}
-                  variant={daysLimit === p.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setDaysLimit(p.value)}
-                >
-                  {translate(p.labelKey)}
-                </Button>
-              ))}
+              {chartPeriods.map((p) => {
+                const isLocked = p.premium && !isPremium;
+                return (
+                  <Button
+                    key={p.value}
+                    variant={daysLimit === p.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      if (isLocked) {
+                        setShowPaywall(true);
+                      } else {
+                        setDaysLimit(p.value);
+                      }
+                    }}
+                    className="gap-1"
+                  >
+                    <span>{translate(p.labelKey)}</span>
+                    {isLocked && <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </CardHeader>
@@ -315,6 +332,14 @@ export default function CountryRiskPage() {
           </div>
         </CardContent>
       </Card>
+
+      {showPaywall && (
+        <Paywall
+          feature="Datos históricos avanzados"
+          description="Para ver datos de más de 2 años necesitás Premium. Accedé a gráficos históricos completos de hasta 25 años."
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
     </div>
   );
 }

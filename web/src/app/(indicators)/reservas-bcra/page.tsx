@@ -1,16 +1,18 @@
 "use client";
 
+import { Paywall } from "@/components/Paywall";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
 import { formatDateDayShort, formatReservesUSD, generateReferenceAreas } from "@/lib/utils";
+import { useAuthStore } from "@/store/useStore";
 import type { Reserves } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, Landmark, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
+import { Building2, Crown, Landmark, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const AreaChart = dynamic(
   () => import("@/components/charts").then((mod) => ({ default: mod.AreaChart })),
@@ -28,20 +30,28 @@ const LIABILITY_COLORS = ["#ef4444", "#3b82f6", "#eab308", "#8b5cf6", "#06b6d4"]
 
 export default function ReservesPage() {
   const { translate } = useTranslation();
+  const { subscription } = useAuthStore();
   const [period, setPeriod] = useState(365);
+  const [showPaywall, setShowPaywall] = useState(false);
 
-  const PERIODS = [
-    { value: 7, label: translate("days7") },
-    { value: 30, label: translate("days30") },
-    { value: 90, label: translate("months3") },
-    { value: 180, label: translate("months6") },
-    { value: 365, label: translate("year1") },
-    { value: 1095, label: translate("year3") },
-    { value: 1825, label: translate("year5") },
-    { value: 3650, label: translate("year10") },
-    { value: 5475, label: translate("year15") },
-    { value: 7000, label: translate("max") },
-  ];
+  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
+
+  const PERIODS = useMemo(
+    () => [
+      { value: 7, labelKey: "days7" as const, premium: false },
+      { value: 30, labelKey: "days30" as const, premium: false },
+      { value: 90, labelKey: "months3" as const, premium: false },
+      { value: 180, labelKey: "months6" as const, premium: false },
+      { value: 365, labelKey: "year1" as const, premium: false },
+      { value: 730, labelKey: "year2" as const, premium: false },
+      { value: 1095, labelKey: "year3" as const, premium: true },
+      { value: 1825, labelKey: "year5" as const, premium: true },
+      { value: 3650, labelKey: "year10" as const, premium: true },
+      { value: 5475, labelKey: "year15" as const, premium: true },
+      { value: 7000, labelKey: "max" as const, premium: true },
+    ],
+    [],
+  );
 
   const { data: currentReserves, isLoading } = useQuery({
     queryKey: ["reserves", "ar"],
@@ -353,16 +363,27 @@ export default function ReservesPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">{translate("historicalEvolution")}</CardTitle>
             <div className="flex flex-wrap gap-2">
-              {PERIODS.map((p) => (
-                <Button
-                  key={p.value}
-                  variant={period === p.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setPeriod(p.value)}
-                >
-                  {p.label}
-                </Button>
-              ))}
+              {PERIODS.map((p) => {
+                const isLocked = p.premium && !isPremium;
+                return (
+                  <Button
+                    key={p.value}
+                    variant={period === p.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      if (isLocked) {
+                        setShowPaywall(true);
+                      } else {
+                        setPeriod(p.value);
+                      }
+                    }}
+                    className="gap-1"
+                  >
+                    <span>{translate(p.labelKey)}</span>
+                    {isLocked && <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </CardHeader>
@@ -454,6 +475,14 @@ export default function ReservesPage() {
           </div>
         </CardContent>
       </Card>
+
+      {showPaywall && (
+        <Paywall
+          feature="Datos históricos avanzados"
+          description="Para ver datos de más de 2 años necesitás Premium. Accedé a gráficos históricos completos de hasta 25 años."
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
     </div>
   );
 }

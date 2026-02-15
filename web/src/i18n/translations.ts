@@ -83,6 +83,9 @@ export const translations = {
     rateComparator: "Comparador de Tasas",
     ratesComparatorDesc: "Compará TNA de billeteras virtuales y plazos fijos de bancos",
     rateComparatorSubtitle: "Compará TNA de inversiones",
+    bestRates: "Mejores Tasas",
+    virtualWallets: "Billeteras Virtuales",
+    fixedTermDeposits: "Plazos Fijos",
     walletRates: "Billeteras virtuales",
     fixedTermRates: "Plazos fijos",
     usdAccounts: "Cuentas USD",
@@ -101,6 +104,7 @@ export const translations = {
     noLimit: "Sin límites",
     limitLabel: "Límite",
     seeMore: "Ver más",
+    seeAll: "Ver todo",
     walletRatesDisclaimer: "Tasas TNA de fondos comunes de inversión (FCI) y billeteras virtuales.",
     fixedTermRatesDisclaimer:
       "Tasas para plazos fijos en pesos. Las tasas pueden variar según el monto y el plazo. Verificá en cada banco.",
