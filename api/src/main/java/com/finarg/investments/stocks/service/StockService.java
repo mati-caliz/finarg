@@ -5,6 +5,7 @@ import com.finarg.investments.stocks.dto.StockDTO;
 import com.finarg.shared.constants.FinancialConstants;
 import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.shared.util.DateTimeUtils;
+import com.finarg.shared.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,31 +46,29 @@ public class StockService {
     }
 
     private StockDTO mapToStockDTO(DolaritoMervalClient.StockItem stock) {
-        BigDecimal currentPrice = stock.getUltOperado() != null
-                ? stock.getUltOperado()
-                : stock.getCierreAnterior();
+        BigDecimal currentPrice = stock.getLastTraded() != null
+                ? stock.getLastTraded()
+                : stock.getPreviousClose();
 
-        BigDecimal changePercent = BigDecimalUtils.orZero(stock.getVariacion());
-        BigDecimal change = BigDecimalUtils.percentageChange(stock.getCierreAnterior(), changePercent);
+        BigDecimal changePercent = BigDecimalUtils.orZero(stock.getVariation());
+        BigDecimal change = BigDecimalUtils.percentageChange(stock.getPreviousClose(), changePercent);
 
-        BigDecimal volume = stock.getVolumen() != null
-                ? new BigDecimal(stock.getVolumen())
-                : BigDecimal.ZERO;
+        BigDecimal volume = BigDecimalUtils.fromLong(stock.getVolume());
 
-        String currency = stock.getMoneda() != null
-                ? stock.getMoneda().getSimbolo()
+        String currency = stock.getCurrency() != null
+                ? stock.getCurrency().getSymbol()
                 : FinancialConstants.DEFAULT_CURRENCY;
 
         return StockDTO.builder()
-                .ticker(stock.getTicker() != null ? stock.getTicker() : "")
-                .companyName(stock.getNombre() != null ? stock.getNombre() : stock.getTicker())
+                .ticker(StringUtils.orEmpty(stock.getTicker()))
+                .companyName(StringUtils.firstNonBlank(stock.getName(), stock.getTicker()))
                 .currentPrice(BigDecimalUtils.orZero(currentPrice))
                 .change(change)
                 .changePercent(changePercent)
                 .volume(volume)
                 .marketCap(null)
                 .currency(currency)
-                .lastUpdate(DateTimeUtils.fromEpochMillis(stock.getTimestampCotizacion()))
+                .lastUpdate(DateTimeUtils.fromEpochMillis(stock.getQuoteTimestamp()))
                 .build();
     }
 }

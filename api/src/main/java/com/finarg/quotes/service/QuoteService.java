@@ -9,6 +9,7 @@ import com.finarg.quotes.entity.QuoteHistory;
 import com.finarg.shared.enums.Country;
 import com.finarg.shared.enums.CurrencyType;
 import com.finarg.shared.enums.GapLevel;
+import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.quotes.repository.QuoteHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +46,8 @@ public class QuoteService {
         QuoteClient client = quoteClientFactory.getClient(country);
         QuoteDTO quote = client.getQuote(type);
         if (quote != null) {
-            BigDecimal variation = calculateVariation(quote.getType(), quote.getSell());
-            quote.setVariation(variation);
-            quote.setBaseCurrency(quote.getType().getBaseCurrency());
-            quote.setHasHistory(quote.getType().isHasHistory());
+            BigDecimal variation = fetchAndCalculateVariation(quote.getType(), quote.getSell());
+            enrichQuoteMetadata(quote, variation);
         }
         return quote;
     }
@@ -58,15 +56,15 @@ public class QuoteService {
     public GapDTO calculateGap(Country country) {
         QuoteClient client = quoteClientFactory.getClient(country);
         List<QuoteDTO> quotes = client.getAllQuotes();
-        
+
         CurrencyType officialType = getOfficialType(country);
         CurrencyType parallelType = getParallelType(country);
-        
+
         QuoteDTO official = quotes.stream()
                 .filter(q -> q.getType() == officialType)
                 .findFirst()
                 .orElse(null);
-                
+
         QuoteDTO parallel = quotes.stream()
                 .filter(q -> q.getType() == parallelType)
                 .findFirst()
@@ -85,9 +83,7 @@ public class QuoteService {
         BigDecimal officialSell = official.getSell();
         BigDecimal parallelSell = parallel.getSell();
 
-        BigDecimal gap = parallelSell.subtract(officialSell)
-                .divide(officialSell, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+        BigDecimal gap = BigDecimalUtils.variationPercentage(parallelSell, officialSell);
 
         GapLevel level = GapLevel.fromPercentage(gap.doubleValue());
 
@@ -95,7 +91,7 @@ public class QuoteService {
                 .country(country)
                 .officialRate(officialSell)
                 .parallelRate(parallelSell)
-                .gapPercentage(gap.setScale(2, RoundingMode.HALF_UP))
+                .gapPercentage(gap.setScale(2, java.math.RoundingMode.HALF_UP))
                 .level(level)
                 .trafficLightColor(level.getColor())
                 .description(level.getDescription())
@@ -155,6 +151,12 @@ public class QuoteService {
         log.info("Quotes cache cleared");
     }
 
+    private void enrichQuoteMetadata(QuoteDTO quote, BigDecimal variation) {
+        quote.setVariation(variation);
+        quote.setBaseCurrency(quote.getType().getBaseCurrency());
+        quote.setHasHistory(quote.getType().isHasHistory());
+    }
+
     private List<QuoteDTO> enrichQuotesWithVariation(List<QuoteDTO> quotes) {
         if (quotes.isEmpty()) {
             return quotes;
@@ -164,7 +166,7 @@ public class QuoteService {
         List<CurrencyType> types = quotes.stream()
                 .map(QuoteDTO::getType)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Map<CurrencyType, QuoteHistory> previousByType = quoteHistoryRepository
                 .findLatestByTypesBeforeDate(types, today)
@@ -177,38 +179,22 @@ public class QuoteService {
 
         return quotes.stream()
                 .peek(quote -> {
-                    BigDecimal variation = computeVariation(quote.getSell(), previousByType.get(quote.getType()));
-                    quote.setVariation(variation);
-                    quote.setBaseCurrency(quote.getType().getBaseCurrency());
-                    quote.setHasHistory(quote.getType().isHasHistory());
+                    BigDecimal prevSell = previousByType.containsKey(quote.getType())
+                            ? previousByType.get(quote.getType()).getSell()
+                            : null;
+                    BigDecimal variation = BigDecimalUtils.variationPercentage(quote.getSell(), prevSell);
+                    enrichQuoteMetadata(quote, variation);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
-    private BigDecimal computeVariation(BigDecimal currentSell, QuoteHistory previous) {
-        if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0 || previous == null) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal previousSell = previous.getSell();
-        if (previousSell.compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
-        }
-
-        BigDecimal difference = currentSell.subtract(previousSell);
-        BigDecimal variation = difference.divide(previousSell, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
-
-        return variation.setScale(2, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal calculateVariation(CurrencyType type, BigDecimal currentSell) {
+    private BigDecimal fetchAndCalculateVariation(CurrencyType type, BigDecimal currentSell) {
         if (currentSell == null || currentSell.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
         LocalDate today = LocalDate.now();
         return quoteHistoryRepository.findLatestByTypeBeforeDate(type, today)
-                .map(prev -> computeVariation(currentSell, prev))
+                .map(prev -> BigDecimalUtils.variationPercentage(currentSell, prev.getSell()))
                 .orElse(BigDecimal.ZERO);
     }
 }

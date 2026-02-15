@@ -14,6 +14,7 @@ import reactor.netty.http.client.HttpClient;
 
 import javax.net.ssl.SSLException;
 import java.time.Duration;
+import java.util.Map;
 
 @Configuration
 public class WebClientConfig {
@@ -136,6 +137,16 @@ public class WebClientConfig {
                 .build();
     }
 
+    private WebClient createWebClientWithHeaders(String baseUrl, int timeout, Map<String, String> headers) {
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMillis(timeout));
+        WebClient.Builder builder = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl(baseUrl);
+        headers.forEach(builder::defaultHeader);
+        return builder.build();
+    }
+
     private WebClient createWebClientWithRedirects(String baseUrl, int timeout) {
         HttpClient httpClient = HttpClient.create()
                 .followRedirect(true)
@@ -236,40 +247,28 @@ public class WebClientConfig {
 
     @Bean("wikidataWebClient")
     public WebClient wikidataWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(wikidataTimeout));
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(wikidataBaseUrl)
-                .defaultHeader(HttpHeaders.ACCEPT, "application/sparql-results+json, application/json")
-                .defaultHeader("User-Agent", "Finarg/1.0 (https://finarg.app)")
-                .build();
+        return createWebClientWithHeaders(wikidataBaseUrl, wikidataTimeout, Map.of(
+                HttpHeaders.ACCEPT, "application/sparql-results+json, application/json",
+                "User-Agent", "Finarg/1.0 (https://finarg.app)"
+        ));
     }
 
     @Bean("finnhubWebClient")
     public WebClient finnhubWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(finnhubTimeout));
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(finnhubBaseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader("X-Finnhub-Token", finnhubApiKey)
-                .build();
+        return createWebClientWithHeaders(finnhubBaseUrl, finnhubTimeout, Map.of(
+                HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE,
+                HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE,
+                "X-Finnhub-Token", finnhubApiKey
+        ));
     }
 
     @Bean("iolWebClient")
     public WebClient iolWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(iolTimeout));
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(iolBaseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .defaultHeader(HttpHeaders.USER_AGENT, USER_AGENT)
-                .build();
+        return createWebClientWithHeaders(iolBaseUrl, iolTimeout, Map.of(
+                HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE,
+                HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE,
+                HttpHeaders.USER_AGENT, USER_AGENT
+        ));
     }
 
     @Bean("zonapropWebClient")
@@ -318,14 +317,10 @@ public class WebClientConfig {
 
     @Bean("eleconomistaWebClient")
     public WebClient eleconomistaWebClient() {
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMillis(eleconomistaTimeout));
-        return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .baseUrl(eleconomistaBaseUrl)
-                .defaultHeader("Accept", "application/rss+xml, application/xml, text/xml")
-                .defaultHeader("User-Agent", USER_AGENT)
-                .build();
+        return createWebClientWithHeaders(eleconomistaBaseUrl, eleconomistaTimeout, Map.of(
+                HttpHeaders.ACCEPT, "application/rss+xml, application/xml, text/xml",
+                "User-Agent", USER_AGENT
+        ));
     }
 
     @Bean("argentinaHolidaysWebClient")

@@ -5,6 +5,7 @@ import com.finarg.investments.stocks.client.DolaritoMervalClient;
 import com.finarg.shared.constants.FinancialConstants;
 import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.shared.util.DateTimeUtils;
+import com.finarg.shared.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,30 +38,28 @@ public class LetraService {
     }
 
     private LetraDTO mapToLetraDTO(DolaritoMervalClient.LetraItem letra) {
-        BigDecimal price = letra.getUltOperado() != null
-                ? letra.getUltOperado()
-                : letra.getCierreAnterior();
+        BigDecimal price = letra.getLastTraded() != null
+                ? letra.getLastTraded()
+                : letra.getPreviousClose();
 
-        BigDecimal changePercent = BigDecimalUtils.orZero(letra.getVariacion());
-        BigDecimal change = BigDecimalUtils.percentageChange(letra.getCierreAnterior(), changePercent);
+        BigDecimal changePercent = BigDecimalUtils.orZero(letra.getVariation());
+        BigDecimal change = BigDecimalUtils.percentageChange(letra.getPreviousClose(), changePercent);
 
-        BigDecimal volume = letra.getVolumen() != null
-                ? new BigDecimal(letra.getVolumen())
-                : BigDecimal.ZERO;
+        BigDecimal volume = BigDecimalUtils.fromLong(letra.getVolume());
 
-        String currency = letra.getMoneda() != null
-                ? letra.getMoneda().getSimbolo()
+        String currency = letra.getCurrency() != null
+                ? letra.getCurrency().getSymbol()
                 : FinancialConstants.DEFAULT_CURRENCY;
 
         return LetraDTO.builder()
-                .ticker(letra.getTicker() != null ? letra.getTicker() : "")
-                .name(letra.getNombre() != null ? letra.getNombre() : letra.getTicker())
+                .ticker(StringUtils.orEmpty(letra.getTicker()))
+                .name(StringUtils.firstNonBlank(letra.getName(), letra.getTicker()))
                 .price(BigDecimalUtils.orZero(price))
                 .change(change)
                 .changePercent(changePercent)
                 .volume(volume)
                 .currency(currency)
-                .lastUpdate(DateTimeUtils.fromEpochMillis(letra.getTimestampCotizacion()))
+                .lastUpdate(DateTimeUtils.fromEpochMillis(letra.getQuoteTimestamp()))
                 .maturityDate(null)
                 .build();
     }

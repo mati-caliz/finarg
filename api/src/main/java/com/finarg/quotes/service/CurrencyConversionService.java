@@ -130,22 +130,8 @@ public class CurrencyConversionService {
         BigDecimal fromPrice = getPriceByType(fromQuote, request.getFromPriceType());
         BigDecimal toPrice = getPriceByType(toQuote, request.getToPriceType());
 
-        BigDecimal usdFromFromCurrency;
-        BigDecimal toCurrencyFromUsd;
-
-        if (request.getFromPriceType() == CurrencyConversionRequestDTO.PriceType.SELL) {
-            usdFromFromCurrency = BigDecimal.ONE.divide(fromPrice, SCALE, ROUNDING_MODE);
-        } else {
-            usdFromFromCurrency = BigDecimal.ONE.divide(fromPrice, SCALE, ROUNDING_MODE);
-        }
-
-        if (request.getToPriceType() == CurrencyConversionRequestDTO.PriceType.BUY) {
-            toCurrencyFromUsd = toPrice;
-        } else {
-            toCurrencyFromUsd = toPrice;
-        }
-
-        BigDecimal rate = usdFromFromCurrency.multiply(toCurrencyFromUsd);
+        BigDecimal usdFromFromCurrency = BigDecimal.ONE.divide(fromPrice, SCALE, ROUNDING_MODE);
+        BigDecimal rate = usdFromFromCurrency.multiply(toPrice);
 
         return CurrencyConversionResponseDTO.ConversionRate.builder()
                 .rate(rate)

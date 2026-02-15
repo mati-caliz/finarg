@@ -1,5 +1,6 @@
 package com.finarg.investments.stocks.client;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,20 +60,33 @@ public class DolaritoMervalClient {
 
     @Data
     public static class CedearItem {
-        private String nombre;
-        private String nombreCorto;
-        private BigDecimal maxDia;
-        private BigDecimal minDia;
-        private Long volumen;
-        private BigDecimal variacion;
-        private BigDecimal cierreAnterior;
-        private BigDecimal precioCompra;
-        private BigDecimal precioVenta;
-        private BigDecimal apertura;
-        private BigDecimal ultOperado;
-        private Integer ratioDeConversion;
+        @JsonProperty("nombre")
+        private String name;
+        @JsonProperty("nombreCorto")
+        private String shortName;
+        @JsonProperty("maxDia")
+        private BigDecimal dayHigh;
+        @JsonProperty("minDia")
+        private BigDecimal dayLow;
+        @JsonProperty("volumen")
+        private Long volume;
+        @JsonProperty("variacion")
+        private BigDecimal variation;
+        @JsonProperty("cierreAnterior")
+        private BigDecimal previousClose;
+        @JsonProperty("precioCompra")
+        private BigDecimal bidPrice;
+        @JsonProperty("precioVenta")
+        private BigDecimal askPrice;
+        @JsonProperty("apertura")
+        private BigDecimal openPrice;
+        @JsonProperty("ultOperado")
+        private BigDecimal lastTraded;
+        @JsonProperty("ratioDeConversion")
+        private Integer conversionRatio;
         private String logo;
-        private Moneda moneda;
+        @JsonProperty("moneda")
+        private Currency currency;
     }
 
     @Data
@@ -85,71 +99,118 @@ public class DolaritoMervalClient {
 
     @Data
     public static class EtfItem {
-        private String especie;
-        private BigDecimal ultimo;
-        private BigDecimal variacion;
+        @JsonProperty("especie")
+        private String ticker;
+        @JsonProperty("ultimo")
+        private BigDecimal lastPrice;
+        @JsonProperty("variacion")
+        private BigDecimal variation;
         private BigDecimal varMTD;
         private BigDecimal varYTD;
-        private String simbolo;
-        private String nombre;
+        @JsonProperty("simbolo")
+        private String symbol;
+        @JsonProperty("nombre")
+        private String name;
         private Long timestamp;
     }
 
     @Data
     public static class StockItem {
         private String ticker;
-        private String nombre;
-        private String fechaCotizacion;
-        private Long timestampCotizacion;
-        private BigDecimal variacion;
-        private BigDecimal cierreAnterior;
-        private BigDecimal maxDia;
-        private BigDecimal minDia;
-        private Moneda moneda;
-        private BigDecimal precioCompra;
-        private BigDecimal precioVenta;
-        private BigDecimal ultOperado;
-        private BigDecimal apertura;
-        private Long volumen;
+        @JsonProperty("nombre")
+        private String name;
+        @JsonProperty("fechaCotizacion")
+        private String quoteDate;
+        @JsonProperty("timestampCotizacion")
+        private Long quoteTimestamp;
+        @JsonProperty("variacion")
+        private BigDecimal variation;
+        @JsonProperty("cierreAnterior")
+        private BigDecimal previousClose;
+        @JsonProperty("maxDia")
+        private BigDecimal dayHigh;
+        @JsonProperty("minDia")
+        private BigDecimal dayLow;
+        @JsonProperty("moneda")
+        private Currency currency;
+        @JsonProperty("precioCompra")
+        private BigDecimal bidPrice;
+        @JsonProperty("precioVenta")
+        private BigDecimal askPrice;
+        @JsonProperty("ultOperado")
+        private BigDecimal lastTraded;
+        @JsonProperty("apertura")
+        private BigDecimal openPrice;
+        @JsonProperty("volumen")
+        private Long volume;
     }
 
     @Data
     public static class BondItem {
         private String ticker;
-        private String nombre;
-        private String fechaCotizacion;
-        private Long timestampCotizacion;
-        private BigDecimal variacion;
-        private BigDecimal cierreAnterior;
-        private BigDecimal maxDia;
-        private BigDecimal minDia;
-        private Moneda moneda;
-        private String plazo;
-        private BigDecimal precioCompra;
-        private BigDecimal precioVenta;
-        private BigDecimal ultOperado;
-        private BigDecimal apertura;
-        private Long volumen;
+        @JsonProperty("nombre")
+        private String name;
+        @JsonProperty("fechaCotizacion")
+        private String quoteDate;
+        @JsonProperty("timestampCotizacion")
+        private Long quoteTimestamp;
+        @JsonProperty("variacion")
+        private BigDecimal variation;
+        @JsonProperty("cierreAnterior")
+        private BigDecimal previousClose;
+        @JsonProperty("maxDia")
+        private BigDecimal dayHigh;
+        @JsonProperty("minDia")
+        private BigDecimal dayLow;
+        @JsonProperty("moneda")
+        private Currency currency;
+        @JsonProperty("plazo")
+        private String term;
+        @JsonProperty("precioCompra")
+        private BigDecimal bidPrice;
+        @JsonProperty("precioVenta")
+        private BigDecimal askPrice;
+        @JsonProperty("ultOperado")
+        private BigDecimal lastTraded;
+        @JsonProperty("apertura")
+        private BigDecimal openPrice;
+        @JsonProperty("volumen")
+        private Long volume;
     }
 
     @Data
     public static class LetraItem {
         private String ticker;
-        private String nombre;
-        private String nombreCorto;
-        private String fechaCotizacion;
-        private Long timestampCotizacion;
-        private BigDecimal variacion;
-        private BigDecimal cierreAnterior;
-        private BigDecimal maxDia;
-        private BigDecimal minDia;
-        private Moneda moneda;
-        private String plazo;
-        private BigDecimal precioCompra;
-        private BigDecimal precioVenta;
-        private BigDecimal ultOperado;
-        private BigDecimal apertura;
-        private Long volumen;
+        @JsonProperty("nombre")
+        private String name;
+        @JsonProperty("nombreCorto")
+        private String shortName;
+        @JsonProperty("fechaCotizacion")
+        private String quoteDate;
+        @JsonProperty("timestampCotizacion")
+        private Long quoteTimestamp;
+        @JsonProperty("variacion")
+        private BigDecimal variation;
+        @JsonProperty("cierreAnterior")
+        private BigDecimal previousClose;
+        @JsonProperty("maxDia")
+        private BigDecimal dayHigh;
+        @JsonProperty("minDia")
+        private BigDecimal dayLow;
+        @JsonProperty("moneda")
+        private Currency currency;
+        @JsonProperty("plazo")
+        private String term;
+        @JsonProperty("precioCompra")
+        private BigDecimal bidPrice;
+        @JsonProperty("precioVenta")
+        private BigDecimal askPrice;
+        @JsonProperty("ultOperado")
+        private BigDecimal lastTraded;
+        @JsonProperty("apertura")
+        private BigDecimal openPrice;
+        @JsonProperty("volumen")
+        private Long volume;
     }
 
     @Data
@@ -167,9 +228,11 @@ public class DolaritoMervalClient {
     }
 
     @Data
-    public static class Moneda {
-        private String simbolo;
-        private String descripcion;
+    public static class Currency {
+        @JsonProperty("simbolo")
+        private String symbol;
+        @JsonProperty("descripcion")
+        private String description;
         private String id;
     }
 }

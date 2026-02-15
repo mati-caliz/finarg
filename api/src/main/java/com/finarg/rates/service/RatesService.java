@@ -6,12 +6,13 @@ import com.finarg.quotes.client.argentina.ArgentinaDatosClient.FixedTermRateResp
 import com.finarg.rates.client.FciClient;
 import com.finarg.rates.dto.RateDTO;
 import com.finarg.shared.enums.Country;
+import com.finarg.shared.util.BigDecimalUtils;
+import com.finarg.shared.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -164,14 +164,14 @@ public class RatesService {
     }
 
     private RateDTO createFciRateDTO(String walletName, BigDecimal tnaDecimal) {
-        BigDecimal teaPct = teaFromTna(tnaDecimal.divide(BigDecimal.valueOf(100), 10, RoundingMode.HALF_UP))
-                .multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = BigDecimalUtils.teaFromTna(tnaDecimal.divide(BigDecimalUtils.ONE_HUNDRED, 10, RoundingMode.HALF_UP))
+                .multiply(BigDecimalUtils.ONE_HUNDRED);
 
         String normalizedName = normalizeWalletName(walletName);
         String logo = walletLogoUrl(walletName);
 
         return RateDTO.builder()
-                .id(sanitizeId(normalizedName))
+                .id(StringUtils.sanitizeId(normalizedName))
                 .name(normalizedName)
                 .tna(tnaDecimal.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
@@ -192,7 +192,7 @@ public class RatesService {
         List<ArgentinaDatosClient.UsdAccountResponse> accounts = argentinaDatosClient.getUsdAccounts();
         List<ArgentinaDatosClient.YieldResponse> yields = argentinaDatosClient.getYields();
 
-        java.util.List<RateDTO> result = new java.util.ArrayList<>();
+        List<RateDTO> result = new ArrayList<>();
 
         if (accounts != null) {
             accounts.stream()
@@ -239,14 +239,14 @@ public class RatesService {
     }
 
     private RateDTO mapFciToRateDTO(FciRateResponse r) {
-        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
+        BigDecimal tnaPct = r.getTna().multiply(BigDecimalUtils.ONE_HUNDRED);
         BigDecimal teaPct = r.getTea() != null
-                ? r.getTea().multiply(BigDecimal.valueOf(100))
-                : teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+                ? r.getTea().multiply(BigDecimalUtils.ONE_HUNDRED)
+                : BigDecimalUtils.teaFromTna(r.getTna()).multiply(BigDecimalUtils.ONE_HUNDRED);
         String fundName = formatFundName(r.getFund());
         String logo = walletLogoUrl(r.getFund());
         return RateDTO.builder()
-                .id(sanitizeId(r.getFund()))
+                .id(StringUtils.sanitizeId(r.getFund()))
                 .name(fundName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
@@ -270,7 +270,7 @@ public class RatesService {
         if (name == null || name.isBlank()) {
             return "";
         }
-        String fixed = fixMojibake(name).trim();
+        String fixed = StringUtils.fixMojibake(name).trim();
         String upper = fixed.toUpperCase();
         if (upper.contains("BNA") || upper.contains("NACION") || upper.contains("NACIÓN")) {
             return "BANCO NACIÓN";
@@ -330,11 +330,11 @@ public class RatesService {
 
     private RateDTO mapToRateDTO(FixedTermRateResponse r) {
         BigDecimal tna = bestTna(r);
-        BigDecimal tnaPct = tna.multiply(BigDecimal.valueOf(100));
-        BigDecimal teaPct = teaFromTna(tna).multiply(BigDecimal.valueOf(100));
+        BigDecimal tnaPct = tna.multiply(BigDecimalUtils.ONE_HUNDRED);
+        BigDecimal teaPct = BigDecimalUtils.teaFromTna(tna).multiply(BigDecimalUtils.ONE_HUNDRED);
         String shortName = shortenBankName(r.getEntity());
         return RateDTO.builder()
-                .id(sanitizeId(shortName))
+                .id(StringUtils.sanitizeId(shortName))
                 .name(shortName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
@@ -346,13 +346,7 @@ public class RatesService {
                 .build();
     }
 
-    private static BigDecimal teaFromTna(BigDecimal tna) {
-        return BigDecimal.ONE.add(tna.divide(BigDecimal.valueOf(12), 10, RoundingMode.HALF_UP))
-                .pow(12)
-                .subtract(BigDecimal.ONE);
-    }
-
-    private static final java.util.Set<String> SKIP_WORDS = java.util.Set.of(
+    private static final Set<String> SKIP_WORDS = Set.of(
             "DE", "DEL", "LA", "EL", "LOS", "LAS", "Y", "AND", "OF", "EN", "ARGENTINA", "SA", "S.A", "S.A.U",
             "LIMITADO", "COOPERATIVO", "BUENOS", "AIRES", "TIERRA", "FUEGO");
 
@@ -360,7 +354,7 @@ public class RatesService {
         if (entityName == null || entityName.isBlank()) {
             return "";
         }
-        String fixed = fixMojibake(entityName);
+        String fixed = StringUtils.fixMojibake(entityName);
         String upper = fixed.toUpperCase().trim();
         String cleaned = upper
                 .replaceAll("SOCIEDAD ANONIMA", " ")
@@ -425,44 +419,6 @@ public class RatesService {
         return sb.toString();
     }
 
-    private static String fixMojibake(String s) {
-        if (s == null || s.isEmpty()) {
-            return s;
-        }
-        if (s.contains("Ã")) {
-            try {
-                String decoded = new String(s.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                if (!decoded.contains("Ã")) {
-                    return decoded;
-                }
-            } catch (Exception ignored) {
-            }
-        }
-        return s.replace("Ã©", "é")
-                .replace("Ã‰", "É")
-                .replace("Ã­", "í")
-                .replace("Ã±", "ñ")
-                .replace("Ã'", "Ñ")
-                .replace("ÃÃA", "ÑÍA")
-                .replace("ÃIA", "ÑÍA")
-                .replace("Ãia", "Ñía")
-                .replace("Ã³", "ó")
-                .replace("Ãº", "ú")
-                .replace("Ã¡", "á")
-                .replace("ÃDITO", "ÉDITO")
-                .replace("Ãdito", "édito");
-    }
-
-    private static String sanitizeId(String name) {
-        if (name == null) {
-            return UUID.randomUUID().toString();
-        }
-        return name.toLowerCase()
-                .replaceAll("[^a-z0-9]", "_")
-                .replaceAll("_+", "_")
-                .replaceAll("^_|_$", "");
-    }
-
     private List<RateDTO> markBestRate(List<RateDTO> rates) {
         if (rates.isEmpty()) {
             return rates;
@@ -478,12 +434,12 @@ public class RatesService {
     }
 
     private RateDTO mapUsdAccountToRateDTO(ArgentinaDatosClient.UsdAccountResponse r) {
-        BigDecimal tnaPct = r.getTasa().multiply(BigDecimal.valueOf(100));
-        BigDecimal teaPct = teaFromTna(r.getTasa()).multiply(BigDecimal.valueOf(100));
+        BigDecimal tnaPct = r.getTasa().multiply(BigDecimalUtils.ONE_HUNDRED);
+        BigDecimal teaPct = BigDecimalUtils.teaFromTna(r.getTasa()).multiply(BigDecimalUtils.ONE_HUNDRED);
         String entityName = shortenBankName(r.getEntity());
         String logo = bankLogoUrl(r.getEntity());
         return RateDTO.builder()
-                .id(sanitizeId(r.getEntity()))
+                .id(StringUtils.sanitizeId(r.getEntity()))
                 .name(entityName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
@@ -497,13 +453,13 @@ public class RatesService {
     }
 
     private RateDTO mapYieldToRateDTO(String entity, ArgentinaDatosClient.YieldDetail detail) {
-        BigDecimal apyDecimal = detail.getApy().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        BigDecimal apyDecimal = detail.getApy().divide(BigDecimalUtils.ONE_HUNDRED, 4, RoundingMode.HALF_UP);
         BigDecimal tnaPct = detail.getApy();
-        BigDecimal teaPct = teaFromTna(apyDecimal).multiply(BigDecimal.valueOf(100));
+        BigDecimal teaPct = BigDecimalUtils.teaFromTna(apyDecimal).multiply(BigDecimalUtils.ONE_HUNDRED);
         String entityName = formatFundName(entity);
         String logo = walletLogoUrl(entity);
         return RateDTO.builder()
-                .id(sanitizeId(entity + "_" + detail.getCurrency()))
+                .id(StringUtils.sanitizeId(entity + "_" + detail.getCurrency()))
                 .name(entityName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
@@ -517,12 +473,12 @@ public class RatesService {
     }
 
     private RateDTO mapUvaMortgageToRateDTO(ArgentinaDatosClient.UvaMortgageResponse r) {
-        BigDecimal tnaPct = r.getTna().multiply(BigDecimal.valueOf(100));
-        BigDecimal teaPct = teaFromTna(r.getTna()).multiply(BigDecimal.valueOf(100));
+        BigDecimal tnaPct = r.getTna().multiply(BigDecimalUtils.ONE_HUNDRED);
+        BigDecimal teaPct = BigDecimalUtils.teaFromTna(r.getTna()).multiply(BigDecimalUtils.ONE_HUNDRED);
         String entityName = shortenBankName(r.getCommercialName());
         String logo = bankLogoUrl(r.getCommercialName());
         return RateDTO.builder()
-                .id(sanitizeId(r.getCommercialName()))
+                .id(StringUtils.sanitizeId(r.getCommercialName()))
                 .name(entityName)
                 .tna(tnaPct.setScale(1, RoundingMode.HALF_UP))
                 .tea(teaPct.setScale(1, RoundingMode.HALF_UP))
