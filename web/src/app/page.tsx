@@ -93,6 +93,16 @@ const NextHolidayWidget = dynamic(
   },
 );
 
+const TopRatesWidget = dynamic(
+  () =>
+    import("@/components/dashboard/TopRatesWidget").then((mod) => ({
+      default: mod.TopRatesWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
 export default function DashboardPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
@@ -395,6 +405,8 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               )}
+
+            {countryConfig.features.rates && <TopRatesWidget />}
           </div>
         )}
 
