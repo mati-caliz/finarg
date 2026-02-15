@@ -21,28 +21,31 @@ public class ArgentinaHolidaysClient {
 
     public List<HolidayApiResponse> getHolidaysByYear(int year) {
         try {
-            log.info("Fetching holidays for year: {}", year);
+            log.info("Fetching holidays for year {} from Nager.Date API", year);
             List<HolidayApiResponse> response = webClient.get()
-                    .uri("/{year}", year)
+                    .uri("/{year}/AR", year)
                     .retrieve()
                     .bodyToFlux(HolidayApiResponse.class)
                     .collectList()
                     .block();
 
-            log.info("Successfully fetched {} holidays for year {}", 
+            log.info("Successfully fetched {} holidays for year {}",
                     response != null ? response.size() : 0, year);
             return response != null ? response : List.of();
         } catch (Exception e) {
-            log.error("Error fetching holidays for year {}: {}", year, e.getMessage());
+            log.error("Error fetching holidays for year {}: {}", year, e.getMessage(), e);
             return List.of();
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record HolidayApiResponse(
-            LocalDate fecha,
-            String nombre,
-            String tipo,
-            Boolean nacional
+            LocalDate date,
+            String localName,
+            String name,
+            String countryCode,
+            Boolean fixed,
+            Boolean global,
+            List<String> types
     ) { }
 }
