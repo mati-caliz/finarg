@@ -272,8 +272,6 @@ export default function DashboardPage() {
                   socialIndicators.foodBasicBasket !== null) ||
                 (socialIndicators.ripteSalary !== undefined &&
                   socialIndicators.ripteSalary !== null) ||
-                (socialIndicators.averageSalary !== undefined &&
-                  socialIndicators.averageSalary !== null) ||
                 (socialIndicators.uva !== undefined && socialIndicators.uva !== null) ||
                 (socialIndicators.cer !== undefined && socialIndicators.cer !== null)) && (
                 <Card className="shrink-0 border-t-[3px] border-t-indigo-400 min-h-[380px]">
@@ -356,21 +354,6 @@ export default function DashboardPage() {
                                 currency: "ARS",
                                 maximumFractionDigits: 0,
                               }).format(socialIndicators.ripteSalary)}
-                            </p>
-                          </div>
-                        )}
-                      {socialIndicators.averageSalary !== undefined &&
-                        socialIndicators.averageSalary !== null && (
-                          <div className="p-2 rounded-lg bg-muted/50">
-                            <p className="text-xs text-muted-foreground">
-                              {translate("averageSalary")}
-                            </p>
-                            <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.averageSalary)}
                             </p>
                           </div>
                         )}
