@@ -22,7 +22,7 @@ import { useSocialIndicators } from "@/hooks/useSocialIndicators";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { sortQuotesByVariant } from "@/lib/utils";
-import { useAppStore } from "@/store/useStore";
+import { useAppStore, useAuthStore } from "@/store/useStore";
 import {
   ArrowLeftRight,
   ArrowRight,
@@ -30,7 +30,9 @@ import {
   Calculator,
   ChevronDown,
   CreditCard,
+  Crown,
   Percent,
+  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -94,6 +96,7 @@ const NextHolidayWidget = dynamic(
 export default function DashboardPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
+  const { subscription } = useAuthStore();
   const countryConfig = getCountryConfig(selectedCountry);
 
   const { data: quotes, isLoading: loadingQuotes } = useQuotes();
@@ -562,6 +565,34 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/10 group-hover:bg-orange-500/20 transition-colors shrink-0">
                       <CreditCard className="h-6 w-6 text-orange-500" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          )}
+
+          {(!subscription || subscription.plan === "FREE") && (
+            <Link href="/planes">
+              <Card className="group cursor-pointer border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 h-[140px] relative overflow-hidden">
+                <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  Popular
+                </div>
+                <CardContent className="pt-6 h-full flex items-center">
+                  <div className="flex items-center justify-between w-full gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
+                        <p className="font-bold text-yellow-900 dark:text-yellow-100">
+                          Actualizá a Premium
+                        </p>
+                      </div>
+                      <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                        Cálculos ilimitados + Alertas + Sin ads
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500/20 group-hover:bg-yellow-500/30 transition-colors shrink-0">
+                      <Sparkles className="h-6 w-6 text-yellow-600 dark:text-yellow-500" />
                     </div>
                   </div>
                 </CardContent>

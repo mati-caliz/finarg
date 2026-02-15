@@ -100,7 +100,8 @@
       "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/client/ArgentinaHolidaysClient.java:*)",
       "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/service/HolidayService.java:*)",
       "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/controller/HolidayController.java:*)",
-      "WebFetch(domain:www.afip.gob.ar)"
+      "WebFetch(domain:www.afip.gob.ar)",
+      "Bash(tail:*)"
     ]
   }
 }

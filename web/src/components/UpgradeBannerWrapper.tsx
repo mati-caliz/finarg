@@ -6,7 +6,11 @@ import { UpgradeBanner } from "./UpgradeBanner";
 export function UpgradeBannerWrapper() {
   const { subscription, isAuthenticated } = useAuthStore();
 
-  if (!isAuthenticated || !subscription) return null;
+  if (!isAuthenticated) {
+    return <UpgradeBanner />;
+  }
+
+  if (!subscription) return null;
 
   const isPremium = subscription.plan === "PREMIUM" || subscription.plan === "PROFESSIONAL";
 

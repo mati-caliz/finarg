@@ -42,7 +42,7 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted rounded-md">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium max-w-[150px] truncate">{user?.email}</span>
+                  <span className="text-sm font-medium">{user?.email}</span>
                 </div>
                 <Button variant="outline" size="sm" className="gap-2" onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
@@ -57,7 +57,7 @@ export function Navbar() {
                 </Link>
               </Button>
             ))}
-          {mounted && subscription && subscription.plan === "FREE" && (
+          {mounted && (!isAuthenticated || (subscription && subscription.plan === "FREE")) && (
             <Button
               variant="outline"
               size="sm"

@@ -1,5 +1,6 @@
 "use client";
 
+import { Paywall } from "@/components/Paywall";
 import { QueryError } from "@/components/QueryError";
 import { DolarCardSkeleton } from "@/components/skeletons";
 import { Button } from "@/components/ui/button";
@@ -11,10 +12,10 @@ import type { TranslationKey } from "@/i18n/translations";
 import { quotesApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatCurrencySimple, sortQuotesByVariant } from "@/lib/utils";
-import { useAppStore } from "@/store/useStore";
+import { useAppStore, useAuthStore } from "@/store/useStore";
 import type { Quote } from "@/types";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { TrendingDown, TrendingUp, X } from "lucide-react";
+import { Crown, TrendingDown, TrendingUp, X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 
@@ -44,6 +45,7 @@ type BaseCurrency = "usd" | "eur" | "brl" | "clp" | "uyu" | "pyg" | "bob" | "cny
 export default function QuotesPage() {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryConfig = getCountryConfig(selectedCountry);
+  const { subscription } = useAuthStore();
   const { translate } = useTranslation();
   const hasCurrencyGroups = selectedCountry === "ar";
 
@@ -51,19 +53,22 @@ export default function QuotesPage() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [period, setPeriod] = useState("30");
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  const isPremium = subscription?.plan !== "FREE";
 
   const periods = useMemo(
     () => [
-      { value: "7", label: translate("days7") },
-      { value: "30", label: translate("days30") },
-      { value: "90", label: translate("months3") },
-      { value: "180", label: translate("months6") },
-      { value: "365", label: translate("year1") },
-      { value: "730", label: translate("year2") },
-      { value: "1095", label: translate("year3") },
-      { value: "1825", label: translate("year5") },
-      { value: "3650", label: translate("year10") },
-      { value: "5500", label: translate("max") },
+      { value: "7", label: translate("days7"), premium: false },
+      { value: "30", label: translate("days30"), premium: false },
+      { value: "90", label: translate("months3"), premium: false },
+      { value: "180", label: translate("months6"), premium: false },
+      { value: "365", label: translate("year1"), premium: false },
+      { value: "730", label: translate("year2"), premium: false },
+      { value: "1095", label: translate("year3"), premium: true },
+      { value: "1825", label: translate("year5"), premium: true },
+      { value: "3650", label: translate("year10"), premium: true },
+      { value: "5500", label: translate("max"), premium: true },
     ],
     [translate],
   );
@@ -335,16 +340,35 @@ export default function QuotesPage() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <CardTitle className="text-lg">{translate("history")}</CardTitle>
                   <div className="flex flex-wrap gap-2">
-                    {periods.map((p) => (
-                      <Button
-                        key={p.value}
-                        variant={period === p.value ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setPeriod(p.value)}
-                      >
-                        {p.label}
-                      </Button>
-                    ))}
+                    {periods.map((p) => {
+                      const isLocked = p.premium && !isPremium;
+                      return (
+                        <Button
+                          key={p.value}
+                          variant={period === p.value ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            if (isLocked) {
+                              setShowPaywall(true);
+                            } else {
+                              setPeriod(p.value);
+                            }
+                          }}
+                          className={`relative ${isLocked ? "pr-8" : ""}`}
+                        >
+                          {p.label}
+                          {p.premium && (
+                            <Crown
+                              className={`h-3 w-3 ml-1 ${
+                                isLocked
+                                  ? "text-yellow-600 dark:text-yellow-500"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
+                          )}
+                        </Button>
+                      );
+                    })}
                   </div>
                 </div>
                 {hasCurrencyGroups &&
@@ -511,6 +535,14 @@ export default function QuotesPage() {
           )}
         </CardContent>
       </Card>
+
+      {showPaywall && (
+        <Paywall
+          feature="Datos históricos avanzados"
+          description="Para ver datos de más de 2 años necesitás Premium. Accedé a gráficos históricos completos de hasta 10 años."
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
     </div>
   );
 }
