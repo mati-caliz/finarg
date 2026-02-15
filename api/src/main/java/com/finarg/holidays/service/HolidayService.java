@@ -30,11 +30,11 @@ public class HolidayService {
 
         return holidays.stream()
                 .map(h -> HolidayResponseDTO.builder()
-                        .date(h.fecha())
-                        .name(h.nombre())
-                        .type(h.tipo())
-                        .isNational(h.nacional() != null ? h.nacional() : false)
-                        .daysUntil(calculateDaysUntil(today, h.fecha()))
+                        .date(h.date())
+                        .name(h.localName())
+                        .type(h.types() != null && !h.types().isEmpty() ? h.types().get(0) : "Public")
+                        .isNational(h.global() != null ? h.global() : false)
+                        .daysUntil(calculateDaysUntil(today, h.date()))
                         .build())
                 .sorted(Comparator.comparing(HolidayResponseDTO::date))
                 .toList();
@@ -53,13 +53,13 @@ public class HolidayService {
                 argentinaHolidaysClient.getHolidaysByYear(nextYear);
 
         return Stream.concat(currentYearHolidays.stream(), nextYearHolidays.stream())
-                .filter(h -> h.fecha().isAfter(today) || h.fecha().isEqual(today))
+                .filter(h -> h.date().isAfter(today) || h.date().isEqual(today))
                 .map(h -> HolidayResponseDTO.builder()
-                        .date(h.fecha())
-                        .name(h.nombre())
-                        .type(h.tipo())
-                        .isNational(h.nacional() != null ? h.nacional() : false)
-                        .daysUntil(calculateDaysUntil(today, h.fecha()))
+                        .date(h.date())
+                        .name(h.localName())
+                        .type(h.types() != null && !h.types().isEmpty() ? h.types().get(0) : "Public")
+                        .isNational(h.global() != null ? h.global() : false)
+                        .daysUntil(calculateDaysUntil(today, h.date()))
                         .build())
                 .sorted(Comparator.comparing(HolidayResponseDTO::date))
                 .toList();
