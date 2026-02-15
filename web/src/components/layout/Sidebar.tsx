@@ -376,14 +376,20 @@ export function Sidebar() {
 
   useEffect(() => {
     if (sidebarOpen && window.innerWidth < 1024) {
+      const scrollY = window.scrollY;
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
 
-    return () => {
-      document.body.style.overflow = "";
-    };
+      return () => {
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.width = "";
+        document.body.style.overflow = "";
+        window.scrollTo(0, scrollY);
+      };
+    }
   }, [sidebarOpen]);
 
   const reservesKeyMap: Record<string, TranslationKey> = {
@@ -453,7 +459,7 @@ export function Sidebar() {
             <CountrySelector />
           </div>
 
-          <nav className="flex-1 space-y-1 p-3 overflow-y-auto">
+          <nav className="flex-1 space-y-1 p-3 overflow-y-auto overscroll-none min-h-0">
             {baseNavigationCategories.map((item) => {
               if (isCategory(item)) {
                 return (
@@ -494,41 +500,45 @@ export function Sidebar() {
             })}
           </nav>
 
-          {showPremiumButton && (
-            <div className="px-3 pb-3">
-              <Link href="/planes" onClick={() => toggleSidebar()}>
-                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 p-4 cursor-pointer group hover:shadow-lg transition-all duration-300">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
-                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8" />
+          <div className="mt-auto">
+            {showPremiumButton && (
+              <div className="px-3 pb-3">
+                <Link href="/planes" onClick={() => toggleSidebar()}>
+                  <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 p-4 cursor-pointer group hover:shadow-lg transition-all duration-300">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
+                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8" />
 
-                  <div className="relative flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 flex-shrink-0">
-                      <Crown className="h-5 w-5 text-white" />
+                    <div className="relative flex items-center gap-3">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 flex-shrink-0">
+                        <Crown className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-white leading-tight">
+                          Hacerse Premium
+                        </p>
+                        <p className="text-xs text-white/90 mt-0.5">Sin límites + Sin ads</p>
+                      </div>
+                      <Sparkles className="h-4 w-4 text-white/80 flex-shrink-0" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-white leading-tight">Hacerse Premium</p>
-                      <p className="text-xs text-white/90 mt-0.5">Sin límites + Sin ads</p>
-                    </div>
-                    <Sparkles className="h-4 w-4 text-white/80 flex-shrink-0" />
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
+            )}
+
+            <div className="px-3 pb-3">
+              <GoogleAd
+                adSlot="9876543210"
+                adFormat="auto"
+                style={{ minHeight: "250px", maxWidth: "100%" }}
+              />
             </div>
-          )}
 
-          <div className="px-3 pb-3">
-            <GoogleAd
-              adSlot="9876543210"
-              adFormat="auto"
-              style={{ minHeight: "250px", maxWidth: "100%" }}
-            />
-          </div>
-
-          <div className="border-t border-white/10 p-4">
-            <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
-            <p className="text-xs text-white/40 text-center mt-1">
-              {countryConfig.flag} {countryConfig.shortName}
-            </p>
+            <div className="border-t border-white/10 p-4">
+              <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
+              <p className="text-xs text-white/40 text-center mt-1">
+                {countryConfig.flag} {countryConfig.shortName}
+              </p>
+            </div>
           </div>
         </div>
       </aside>
