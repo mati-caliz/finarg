@@ -85,7 +85,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/inversiones",
         icon: TrendingUp,
         feature: null,
-        isNew: true,
       },
     ],
   },
@@ -116,7 +115,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/noticias-financieras-argentina",
         icon: Newspaper,
         feature: null,
-        isNew: true,
       },
       {
         key: "holidays" as TranslationKey,
@@ -141,7 +139,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/calculadora-interes-compuesto",
         icon: TrendingUp,
         feature: null,
-        isNew: true,
       },
       {
         key: "adjustmentCalculator" as TranslationKey,
@@ -154,7 +151,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/calculadora-cuotas-contado",
         icon: CreditCard,
         feature: null,
-        isNew: true,
       },
     ],
   },
