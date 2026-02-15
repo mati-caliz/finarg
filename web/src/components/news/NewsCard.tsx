@@ -78,6 +78,14 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-3">
+        {article.summary && (
+          <div>
+            <p className="text-sm text-foreground/80 leading-relaxed line-clamp-3">
+              {article.summary}
+            </p>
+          </div>
+        )}
+
         {article.aiSummary && (
           <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
             <div className="flex items-start gap-2 mb-2">
