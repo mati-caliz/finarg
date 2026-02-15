@@ -14,7 +14,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { quotesApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
-import { formatCurrencySimple, sortQuotesByVariant } from "@/lib/utils";
+import { formatCurrencySimple } from "@/lib/utils";
 import { useAppStore, useAuthStore } from "@/store/useStore";
 import type { Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
@@ -127,10 +127,9 @@ export default function QuotesPage() {
     if (!quotes) {
       return undefined;
     }
-    const list = !hasCurrencyGroups
+    return !hasCurrencyGroups
       ? quotes
       : quotes.filter((q) => q.baseCurrency === selectedBaseCurrency);
-    return sortQuotesByVariant(list);
   }, [quotes, hasCurrencyGroups, selectedBaseCurrency]);
 
   useEffect(() => {

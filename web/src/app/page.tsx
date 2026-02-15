@@ -8,7 +8,7 @@ import { useCrypto } from "@/hooks/useCrypto";
 import { useGap, useQuotes } from "@/hooks/useQuotes";
 import { useReserves } from "@/hooks/useReserves";
 import { useTranslation } from "@/hooks/useTranslation";
-import { sortQuotesByVariant } from "@/lib/utils";
+
 import { useAppStore } from "@/store/useStore";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -132,7 +132,7 @@ export default function DashboardPage() {
             <Skeleton className="h-36 rounded-xl" />
           </>
         ) : (
-          sortQuotesByVariant(quotes ?? [])
+          (quotes ?? [])
             .filter((quote) => ["blue", "oficial", "tarjeta", "bolsa"].includes(quote.type))
             .map((quote) => <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />)
         )}

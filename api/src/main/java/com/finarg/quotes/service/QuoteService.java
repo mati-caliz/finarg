@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +39,10 @@ public class QuoteService {
         log.info("Fetching all quotes for country: {}", country);
         QuoteClient client = quoteClientFactory.getClient(country);
         List<QuoteDTO> quotes = client.getAllQuotes();
-        return enrichQuotesWithVariation(quotes);
+        List<QuoteDTO> enriched = new ArrayList<>(enrichQuotesWithVariation(quotes));
+        enriched.forEach(q -> q.setDisplayOrder(calculateDisplayOrder(q.getType())));
+        enriched.sort(Comparator.comparingInt(q -> q.getDisplayOrder() != null ? q.getDisplayOrder() : 99));
+        return enriched;
     }
 
     @Cacheable(value = "quotes", key = "#country.code + '_' + #type.code")
@@ -196,5 +201,22 @@ public class QuoteService {
         return quoteHistoryRepository.findLatestByTypeBeforeDate(type, today)
                 .map(prev -> BigDecimalUtils.variationPercentage(currentSell, prev.getSell()))
                 .orElse(BigDecimal.ZERO);
+    }
+
+    private static int calculateDisplayOrder(CurrencyType type) {
+        if (type == null) {
+            return 99;
+        }
+        String code = type.getCode();
+        if (code.equals("oficial") || code.endsWith("_oficial")) {
+            return 0;
+        }
+        if (code.equals("blue") || code.endsWith("_blue")) {
+            return 1;
+        }
+        if (code.equals("tarjeta") || code.endsWith("_tarjeta")) {
+            return 2;
+        }
+        return 3;
     }
 }

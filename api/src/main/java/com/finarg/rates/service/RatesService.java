@@ -10,7 +10,9 @@ import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.shared.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -90,6 +92,14 @@ public class RatesService {
 
     private final ArgentinaDatosClient argentinaDatosClient;
     private final FciClient fciClient;
+
+    private RatesService self;
+
+    @Lazy
+    @Autowired
+    public void setSelf(RatesService self) {
+        this.self = self;
+    }
 
     private static final Map<String, String> FCI_TO_WALLET_MAPPING = Map.ofEntries(
             Map.entry("Allaria Ahorro - Clase E", "Prex"),
@@ -236,6 +246,33 @@ public class RatesService {
             }
         }
         return sorted;
+    }
+
+    public List<RateDTO> getTopInvestmentRates(Country country, int limit) {
+        List<RateDTO> wallets = self.getWalletRates(country);
+        List<RateDTO> banks = self.getFixedTermRates(country);
+
+        List<RateDTO> topWallets = wallets.stream()
+                .sorted((a, b) -> b.getTna().compareTo(a.getTna()))
+                .limit(limit)
+                .toList();
+
+        List<RateDTO> topBanks = banks.stream()
+                .sorted((a, b) -> b.getTna().compareTo(a.getTna()))
+                .limit(limit)
+                .toList();
+
+        List<RateDTO> result = new ArrayList<>(topWallets);
+        result.addAll(topBanks);
+        return result;
+    }
+
+    public List<RateDTO> getTopMortgageRates(Country country, int limit) {
+        List<RateDTO> mortgages = self.getUvaMortgageRates(country);
+        return mortgages.stream()
+                .sorted(Comparator.comparing(RateDTO::getTna))
+                .limit(limit)
+                .toList();
     }
 
     private RateDTO mapFciToRateDTO(FciRateResponse r) {

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -47,6 +48,22 @@ public class RatesController {
     public ResponseEntity<List<RateDTO>> getUvaMortgageRates() {
         Country c = mapCountry();
         return ResponseEntity.ok(ratesService.getUvaMortgageRates(c));
+    }
+
+    @GetMapping("/top-investment")
+    @Operation(summary = "Get top investment rates (wallets + banks)")
+    public ResponseEntity<List<RateDTO>> getTopInvestmentRates(
+            @RequestParam(defaultValue = "2") int limit) {
+        Country c = mapCountry();
+        return ResponseEntity.ok(ratesService.getTopInvestmentRates(c, limit));
+    }
+
+    @GetMapping("/top-mortgages")
+    @Operation(summary = "Get top mortgage rates (lowest TNA)")
+    public ResponseEntity<List<RateDTO>> getTopMortgageRates(
+            @RequestParam(defaultValue = "2") int limit) {
+        Country c = mapCountry();
+        return ResponseEntity.ok(ratesService.getTopMortgageRates(c, limit));
     }
 
     private static Country mapCountry() {
