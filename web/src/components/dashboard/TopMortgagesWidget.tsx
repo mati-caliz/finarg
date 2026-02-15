@@ -27,16 +27,14 @@ interface RateDTO {
 export function TopMortgagesWidget() {
   const { translate } = useTranslation();
 
-  const { data: mortgages, isLoading } = useQuery({
-    queryKey: ["rates", "uva-mortgages", "ar"],
+  const { data: bestMortgages, isLoading } = useQuery({
+    queryKey: ["rates", "top-mortgages", "ar"],
     queryFn: async () => {
-      const response = await ratesApi.getUvaMortgages("ar");
+      const response = await ratesApi.getTopMortgages("ar", 2);
       return (response.data as RateDTO[]) ?? [];
     },
     staleTime: CACHE_TIMES.REALTIME_STALE,
   });
-
-  const bestMortgages = mortgages?.sort((a, b) => a.tna - b.tna).slice(0, 2);
 
   if (isLoading) {
     return <Skeleton className="h-[180px] w-full rounded-xl" />;

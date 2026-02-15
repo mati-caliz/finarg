@@ -144,15 +144,18 @@ public class NewsService {
     }
 
     private NewsArticleResponseDTO mapToResponseDTO(NewsArticle article) {
-        List<String> keyPoints = article.getKeyPoints() != null
-                ? Arrays.asList(article.getKeyPoints().split(";\\s*"))
-                : List.of();
+        List<String> aiKeyPoints = parseKeyPointsFromAiSummary(article.getAiSummary());
+        List<String> keyPoints = !aiKeyPoints.isEmpty()
+                ? aiKeyPoints
+                : (article.getKeyPoints() != null
+                        ? Arrays.asList(article.getKeyPoints().split(";\\s*"))
+                        : List.of());
 
         return NewsArticleResponseDTO.builder()
                 .id(article.getId())
                 .title(article.getTitle())
                 .summary(article.getSummary())
-                .aiSummary(article.getAiSummary())
+                .aiSummary(cleanAiSummary(article.getAiSummary()))
                 .sentiment(article.getSentiment())
                 .category(article.getCategory())
                 .source(article.getSource())
@@ -163,5 +166,30 @@ public class NewsService {
                 .publishedDate(article.getPublishedDate())
                 .keyPoints(keyPoints)
                 .build();
+    }
+
+    private String cleanAiSummary(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        String[] parts = raw.split("(?i)\\*\\*SENTIMIENTO:\\*\\*");
+        return parts[0].trim();
+    }
+
+    private List<String> parseKeyPointsFromAiSummary(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return List.of();
+        }
+        String[] sections = raw.split("(?i)\\*\\*PUNTOS_CLAVE:\\*\\*");
+        if (sections.length < 2) {
+            return List.of();
+        }
+        String keyPointsSection = sections[1];
+        return Arrays.stream(keyPointsSection.split("\n"))
+                .map(String::trim)
+                .filter(line -> line.startsWith("*") || line.startsWith("-"))
+                .map(line -> line.replaceFirst("^[*\\-]\\s*", "").trim())
+                .filter(point -> point.length() > 10)
+                .toList();
     }
 }

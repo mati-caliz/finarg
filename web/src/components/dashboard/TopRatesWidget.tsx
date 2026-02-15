@@ -27,28 +27,17 @@ interface RateDTO {
 export function TopInvestmentRatesWidget() {
   const { translate } = useTranslation();
 
-  const { data: wallets, isLoading: loadingWallets } = useQuery({
-    queryKey: ["rates", "wallets", "ar"],
+  const { data: topRates, isLoading } = useQuery({
+    queryKey: ["rates", "top-investment", "ar"],
     queryFn: async () => {
-      const response = await ratesApi.getWallets("ar");
+      const response = await ratesApi.getTopInvestment("ar", 2);
       return (response.data as RateDTO[]) ?? [];
     },
     staleTime: CACHE_TIMES.REALTIME_STALE,
   });
 
-  const { data: banks, isLoading: loadingBanks } = useQuery({
-    queryKey: ["rates", "fixed-term", "ar"],
-    queryFn: async () => {
-      const response = await ratesApi.getFixedTerm("ar");
-      return (response.data as RateDTO[]) ?? [];
-    },
-    staleTime: CACHE_TIMES.REALTIME_STALE,
-  });
-
-  const topWallets = wallets?.sort((a, b) => b.tna - a.tna).slice(0, 2);
-  const topBanks = banks?.sort((a, b) => b.tna - a.tna).slice(0, 2);
-
-  const isLoading = loadingWallets || loadingBanks;
+  const topWallets = topRates?.filter((r) => !r.term).slice(0, 2);
+  const topBanks = topRates?.filter((r) => !!r.term).slice(0, 2);
 
   if (isLoading) {
     return <Skeleton className="h-[260px] w-full rounded-xl" />;

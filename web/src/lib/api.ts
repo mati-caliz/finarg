@@ -102,6 +102,10 @@ export const ratesApi = {
   getUsdAccounts: (country = "ar") => cachedApi.get("/rates/usd-accounts", { params: { country } }),
   getUvaMortgages: (country = "ar") =>
     cachedApi.get("/rates/uva-mortgages", { params: { country } }),
+  getTopInvestment: (country = "ar", limit = 2) =>
+    cachedApi.get("/rates/top-investment", { params: { country, limit } }),
+  getTopMortgages: (country = "ar", limit = 2) =>
+    cachedApi.get("/rates/top-mortgages", { params: { country, limit } }),
 };
 
 export const exchangeRateComparisonApi = {

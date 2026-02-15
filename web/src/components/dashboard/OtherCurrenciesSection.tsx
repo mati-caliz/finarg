@@ -11,7 +11,7 @@ import {
 import { useQuotes } from "@/hooks/useQuotes";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
-import { sortQuotesByVariant } from "@/lib/utils";
+
 import { useAppStore } from "@/store/useStore";
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -88,7 +88,7 @@ export function OtherCurrenciesSection() {
       </div>
       {filteredQuotesByCurrency && filteredQuotesByCurrency.length > 0 && (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-          {sortQuotesByVariant(filteredQuotesByCurrency).map((quote) => (
+          {filteredQuotesByCurrency.map((quote) => (
             <QuoteCard key={quote.type} quote={quote} country={selectedCountry} />
           ))}
         </div>

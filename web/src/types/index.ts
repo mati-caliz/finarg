@@ -11,6 +11,7 @@ export interface Quote {
   lastUpdate: string;
   baseCurrency?: string;
   hasHistory?: boolean;
+  displayOrder?: number;
 }
 
 export interface Gap {

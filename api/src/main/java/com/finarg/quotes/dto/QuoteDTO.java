@@ -23,4 +23,5 @@ public class QuoteDTO implements Serializable {
     private LocalDateTime lastUpdate;
     private String baseCurrency;
     private Boolean hasHistory;
+    private Integer displayOrder;
 }
