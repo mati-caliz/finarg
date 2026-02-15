@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 import { CafecitoModal } from "@/components/CafecitoModal";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { UpgradeBannerWrapper } from "@/components/UpgradeBannerWrapper";
@@ -118,6 +119,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <CafecitoModal />
+          <FeedbackWidget />
         </Providers>
         <ServiceWorkerRegistration />
         <Suspense fallback={null}>
