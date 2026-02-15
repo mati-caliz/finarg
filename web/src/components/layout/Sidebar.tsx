@@ -1,6 +1,7 @@
 "use client";
 
 import { GoogleAd } from "@/components/GoogleAd";
+import { InvestmentsPremiumModal } from "@/components/InvestmentsPremiumModal";
 import { Button } from "@/components/ui/button";
 import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -186,6 +187,8 @@ interface NavItemProps {
   translate: (key: TranslationKey) => string;
   selectedCountry: string;
   reservesKeyMap: Record<string, TranslationKey>;
+  subscription?: { plan: string } | null;
+  onInvestmentsClick?: () => void;
 }
 
 function NavItem({
@@ -195,9 +198,15 @@ function NavItem({
   translate,
   selectedCountry,
   reservesKeyMap,
+  subscription,
+  onInvestmentsClick,
 }: NavItemProps) {
   const isActive = pathname === item.href;
   const isComingSoon = item.isComingSoon || item.href === "#";
+  const isPremiumFeature = item.key === "investmentsTitle";
+  const isFreeUser = !subscription || subscription.plan === "FREE";
+  const showPremiumBadge = isPremiumFeature && isFreeUser;
+  const shouldBlockAccess = isPremiumFeature && isFreeUser;
   const displayName =
     item.feature === "reserves"
       ? translate(reservesKeyMap[selectedCountry] || "reserves")
@@ -209,6 +218,11 @@ function NavItem({
       onClick={(e) => {
         if (isComingSoon) {
           e.preventDefault();
+          return;
+        }
+        if (shouldBlockAccess && onInvestmentsClick) {
+          e.preventDefault();
+          onInvestmentsClick();
           return;
         }
         if (window.innerWidth < 1024) {
@@ -225,6 +239,12 @@ function NavItem({
     >
       <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
       <span className={cn("flex-1", isComingSoon && "opacity-50")}>{displayName}</span>
+      {showPremiumBadge && (
+        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white uppercase tracking-wide flex items-center gap-0.5">
+          <Crown className="h-2.5 w-2.5" />
+          Pro
+        </span>
+      )}
       {item.isNew && (
         <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
           Nuevo
@@ -249,6 +269,8 @@ interface NavCategoryProps {
   reservesKeyMap: Record<string, TranslationKey>;
   isOpen: boolean;
   onToggle: () => void;
+  subscription?: { plan: string } | null;
+  onInvestmentsClick?: () => void;
 }
 
 function NavCategory({
@@ -261,6 +283,8 @@ function NavCategory({
   reservesKeyMap,
   isOpen,
   onToggle,
+  subscription,
+  onInvestmentsClick,
 }: NavCategoryProps) {
   const filteredItems = category.items.filter((item) => {
     if (!item.feature) {
@@ -296,6 +320,8 @@ function NavCategory({
               translate={translate}
               selectedCountry={selectedCountry}
               reservesKeyMap={reservesKeyMap}
+              subscription={subscription}
+              onInvestmentsClick={onInvestmentsClick}
             />
           ))}
         </div>
@@ -311,6 +337,7 @@ export function Sidebar() {
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const [isInvestmentsModalOpen, setIsInvestmentsModalOpen] = useState(false);
 
   const showPremiumButton =
     !isAuthenticated || (subscription && (subscription.plan === "FREE" || !subscription.plan));
@@ -419,6 +446,8 @@ export function Sidebar() {
                     reservesKeyMap={reservesKeyMap}
                     isOpen={openCategory === item.key}
                     onToggle={() => setOpenCategory(openCategory === item.key ? null : item.key)}
+                    subscription={subscription}
+                    onInvestmentsClick={() => setIsInvestmentsModalOpen(true)}
                   />
                 );
               }
@@ -433,6 +462,8 @@ export function Sidebar() {
                     translate={translate}
                     selectedCountry={selectedCountry}
                     reservesKeyMap={reservesKeyMap}
+                    subscription={subscription}
+                    onInvestmentsClick={() => setIsInvestmentsModalOpen(true)}
                   />
                 );
               }
@@ -479,6 +510,11 @@ export function Sidebar() {
           </div>
         </div>
       </aside>
+
+      <InvestmentsPremiumModal
+        isOpen={isInvestmentsModalOpen}
+        onClose={() => setIsInvestmentsModalOpen(false)}
+      />
     </>
   );
 }
