@@ -21,7 +21,7 @@ export function UpgradeBanner() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/pricing">
+          <Link href="/planes">
             <button
               type="button"
               className="bg-white text-orange-600 px-4 py-1.5 rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors"

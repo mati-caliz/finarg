@@ -64,7 +64,7 @@ export function Navbar() {
               className="gap-2 hidden sm:flex border-yellow-200 dark:border-yellow-800 hover:bg-yellow-50 dark:hover:bg-yellow-950 hover:text-yellow-700 dark:hover:text-yellow-400"
               asChild
             >
-              <Link href="/pricing">
+              <Link href="/planes">
                 <Crown className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
                 <span>Premium</span>
               </Link>

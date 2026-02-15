@@ -59,7 +59,7 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
       {
         key: "quotes" as TranslationKey,
         href: "/cotizaciones",
-        icon: DollarSign,
+        icon: LineChart,
         feature: "quotes" as const,
       },
       {

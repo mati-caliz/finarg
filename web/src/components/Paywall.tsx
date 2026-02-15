@@ -52,7 +52,7 @@ export function Paywall({ feature, description, onClose }: PaywallProps) {
           </div>
 
           <div className="flex gap-3">
-            <Link href="/pricing" className="flex-1">
+            <Link href="/planes" className="flex-1">
               <Button className="w-full bg-yellow-500 hover:bg-yellow-600 text-white">
                 Ver Planes
               </Button>
