@@ -125,6 +125,7 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/feriados",
         icon: CalendarDays,
         feature: null,
+        isNew: true,
       },
     ],
   },
