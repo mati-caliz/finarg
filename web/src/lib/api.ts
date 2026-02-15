@@ -5,6 +5,8 @@ import type {
   CurrencyConversionRequest,
   CurrencyConversionResponse,
   ExchangeRateComparison,
+  FeedbackRequest,
+  FeedbackResponse,
   Holiday,
   IncomeTaxRequest,
   NewsArticle,
@@ -165,4 +167,10 @@ export const subscriptionsApi = {
       `/subscriptions/${subscriptionId}/checkout`,
     ),
   cancel: () => api.delete("/subscriptions"),
+};
+
+export const feedbackApi = {
+  submit: (data: FeedbackRequest) => api.post<FeedbackResponse>("/feedback", data),
+  getAll: () => api.get<FeedbackResponse[]>("/feedback"),
+  getByRating: (rating: number) => api.get<FeedbackResponse[]>(`/feedback/rating/${rating}`),
 };

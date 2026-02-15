@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { feedbackApi } from "@/lib/api";
 import { MessageSquare, Send, Star, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -19,6 +20,7 @@ export function FeedbackWidget() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const lastClosedStr = localStorage.getItem(STORAGE_KEY);
@@ -51,25 +53,28 @@ export function FeedbackWidget() {
     }
 
     setIsSubmitting(true);
+    setError("");
 
-    const feedback = {
-      rating,
-      comment,
-      email,
-      timestamp: new Date().toISOString(),
-      url: typeof window !== "undefined" ? window.location.href : "",
-    };
+    try {
+      await feedbackApi.submit({
+        rating,
+        comment: comment || undefined,
+        email: email || undefined,
+        timestamp: new Date().toISOString(),
+        url: typeof window !== "undefined" ? window.location.href : "",
+      });
 
-    console.log("Feedback submitted:", feedback);
+      setIsSubmitted(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-
-    setTimeout(() => {
-      handleClose();
-    }, 2000);
+      setTimeout(() => {
+        handleClose();
+      }, 2000);
+    } catch (err) {
+      setError("Hubo un error al enviar tu feedback. Por favor, intentá de nuevo.");
+      console.error("Error submitting feedback:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!shouldShow) {
@@ -172,6 +177,12 @@ export function FeedbackWidget() {
                   placeholder="tu@email.com"
                 />
               </div>
+
+              {error && (
+                <div className="p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-md border border-red-200 dark:border-red-800">
+                  {error}
+                </div>
+              )}
 
               <div className="flex gap-2">
                 <Button
