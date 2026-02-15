@@ -354,17 +354,11 @@ export default function QuotesPage() {
                               setPeriod(p.value);
                             }
                           }}
-                          className={`relative ${isLocked ? "pr-8" : ""}`}
+                          className="gap-1"
                         >
-                          {p.label}
-                          {p.premium && (
-                            <Crown
-                              className={`h-3 w-3 ml-1 ${
-                                isLocked
-                                  ? "text-yellow-600 dark:text-yellow-500"
-                                  : "text-muted-foreground"
-                              }`}
-                            />
+                          <span>{p.label}</span>
+                          {isLocked && (
+                            <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />
                           )}
                         </Button>
                       );
