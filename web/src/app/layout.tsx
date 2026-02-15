@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
+import { CafecitoModal } from "@/components/CafecitoModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { UpgradeBannerWrapper } from "@/components/UpgradeBannerWrapper";
@@ -116,6 +117,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="p-4 lg:p-6">{children}</main>
             </div>
           </div>
+          <CafecitoModal />
         </Providers>
         <ServiceWorkerRegistration />
         <Suspense fallback={null}>

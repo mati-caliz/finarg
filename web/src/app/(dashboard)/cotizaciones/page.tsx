@@ -55,7 +55,7 @@ export default function QuotesPage() {
   const [period, setPeriod] = useState("30");
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const isPremium = subscription?.plan !== "FREE";
+  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const periods = useMemo(
     () => [
