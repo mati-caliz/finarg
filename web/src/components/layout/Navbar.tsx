@@ -28,12 +28,15 @@ export function Navbar() {
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="flex h-full items-center justify-between gap-4 px-4 lg:px-6">
         <div className="flex-1 min-w-0 ml-12 lg:ml-0">
-          <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit"
+          >
             <Sparkles className="h-4 w-4 text-primary hidden sm:block" />
             <h1 className="text-base sm:text-lg font-semibold truncate">
               {translate("financialPanel")}
             </h1>
-          </div>
+          </Link>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
