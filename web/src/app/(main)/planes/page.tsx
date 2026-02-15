@@ -133,7 +133,7 @@ export default function PricingPage() {
             </div>
 
             {!isAuthenticated ? (
-              <Link href="/register" className="block">
+              <Link href="/login" className="block">
                 <button
                   type="button"
                   className={`w-full py-3 rounded-lg font-semibold transition-all mb-6 ${

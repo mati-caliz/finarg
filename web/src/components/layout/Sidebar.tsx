@@ -374,6 +374,18 @@ export function Sidebar() {
     };
   }, [setSidebarOpen]);
 
+  useEffect(() => {
+    if (sidebarOpen && window.innerWidth < 1024) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
   const reservesKeyMap: Record<string, TranslationKey> = {
     ar: "bcraReserves",
     co: "banrepReserves",
@@ -420,7 +432,16 @@ export function Sidebar() {
       >
         <div className="flex h-full flex-col">
           <div className="flex h-16 items-center justify-center border-b border-white/10">
-            <Link href="/" className="flex items-center gap-2.5" aria-label="Ir al inicio">
+            <Link
+              href="/"
+              className="flex items-center gap-2.5"
+              aria-label="Ir al inicio"
+              onClick={() => {
+                if (window.innerWidth < 1024) {
+                  toggleSidebar();
+                }
+              }}
+            >
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/20">
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>

@@ -96,11 +96,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly" as const,
       priority: 0.3,
     },
-    {
-      url: `${baseUrl}/register`,
-      lastModified,
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    },
   ];
 }

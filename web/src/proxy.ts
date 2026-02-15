@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const PROTECTED_ROUTES: string[] = [];
 
-const PUBLIC_ONLY_ROUTES = ["/login", "/register"];
+const PUBLIC_ONLY_ROUTES = ["/login"];
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
