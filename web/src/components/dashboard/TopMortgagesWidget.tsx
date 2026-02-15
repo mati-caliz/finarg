@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ratesApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { formatPercent } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Home, TrendingDown } from "lucide-react";
@@ -32,7 +33,7 @@ export function TopMortgagesWidget() {
       const response = await ratesApi.getUvaMortgages("ar");
       return (response.data as RateDTO[]) ?? [];
     },
-    staleTime: 300000,
+    staleTime: CACHE_TIMES.REALTIME_STALE,
   });
 
   const bestMortgages = mortgages?.sort((a, b) => a.tna - b.tna).slice(0, 2);

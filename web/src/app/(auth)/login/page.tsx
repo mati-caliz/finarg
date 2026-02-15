@@ -27,7 +27,7 @@ export default function LoginPage() {
       router.push("/");
     },
     onError: (err: Error & { response?: { data?: { message?: string } } }) => {
-      setError(err.response?.data?.message || "Error al iniciar sesión con Google.");
+      setError(err.response?.data?.message || "Error logging in with Google.");
     },
   });
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
                   <GoogleOAuthWrapper>
                     <GoogleLogin
                       onSuccess={(res) => handleGoogleSuccess(res?.credential)}
-                      onError={() => setError("Error al iniciar sesión con Google.")}
+                      onError={() => setError("Error logging in with Google.")}
                       useOneTap={false}
                       theme="filled_black"
                       size="large"

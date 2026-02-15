@@ -1,13 +1,11 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { VariationBadge } from "@/components/ui/variation-badge";
 import { useLetras } from "@/hooks/useInvestments";
 import { useTranslation } from "@/hooks/useTranslation";
-import { INVESTMENT_GRID, variationColor } from "@/lib/constants";
-import { formatNumber, formatPrice } from "@/lib/utils";
-import type { Letra } from "@/types";
+import { INVESTMENT_GRID } from "@/lib/constants";
+import { InvestmentCard } from "./InvestmentCard";
 import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
+import { letraToCardProps } from "./investmentAdapters";
 
 export function LetrasSection() {
   const { translate } = useTranslation();
@@ -22,39 +20,8 @@ export function LetrasSection() {
       skeletonCount={6}
       skeletonHeight="h-40"
     >
-      {letras?.map((letra: Letra) => (
-        <Card key={letra.ticker} className="border-t-[3px] border-t-blue-500">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center justify-between">
-              <span>{letra.ticker}</span>
-              <VariationBadge variation={letra.changePercent} />
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground truncate">{letra.name}</p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">{translate("price")}</p>
-                  <p className="text-xl font-bold">{formatPrice(letra.price, letra.currency)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-muted-foreground">{translate("volume")}</p>
-                  <p className="text-sm font-medium">{formatNumber(letra.volume, 0)}</p>
-                </div>
-              </div>
-              <div className="pt-2 border-t flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">{translate("change")}</p>
-                  <p className={`text-sm font-medium ${variationColor(letra.change >= 0)}`}>
-                    {letra.change >= 0 ? "+" : ""}
-                    {formatPrice(letra.change, letra.currency)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {letras?.map((letra) => (
+        <InvestmentCard key={letra.ticker} {...letraToCardProps(letra, translate)} />
       ))}
     </InvestmentSectionWrapper>
   );

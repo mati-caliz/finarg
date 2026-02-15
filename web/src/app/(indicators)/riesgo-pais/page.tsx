@@ -1,7 +1,10 @@
 "use client";
 
 import { Paywall } from "@/components/Paywall";
-import { Button } from "@/components/ui/button";
+import { GovernmentLegend } from "@/components/charts/GovernmentLegend";
+import { PeriodSelector } from "@/components/charts/PeriodSelector";
+import type { ChartPeriod } from "@/components/charts/PeriodSelector";
+import { CountryRiskSummaryCards } from "@/components/indicators/country-risk/CountryRiskSummaryCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCountryRisk, useCountryRiskHistory } from "@/hooks/useCountryRisk";
@@ -11,7 +14,6 @@ import { queryKeys } from "@/lib/queryKeys";
 import { formatDateShort, generateReferenceAreas } from "@/lib/utils";
 import { useAuthStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, Crown, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
@@ -37,7 +39,7 @@ export default function CountryRiskPage() {
 
   const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
-  const chartPeriods = useMemo(
+  const chartPeriods: ChartPeriod[] = useMemo(
     () => [
       { value: 365, labelKey: "year1" as const, premium: false },
       { value: 730, labelKey: "year2" as const, premium: false },
@@ -111,119 +113,24 @@ export default function CountryRiskPage() {
         <p className="text-muted-foreground text-sm mt-1">{translate("countryRiskDescription")}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="bg-card">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{translate("currentCountryRisk")}</p>
-                <div className="text-2xl font-bold text-foreground mt-1 min-h-[2rem] flex items-center">
-                  {isLoadingCurrent ? (
-                    <Skeleton className="h-8 w-24" />
-                  ) : currentRisk ? (
-                    `${Number(currentRisk.value).toFixed(0)} ${Math.abs(Number(currentRisk.value)) === 1 ? translate("basisPoint") : translate("basisPoints")}`
-                  ) : (
-                    "-"
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
-                  {currentRisk?.date
-                    ? new Date(currentRisk.date).toLocaleDateString("es-AR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : ""}
-                </p>
-              </div>
-              <div className="p-3 bg-red-500/10 rounded-lg shrink-0">
-                <AlertTriangle className="h-6 w-6 text-red-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card">
-          <CardContent className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-muted-foreground">{translate("dailyVariation")}</p>
-                <div
-                  className={`text-2xl font-bold mt-1 min-h-[2rem] flex items-center ${
-                    variation > 0
-                      ? "text-red-500"
-                      : variation < 0
-                        ? "text-green-500"
-                        : "text-foreground"
-                  }`}
-                >
-                  {isLoadingHistory ? (
-                    <Skeleton className="h-8 w-24" />
-                  ) : (
-                    <>
-                      {variation > 0 && "+"}
-                      {variation.toFixed(0)}{" "}
-                      {Math.abs(variation) === 1
-                        ? translate("basisPoint")
-                        : translate("basisPoints")}
-                    </>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1 min-h-[1.25rem]">
-                  {translate("vsYesterday")}
-                </p>
-              </div>
-              <div
-                className={`p-3 rounded-lg shrink-0 ${
-                  variation > 0
-                    ? "bg-red-500/10"
-                    : variation < 0
-                      ? "bg-green-500/10"
-                      : "bg-muted/10"
-                }`}
-              >
-                <TrendingUp
-                  className={`h-6 w-6 ${
-                    variation > 0
-                      ? "text-red-500"
-                      : variation < 0
-                        ? "text-green-500"
-                        : "text-muted-foreground"
-                  }`}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <CountryRiskSummaryCards
+        currentRisk={currentRisk}
+        variation={variation}
+        isLoadingCurrent={isLoadingCurrent}
+        isLoadingHistory={isLoadingHistory}
+      />
 
       <Card className="bg-card">
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">{translate("countryRiskHistory")}</CardTitle>
-            <div className="flex flex-wrap gap-2">
-              {chartPeriods.map((p) => {
-                const isLocked = p.premium && !isPremium;
-                return (
-                  <Button
-                    key={p.value}
-                    variant={daysLimit === p.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      if (isLocked) {
-                        setShowPaywall(true);
-                      } else {
-                        setDaysLimit(p.value);
-                      }
-                    }}
-                    className="gap-1"
-                  >
-                    <span>{translate(p.labelKey)}</span>
-                    {isLocked && <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />}
-                  </Button>
-                );
-              })}
-            </div>
+            <PeriodSelector
+              periods={chartPeriods}
+              selected={daysLimit}
+              onChange={setDaysLimit}
+              isPremium={isPremium}
+              onPremiumClick={() => setShowPaywall(true)}
+            />
           </div>
         </CardHeader>
         <CardContent>
@@ -252,19 +159,7 @@ export default function CountryRiskPage() {
                     colors={["#ef4444"]}
                     referenceAreas={referenceAreas}
                   />
-                  {visibleGovs.length > 0 && (
-                    <div className="flex flex-wrap gap-3 mt-4 justify-center">
-                      {visibleGovs.map((gov) => (
-                        <div key={gov.label} className="flex items-center gap-1.5">
-                          <div
-                            className="w-3 h-3 rounded-sm"
-                            style={{ backgroundColor: gov.color }}
-                          />
-                          <span className="text-xs text-muted-foreground">{gov.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <GovernmentLegend governments={visibleGovs} />
                 </>
               );
             })()
@@ -335,8 +230,8 @@ export default function CountryRiskPage() {
 
       {showPaywall && (
         <Paywall
-          feature="Datos históricos avanzados"
-          description="Para ver datos de más de 2 años necesitás Premium. Accedé a gráficos históricos completos de hasta 25 años."
+          feature={translate("advancedHistoricalData")}
+          description="Para ver datos de más de 2 años necesitas Premium. Accede a graficos historicos completos de hasta 25 anos."
           onClose={() => setShowPaywall(false)}
         />
       )}
