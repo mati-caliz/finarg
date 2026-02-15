@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice, formatVariation } from "@/lib/utils";
 import type { Crypto } from "@/types";
 import { Bitcoin, TrendingDown, TrendingUp } from "lucide-react";
 import { memo } from "react";
@@ -12,19 +13,6 @@ interface CryptoWidgetProps {
 
 export const CryptoWidget = memo(function CryptoWidget({ cryptoList }: CryptoWidgetProps) {
   const { translate } = useTranslation();
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(price);
-  };
-
-  const formatChange = (change: number) => {
-    return `${change > 0 ? "+" : ""}${change.toFixed(2)}%`;
-  };
 
   return (
     <Card className="shrink-0 border-t-[3px] border-t-orange-500">
@@ -52,10 +40,12 @@ export const CryptoWidget = memo(function CryptoWidget({ cryptoList }: CryptoWid
                   ) : (
                     <TrendingDown className="h-2.5 w-2.5" />
                   )}
-                  {formatChange(crypto.change24h)}
+                  {formatVariation(crypto.change24h)}
                 </div>
               </div>
-              <p className="text-lg font-bold text-foreground">{formatPrice(crypto.priceUsd)}</p>
+              <p className="text-lg font-bold text-foreground">
+                {formatPrice(crypto.priceUsd, "USD")}
+              </p>
               <p className="text-[10px] text-muted-foreground mt-0.5">USD</p>
             </div>
           ))}

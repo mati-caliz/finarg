@@ -95,6 +95,27 @@ export function formatPercent(value: number | string, decimals = 2): string {
   return `${Number(value).toFixed(decimals)}%`;
 }
 
+export function formatVariation(value: number, decimals = 2): string {
+  const sign = value > 0 ? "+" : "";
+  return `${sign}${value.toFixed(decimals)}%`;
+}
+
+export function formatCurrencyNoDecimals(value: number | null | undefined): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0,
+    }).format(0);
+  }
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
 export function formatDateShort(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString("es-AR", { month: "short", year: "2-digit" });

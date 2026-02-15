@@ -34,17 +34,12 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     this.setState({ errorInfo });
 
-    // Log error to console in development
     if (process.env.NODE_ENV === "development") {
       console.error("ErrorBoundary caught an error:", error);
       console.error("Component stack:", errorInfo.componentStack);
     }
 
-    // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
-
-    // In production, you might want to send this to an error tracking service
-    // Example: Sentry.captureException(error, { extra: errorInfo });
   }
 
   handleReset = (): void => {
@@ -60,12 +55,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   render(): ReactNode {
     if (this.state.hasError) {
-      // Custom fallback if provided
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      // Default error UI
       return (
         <div className="min-h-[400px] flex items-center justify-center p-4">
           <Card className="bg-card max-w-md w-full">

@@ -122,7 +122,6 @@ export const CurrencySelector = memo(
     const groupedOptions = useMemo(() => {
       const grouped = new Map<string, CurrencyOption[]>();
 
-      // Define priority order for common currencies
       const priorityOrder: Record<string, number> = {
         ars: 0,
         brl: 0,
@@ -145,7 +144,6 @@ export const CurrencySelector = memo(
         grouped.get(key)?.push(option);
       }
 
-      // Sort each group by priority
       for (const [, options] of grouped) {
         options.sort((a, b) => {
           const priorityA = priorityOrder[a.currencyCode] || 999;

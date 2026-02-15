@@ -1,5 +1,6 @@
 "use client";
 
+import { CHART_STYLES } from "@/lib/constants";
 import {
   Bar,
   CartesianGrid,
@@ -71,29 +72,25 @@ export function BarChart({
             strokeOpacity={0}
           />
         ))}
-        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke="#333" />}
+        {showGrid && <CartesianGrid strokeDasharray="3 3" stroke={CHART_STYLES.grid.stroke} />}
         <XAxis
           dataKey={xKey}
-          stroke="#888"
-          fontSize={12}
+          stroke={CHART_STYLES.axis.stroke}
+          fontSize={CHART_STYLES.axis.fontSize}
           tickFormatter={formatX}
-          tick={{ fill: "#888" }}
+          tick={{ fill: CHART_STYLES.axis.fill }}
         />
         <YAxis
-          stroke="#888"
-          fontSize={12}
+          stroke={CHART_STYLES.axis.stroke}
+          fontSize={CHART_STYLES.axis.fontSize}
           tickFormatter={formatY}
-          tick={{ fill: "#888" }}
+          tick={{ fill: CHART_STYLES.axis.fill }}
           width={80}
         />
         <Tooltip
-          contentStyle={{
-            backgroundColor: "#1a1a1a",
-            border: "1px solid #333",
-            borderRadius: "8px",
-          }}
-          labelStyle={{ color: "#fff" }}
-          itemStyle={{ color: "#fff" }}
+          contentStyle={CHART_STYLES.tooltip.contentStyle}
+          labelStyle={CHART_STYLES.tooltip.labelStyle}
+          itemStyle={CHART_STYLES.tooltip.itemStyle}
           formatter={(value: number) => [formatY ? formatY(value) : value.toLocaleString("es-AR")]}
         />
         {referenceLines.map((line) => (
@@ -105,7 +102,7 @@ export function BarChart({
             label={{
               value: line.label,
               position: "top",
-              fill: "#888",
+              fill: CHART_STYLES.axis.fill,
               fontSize: 10,
             }}
           />

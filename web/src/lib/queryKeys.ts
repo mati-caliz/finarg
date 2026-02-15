@@ -30,6 +30,15 @@ export const queryKeys = {
     usdAccounts: (country: CountryCode) => ["rates", "usd-accounts", country] as const,
     uvaMortgages: (country: CountryCode) => ["rates", "uva-mortgages", country] as const,
   },
+  investments: {
+    stocks: () => ["investments", "stocks"] as const,
+    cedears: () => ["investments", "cedears"] as const,
+    bonds: () => ["investments", "bonds"] as const,
+    etf: () => ["investments", "etf"] as const,
+    metals: () => ["investments", "metals"] as const,
+    letras: () => ["investments", "letras"] as const,
+    cauciones: () => ["investments", "cauciones"] as const,
+  },
   news: {
     all: ["news"] as const,
     list: (country: CountryCode, page: number, size: number) =>

@@ -2,12 +2,10 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { useCrypto } from "@/hooks/useCrypto";
-import { variationColor } from "@/lib/constants";
+import { INVESTMENT_GRID, variationColor } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
-
-const GRID_CLASS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4";
 
 export function CryptoSection() {
   const { data: cryptoList, isLoading, error } = useCrypto();
@@ -17,7 +15,7 @@ export function CryptoSection() {
       isLoading={isLoading}
       error={error}
       isEmpty={cryptoList === null || cryptoList === undefined || cryptoList.length === 0}
-      gridClassName={GRID_CLASS}
+      gridClassName={INVESTMENT_GRID.FOUR_COL}
       skeletonCount={8}
       skeletonHeight="h-32"
     >

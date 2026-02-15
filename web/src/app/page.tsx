@@ -21,7 +21,7 @@ import { useReserves } from "@/hooks/useReserves";
 import { useSocialIndicators } from "@/hooks/useSocialIndicators";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
-import { sortQuotesByVariant } from "@/lib/utils";
+import { formatCurrency, formatCurrencyNoDecimals, sortQuotesByVariant } from "@/lib/utils";
 import { useAppStore, useAuthStore } from "@/store/useStore";
 import {
   ArrowLeftRight,
@@ -318,11 +318,7 @@ export default function DashboardPage() {
                               {translate("minimumSalary")}
                             </p>
                             <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.minimumSalary)}
+                              {formatCurrencyNoDecimals(socialIndicators.minimumSalary)}
                             </p>
                           </div>
                         )}
@@ -333,11 +329,7 @@ export default function DashboardPage() {
                               {translate("minimumPension")}
                             </p>
                             <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.minimumPension)}
+                              {formatCurrencyNoDecimals(socialIndicators.minimumPension)}
                             </p>
                           </div>
                         )}
@@ -348,11 +340,7 @@ export default function DashboardPage() {
                               {translate("canastaBasicaTotal")}
                             </p>
                             <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.totalBasicBasket)}
+                              {formatCurrencyNoDecimals(socialIndicators.totalBasicBasket)}
                             </p>
                           </div>
                         )}
@@ -363,11 +351,7 @@ export default function DashboardPage() {
                               {translate("canastaBasicaAlimentaria")}
                             </p>
                             <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.foodBasicBasket)}
+                              {formatCurrencyNoDecimals(socialIndicators.foodBasicBasket)}
                             </p>
                           </div>
                         )}
@@ -378,11 +362,7 @@ export default function DashboardPage() {
                               {translate("salarioRipte")}
                             </p>
                             <p className="text-lg font-semibold text-foreground">
-                              {new Intl.NumberFormat("es-AR", {
-                                style: "currency",
-                                currency: "ARS",
-                                maximumFractionDigits: 0,
-                              }).format(socialIndicators.ripteSalary)}
+                              {formatCurrencyNoDecimals(socialIndicators.ripteSalary)}
                             </p>
                           </div>
                         )}
@@ -390,11 +370,7 @@ export default function DashboardPage() {
                         <div className="p-2 rounded-lg bg-muted/50">
                           <p className="text-xs text-muted-foreground">{translate("uva")}</p>
                           <p className="text-lg font-semibold text-foreground">
-                            {new Intl.NumberFormat("es-AR", {
-                              style: "currency",
-                              currency: "ARS",
-                              minimumFractionDigits: 2,
-                            }).format(socialIndicators.uva)}
+                            {formatCurrency(socialIndicators.uva)}
                           </p>
                         </div>
                       )}

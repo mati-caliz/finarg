@@ -58,6 +58,44 @@ export function getRiskStyles(value: number): RiskStyles {
   return RISK_EXTREME;
 }
 
+export const CACHE_TIMES = {
+  REALTIME_STALE: 5 * 60 * 1000,
+  REALTIME_GC: 60 * 60 * 1000,
+  MARKET_STALE: 30 * 60 * 1000,
+  MARKET_GC: 24 * 60 * 60 * 1000,
+  HISTORICAL_STALE: 60 * 60 * 1000,
+  HISTORICAL_GC: 7 * 24 * 60 * 60 * 1000,
+  STATIC_STALE: 24 * 60 * 60 * 1000,
+  STATIC_GC: 7 * 24 * 60 * 60 * 1000,
+  NEWS_STALE: 10 * 60 * 1000,
+  NEWS_GC: 60 * 60 * 1000,
+  QUOTES_STALE: 5 * 60 * 1000,
+  QUOTES_GC: 24 * 60 * 60 * 1000,
+} as const;
+
+export const CHART_STYLES = {
+  grid: { stroke: "hsl(var(--border))" },
+  axis: {
+    stroke: "hsl(var(--muted-foreground))",
+    fill: "hsl(var(--muted-foreground))",
+    fontSize: 12,
+  },
+  tooltip: {
+    contentStyle: {
+      backgroundColor: "hsl(var(--card))",
+      border: "1px solid hsl(var(--border))",
+      borderRadius: "8px",
+    },
+    labelStyle: { color: "hsl(var(--foreground))" },
+    itemStyle: { color: "hsl(var(--foreground))" },
+  },
+} as const;
+
+export const INVESTMENT_GRID = {
+  FOUR_COL: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4",
+  THREE_COL: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4",
+} as const;
+
 export const BANDS_COLOR_CLASSES = {
   green: {
     bg: "bg-emerald-500",

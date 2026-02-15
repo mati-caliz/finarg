@@ -2,6 +2,7 @@
 
 import type { CountryCode } from "@/config/countries";
 import { holidaysApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { queryKeys } from "@/lib/queryKeys";
 import { useAppStore } from "@/store/useStore";
 import type { Holiday } from "@/types";
@@ -17,8 +18,8 @@ export function useHolidays(country?: CountryCode, year?: number) {
       const response = await holidaysApi.getAll(countryToUse, year);
       return response.data;
     },
-    staleTime: 86400000,
-    gcTime: 172800000,
+    staleTime: CACHE_TIMES.STATIC_STALE,
+    gcTime: CACHE_TIMES.STATIC_GC,
   });
 }
 
@@ -32,7 +33,7 @@ export function useUpcomingHolidays(country?: CountryCode) {
       const response = await holidaysApi.getUpcoming(countryToUse);
       return response.data;
     },
-    staleTime: 3600000,
-    gcTime: 7200000,
+    staleTime: CACHE_TIMES.HISTORICAL_STALE,
+    gcTime: CACHE_TIMES.MARKET_GC,
   });
 }

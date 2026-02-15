@@ -160,7 +160,6 @@ const RateSection = ({
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 flex-1 gap-3">
-                      {/* Logo Section */}
                       <div className="rate-logo flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/50 bg-muted/50 p-1.5">
                         {optimizedLogoUrl ? (
                           <>
@@ -195,7 +194,6 @@ const RateSection = ({
                         )}
                       </div>
 
-                      {/* Info Section */}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-semibold text-foreground">{row.name}</span>
@@ -206,7 +204,6 @@ const RateSection = ({
                           )}
                         </div>
 
-                        {/* Product Description */}
                         {row.product && (
                           <div className="mt-1 max-h-20 overflow-y-auto overscroll-contain">
                             <p className="text-xs text-muted-foreground leading-relaxed pr-1">
@@ -215,7 +212,6 @@ const RateSection = ({
                           </div>
                         )}
 
-                        {/* Tags (Term/Limit/Type) */}
                         <div className="mt-2 flex flex-wrap gap-1">
                           {type === "bank" ? (
                             <span className="rounded border border-border px-2 py-0.5 text-xs">
@@ -239,7 +235,6 @@ const RateSection = ({
                             ))}
                         </div>
 
-                        {/* External Link (Banks only) */}
                         {type === "bank" && row.link && (
                           <a
                             href={row.link}
@@ -254,7 +249,6 @@ const RateSection = ({
                       </div>
                     </div>
 
-                    {/* Rates Section */}
                     <div className="flex shrink-0 flex-col items-end">
                       <span className="text-2xl font-bold text-primary">
                         {row.tna > 0 ? formatPercent(row.tna, 1) : "-"}

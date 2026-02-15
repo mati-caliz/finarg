@@ -2,6 +2,7 @@
 
 import type { CountryCode } from "@/config/countries";
 import { quotesApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { queryKeys } from "@/lib/queryKeys";
 import { useAppStore } from "@/store/useStore";
 import type { Gap, Quote } from "@/types";
@@ -17,8 +18,8 @@ export function useQuotes(country?: CountryCode) {
       const response = await quotesApi.getAllByCountry(countryToUse);
       return response.data;
     },
-    staleTime: 300000,
-    gcTime: 86400000,
+    staleTime: CACHE_TIMES.QUOTES_STALE,
+    gcTime: CACHE_TIMES.QUOTES_GC,
   });
 }
 
@@ -32,7 +33,7 @@ export function useGap(country?: CountryCode) {
       const response = await quotesApi.getGapByCountry(countryToUse);
       return response.data;
     },
-    staleTime: 300000,
-    gcTime: 86400000,
+    staleTime: CACHE_TIMES.QUOTES_STALE,
+    gcTime: CACHE_TIMES.QUOTES_GC,
   });
 }

@@ -14,7 +14,6 @@ export function Skeleton({ className, style, ...props }: SkeletonProps) {
   );
 }
 
-// Common skeleton patterns
 export function SkeletonText({ className, lines = 1 }: { className?: string; lines?: number }) {
   return (
     <div className={cn("space-y-2", className)}>

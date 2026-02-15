@@ -1,6 +1,7 @@
 "use client";
 
 import { inflationApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import type { Inflation, InflationAdjustment } from "@/types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -11,8 +12,8 @@ export function useCurrentInflation() {
       const response = await inflationApi.getCurrent();
       return response.data;
     },
-    staleTime: 3600000,
-    gcTime: 604800000,
+    staleTime: CACHE_TIMES.HISTORICAL_STALE,
+    gcTime: CACHE_TIMES.HISTORICAL_GC,
   });
 }
 
@@ -23,8 +24,8 @@ export function useMonthlyInflation() {
       const response = await inflationApi.getMonthly(300);
       return response.data;
     },
-    staleTime: 3600000,
-    gcTime: 604800000,
+    staleTime: CACHE_TIMES.HISTORICAL_STALE,
+    gcTime: CACHE_TIMES.HISTORICAL_GC,
   });
 }
 

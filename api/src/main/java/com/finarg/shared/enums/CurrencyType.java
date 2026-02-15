@@ -43,12 +43,10 @@ public enum CurrencyType {
     BR_PTAX("ptax", "PTAX (BCB)", Country.BRAZIL, "brl", true),
     BR_PARALLEL("paralelo", "Parallel", Country.BRAZIL, "brl", true),
 
-    // Chile
     CL_OBSERVED("observado", "Observed Dollar", Country.CHILE, "clp", true),
     CL_INFORMAL("informal", "Informal", Country.CHILE, "clp", true),
     CL_CRYPTO("cripto", "Crypto P2P", Country.CHILE, "clp", true),
 
-    // Uruguay
     UY_INTERBANK("interbancario", "Interbank", Country.URUGUAY, "uyu", true),
     UY_BILL("billete", "Bill", Country.URUGUAY, "uyu", true),
     UY_EBROU("ebrou", "eBROU", Country.URUGUAY, "uyu", true);
