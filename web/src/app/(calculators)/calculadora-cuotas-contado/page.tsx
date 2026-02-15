@@ -7,7 +7,6 @@ import SavedCalculationsCard from "@/components/calculators/installments/SavedCa
 import { formatCurrency } from "@/components/calculators/installments/formatCurrency";
 import type {
   CalculationResult,
-  ChartDataPoint,
   InflationComparison,
   SavedCalculation,
 } from "@/components/calculators/installments/types";
@@ -15,61 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentInflation } from "@/hooks/useInflation";
 import { X } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
-const DynamicLineChart = dynamic(
-  () =>
-    Promise.resolve(({ data }: { data: ChartDataPoint[] }) => (
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-          <XAxis
-            dataKey="month"
-            className="text-xs"
-            label={{ value: "Cuota N°", position: "insideBottom", offset: -5 }}
-          />
-          <YAxis
-            className="text-xs"
-            label={{ value: "Valor ($)", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "hsl(var(--card))",
-              border: "1px solid hsl(var(--border))",
-            }}
-          />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="nominalValue"
-            stroke="#94a3b8"
-            name="Valor nominal"
-            strokeWidth={2}
-          />
-          <Line
-            type="monotone"
-            dataKey="presentValue"
-            stroke="#10b981"
-            name="Valor presente"
-            strokeWidth={2}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    )),
-  { ssr: false },
+const InstallmentChart = dynamic(
+  () => import("@/components/calculators/installments/InstallmentChart"),
+  { ssr: false, loading: () => <Skeleton className="h-[300px] w-full rounded-xl" /> },
 );
 
 export default function InstallmentsVsCashCalculatorPage() {
@@ -172,7 +125,7 @@ export default function InstallmentsVsCashCalculatorPage() {
                 Este gráfico muestra cómo el valor real de cada cuota disminuye con el tiempo debido
                 a la inflación.
               </p>
-              <DynamicLineChart data={result.chartData} />
+              <InstallmentChart data={result.chartData} />
             </CardContent>
           </Card>
 
