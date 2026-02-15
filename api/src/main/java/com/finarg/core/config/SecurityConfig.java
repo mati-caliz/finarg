@@ -62,6 +62,7 @@ public class SecurityConfig {
                                 "/api/v1/currency/**",
                                 "/api/v1/investments/**",
                                 "/api/v1/news/**",
+                                "/api/v1/{country}/feriados/**",
                                 "/api/v1/countries",
                                 "/actuator/health"
                         ).permitAll()
