@@ -1,6 +1,7 @@
 "use client";
 
 import { Paywall } from "@/components/Paywall";
+import { UsageBadge } from "@/components/UsageBadge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/useStore";
@@ -110,6 +111,8 @@ export default function CompoundInterestCalculatorPage() {
             {translate("compoundInterestSubtitle")}
           </p>
         </div>
+
+        <UsageBadge />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="bg-card">

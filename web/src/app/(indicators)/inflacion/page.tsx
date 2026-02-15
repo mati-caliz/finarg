@@ -1,5 +1,6 @@
 "use client";
 
+import { Paywall } from "@/components/Paywall";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,9 +9,10 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { inflationApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatDateShort, formatPercent, generateReferenceAreas } from "@/lib/utils";
+import { useAuthStore } from "@/store/useStore";
 import type { Inflation } from "@/types";
 import { useQuery } from "@tanstack/react-query";
-import { BarChart3, Calendar, TrendingUp } from "lucide-react";
+import { BarChart3, Calendar, Crown, TrendingUp } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
@@ -28,17 +30,21 @@ const LineChart = dynamic(
 
 export default function InflationPage() {
   const { translate } = useTranslation();
+  const { subscription } = useAuthStore();
   const [chartMonthsLimit, setChartMonthsLimit] = useState(24);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  const isPremium = subscription?.plan !== "FREE";
 
   const chartPeriods = useMemo(
     () => [
-      { value: 12, labelKey: "year1" as const },
-      { value: 24, labelKey: "year2" as const },
-      { value: 60, labelKey: "year5" as const },
-      { value: 120, labelKey: "year10" as const },
-      { value: 240, labelKey: "year20" as const },
-      { value: 300, labelKey: "year25" as const },
-      { value: 600, labelKey: "max" as const },
+      { value: 12, labelKey: "year1" as const, premium: false },
+      { value: 24, labelKey: "year2" as const, premium: false },
+      { value: 60, labelKey: "year5" as const, premium: true },
+      { value: 120, labelKey: "year10" as const, premium: true },
+      { value: 240, labelKey: "year20" as const, premium: true },
+      { value: 300, labelKey: "year25" as const, premium: true },
+      { value: 600, labelKey: "max" as const, premium: true },
     ],
     [],
   );
@@ -167,16 +173,35 @@ export default function InflationPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="text-lg">{translate("monthlyEvolution")}</CardTitle>
               <div className="flex flex-wrap gap-2">
-                {chartPeriods.map((p) => (
-                  <Button
-                    key={p.value}
-                    variant={chartMonthsLimit === p.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setChartMonthsLimit(p.value)}
-                  >
-                    {translate(p.labelKey)}
-                  </Button>
-                ))}
+                {chartPeriods.map((p) => {
+                  const isLocked = p.premium && !isPremium;
+                  return (
+                    <Button
+                      key={p.value}
+                      variant={chartMonthsLimit === p.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowPaywall(true);
+                        } else {
+                          setChartMonthsLimit(p.value);
+                        }
+                      }}
+                      className={`relative ${isLocked ? "pr-8" : ""}`}
+                    >
+                      {translate(p.labelKey)}
+                      {p.premium && (
+                        <Crown
+                          className={`h-3 w-3 ml-1 ${
+                            isLocked
+                              ? "text-yellow-600 dark:text-yellow-500"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                      )}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </CardHeader>
@@ -244,16 +269,35 @@ export default function InflationPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="text-lg">{translate("yearOverYearEvolution")}</CardTitle>
               <div className="flex flex-wrap gap-2">
-                {chartPeriods.map((p) => (
-                  <Button
-                    key={p.value}
-                    variant={chartMonthsLimit === p.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setChartMonthsLimit(p.value)}
-                  >
-                    {translate(p.labelKey)}
-                  </Button>
-                ))}
+                {chartPeriods.map((p) => {
+                  const isLocked = p.premium && !isPremium;
+                  return (
+                    <Button
+                      key={p.value}
+                      variant={chartMonthsLimit === p.value ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isLocked) {
+                          setShowPaywall(true);
+                        } else {
+                          setChartMonthsLimit(p.value);
+                        }
+                      }}
+                      className={`relative ${isLocked ? "pr-8" : ""}`}
+                    >
+                      {translate(p.labelKey)}
+                      {p.premium && (
+                        <Crown
+                          className={`h-3 w-3 ml-1 ${
+                            isLocked
+                              ? "text-yellow-600 dark:text-yellow-500"
+                              : "text-muted-foreground"
+                          }`}
+                        />
+                      )}
+                    </Button>
+                  );
+                })}
               </div>
             </div>
           </CardHeader>
@@ -372,6 +416,14 @@ export default function InflationPage() {
           </CardContent>
         </Card>
       </div>
+
+      {showPaywall && (
+        <Paywall
+          feature="Datos históricos avanzados"
+          description="Para ver datos de más de 2 años necesitás Premium. Accedé a gráficos históricos completos de hasta 25 años."
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
     </div>
   );
 }
