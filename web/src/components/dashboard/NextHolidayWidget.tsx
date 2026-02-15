@@ -29,7 +29,7 @@ export function NextHolidayWidget() {
   }
 
   if (error) {
-    console.error("Error cargando feriados:", error);
+    console.error("Error loading holidays:", error);
     return (
       <Card className="border-t-[3px] border-t-red-500">
         <CardHeader className="pb-3">
@@ -39,17 +39,14 @@ export function NextHolidayWidget() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-red-500">Error al cargar feriados</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Verificá que el backend esté corriendo
-          </p>
+          <p className="text-sm text-red-500">{translate("errorLoadingHolidays")}</p>
+          <p className="text-xs text-muted-foreground mt-1">{translate("verifyBackendRunning")}</p>
         </CardContent>
       </Card>
     );
   }
 
   if (!holidays || holidays.length === 0) {
-    console.warn("No hay feriados disponibles");
     return (
       <Card className="border-t-[3px] border-t-amber-500">
         <CardHeader className="pb-3">
@@ -59,7 +56,7 @@ export function NextHolidayWidget() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No hay feriados próximos</p>
+          <p className="text-sm text-muted-foreground">{translate("noUpcomingHolidays")}</p>
         </CardContent>
       </Card>
     );

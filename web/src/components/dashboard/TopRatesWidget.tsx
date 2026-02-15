@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ratesApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { formatPercent } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Landmark, TrendingUp, Wallet } from "lucide-react";
@@ -32,7 +33,7 @@ export function TopInvestmentRatesWidget() {
       const response = await ratesApi.getWallets("ar");
       return (response.data as RateDTO[]) ?? [];
     },
-    staleTime: 300000,
+    staleTime: CACHE_TIMES.REALTIME_STALE,
   });
 
   const { data: banks, isLoading: loadingBanks } = useQuery({
@@ -41,7 +42,7 @@ export function TopInvestmentRatesWidget() {
       const response = await ratesApi.getFixedTerm("ar");
       return (response.data as RateDTO[]) ?? [];
     },
-    staleTime: 300000,
+    staleTime: CACHE_TIMES.REALTIME_STALE,
   });
 
   const topWallets = wallets?.sort((a, b) => b.tna - a.tna).slice(0, 2);
