@@ -2,8 +2,10 @@ package com.finarg.investments.etf.service;
 
 import com.finarg.investments.etf.dto.EtfDTO;
 import com.finarg.investments.stocks.client.DolaritoMervalClient;
+import com.finarg.shared.constants.FinancialConstants;
 import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.shared.util.DateTimeUtils;
+import com.finarg.shared.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,32 +40,32 @@ public class EtfService {
 
         return mervalData.getEtfs().getBody().stream()
                 .filter(Objects::nonNull)
-                .filter(etf -> POPULAR_ETFS.contains(etf.getEspecie()))
+                .filter(etf -> POPULAR_ETFS.contains(etf.getTicker()))
                 .sorted(Comparator.comparing(
-                        etf -> POPULAR_ETFS.indexOf(etf.getEspecie())
+                        etf -> POPULAR_ETFS.indexOf(etf.getTicker())
                 ))
                 .map(this::mapToEtfDTO)
                 .toList();
     }
 
     private EtfDTO mapToEtfDTO(DolaritoMervalClient.EtfItem etf) {
-        String ticker = etf.getEspecie() != null
-                ? etf.getEspecie().replace("_US", "")
+        String ticker = etf.getTicker() != null
+                ? etf.getTicker().replace("_US", "")
                 : "";
 
-        BigDecimal changePercent = BigDecimalUtils.orZero(etf.getVariacion());
-        BigDecimal change = BigDecimalUtils.percentageChange(etf.getUltimo(), changePercent);
+        BigDecimal changePercent = BigDecimalUtils.orZero(etf.getVariation());
+        BigDecimal change = BigDecimalUtils.percentageChange(etf.getLastPrice(), changePercent);
 
         return EtfDTO.builder()
                 .ticker(ticker)
-                .name(etf.getNombre() != null ? etf.getNombre() : ticker)
-                .price(BigDecimalUtils.orZero(etf.getUltimo()))
+                .name(StringUtils.firstNonBlank(etf.getName(), ticker))
+                .price(BigDecimalUtils.orZero(etf.getLastPrice()))
                 .change(change)
                 .changePercent(changePercent)
                 .volume(BigDecimal.ZERO)
                 .aum(null)
                 .expenseRatio(null)
-                .currency("USD")
+                .currency(FinancialConstants.USD_CURRENCY)
                 .lastUpdate(DateTimeUtils.fromEpochMillis(etf.getTimestamp()))
                 .build();
     }

@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.finarg.shared.util.BigDecimalUtils;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -179,12 +181,12 @@ public class ArgentinaQuoteClient implements QuoteClient {
     private QuoteDTO calculateDerivedRate(DolarApiResponse base, DolarApiResponse official,
                                           CotizacionApiResponse targetOfficial,
                                           CurrencyType type, String name) {
-        BigDecimal officialSell = safeValue(official.getVenta(), BigDecimal.ONE);
-        BigDecimal officialBuy = safeValue(official.getCompra(), BigDecimal.ONE);
-        BigDecimal targetSell = safeValue(targetOfficial.getVenta(), BigDecimal.ZERO);
-        BigDecimal targetBuy = safeValue(targetOfficial.getCompra(), BigDecimal.ZERO);
-        BigDecimal baseSell = safeValue(base.getVenta(), BigDecimal.ZERO);
-        BigDecimal baseBuy = safeValue(base.getCompra(), BigDecimal.ZERO);
+        BigDecimal officialSell = BigDecimalUtils.orDefault(official.getVenta(), BigDecimal.ONE);
+        BigDecimal officialBuy = BigDecimalUtils.orDefault(official.getCompra(), BigDecimal.ONE);
+        BigDecimal targetSell = BigDecimalUtils.orDefault(targetOfficial.getVenta(), BigDecimal.ZERO);
+        BigDecimal targetBuy = BigDecimalUtils.orDefault(targetOfficial.getCompra(), BigDecimal.ZERO);
+        BigDecimal baseSell = BigDecimalUtils.orDefault(base.getVenta(), BigDecimal.ZERO);
+        BigDecimal baseBuy = BigDecimalUtils.orDefault(base.getCompra(), BigDecimal.ZERO);
 
         if (targetSell.compareTo(BigDecimal.ZERO) == 0 || targetBuy.compareTo(BigDecimal.ZERO) == 0) {
             return null;
@@ -251,9 +253,9 @@ public class ArgentinaQuoteClient implements QuoteClient {
         }
 
         BigDecimal usdPerUnit = BigDecimal.ONE.divide(unitsPerUsd, 10, RoundingMode.HALF_UP);
-        BigDecimal sell = usdPerUnit.multiply(safeValue(dollarResponse.getVenta(), BigDecimal.ZERO))
+        BigDecimal sell = usdPerUnit.multiply(BigDecimalUtils.orDefault(dollarResponse.getVenta(), BigDecimal.ZERO))
                 .setScale(4, RoundingMode.HALF_UP);
-        BigDecimal buy = usdPerUnit.multiply(safeValue(dollarResponse.getCompra(), BigDecimal.ZERO))
+        BigDecimal buy = usdPerUnit.multiply(BigDecimalUtils.orDefault(dollarResponse.getCompra(), BigDecimal.ZERO))
                 .setScale(4, RoundingMode.HALF_UP);
 
         result.add(QuoteDTO.builder()
@@ -281,8 +283,8 @@ public class ArgentinaQuoteClient implements QuoteClient {
 
     private QuoteDTO buildBasicQuote(CurrencyType type, String name,
                                      BigDecimal buyRaw, BigDecimal sellRaw, String dateStr) {
-        BigDecimal buy = safeValue(buyRaw, BigDecimal.ZERO);
-        BigDecimal sell = safeValue(sellRaw, BigDecimal.ZERO);
+        BigDecimal buy = BigDecimalUtils.orDefault(buyRaw, BigDecimal.ZERO);
+        BigDecimal sell = BigDecimalUtils.orDefault(sellRaw, BigDecimal.ZERO);
         return QuoteDTO.builder()
                 .type(type)
                 .country(Country.ARGENTINA)
@@ -308,10 +310,6 @@ public class ArgentinaQuoteClient implements QuoteClient {
         } catch (Exception e) {
             return LocalDateTime.now();
         }
-    }
-
-    private BigDecimal safeValue(BigDecimal val, BigDecimal defaultVal) {
-        return val != null ? val : defaultVal;
     }
 
     private DolarApiResponse findDolar(List<DolarApiResponse> list, String casa) {

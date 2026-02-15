@@ -1,5 +1,6 @@
 package com.finarg.rates.client;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.finarg.shared.util.BigDecimalUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,7 +58,7 @@ public class FciClient {
             }
 
             return response.stream()
-                    .filter(fund -> fund.getVcp() != null && fund.getFecha() != null)
+                    .filter(fund -> fund.getShareValue() != null && fund.getDate() != null)
                     .toList();
         } catch (Exception e) {
             log.error("Error fetching FCI data from {}: {}", uriPath, e.getMessage());
@@ -85,22 +87,22 @@ public class FciClient {
     }
 
     public Map<String, BigDecimal> calculateAllTnas() {
-        List<FciFundData> latestData = new java.util.ArrayList<>(getLatestFciData());
+        List<FciFundData> latestData = new ArrayList<>(getLatestFciData());
         latestData.addAll(getLatestRentaFijaData());
 
-        List<FciFundData> previousData = new java.util.ArrayList<>(getPreviousFciData());
+        List<FciFundData> previousData = new ArrayList<>(getPreviousFciData());
         previousData.addAll(getPreviousRentaFijaData());
 
         Map<String, FciFundData> previousMap = previousData.stream()
-                .collect(Collectors.toMap(FciFundData::getFondo, fund -> fund, (a, b) -> a));
+                .collect(Collectors.toMap(FciFundData::getFundName, fund -> fund, (a, b) -> a));
 
         return latestData.stream()
-                .filter(latest -> previousMap.containsKey(latest.getFondo()))
+                .filter(latest -> previousMap.containsKey(latest.getFundName()))
                 .collect(Collectors.toMap(
-                        FciFundData::getFondo,
+                        FciFundData::getFundName,
                         latest -> {
-                            FciFundData previous = previousMap.get(latest.getFondo());
-                            return calculateTna(latest.getVcp(), previous.getVcp(), latest.getFecha(), previous.getFecha());
+                            FciFundData previous = previousMap.get(latest.getFundName());
+                            return calculateTna(latest.getShareValue(), previous.getShareValue(), latest.getDate(), previous.getDate());
                         },
                         (a, b) -> a
                 ))
@@ -124,11 +126,17 @@ public class FciClient {
 
     @Data
     public static class FciFundData {
-        private String fondo;
-        private String horizonte;
-        private String fecha;
-        private BigDecimal vcp;
-        private BigDecimal ccp;
-        private BigDecimal patrimonio;
+        @JsonProperty("fondo")
+        private String fundName;
+        @JsonProperty("horizonte")
+        private String horizon;
+        @JsonProperty("fecha")
+        private String date;
+        @JsonProperty("vcp")
+        private BigDecimal shareValue;
+        @JsonProperty("ccp")
+        private BigDecimal sharePrice;
+        @JsonProperty("patrimonio")
+        private BigDecimal equity;
     }
 }

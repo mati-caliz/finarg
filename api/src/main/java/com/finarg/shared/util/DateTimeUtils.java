@@ -8,6 +8,10 @@ public final class DateTimeUtils {
 
     private DateTimeUtils() { }
 
+    public static LocalDateTime now() {
+        return LocalDateTime.now();
+    }
+
     public static LocalDateTime fromEpochMillis(Long epochMillis) {
         if (epochMillis == null) {
             return LocalDateTime.now();

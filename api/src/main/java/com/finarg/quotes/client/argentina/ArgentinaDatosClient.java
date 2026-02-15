@@ -13,8 +13,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -47,11 +48,11 @@ public class ArgentinaDatosClient {
             log.debug("Received {} inflation records from API", responses.size());
 
             int fromIndex = Math.max(0, responses.size() - limit);
-            List<InflationDTO> result = responses.subList(fromIndex, responses.size()).stream()
+            List<InflationDTO> result = new java.util.ArrayList<>(responses.subList(fromIndex, responses.size()).stream()
                     .map(this::mapToInflationDTO)
-                    .collect(Collectors.toList());
-            
-            java.util.Collections.reverse(result);
+                    .toList());
+
+            Collections.reverse(result);
             
             if (!result.isEmpty()) {
                 InflationDTO latest = result.get(0);
@@ -83,7 +84,7 @@ public class ArgentinaDatosClient {
                             .date(LocalDate.parse(r.getDate()))
                             .yearOverYear(r.getValue())
                             .build())
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (Exception e) {
             log.error("Error fetching year over year inflation: {}", e.getMessage());
             return List.of();
@@ -263,7 +264,7 @@ public class ArgentinaDatosClient {
                         LocalDate d = LocalDate.parse(r.getFecha());
                         return !d.isBefore(from) && !d.isAfter(to);
                     })
-                    .sorted(java.util.Comparator.comparing(CotizacionHistoryResponse::getFecha))
+                    .sorted(Comparator.comparing(CotizacionHistoryResponse::getFecha))
                     .map(r -> QuoteHistory.builder()
                             .type(type)
                             .country(Country.ARGENTINA)
@@ -310,7 +311,7 @@ public class ArgentinaDatosClient {
                         LocalDate d = LocalDate.parse(r.getDate());
                         return !d.isBefore(from) && !d.isAfter(to);
                     })
-                    .sorted(java.util.Comparator.comparing(r -> LocalDate.parse(r.getDate())))
+                    .sorted(Comparator.comparing(r -> LocalDate.parse(r.getDate())))
                     .map(r -> QuoteHistory.builder()
                             .type(type)
                             .country(Country.ARGENTINA)
