@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { UpgradeBannerWrapper } from "@/components/UpgradeBannerWrapper";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { EarlyHints } from "./early-hints";
@@ -102,6 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Sidebar />
             <div className="lg:pl-64">
               <Navbar />
+              <UpgradeBannerWrapper />
               <main className="p-4 lg:p-6">{children}</main>
             </div>
           </div>

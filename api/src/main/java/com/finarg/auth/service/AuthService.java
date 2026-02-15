@@ -5,6 +5,7 @@ import com.finarg.core.exception.InvalidTokenException;
 import com.finarg.core.exception.UserNotFoundException;
 import com.finarg.auth.dto.AuthRequestDTO;
 import com.finarg.auth.dto.AuthResponseDTO;
+import com.finarg.subscription.service.SubscriptionService;
 import com.finarg.user.dto.UserDTO;
 import com.finarg.user.entity.User;
 import com.finarg.user.repository.UserRepository;
@@ -28,16 +29,19 @@ public class AuthService implements UserDetailsService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final GoogleIdTokenVerifierService googleIdTokenVerifier;
+    private final SubscriptionService subscriptionService;
 
     public AuthService(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             @Lazy AuthenticationManager authenticationManager,
-            GoogleIdTokenVerifierService googleIdTokenVerifier
+            GoogleIdTokenVerifierService googleIdTokenVerifier,
+            SubscriptionService subscriptionService
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.subscriptionService = subscriptionService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
@@ -145,6 +149,7 @@ public class AuthService implements UserDetailsService {
                         .email(user.getEmail())
                         .emailVerified(user.isEmailVerified())
                         .build())
+                .subscription(subscriptionService.getSubscriptionResponse(user))
                 .build();
     }
 }
