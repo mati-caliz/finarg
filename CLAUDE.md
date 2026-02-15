@@ -1089,7 +1089,7 @@ export default function NewFeaturePage() {
   }
 
   return (
-    <div className="container py-8">
+    <div className="py-8">
       <h1 className="text-3xl font-bold mb-6">
         {translate('newFeature.title')}
       </h1>
