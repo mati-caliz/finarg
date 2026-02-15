@@ -19,6 +19,7 @@ const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
   { pattern: /investments\/metals/, revalidate: 300 },
   { pattern: /rates/, revalidate: 1800 },
   { pattern: /news/, revalidate: 300 },
+  { pattern: /feriados/, revalidate: 86400 },
 ];
 
 function getBackendUrl(): string {

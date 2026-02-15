@@ -38,4 +38,8 @@ export const queryKeys = {
       ["news", "category", category, country, page, size] as const,
     detail: (id: number) => ["news", "detail", id] as const,
   },
+  holidays: {
+    all: (country: CountryCode, year?: number) => ["holidays", country, year] as const,
+    upcoming: (country: CountryCode) => ["holidays", "upcoming", country] as const,
+  },
 };

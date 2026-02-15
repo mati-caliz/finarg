@@ -4,6 +4,7 @@ import type {
   CurrencyConversionRequest,
   CurrencyConversionResponse,
   ExchangeRateComparison,
+  Holiday,
   IncomeTaxRequest,
   NewsArticle,
   NewsListResponse,
@@ -142,4 +143,11 @@ export const newsApi = {
     cachedApi.get<NewsListResponse>("/news/official", { params: { country, page, size } }),
 
   getById: (id: number) => cachedApi.get<NewsArticle>(`/news/${id}`),
+};
+
+export const holidaysApi = {
+  getAll: (country: CountryCode = "ar", year?: number) =>
+    cachedApi.get<Holiday[]>(`/${country}/feriados`, { params: { year } }),
+  getUpcoming: (country: CountryCode = "ar") =>
+    cachedApi.get<Holiday[]>(`/${country}/feriados/upcoming`),
 };

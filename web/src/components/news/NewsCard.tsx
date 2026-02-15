@@ -47,14 +47,6 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
     locale: es,
   });
 
-  console.log("🔍 DEBUG - News Article:", {
-    id: article.id,
-    title: article.title.substring(0, 50),
-    hasKeyPoints: !!article.keyPoints,
-    keyPointsLength: article.keyPoints?.length,
-    keyPoints: article.keyPoints,
-  });
-
   return (
     <Card className={`border-t-[3px] ${categoryColors[article.category]} overflow-hidden`}>
       <CardHeader className="pb-3">

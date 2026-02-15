@@ -121,6 +121,9 @@ external:
     ollama:
       base-url: http://ollama:11434
       timeout: 30000
+    argentina-holidays:
+      base-url: https://nolaborables.com.ar/api/v2/feriados
+      timeout: 10000
 
 scheduler:
   enabled: true
