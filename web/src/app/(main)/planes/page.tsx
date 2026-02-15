@@ -1,13 +1,16 @@
 "use client";
 
 import { subscriptionsApi } from "@/lib/api";
+import { useAuthStore } from "@/store/useStore";
 import type { PlanPricing } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Crown, Sparkles, Zap } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function PricingPage() {
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly");
+  const { isAuthenticated, subscription } = useAuthStore();
 
   const { data: pricing, isLoading } = useQuery({
     queryKey: ["pricing"],
@@ -129,18 +132,36 @@ export default function PricingPage() {
               )}
             </div>
 
-            <button
-              type="button"
-              className={`w-full py-3 rounded-lg font-semibold transition-all mb-6 ${
-                plan.recommended
-                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                  : plan.plan === "FREE"
-                    ? "bg-muted hover:bg-muted/80 text-foreground"
-                    : "bg-primary hover:bg-primary/90 text-primary-foreground"
-              }`}
-            >
-              {plan.plan === "FREE" ? "Plan Actual" : "Actualizar"}
-            </button>
+            {!isAuthenticated ? (
+              <Link href="/register" className="block">
+                <button
+                  type="button"
+                  className={`w-full py-3 rounded-lg font-semibold transition-all mb-6 ${
+                    plan.recommended
+                      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                      : plan.plan === "FREE"
+                        ? "bg-green-500 hover:bg-green-600 text-white"
+                        : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                  }`}
+                >
+                  {plan.plan === "FREE" ? "Comenzar Gratis" : "Comenzar Ahora"}
+                </button>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                className={`w-full py-3 rounded-lg font-semibold transition-all mb-6 ${
+                  plan.recommended
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : plan.plan === "FREE"
+                      ? "bg-muted hover:bg-muted/80 text-foreground"
+                      : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                }`}
+                disabled={subscription?.plan === plan.plan}
+              >
+                {subscription?.plan === plan.plan ? "Plan Actual" : "Actualizar"}
+              </button>
+            )}
 
             <div className="space-y-3">
               {plan.highlights.map((highlight) => (
@@ -158,7 +179,7 @@ export default function PricingPage() {
       <div className="mt-16 text-center">
         <p className="text-muted-foreground">
           ¿Tenés dudas?{" "}
-          <a href="/contacto" className="text-primary hover:underline">
+          <a href="mailto:matiascaliz@hotmail.com" className="text-primary hover:underline">
             Contactanos
           </a>
         </p>
