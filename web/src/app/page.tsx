@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleAd } from "@/components/GoogleAd";
 import { QuoteCard } from "@/components/dashboard/QuoteCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -568,6 +569,13 @@ export default function DashboardPage() {
             </Link>
           )}
         </div>
+
+        <GoogleAd
+          adSlot="1234567890"
+          adFormat="auto"
+          className="mt-8"
+          style={{ minHeight: "100px" }}
+        />
       </div>
     </div>
   );
