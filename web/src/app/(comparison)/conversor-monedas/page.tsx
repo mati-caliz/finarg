@@ -12,6 +12,7 @@ import type { CountryCode } from "@/config/countries";
 import { useCurrencyConversion } from "@/hooks/useCurrencyConversion";
 import { useQuotes } from "@/hooks/useQuotes";
 import { useTranslation } from "@/hooks/useTranslation";
+import { logger } from "@/lib/logger";
 import type {
   ConversionHistory,
   CurrencyConversionRequest,
@@ -40,7 +41,7 @@ function saveHistory(history: ConversionHistory[]) {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   } catch (error) {
-    console.error("Failed to save history:", error);
+    logger.error("Failed to save history:", error);
   }
 }
 
@@ -151,7 +152,7 @@ export default function UniversalConverterPage() {
         saveHistory(updatedHistory);
       },
       onError: (error) => {
-        console.error("Conversion error:", error);
+        logger.error("Conversion error:", error);
       },
     });
   };

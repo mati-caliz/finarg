@@ -8,6 +8,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -84,7 +85,7 @@ public class DatosGobArClient {
             }
 
             return parseRipteFromHtml(html);
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error scraping RIPTE value: {}", e.getMessage());
             return null;
         }
@@ -187,7 +188,7 @@ public class DatosGobArClient {
                     .retrieve()
                     .bodyToMono(SeriesApiResponse.class)
                     .block();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching series data for IDs {}: {}", ids, e.getMessage());
             return null;
         }
@@ -227,7 +228,7 @@ public class DatosGobArClient {
 
             String value = values[columnIndex].trim();
             return value.isEmpty() ? null : new BigDecimal(value);
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching CSV value for column {}: {}", columnName, e.getMessage());
             return null;
         }

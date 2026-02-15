@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class ExchangerateApiClient {
             }
 
             return Optional.empty();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching rates from Exchangerate API: {}", e.getMessage());
             return Optional.empty();
         }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,7 +61,7 @@ public class ArgentinaDatosClient {
             }
             
             return result;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching inflation from ArgentinaDatos: {}", e.getMessage(), e);
             return List.of();
         }
@@ -85,7 +86,7 @@ public class ArgentinaDatosClient {
                             .yearOverYear(r.getValue())
                             .build())
                     .toList();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching year over year inflation: {}", e.getMessage());
             return List.of();
         }
@@ -101,7 +102,7 @@ public class ArgentinaDatosClient {
                     .block();
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching fixed term rates: {}", e.getMessage());
             return List.of();
         }
@@ -117,7 +118,7 @@ public class ArgentinaDatosClient {
                     .block();
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching wallet FCI rates: {}", e.getMessage());
             return List.of();
         }
@@ -133,7 +134,7 @@ public class ArgentinaDatosClient {
                     .block();
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching USD accounts: {}", e.getMessage());
             return List.of();
         }
@@ -149,7 +150,7 @@ public class ArgentinaDatosClient {
                     .block();
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching yields: {}", e.getMessage());
             return List.of();
         }
@@ -165,7 +166,7 @@ public class ArgentinaDatosClient {
                     .block();
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching UVA mortgages: {}", e.getMessage());
             return List.of();
         }
@@ -186,7 +187,7 @@ public class ArgentinaDatosClient {
             }
 
             return response;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching country risk from ArgentinaDatos: {}", e.getMessage());
             return null;
         }
@@ -208,7 +209,7 @@ public class ArgentinaDatosClient {
             }
 
             return responses != null ? responses : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching country risk history from ArgentinaDatos: {}", e.getMessage());
             return List.of();
         }
@@ -273,7 +274,7 @@ public class ArgentinaDatosClient {
                             .sell(r.getVenta() != null ? r.getVenta() : BigDecimal.ZERO)
                             .build())
                     .toList();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching {} history from ArgentinaDatos: {}", moneda, e.getMessage());
             return List.of();
         }
@@ -320,7 +321,7 @@ public class ArgentinaDatosClient {
                             .sell(r.getSell() != null ? r.getSell() : BigDecimal.ZERO)
                             .build())
                     .toList();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching dollar history from ArgentinaDatos: {}", e.getMessage());
             return List.of();
         }

@@ -9,6 +9,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ public class ElEconomistaRssClient implements NewsScraperClient {
         } catch (WebClientResponseException e) {
             log.error("Error fetching RSS from El Economista (HTTP {}): {}", e.getStatusCode(), e.getMessage());
             return List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching RSS from El Economista: {}", e.getMessage());
             return List.of();
         }

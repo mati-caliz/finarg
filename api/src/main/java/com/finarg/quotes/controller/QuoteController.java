@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Quotes", description = "Real-time currency quotes")

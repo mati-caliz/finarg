@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1/{country}/feriados")
 @RequiredArgsConstructor
 @Tag(name = "Holidays", description = "Public holidays information")

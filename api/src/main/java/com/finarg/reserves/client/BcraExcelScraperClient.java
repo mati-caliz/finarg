@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 @Slf4j
 @Component
@@ -44,7 +45,7 @@ public class BcraExcelScraperClient {
             }
 
             return parseExcel(excelBytes);
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching BCRA liabilities from Excel: {}", e.getMessage(), e);
             return null;
         }

@@ -5,22 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatDateSlash, formatLimit, formatPercent } from "@/lib/utils";
+import type { RateDTO } from "@/types";
 import { ExternalLink, Landmark, Wallet } from "lucide-react";
 import type { ElementType } from "react";
-
-export interface RateDTO {
-  id: string;
-  name: string;
-  tna: number;
-  tea?: number;
-  product?: string;
-  term?: string;
-  date?: string;
-  limit?: number;
-  logo?: string;
-  link?: string;
-  isBestRate?: boolean;
-}
 
 function extractDomainFromFaviconUrl(url: string): string | null {
   const domainMatch = url.match(/[?&]domain=([^&]+)/);

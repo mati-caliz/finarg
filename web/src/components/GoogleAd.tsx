@@ -1,5 +1,6 @@
 "use client";
 
+import { logger } from "@/lib/logger";
 import { useAuthStore } from "@/store/useStore";
 import { useEffect } from "react";
 
@@ -22,7 +23,7 @@ export function GoogleAd({ adSlot, adFormat = "auto", className = "", style }: G
         }
         w.adsbygoogle.push({});
       } catch (err) {
-        console.error("AdSense error:", err);
+        logger.error("AdSense error:", err);
       }
     }
   }, [subscription?.plan]);

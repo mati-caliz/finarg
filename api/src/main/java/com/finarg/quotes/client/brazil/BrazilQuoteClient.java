@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class BrazilQuoteClient implements QuoteClient {
                         .lastUpdate(LocalDateTime.now())
                         .build());
             }
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching PTAX from BCB API: {}", e.getMessage());
         }
 

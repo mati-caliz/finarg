@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,7 +42,7 @@ public class DolaritoMervalClient {
                     response.getLeadEquity() != null ? response.getLeadEquity().size() : 0);
 
             return response;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching merval data from dolarito.ar: {}", e.getMessage(), e);
             return new DolaritoMervalResponse();
         }

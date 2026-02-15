@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useUpcomingHolidays } from "@/hooks/useHolidays";
 import { useTranslation } from "@/hooks/useTranslation";
+import { logger } from "@/lib/logger";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarDays } from "lucide-react";
@@ -29,7 +30,7 @@ export function NextHolidayWidget() {
   }
 
   if (error) {
-    console.error("Error loading holidays:", error);
+    logger.error("Error loading holidays:", error);
     return (
       <Card className="border-t-[3px] border-t-red-500">
         <CardHeader className="pb-3">

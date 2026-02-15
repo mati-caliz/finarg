@@ -1,12 +1,13 @@
 package com.finarg.news.enums;
 
+import com.finarg.shared.constants.UiColors;
 import lombok.Getter;
 
 @Getter
 public enum AiSentiment {
-    POSITIVE("Positivo", "#22c55e"),
+    POSITIVE("Positivo", UiColors.GREEN),
     NEUTRAL("Neutral", "#64748b"),
-    NEGATIVE("Negativo", "#ef4444"),
+    NEGATIVE("Negativo", UiColors.RED),
     MIXED("Mixto", "#f59e0b");
 
     private final String displayName;

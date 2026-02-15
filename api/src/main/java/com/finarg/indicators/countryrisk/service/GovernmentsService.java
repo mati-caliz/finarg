@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class GovernmentsService {
 
             List<GovernmentDTO> parsed = parseSparqlResponse(responseBody);
             return parsed.isEmpty() ? getFallbackGovernments(country) : parsed;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching governments from Wikidata for {}: {}", country, e.getMessage());
             return getFallbackGovernments(country);
         }

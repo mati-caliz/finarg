@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuotes } from "@/hooks/useQuotes";
 import { useTranslation } from "@/hooks/useTranslation";
 import { exchangeBandsApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import type { ExchangeBands, Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Loader2, Minus, TrendingDown, TrendingUp } from "lucide-react";
@@ -205,8 +206,8 @@ export default function BandsPage() {
       const response = await exchangeBandsApi.getCurrent();
       return response.data as ExchangeBands;
     },
-    staleTime: 86400000,
-    gcTime: 86400000,
+    staleTime: CACHE_TIMES.STATIC_STALE,
+    gcTime: CACHE_TIMES.STATIC_GC,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
