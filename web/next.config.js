@@ -35,7 +35,7 @@ const securityHeaders = [
       isProd
         ? "script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.googletagmanager.com"
         : "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://www.googletagmanager.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://www.bcra.gob.ar https://icon.horse https://icons.com.ar https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com https://www.google-analytics.com",
       [
