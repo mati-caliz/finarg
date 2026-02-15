@@ -6,10 +6,18 @@ on:
   workflow_dispatch:
   workflow_call:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   changes:
     name: Detect Changes
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
@@ -32,6 +40,7 @@ jobs:
   frontend-lint:
     name: Frontend Linting
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: changes
     if: needs.changes.outputs.frontend == 'true'
     defaults:
@@ -72,6 +81,7 @@ jobs:
   backend-build:
     name: Backend Build & Test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: changes
     if: needs.changes.outputs.backend == 'true'
     defaults:
@@ -98,6 +108,7 @@ jobs:
   summary:
     name: CI Summary
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [changes, frontend-lint, backend-build]
     if: always()
 
