@@ -3,12 +3,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBonds } from "@/hooks/useInvestments";
 import { useTranslation } from "@/hooks/useTranslation";
+import { INVESTMENT_GRID } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
-
-const GRID_CLASS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
 
 export function BondsSection() {
   const { translate } = useTranslation();
@@ -19,7 +18,7 @@ export function BondsSection() {
       isLoading={isLoading}
       error={error}
       isEmpty={bonds === null || bonds === undefined || bonds.length === 0}
-      gridClassName={GRID_CLASS}
+      gridClassName={INVESTMENT_GRID.THREE_COL}
       skeletonCount={6}
       skeletonHeight="h-40"
     >

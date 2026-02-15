@@ -2,12 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCedears } from "@/hooks/useInvestments";
-import { variationColor } from "@/lib/constants";
+import { INVESTMENT_GRID, variationColor } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
-
-const GRID_CLASS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4";
 
 export function CedearsSection() {
   const { data: cedears, isLoading, error } = useCedears();
@@ -17,7 +15,7 @@ export function CedearsSection() {
       isLoading={isLoading}
       error={error}
       isEmpty={cedears === null || cedears === undefined || cedears.length === 0}
-      gridClassName={GRID_CLASS}
+      gridClassName={INVESTMENT_GRID.FOUR_COL}
       skeletonCount={8}
       skeletonHeight="h-32"
     >

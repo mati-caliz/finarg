@@ -231,7 +231,6 @@ export const translations = {
     year: "año",
     years: "años",
 
-    // Dashboard
     marketSummary: "Resumen del mercado financiero",
     socialIndicators: "Indicadores sociales",
     minimumSalary: "Salario mínimo",
@@ -252,7 +251,6 @@ export const translations = {
     noDataAvailable: "No hay datos disponibles",
     crypto: "Criptomonedas",
 
-    // Investments
     investmentsTitle: "Inversiones",
     investmentsDesc: "Precios en tiempo real de acciones, bonos, criptomonedas y más",
     stocks: "Acciones",
@@ -305,7 +303,6 @@ export const translations = {
     wholesaleDollar: "Dólar Mayorista",
     importantInfo: "Información importante",
 
-    // Quotes Page
     allQuotesRealTime: "Cotizaciones en tiempo real",
     selectQuote: "Seleccionar cotización",
     currencyDollar: "Dólar",
@@ -350,7 +347,6 @@ export const translations = {
     years15: "15Y",
     max: "Máx",
 
-    // Currency Types
     oficial: "Dólar Oficial",
     blue: "Dólar Blue",
     bolsa: "Dólar MEP/Bolsa",
@@ -416,7 +412,6 @@ export const translations = {
     billete: "Billete",
     ebrou: "eBROU",
 
-    // Income Tax Page
     incomeTaxTitle: "Calculadora de Sueldo Neto",
     incomeTaxSubtitle: "Para empleados en relación de dependencia.",
     employeeData: "Datos del Empleado",
@@ -487,14 +482,12 @@ export const translations = {
     faqValuesDisclaimerAnswer:
       "Es una estimación según normativa vigente. Para tu caso particular conviene consultar con un contador.",
 
-    // Reserves Labels
     bcraReserves: "Reservas BCRA",
     banrepReserves: "Reservas BanRep",
     bcbReserves: "Reservas BCB",
     bcchReserves: "Reservas BCCh",
     bcuReserves: "Reservas BCU",
 
-    // Exchange Bands
     exchangeBands: "Bandas Cambiarias",
     bandsPositionText: "Posición en las bandas: {percent}%",
     bandsCalculator: "Calculadora de Bandas",
@@ -527,7 +520,6 @@ export const translations = {
       "El sistema de bandas define los límites de intervención del Banco Central. Cuando el dólar toca el piso, el BCRA compra para sostener el precio. Cuando toca el techo, vende para frenar la suba. En la zona media, el mercado opera libremente.",
     bandsDataUnavailable: "No se pudieron cargar los datos de las bandas cambiarias",
 
-    // Gap Indicator
     gapIndicator: "Indicador de Brecha",
     lowGap: "Brecha Baja",
     mediumGap: "Brecha Media",
@@ -538,13 +530,11 @@ export const translations = {
     official: "Oficial",
     parallel: "Paralelo",
 
-    // Dashboard Widget Labels
     grossMillionsUsd: "Brutas (millones USD)",
     netBcra: "Netas (BCRA)",
     netFmi: "Netas (FMI)",
     netEstimated: "Netas (estimadas)",
 
-    // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Otros países próximamente",
     comingSoon: "Próximamente",
@@ -561,7 +551,6 @@ export const translations = {
     retry: "Reintentar",
   },
   pt: {
-    // Navigation
     dashboard: "Dashboard",
     quotes: "Cotações",
     exchangeRatesComparator: "Comparador de Taxas de Câmbio",
@@ -572,14 +561,12 @@ export const translations = {
     reserves: "Reservas",
     tools: "Ferramentas",
 
-    // Countries
     ar: "Argentina",
     co: "Colômbia",
     br: "Brasil",
     cl: "Chile",
     uy: "Uruguai",
 
-    // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparação de todas as taxas de câmbio disponíveis",
     exchangeRateComparator: "Comparador de Taxas de Câmbio",
     exchangeRateComparatorSubtitle: "Compare preços de compra e venda",
@@ -624,7 +611,6 @@ export const translations = {
     noBankRates: "Não há dados de prazos fixos disponíveis.",
     ratesUpdateNote: "As taxas são atualizadas conforme a fonte (BCRA e APIs de carteiras).",
 
-    // Calculadora de Juros Compostos
     compoundInterestTitle: "Calculadora de Juros Compostos",
     compoundInterestSubtitle:
       "Calcule quanto você pode ganhar investindo com juros compostos ao longo do tempo.",
@@ -661,7 +647,6 @@ export const translations = {
     faqCompoundVsSimpleAnswer:
       "Nos juros simples, os juros são calculados apenas sobre o capital inicial. Nos juros compostos, os juros são calculados sobre o capital inicial mais os juros acumulados, gerando um rendimento muito maior a longo prazo.",
 
-    // Reservas
     bcraReservesTitle: "Reservas BCRA",
     bcraReservesDesc: "Reservas internacionais do Banco Central da Argentina",
     grossReserves: "Reservas Brutas",
@@ -691,7 +676,6 @@ export const translations = {
     publicUsdDeposits: "Depósitos públicos em USD",
     reservesUpdateNote: "Os dados são atualizados aproximadamente a cada 5 minutos.",
 
-    // Inflacion
     inflationTitle: "Inflação",
     inflationDesc: "Dados do IPC e calculadora de ajuste de inflação",
     monthlyInflation: "Inflação Mensal",
@@ -733,7 +717,6 @@ export const translations = {
     year: "ano",
     years: "anos",
 
-    // Dashboard
     marketSummary: "Resumo do mercado financeiro",
     socialIndicators: "Indicadores sociais",
     minimumSalary: "Salário mínimo",
@@ -764,7 +747,6 @@ export const translations = {
     wholesaleDollar: "Dólar Comercial",
     importantInfo: "Informação importante",
 
-    // Income Tax Page (Basic translation, though logic might differ)
     incomeTaxTitle: "Calculadora de Salário Líquido",
     incomeTaxSubtitle: "Para funcionários com vínculo empregatício. Tabelas atualizadas 2025.",
     employeeData: "Dados do Funcionário",
@@ -835,14 +817,12 @@ export const translations = {
     faqValuesDisclaimerAnswer:
       "É uma estimativa conforme a normativa vigente. Para o seu caso, consulte um contador.",
 
-    // Reserves Labels
     bcraReserves: "Reservas BCRA",
     banrepReserves: "Reservas BanRep",
     bcbReserves: "Reservas BCB",
     bcchReserves: "Reservas BCCh",
     bcuReserves: "Reservas BCU",
 
-    // Exchange Bands
     exchangeBands: "Bandas Cambiais",
     bandsPositionText: "Posição nas bandas: {percent}%",
     bandsCalculator: "Calculadora de Bandas",
@@ -875,7 +855,6 @@ export const translations = {
       "O sistema de bandas define os limites de intervenção do Banco Central. Quando o dólar toca o piso, o BCRA compra para sustentar o preço. Quando toca o teto, vende para conter a alta. Na zona média, o mercado opera livremente.",
     bandsDataUnavailable: "Não foi possível carregar os dados das bandas cambiais",
 
-    // Gap Indicator
     gapIndicator: "Indicador de Brecha",
     lowGap: "Brecha Baixa",
     mediumGap: "Brecha Média",
@@ -886,13 +865,11 @@ export const translations = {
     official: "Oficial",
     parallel: "Paralelo",
 
-    // Dashboard Widget Labels
     grossMillionsUsd: "Brutas (milhões USD)",
     netBcra: "Líquidas (BCRA)",
     netFmi: "Líquidas (FMI)",
     netEstimated: "Líquidas (estimadas)",
 
-    // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Outros países em breve",
     comingSoon: "Em breve",
@@ -927,7 +904,6 @@ export const translations = {
     retry: "Tentar novamente",
   },
   en: {
-    // Navigation
     dashboard: "Dashboard",
     quotes: "Quotes",
     exchangeRatesComparator: "Exchange Rates Comparator",
@@ -938,14 +914,12 @@ export const translations = {
     reserves: "Reserves",
     tools: "Tools",
 
-    // Countries
     ar: "Argentina",
     co: "Colombia",
     br: "Brazil",
     cl: "Chile",
     uy: "Uruguay",
 
-    // Exchange Rate Comparator
     exchangeRatesComparatorDesc: "Comparison of all available exchange rates",
     exchangeRateComparator: "Exchange Rates Comparator",
     exchangeRateComparatorSubtitle: "Compare buy and sell prices",
@@ -988,7 +962,6 @@ export const translations = {
     noBankRates: "No fixed-term rate data available.",
     ratesUpdateNote: "Rates are updated according to the source (BCRA and wallet APIs).",
 
-    // Compound Interest Calculator
     compoundInterestTitle: "Compound Interest Calculator",
     compoundInterestSubtitle:
       "Calculate how much you can earn by investing with compound interest over time.",
@@ -1025,7 +998,6 @@ export const translations = {
     faqCompoundVsSimpleAnswer:
       "With simple interest, interest is calculated only on the initial principal. With compound interest, interest is calculated on the initial principal plus accumulated interest, generating much higher returns in the long term.",
 
-    // Reserves
     bcraReservesTitle: "BCRA Reserves",
     bcraReservesDesc: "International reserves of the Central Bank of Argentina",
     grossReserves: "Gross Reserves",
@@ -1055,7 +1027,6 @@ export const translations = {
     publicUsdDeposits: "Public USD deposits",
     reservesUpdateNote: "Data is updated approximately every 5 minutes.",
 
-    // Inflacion
     inflationTitle: "Argentina",
     inflationDesc: "CPI data and inflation adjustment calculator",
     monthlyInflation: "Monthly Inflation",
@@ -1097,7 +1068,6 @@ export const translations = {
     year: "year",
     years: "years",
 
-    // Arbitraje
     arbitrageDetector: "Arbitrage Detector",
     arbitrageDesc: "Profit opportunities between different dollar quotes",
     totalOpportunities: "Total Opportunities",
@@ -1114,7 +1084,6 @@ export const translations = {
     stepsToExecute: "Steps to execute:",
     arbitrageUpdateNote: "Data is updated automatically every 30 seconds.",
 
-    // Dashboard
     marketSummary: "Financial market summary",
     wholesaleDollar: "Wholesale Dollar",
     importantInfo: "Important information",
@@ -1138,7 +1107,6 @@ export const translations = {
     compareReturns: "Compare returns",
     updateValues: "Update historical values",
 
-    // Quotes Page
     allQuotesRealTime: "All quotes in real-time",
     selectQuote: "Select quote",
     currencyDollar: "Dollar",
@@ -1182,7 +1150,6 @@ export const translations = {
     years15: "15Y",
     max: "Max",
 
-    // Currency Types
     oficial: "Dollar Official",
     blue: "Dollar Blue",
     bolsa: "MEP/Stock",
@@ -1248,7 +1215,6 @@ export const translations = {
     billete: "Bill",
     ebrou: "eBROU",
 
-    // Income Tax Page
     incomeTaxTitle: "Net Salary Calculator",
     incomeTaxSubtitle: "For salaried employees.",
     employeeData: "Employee Data",
@@ -1319,14 +1285,12 @@ export const translations = {
     faqValuesDisclaimerAnswer:
       "It is an estimate under current regulations. For your specific case, consult an accountant.",
 
-    // Reserves Labels
     bcraReserves: "BCRA Reserves",
     banrepReserves: "BanRep Reserves",
     bcbReserves: "BCB Reserves",
     bcchReserves: "BCCh Reserves",
     bcuReserves: "BCU Reserves",
 
-    // Exchange Bands
     exchangeBands: "Exchange Bands",
     bandsPositionText: "Position in bands: {percent}%",
     bandsCalculator: "Bands Calculator",
@@ -1359,7 +1323,6 @@ export const translations = {
       "The bands system defines Central Bank intervention limits. When the dollar hits the floor, the BCRA buys to support the price. When it hits the ceiling, it sells to curb the rise. In the middle zone, the market operates freely.",
     bandsDataUnavailable: "Could not load exchange bands data",
 
-    // Gap Indicator
     gapIndicator: "Gap Indicator",
     lowGap: "Low Gap",
     mediumGap: "Medium Gap",
@@ -1370,13 +1333,11 @@ export const translations = {
     official: "Official",
     parallel: "Parallel",
 
-    // Dashboard Widget Labels
     grossMillionsUsd: "Gross (millions USD)",
     netBcra: "Net (BCRA)",
     netFmi: "Net (IMF)",
     netEstimated: "Net (estimated)",
 
-    // App
     footerVersion: "FinLatam v2.0.0",
     otherCountriesComingSoon: "Other countries coming soon",
     comingSoon: "Coming Soon",

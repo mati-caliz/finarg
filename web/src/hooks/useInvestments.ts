@@ -1,103 +1,58 @@
 "use client";
 
 import { investmentsApi } from "@/lib/api";
-import type { Bond, Cedear, Etf, Metal, Stock } from "@/types";
+import { CACHE_TIMES } from "@/lib/constants";
+import { queryKeys } from "@/lib/queryKeys";
+import type { Bond, Caucion, Cedear, Etf, Letra, Metal, Stock } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
-export function useStocks() {
-  return useQuery<Stock[]>({
-    queryKey: ["investments", "stocks"],
-    queryFn: async () => {
-      const response = await investmentsApi.getStocks();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
+const INVESTMENT_QUERY_OPTIONS = {
+  staleTime: CACHE_TIMES.REALTIME_STALE,
+  gcTime: CACHE_TIMES.REALTIME_GC,
+  refetchOnWindowFocus: true,
+  refetchOnReconnect: true,
+} as const;
+
+function createInvestmentHook<T>(key: readonly string[], fetcher: () => Promise<{ data: T[] }>) {
+  return () =>
+    useQuery<T[]>({
+      queryKey: key,
+      queryFn: async () => (await fetcher()).data,
+      ...INVESTMENT_QUERY_OPTIONS,
+    });
 }
 
-export function useCedears() {
-  return useQuery<Cedear[]>({
-    queryKey: ["investments", "cedears"],
-    queryFn: async () => {
-      const response = await investmentsApi.getCedears();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useStocks = createInvestmentHook<Stock>(
+  queryKeys.investments.stocks(),
+  investmentsApi.getStocks,
+);
 
-export function useBonds() {
-  return useQuery<Bond[]>({
-    queryKey: ["investments", "bonds"],
-    queryFn: async () => {
-      const response = await investmentsApi.getBonds();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useCedears = createInvestmentHook<Cedear>(
+  queryKeys.investments.cedears(),
+  investmentsApi.getCedears,
+);
 
-export function useEtfs() {
-  return useQuery<Etf[]>({
-    queryKey: ["investments", "etf"],
-    queryFn: async () => {
-      const response = await investmentsApi.getEtfs();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useBonds = createInvestmentHook<Bond>(
+  queryKeys.investments.bonds(),
+  investmentsApi.getBonds,
+);
 
-export function useMetals() {
-  return useQuery<Metal[]>({
-    queryKey: ["investments", "metals"],
-    queryFn: async () => {
-      const response = await investmentsApi.getMetals();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useEtfs = createInvestmentHook<Etf>(
+  queryKeys.investments.etf(),
+  investmentsApi.getEtfs,
+);
 
-export function useLetras() {
-  return useQuery({
-    queryKey: ["investments", "letras"],
-    queryFn: async () => {
-      const response = await investmentsApi.getLetras();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useMetals = createInvestmentHook<Metal>(
+  queryKeys.investments.metals(),
+  investmentsApi.getMetals,
+);
 
-export function useCauciones() {
-  return useQuery({
-    queryKey: ["investments", "cauciones"],
-    queryFn: async () => {
-      const response = await investmentsApi.getCauciones();
-      return response.data;
-    },
-    staleTime: 300000,
-    gcTime: 3600000,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-  });
-}
+export const useLetras = createInvestmentHook<Letra>(
+  queryKeys.investments.letras(),
+  investmentsApi.getLetras,
+);
+
+export const useCauciones = createInvestmentHook<Caucion>(
+  queryKeys.investments.cauciones(),
+  investmentsApi.getCauciones,
+);

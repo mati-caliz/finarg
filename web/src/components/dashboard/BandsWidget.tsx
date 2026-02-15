@@ -3,16 +3,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { exchangeBandsApi } from "@/lib/api";
-import { BANDS_COLOR_CLASSES } from "@/lib/constants";
+import { BANDS_COLOR_CLASSES, CACHE_TIMES } from "@/lib/constants";
 import type { ExchangeBands, Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { memo } from "react";
 
 interface BandsWidgetProps {
   officialQuote: Quote | undefined;
 }
 
-export function BandsWidget({ officialQuote }: BandsWidgetProps) {
+export const BandsWidget = memo(function BandsWidget({ officialQuote }: BandsWidgetProps) {
   const { translate } = useTranslation();
   const { data: bands, isLoading } = useQuery({
     queryKey: ["exchangeBands"],
@@ -20,8 +21,8 @@ export function BandsWidget({ officialQuote }: BandsWidgetProps) {
       const response = await exchangeBandsApi.getCurrent();
       return response.data as ExchangeBands;
     },
-    staleTime: 86400000,
-    gcTime: 86400000,
+    staleTime: CACHE_TIMES.STATIC_STALE,
+    gcTime: CACHE_TIMES.STATIC_GC,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
@@ -136,4 +137,4 @@ export function BandsWidget({ officialQuote }: BandsWidgetProps) {
       </Card>
     </Link>
   );
-}
+});

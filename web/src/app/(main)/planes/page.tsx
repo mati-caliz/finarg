@@ -62,7 +62,6 @@ export default function PricingPage() {
           Potenciá tu análisis financiero con FinArg
         </p>
 
-        {/* Billing Toggle */}
         <div className="inline-flex items-center gap-4 p-1 bg-muted rounded-lg">
           <button
             type="button"
@@ -92,7 +91,6 @@ export default function PricingPage() {
         </div>
       </div>
 
-      {/* Pricing Cards */}
       <div className="grid md:grid-cols-3 gap-8">
         {pricing?.plans.map((plan: PlanPricing) => (
           <div
@@ -175,7 +173,6 @@ export default function PricingPage() {
         ))}
       </div>
 
-      {/* FAQ or Additional Info */}
       <div className="mt-16 text-center">
         <p className="text-muted-foreground">
           ¿Tenés dudas?{" "}

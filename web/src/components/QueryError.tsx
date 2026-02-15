@@ -135,7 +135,6 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
   );
 }
 
-// Empty state component
 interface EmptyStateProps {
   icon?: React.ComponentType<{ className?: string }>;
   title: string;

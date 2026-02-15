@@ -2,6 +2,7 @@
 
 import type { CountryCode } from "@/config/countries";
 import { newsApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { parseAiAnalysis } from "@/lib/parseAiAnalysis";
 import { queryKeys } from "@/lib/queryKeys";
 import { useAppStore } from "@/store/useStore";
@@ -32,8 +33,8 @@ export function useNews(country?: CountryCode, page = 0, size = 20) {
       const response = await newsApi.getLatest(countryToUse, page, size);
       return processNewsArticles(response.data);
     },
-    staleTime: 600000,
-    gcTime: 3600000,
+    staleTime: CACHE_TIMES.NEWS_STALE,
+    gcTime: CACHE_TIMES.NEWS_GC,
   });
 }
 
@@ -47,8 +48,8 @@ export function useNewsByCategory(category: string, country?: CountryCode, page 
       const response = await newsApi.getByCategory(category, countryToUse, page, size);
       return processNewsArticles(response.data);
     },
-    staleTime: 600000,
-    gcTime: 3600000,
+    staleTime: CACHE_TIMES.NEWS_STALE,
+    gcTime: CACHE_TIMES.NEWS_GC,
   });
 }
 
@@ -65,7 +66,7 @@ export function useNewsById(id: number) {
         keyPoints: parsed.keyPoints.length > 0 ? parsed.keyPoints : article.keyPoints,
       };
     },
-    staleTime: 600000,
-    gcTime: 3600000,
+    staleTime: CACHE_TIMES.NEWS_STALE,
+    gcTime: CACHE_TIMES.NEWS_GC,
   });
 }

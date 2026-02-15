@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
+import type { TranslationKey } from "@/i18n/translations";
 import { getGapClass, getGapColor } from "@/lib/utils";
 import type { Gap } from "@/types";
 import { Activity } from "lucide-react";
@@ -11,6 +12,28 @@ export interface GapGaugeProps {
   gap: Gap;
 }
 
+function formatValue(value: number | null, decimals: number): string {
+  return value === null ? "-" : value.toFixed(decimals);
+}
+
+const GAP_LABEL_KEYS: Record<string, TranslationKey> = {
+  LOW: "lowGap",
+  MEDIUM: "mediumGap",
+  HIGH: "highGap",
+};
+
+const GAP_DESCRIPTION_KEYS: Record<string, TranslationKey> = {
+  LOW: "stableMarket",
+  MEDIUM: "moderateVolatility",
+  HIGH: "highVolatility",
+};
+
+const GAP_BORDER_COLORS: Record<string, string> = {
+  LOW: "border-t-emerald-500",
+  MEDIUM: "border-t-yellow-500",
+  HIGH: "border-t-red-500",
+};
+
 export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
   const { translate } = useTranslation();
   const color = getGapColor(gap.level);
@@ -18,50 +41,15 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
   const gapPercentage = Number.isFinite(gap.gapPercentage) ? gap.gapPercentage : null;
   const officialRate = Number.isFinite(gap.officialRate) ? gap.officialRate : null;
   const parallelRate = Number.isFinite(gap.parallelRate) ? gap.parallelRate : null;
-  const formatValue = (value: number | null, decimals: number) =>
-    value === null ? "-" : value.toFixed(decimals);
 
-  const getGapLabel = () => {
-    switch (gap.level) {
-      case "LOW":
-        return translate("lowGap");
-      case "MEDIUM":
-        return translate("mediumGap");
-      case "HIGH":
-        return translate("highGap");
-      default:
-        return "";
-    }
-  };
-
-  const getGapDescription = () => {
-    switch (gap.level) {
-      case "LOW":
-        return translate("stableMarket");
-      case "MEDIUM":
-        return translate("moderateVolatility");
-      case "HIGH":
-        return translate("highVolatility");
-      default:
-        return gap.description;
-    }
-  };
-
-  const getBorderColor = () => {
-    switch (gap.level) {
-      case "LOW":
-        return "border-t-emerald-500";
-      case "MEDIUM":
-        return "border-t-yellow-500";
-      case "HIGH":
-        return "border-t-red-500";
-      default:
-        return "border-t-slate-400";
-    }
-  };
+  const gapLabel = GAP_LABEL_KEYS[gap.level] ? translate(GAP_LABEL_KEYS[gap.level]) : "";
+  const gapDescription = GAP_DESCRIPTION_KEYS[gap.level]
+    ? translate(GAP_DESCRIPTION_KEYS[gap.level])
+    : gap.description;
+  const borderColor = GAP_BORDER_COLORS[gap.level] ?? "border-t-slate-400";
 
   return (
-    <Card className={`border-t-[3px] ${getBorderColor()}`}>
+    <Card className={`border-t-[3px] ${borderColor}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
           <Activity className="h-3.5 w-3.5" />
@@ -85,9 +73,9 @@ export const GapGauge = memo(function GapGauge({ gap }: GapGaugeProps) {
 
           <div className="text-center">
             <p className="text-lg font-semibold" style={{ color }}>
-              {getGapLabel()}
+              {gapLabel}
             </p>
-            <p className="text-sm text-muted-foreground mt-1">{getGapDescription()}</p>
+            <p className="text-sm text-muted-foreground mt-1">{gapDescription}</p>
           </div>
 
           <div className="w-full mt-4 pt-4 border-t border-border/50 space-y-2">

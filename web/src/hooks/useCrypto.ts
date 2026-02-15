@@ -1,6 +1,7 @@
 "use client";
 
 import { cryptoApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import type { Crypto } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -11,7 +12,7 @@ export function useCrypto() {
       const response = await cryptoApi.getCurrent();
       return response.data;
     },
-    staleTime: 300000,
-    gcTime: 86400000,
+    staleTime: CACHE_TIMES.REALTIME_STALE,
+    gcTime: CACHE_TIMES.MARKET_GC,
   });
 }

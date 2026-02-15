@@ -4,12 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { VariationBadge } from "@/components/ui/variation-badge";
 import { useLetras } from "@/hooks/useInvestments";
 import { useTranslation } from "@/hooks/useTranslation";
-import { variationColor } from "@/lib/constants";
+import { INVESTMENT_GRID, variationColor } from "@/lib/constants";
 import { formatNumber, formatPrice } from "@/lib/utils";
 import type { Letra } from "@/types";
 import { InvestmentSectionWrapper } from "./InvestmentSectionWrapper";
-
-const GRID_CLASS = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4";
 
 export function LetrasSection() {
   const { translate } = useTranslation();
@@ -20,7 +18,7 @@ export function LetrasSection() {
       isLoading={isLoading}
       error={error}
       isEmpty={letras === null || letras === undefined || letras.length === 0}
-      gridClassName={GRID_CLASS}
+      gridClassName={INVESTMENT_GRID.THREE_COL}
       skeletonCount={6}
       skeletonHeight="h-40"
     >
