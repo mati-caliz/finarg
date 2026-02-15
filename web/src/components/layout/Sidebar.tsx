@@ -245,6 +245,8 @@ interface NavCategoryProps {
   selectedCountry: string;
   countryConfig: ReturnType<typeof getCountryConfig>;
   reservesKeyMap: Record<string, TranslationKey>;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 function NavCategory({
@@ -255,9 +257,9 @@ function NavCategory({
   selectedCountry,
   countryConfig,
   reservesKeyMap,
+  isOpen,
+  onToggle,
 }: NavCategoryProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
   const filteredItems = category.items.filter((item) => {
     if (!item.feature) {
       return true;
@@ -272,7 +274,7 @@ function NavCategory({
   return (
     <div className="space-y-1">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-white/70 hover:text-white/90 hover:bg-white/5 rounded-lg transition-all duration-200"
         type="button"
       >
@@ -305,6 +307,7 @@ export function Sidebar() {
   const { sidebarOpen, toggleSidebar, setSidebarOpen, selectedCountry } = useAppStore();
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
+  const [openCategory, setOpenCategory] = useState<string | null>(null);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -408,6 +411,8 @@ export function Sidebar() {
                     selectedCountry={selectedCountry}
                     countryConfig={countryConfig}
                     reservesKeyMap={reservesKeyMap}
+                    isOpen={openCategory === item.key}
+                    onToggle={() => setOpenCategory(openCategory === item.key ? null : item.key)}
                   />
                 );
               }

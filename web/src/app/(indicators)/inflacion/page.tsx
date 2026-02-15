@@ -34,7 +34,7 @@ export default function InflationPage() {
   const [chartMonthsLimit, setChartMonthsLimit] = useState(24);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const isPremium = subscription?.plan !== "FREE";
+  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const chartPeriods = useMemo(
     () => [
