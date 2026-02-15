@@ -149,12 +149,6 @@ export function HolidaysCalendar() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">
-                {holidays.length}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">Total de feriados</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">
                 {holidays.filter((h) => h.isNational).length}
               </p>
               <p className="text-sm text-muted-foreground mt-1">Feriados nacionales</p>
