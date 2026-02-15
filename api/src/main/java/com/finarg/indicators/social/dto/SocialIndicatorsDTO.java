@@ -19,7 +19,6 @@ public class SocialIndicatorsDTO implements Serializable {
     private BigDecimal totalBasicBasket;
     private BigDecimal foodBasicBasket;
     private BigDecimal ripteSalary;
-    private BigDecimal averageSalary;
     private BigDecimal uva;
     private BigDecimal cer;
 }

@@ -116,7 +116,6 @@ export interface SocialIndicators {
   totalBasicBasket?: number;
   foodBasicBasket?: number;
   ripteSalary?: number;
-  averageSalary?: number;
   uva?: number;
   cer?: number;
 }
