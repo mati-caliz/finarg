@@ -120,7 +120,7 @@ public class WebClientConfig {
     @Value("${external.apis.eleconomista.timeout:10000}")
     private int eleconomistaTimeout;
 
-    @Value("${external.apis.argentina-holidays.base-url:https://nolaborables.com.ar/api/v2/feriados}")
+    @Value("${external.apis.argentina-holidays.base-url:https://date.nager.at/api/v3/publicholidays}")
     private String argentinaHolidaysBaseUrl;
     @Value("${external.apis.argentina-holidays.timeout:10000}")
     private int argentinaHolidaysTimeout;
