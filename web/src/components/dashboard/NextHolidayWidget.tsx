@@ -102,15 +102,17 @@ export function NextHolidayWidget() {
             <p className="text-xs font-medium text-muted-foreground mb-1.5">
               {translate("upcomingHolidays")}:
             </p>
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               {holidays.slice(1, 4).map((holiday) => {
                 const date = new Date(holiday.date);
                 return (
-                  <div key={holiday.date} className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">
+                  <div key={holiday.date} className="flex items-start gap-2 text-xs">
+                    <span className="text-muted-foreground whitespace-nowrap font-medium min-w-[45px]">
                       {format(date, "d MMM", { locale: es })}
                     </span>
-                    <span className="font-medium truncate ml-2">{holiday.name}</span>
+                    <span className="font-medium text-foreground leading-tight">
+                      {holiday.name}
+                    </span>
                   </div>
                 );
               })}
