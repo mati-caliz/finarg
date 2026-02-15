@@ -1,6 +1,7 @@
 import type { CountryCode } from "@/config/countries";
 import type {
   CompoundInterestRequest,
+  CreateSubscriptionRequest,
   CurrencyConversionRequest,
   CurrencyConversionResponse,
   ExchangeRateComparison,
@@ -8,6 +9,8 @@ import type {
   IncomeTaxRequest,
   NewsArticle,
   NewsListResponse,
+  PricingResponse,
+  SubscriptionResponse,
 } from "@/types";
 import axios from "axios";
 
@@ -150,4 +153,16 @@ export const holidaysApi = {
     cachedApi.get<Holiday[]>(`/${country}/feriados`, { params: { year } }),
   getUpcoming: (country: CountryCode = "ar") =>
     cachedApi.get<Holiday[]>(`/${country}/feriados/upcoming`),
+};
+
+export const subscriptionsApi = {
+  getPricing: () => apiClient.get<PricingResponse>("/subscriptions/pricing"),
+  getCurrent: () => apiClient.get<SubscriptionResponse>("/subscriptions/current"),
+  create: (data: CreateSubscriptionRequest) =>
+    apiClient.post<SubscriptionResponse>("/subscriptions", data),
+  createCheckout: (subscriptionId: number) =>
+    apiClient.post<{ checkoutUrl: string; subscriptionId: string }>(
+      `/subscriptions/${subscriptionId}/checkout`,
+    ),
+  cancel: () => apiClient.delete("/subscriptions"),
 };

@@ -132,6 +132,74 @@ export interface AuthResponse {
   tokenType: string;
   expiresIn: number;
   user: User;
+  subscription: SubscriptionResponse;
+}
+
+export type SubscriptionPlan = "FREE" | "PREMIUM" | "PROFESSIONAL";
+export type SubscriptionStatus =
+  | "ACTIVE"
+  | "CANCELLED"
+  | "EXPIRED"
+  | "PENDING_PAYMENT"
+  | "PAYMENT_FAILED";
+export type BillingPeriod = "MONTHLY" | "YEARLY";
+
+export interface PlanFeatures {
+  dailyCalculations: number;
+  maxAlerts: number;
+  apiRequestsPerDay: number;
+  hasAdvancedFeatures: boolean;
+  hasExportData: boolean;
+  hasApiAccess: boolean;
+  isUnlimitedCalculations: boolean;
+  isUnlimitedAlerts: boolean;
+}
+
+export interface UsageLimits {
+  calculationsUsedToday: number;
+  calculationsLimit: number;
+  alertsUsed: number;
+  alertsLimit: number;
+  apiRequestsToday: number;
+  apiRequestsLimit: number;
+  canUseCalculator: boolean;
+  canCreateAlert: boolean;
+  canMakeApiRequest: boolean;
+}
+
+export interface SubscriptionResponse {
+  id?: number;
+  plan: SubscriptionPlan;
+  status: SubscriptionStatus;
+  billingPeriod: BillingPeriod;
+  startDate: string;
+  endDate: string;
+  cancelledAt?: string;
+  priceAtPurchase?: number;
+  features: PlanFeatures;
+  currentUsage: UsageLimits;
+}
+
+export interface CreateSubscriptionRequest {
+  plan: SubscriptionPlan;
+  billingPeriod: BillingPeriod;
+  paymentMethodId?: string;
+}
+
+export interface PlanPricing {
+  plan: SubscriptionPlan;
+  name: string;
+  description: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  yearlyDiscount: number;
+  features: PlanFeatures;
+  highlights: string[];
+  recommended: boolean;
+}
+
+export interface PricingResponse {
+  plans: PlanPricing[];
 }
 
 export interface ExchangeBands {

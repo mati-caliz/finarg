@@ -1,5 +1,6 @@
 package com.finarg.auth.dto;
 
+import com.finarg.subscription.dto.SubscriptionResponseDTO;
 import com.finarg.user.dto.UserDTO;
 import lombok.*;
 
@@ -15,4 +16,5 @@ public class AuthResponseDTO implements Serializable {
     private String tokenType;
     private Long expiresIn;
     private UserDTO user;
+    private SubscriptionResponseDTO subscription;
 }

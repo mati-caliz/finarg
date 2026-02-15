@@ -1,29 +1,59 @@
 import type { CountryCode } from "@/config/countries";
-import type { User } from "@/types";
+import type { SubscriptionResponse, User } from "@/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface AuthState {
   user: User | null;
   accessToken: string | null;
+  subscription: SubscriptionResponse | null;
   isAuthenticated: boolean;
-  setAuth: (user: User, accessToken: string) => void;
+  setAuth: (user: User, accessToken: string, subscription?: SubscriptionResponse) => void;
+  setSubscription: (subscription: SubscriptionResponse) => void;
   logout: () => void;
+  isPremium: () => boolean;
+  canUseFeature: (feature: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       accessToken: null,
+      subscription: null,
       isAuthenticated: false,
-      setAuth: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
-      logout: () => set({ user: null, accessToken: null, isAuthenticated: false }),
+      setAuth: (user, accessToken, subscription) =>
+        set({ user, accessToken, subscription: subscription || null, isAuthenticated: true }),
+      setSubscription: (subscription) => set({ subscription }),
+      logout: () =>
+        set({ user: null, accessToken: null, subscription: null, isAuthenticated: false }),
+      isPremium: () => {
+        const subscription = get().subscription;
+        return subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
+      },
+      canUseFeature: (feature: string) => {
+        const subscription = get().subscription;
+        if (!subscription) return false;
+
+        switch (feature) {
+          case "advanced_analytics":
+            return subscription.features.hasAdvancedFeatures;
+          case "export_data":
+            return subscription.features.hasExportData;
+          case "api_access":
+            return subscription.features.hasApiAccess;
+          case "unlimited_calculations":
+            return subscription.features.isUnlimitedCalculations;
+          default:
+            return false;
+        }
+      },
     }),
     {
       name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
+        subscription: state.subscription,
         isAuthenticated: state.isAuthenticated,
       }),
     },

@@ -29,7 +29,7 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
+      setAuth(data.user, data.accessToken, data.subscription);
       router.push("/");
     },
     onError: (error: Error & { response?: { data?: { message?: string } } }) => {
@@ -51,7 +51,7 @@ export default function LoginPage() {
       return response.data as AuthResponse;
     },
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
+      setAuth(data.user, data.accessToken, data.subscription);
       router.push("/");
     },
     onError: (err: Error & { response?: { data?: { message?: string } } }) => {
