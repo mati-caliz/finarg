@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.netty.http.client.HttpClient;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -52,7 +53,7 @@ public class LaNacionEconomiaNewsClient implements NewsScraperClient {
         } catch (WebClientResponseException e) {
             log.error("Error fetching news from La Nación (HTTP {}): {}", e.getStatusCode(), e.getMessage());
             return List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching news from La Nación: {}", e.getMessage());
             return List.of();
         }

@@ -13,4 +13,5 @@ import java.time.LocalDate;
 public class CountryRiskDTO implements Serializable {
     private BigDecimal value;
     private LocalDate date;
+    private Double displayPercentage;
 }

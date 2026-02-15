@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useTranslation } from "@/hooks/useTranslation";
 import type { NewsArticle } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -34,14 +35,16 @@ const categoryColors = {
   GOVERNMENT_BULLETIN: "border-t-purple-500",
 };
 
-const sentimentLabels = {
-  POSITIVE: "Positivo",
-  NEUTRAL: "Neutral",
-  NEGATIVE: "Negativo",
-  MIXED: "Mixto",
-};
+const sentimentKeyMap = {
+  POSITIVE: "sentimentPositive",
+  NEUTRAL: "sentimentNeutral",
+  NEGATIVE: "sentimentNegative",
+  MIXED: "sentimentMixed",
+} as const;
 
 export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
+  const { translate } = useTranslation();
+
   const relativeTime = formatDistanceToNow(new Date(article.publishedDate), {
     addSuffix: true,
     locale: es,
@@ -63,7 +66,7 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
                 <>
                   <span>•</span>
                   <Badge variant="outline" className="text-xs">
-                    Oficial
+                    {translate("newsOfficialBadge")}
                   </Badge>
                 </>
               )}
@@ -71,7 +74,7 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
           </div>
           {article.sentiment && (
             <Badge className={sentimentColors[article.sentiment]}>
-              {sentimentLabels[article.sentiment]}
+              {translate(sentimentKeyMap[article.sentiment])}
             </Badge>
           )}
         </div>
@@ -90,7 +93,7 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
           <div className="p-3 rounded-lg bg-muted/50 border border-border/50">
             <div className="flex items-start gap-2 mb-2">
               <Sparkles className="w-4 h-4 text-violet-500 shrink-0 mt-0.5" />
-              <p className="text-sm font-medium">Resumen IA</p>
+              <p className="text-sm font-medium">{translate("newsAiSummary")}</p>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">{article.aiSummary}</p>
           </div>
@@ -99,7 +102,7 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
         {article.keyPoints && article.keyPoints.length > 0 && (
           <div className="space-y-1.5">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Puntos clave
+              {translate("newsKeyPoints")}
             </p>
             <ul className="space-y-1">
               {article.keyPoints
@@ -121,7 +124,7 @@ export const NewsCard = memo(function NewsCard({ article }: NewsCardProps) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-sm text-violet-600 dark:text-violet-400 hover:underline"
           >
-            Leer artículo completo
+            {translate("newsReadFullArticle")}
             <ExternalLink className="w-3.5 h-3.5" />
           </Link>
         </div>

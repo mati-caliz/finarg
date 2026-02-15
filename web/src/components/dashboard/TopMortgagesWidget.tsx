@@ -6,23 +6,10 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { ratesApi } from "@/lib/api";
 import { CACHE_TIMES } from "@/lib/constants";
 import { formatPercent } from "@/lib/utils";
+import type { RateDTO } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Home, TrendingDown } from "lucide-react";
 import Link from "next/link";
-
-interface RateDTO {
-  id: string;
-  name: string;
-  tna: number;
-  tea?: number;
-  product?: string;
-  term?: string;
-  date?: string;
-  limit?: number;
-  logo?: string;
-  link?: string;
-  isBestRate?: boolean;
-}
 
 export function TopMortgagesWidget() {
   const { translate } = useTranslation();

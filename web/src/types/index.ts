@@ -215,6 +215,12 @@ export interface ExchangeBands {
 export interface CountryRisk {
   value: number;
   date: string;
+  displayPercentage?: number;
+}
+
+export interface TopInvestmentRatesResponse {
+  topWallets: RateDTO[];
+  topBanks: RateDTO[];
 }
 
 export interface Government {
@@ -475,4 +481,18 @@ export interface FeedbackResponse {
   url: string;
   timestamp: string;
   createdAt: string;
+}
+
+export interface RateDTO {
+  id: string;
+  name: string;
+  tna: number;
+  tea?: number;
+  product?: string;
+  term?: string;
+  date?: string;
+  limit?: number;
+  logo?: string;
+  link?: string;
+  isBestRate?: boolean;
 }

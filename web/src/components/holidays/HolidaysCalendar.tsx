@@ -4,10 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHolidays } from "@/hooks/useHolidays";
 import { useTranslation } from "@/hooks/useTranslation";
+import type { TranslationKey } from "@/i18n/translations";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar, MapPin } from "lucide-react";
 import { useMemo } from "react";
+
+const monthKeys: TranslationKey[] = [
+  "monthJanuary",
+  "monthFebruary",
+  "monthMarch",
+  "monthApril",
+  "monthMay",
+  "monthJune",
+  "monthJuly",
+  "monthAugust",
+  "monthSeptember",
+  "monthOctober",
+  "monthNovember",
+  "monthDecember",
+];
 
 export function HolidaysCalendar() {
   const currentYear = new Date().getFullYear();
@@ -33,21 +49,6 @@ export function HolidaysCalendar() {
     );
   }, [holidays]);
 
-  const monthNames = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -62,9 +63,7 @@ export function HolidaysCalendar() {
     return (
       <Card>
         <CardContent className="py-12">
-          <p className="text-center text-muted-foreground">
-            Error al cargar los feriados. Por favor, intentá nuevamente más tarde.
-          </p>
+          <p className="text-center text-muted-foreground">{translate("holidaysLoadError")}</p>
           <p className="text-center text-sm text-red-500 mt-2">{error.message}</p>
         </CardContent>
       </Card>
@@ -75,9 +74,7 @@ export function HolidaysCalendar() {
     return (
       <Card>
         <CardContent className="py-12">
-          <p className="text-center text-muted-foreground">
-            No hay feriados disponibles para este año
-          </p>
+          <p className="text-center text-muted-foreground">{translate("holidaysNoneAvailable")}</p>
         </CardContent>
       </Card>
     );
@@ -93,7 +90,7 @@ export function HolidaysCalendar() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {monthNames[month]}
+                  {translate(monthKeys[month])}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -126,10 +123,13 @@ export function HolidaysCalendar() {
                       {holiday.daysUntil !== null && holiday.daysUntil >= 0 && (
                         <p className="text-xs text-muted-foreground mt-2">
                           {holiday.daysUntil === 0
-                            ? "¡Hoy!"
+                            ? translate("holidaysToday")
                             : holiday.daysUntil === 1
-                              ? "Mañana"
-                              : `Faltan ${holiday.daysUntil} días`}
+                              ? translate("holidaysTomorrow")
+                              : translate("holidaysDaysUntil").replace(
+                                  "{days}",
+                                  String(holiday.daysUntil),
+                                )}
                         </p>
                       )}
                     </div>
@@ -143,7 +143,9 @@ export function HolidaysCalendar() {
 
       <Card className="border-t-[3px] border-t-blue-500">
         <CardHeader>
-          <CardTitle>Resumen {currentYear}</CardTitle>
+          <CardTitle>
+            {translate("holidaysSummary").replace("{year}", String(currentYear))}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -151,19 +153,21 @@ export function HolidaysCalendar() {
               <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">
                 {holidays.filter((h) => h.isNational).length}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">Feriados nacionales</p>
+              <p className="text-sm text-muted-foreground mt-1">{translate("holidaysNational")}</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">
                 {holidays.filter((h) => h.daysUntil !== null && h.daysUntil >= 0).length}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">Próximos feriados</p>
+              <p className="text-sm text-muted-foreground mt-1">{translate("holidaysUpcoming")}</p>
             </div>
             <div className="text-center">
               <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">
                 {Object.keys(holidaysByMonth).length}
               </p>
-              <p className="text-sm text-muted-foreground mt-1">Meses con feriados</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {translate("holidaysMonthsWithHolidays")}
+              </p>
             </div>
           </div>
         </CardContent>

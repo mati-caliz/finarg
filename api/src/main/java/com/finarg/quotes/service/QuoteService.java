@@ -8,6 +8,7 @@ import com.finarg.quotes.dto.QuoteDTO;
 import com.finarg.quotes.entity.QuoteHistory;
 import com.finarg.shared.enums.Country;
 import com.finarg.shared.enums.CurrencyType;
+import com.finarg.shared.constants.UiColors;
 import com.finarg.shared.enums.GapLevel;
 import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.quotes.repository.QuoteHistoryRepository;
@@ -30,6 +31,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QuoteService {
 
+    private static final int DISPLAY_ORDER_OFFICIAL = 0;
+    private static final int DISPLAY_ORDER_BLUE = 1;
+    private static final int DISPLAY_ORDER_CARD = 2;
+    private static final int DISPLAY_ORDER_OTHER = 3;
+    private static final int DISPLAY_ORDER_DEFAULT = 99;
+
     private final QuoteClientFactory quoteClientFactory;
     private final QuoteHistoryRepository quoteHistoryRepository;
     private final ArgentinaDatosClient argentinaDatosClient;
@@ -41,7 +48,7 @@ public class QuoteService {
         List<QuoteDTO> quotes = client.getAllQuotes();
         List<QuoteDTO> enriched = new ArrayList<>(enrichQuotesWithVariation(quotes));
         enriched.forEach(q -> q.setDisplayOrder(calculateDisplayOrder(q.getType())));
-        enriched.sort(Comparator.comparingInt(q -> q.getDisplayOrder() != null ? q.getDisplayOrder() : 99));
+        enriched.sort(Comparator.comparingInt(q -> q.getDisplayOrder() != null ? q.getDisplayOrder() : DISPLAY_ORDER_DEFAULT));
         return enriched;
     }
 
@@ -80,7 +87,7 @@ public class QuoteService {
                     .country(country)
                     .gapPercentage(BigDecimal.ZERO)
                     .level(GapLevel.LOW)
-                    .trafficLightColor("#22c55e")
+                    .trafficLightColor(UiColors.GREEN)
                     .description("No data available")
                     .build();
         }
@@ -205,18 +212,18 @@ public class QuoteService {
 
     private static int calculateDisplayOrder(CurrencyType type) {
         if (type == null) {
-            return 99;
+            return DISPLAY_ORDER_DEFAULT;
         }
         String code = type.getCode();
         if (code.equals("oficial") || code.endsWith("_oficial")) {
-            return 0;
+            return DISPLAY_ORDER_OFFICIAL;
         }
         if (code.equals("blue") || code.endsWith("_blue")) {
-            return 1;
+            return DISPLAY_ORDER_BLUE;
         }
         if (code.equals("tarjeta") || code.endsWith("_tarjeta")) {
-            return 2;
+            return DISPLAY_ORDER_CARD;
         }
-        return 3;
+        return DISPLAY_ORDER_OTHER;
     }
 }

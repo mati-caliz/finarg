@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { formatDateDayShort, generateReferenceAreas } from "@/lib/utils";
 import { useAuthStore } from "@/store/useStore";
 import type { Reserves } from "@/types";
@@ -61,7 +62,7 @@ export default function ReservesPage() {
       const response = await reservesApi.getCurrent("ar");
       return response.data as Reserves;
     },
-    refetchInterval: 300000,
+    refetchInterval: CACHE_TIMES.REALTIME_STALE,
   });
 
   const { data: historicalReserves, isLoading: historicalLoading } = useQuery({

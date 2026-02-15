@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,7 +65,7 @@ public class FinnhubClient {
 
             log.debug("Received {} stock quotes", quotes.size());
             return quotes;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching stock quotes: {}", e.getMessage(), e);
             return List.of();
         }

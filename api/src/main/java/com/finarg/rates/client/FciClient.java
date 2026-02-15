@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -60,7 +61,7 @@ public class FciClient {
             return response.stream()
                     .filter(fund -> fund.getShareValue() != null && fund.getDate() != null)
                     .toList();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching FCI data from {}: {}", uriPath, e.getMessage());
             return List.of();
         }

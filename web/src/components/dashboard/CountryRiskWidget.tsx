@@ -8,6 +8,8 @@ import type { CountryRisk } from "@/types";
 import { AlertTriangle, TrendingUp } from "lucide-react";
 import { memo } from "react";
 
+const MAX_COUNTRY_RISK_DISPLAY = 2000;
+
 interface CountryRiskWidgetProps {
   countryRisk: CountryRisk;
 }
@@ -62,7 +64,9 @@ export const CountryRiskWidget = memo(function CountryRiskWidget({
           <div className="w-full bg-muted rounded-full h-2">
             <div
               className={`h-2 rounded-full transition-all ${getRiskBarColor(countryRisk.value)}`}
-              style={{ width: `${Math.min((countryRisk.value / 2000) * 100, 100)}%` }}
+              style={{
+                width: `${countryRisk.displayPercentage !== undefined && countryRisk.displayPercentage !== null ? countryRisk.displayPercentage : Math.min((countryRisk.value / MAX_COUNTRY_RISK_DISPLAY) * 100, 100)}%`,
+              }}
             />
           </div>
         </div>

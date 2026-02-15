@@ -1,6 +1,7 @@
 package com.finarg.rates.controller;
 
 import com.finarg.rates.dto.RateDTO;
+import com.finarg.rates.dto.TopInvestmentRatesDTO;
 import com.finarg.shared.enums.Country;
 import com.finarg.rates.service.RatesService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,10 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/api/v1/rates")
 @RequiredArgsConstructor
 @Tag(name = "Rates", description = "TNA rates comparator - banks and wallets")
@@ -52,7 +55,7 @@ public class RatesController {
 
     @GetMapping("/top-investment")
     @Operation(summary = "Get top investment rates (wallets + banks)")
-    public ResponseEntity<List<RateDTO>> getTopInvestmentRates(
+    public ResponseEntity<TopInvestmentRatesDTO> getTopInvestmentRates(
             @RequestParam(defaultValue = "2") int limit) {
         Country c = mapCountry();
         return ResponseEntity.ok(ratesService.getTopInvestmentRates(c, limit));

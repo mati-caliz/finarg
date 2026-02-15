@@ -21,6 +21,9 @@ import java.util.function.Predicate;
 @RequiredArgsConstructor
 public class InflationService {
 
+    private static final int CURRENT_INFLATION_FETCH_MONTHS = 13;
+    private static final int INFLATION_ADJUSTMENT_MAX_MONTHS = 120;
+
     private final ArgentinaDatosClient argentinaDatosClient;
 
     @Cacheable(value = "inflation", key = "'monthly_' + #limit")
@@ -64,7 +67,7 @@ public class InflationService {
     @Cacheable(value = "inflation", key = "'current'", unless = "#result == null || #result.value == null || #result.value.signum() == 0")
     public InflationDTO getCurrentInflation() {
         log.info("Fetching current inflation (not from cache)");
-        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(13);
+        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(CURRENT_INFLATION_FETCH_MONTHS);
 
         if (inflations.isEmpty()) {
             log.warn("No inflation data available from API - returning empty result");
@@ -109,7 +112,7 @@ public class InflationService {
                                                      LocalDate toDate) {
         log.info("Adjusting for inflation: {} from {} to {}", originalAmount, fromDate, toDate);
 
-        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(120);
+        List<InflationDTO> inflations = argentinaDatosClient.getMonthlyInflation(INFLATION_ADJUSTMENT_MAX_MONTHS);
 
         BigDecimal accumulatedFactor = BigDecimal.ONE;
         for (InflationDTO inf : inflations) {

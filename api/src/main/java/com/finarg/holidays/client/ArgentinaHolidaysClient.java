@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ArgentinaHolidaysClient {
             log.info("Successfully fetched {} holidays for year {}",
                     response != null ? response.size() : 0, year);
             return response != null ? response : List.of();
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching holidays for year {}: {}", year, e.getMessage(), e);
             return List.of();
         }

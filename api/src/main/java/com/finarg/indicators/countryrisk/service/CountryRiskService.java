@@ -30,6 +30,7 @@ public class CountryRiskService {
         return CountryRiskDTO.builder()
                 .value(response.getValue())
                 .date(LocalDate.parse(response.getDate()))
+                .displayPercentage(calculateDisplayPercentage(response.getValue().doubleValue()))
                 .build();
     }
 
@@ -47,7 +48,14 @@ public class CountryRiskService {
                 .map(response -> CountryRiskDTO.builder()
                         .value(response.getValue())
                         .date(LocalDate.parse(response.getDate()))
+                        .displayPercentage(calculateDisplayPercentage(response.getValue().doubleValue()))
                         .build())
                 .toList();
+    }
+
+    private static final double MAX_COUNTRY_RISK_DISPLAY = 2000.0;
+
+    private static double calculateDisplayPercentage(double value) {
+        return Math.min((value / MAX_COUNTRY_RISK_DISPLAY) * 100, 100);
     }
 }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import org.springframework.web.reactive.function.client.WebClientException;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,7 +78,7 @@ public class ColombiaQuoteClient implements QuoteClient {
 
             quotes.add(generateCryptoQuote());
             
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching quotes from Colombia API: {}", e.getMessage());
             quotes.addAll(generateFallbackQuotes());
         }

@@ -13,6 +13,7 @@ import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { quotesApi } from "@/lib/api";
+import { CACHE_TIMES } from "@/lib/constants";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatCurrencySimple } from "@/lib/utils";
 import { useAppStore, useAuthStore } from "@/store/useStore";
@@ -78,7 +79,7 @@ export default function QuotesPage() {
       const response = await quotesApi.getAllByCountry(selectedCountry);
       return response.data as Quote[];
     },
-    staleTime: 30000,
+    staleTime: CACHE_TIMES.QUOTES_STALE,
     refetchInterval: QUOTES_REFETCH_MS,
   });
 
@@ -365,7 +366,7 @@ export default function QuotesPage() {
       {showPaywall && (
         <Paywall
           feature={translate("advancedHistoricalData")}
-          description="Para ver datos de mas de 2 anos necesitas Premium. Accede a graficos historicos completos de hasta 10 anos."
+          description={translate("paywallHistoricalDescription")}
           onClose={() => setShowPaywall(false)}
         />
       )}

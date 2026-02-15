@@ -3,7 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/hooks/useTranslation";
 import { feedbackApi } from "@/lib/api";
+import { logger } from "@/lib/logger";
 import { MessageSquare, Send, Star, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -21,6 +23,7 @@ export function FeedbackWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const { translate } = useTranslation();
 
   useEffect(() => {
     const lastClosedStr = localStorage.getItem(STORAGE_KEY);
@@ -70,8 +73,8 @@ export function FeedbackWidget() {
         handleClose();
       }, 2000);
     } catch (err) {
-      setError("Hubo un error al enviar tu feedback. Por favor, intentá de nuevo.");
-      console.error("Error submitting feedback:", err);
+      setError(translate("feedbackSubmitError"));
+      logger.error("Error submitting feedback:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -87,10 +90,12 @@ export function FeedbackWidget() {
         type="button"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
-        aria-label="Enviar feedback"
+        aria-label={translate("feedbackAriaLabel")}
       >
         <MessageSquare className="h-5 w-5 group-hover:rotate-12 transition-transform" />
-        <span className="text-sm font-semibold hidden sm:inline">¿Qué te parece?</span>
+        <span className="text-sm font-semibold hidden sm:inline">
+          {translate("feedbackButtonText")}
+        </span>
       </button>
     );
   }
@@ -103,13 +108,13 @@ export function FeedbackWidget() {
             type="button"
             onClick={handleClose}
             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Cerrar"
+            aria-label={translate("feedbackCloseAriaLabel")}
           >
             <X className="h-4 w-4" />
           </button>
           <CardTitle className="text-lg flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-            {isSubmitted ? "¡Gracias!" : "Tu opinión nos ayuda"}
+            {isSubmitted ? translate("feedbackThankYou") : translate("feedbackTitle")}
           </CardTitle>
         </CardHeader>
 
@@ -119,13 +124,15 @@ export function FeedbackWidget() {
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 mx-auto mb-3">
                 <Send className="h-6 w-6 text-green-600 dark:text-green-500" />
               </div>
-              <p className="text-sm text-muted-foreground">Tu feedback fue enviado correctamente</p>
+              <p className="text-sm text-muted-foreground">
+                {translate("feedbackSubmittedMessage")}
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <fieldset>
                 <legend className="block text-sm font-medium mb-2">
-                  ¿Cómo calificarías tu experiencia?
+                  {translate("feedbackRatingQuestion")}
                 </legend>
                 <div className="flex gap-2 justify-center">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -136,7 +143,10 @@ export function FeedbackWidget() {
                       onMouseEnter={() => setHoveredRating(star)}
                       onMouseLeave={() => setHoveredRating(0)}
                       className="transition-all duration-200 hover:scale-110"
-                      aria-label={`${star} estrellas`}
+                      aria-label={translate("feedbackStarsAriaLabel").replace(
+                        "{stars}",
+                        String(star),
+                      )}
                     >
                       <Star
                         className={`h-8 w-8 ${
@@ -152,13 +162,13 @@ export function FeedbackWidget() {
 
               <div>
                 <label htmlFor="comment" className="block text-sm font-medium mb-2">
-                  ¿Qué podemos mejorar? (opcional)
+                  {translate("feedbackCommentLabel")}
                 </label>
                 <textarea
                   id="comment"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Contanos qué te gustaría que mejoremos..."
+                  placeholder={translate("feedbackCommentPlaceholder")}
                   className="w-full min-h-[80px] px-3 py-2 text-sm rounded-md border border-input bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                   maxLength={500}
                 />
@@ -167,7 +177,7 @@ export function FeedbackWidget() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
-                  Email (opcional, por si queremos contactarte)
+                  {translate("feedbackEmailLabel")}
                 </label>
                 <Input
                   id="email"
@@ -190,10 +200,12 @@ export function FeedbackWidget() {
                   disabled={rating === 0 || isSubmitting}
                   className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
                 >
-                  {isSubmitting ? "Enviando..." : "Enviar feedback"}
+                  {isSubmitting
+                    ? translate("feedbackSubmitting")
+                    : translate("feedbackSubmitButton")}
                 </Button>
                 <Button type="button" variant="outline" onClick={handleClose}>
-                  Más tarde
+                  {translate("feedbackLater")}
                 </Button>
               </div>
             </form>

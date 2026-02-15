@@ -1,13 +1,13 @@
 "use client";
 
 import { RateSection } from "@/components/comparison/RateSection";
-import type { RateDTO } from "@/components/comparison/RateSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useTranslation } from "@/hooks/useTranslation";
 import { ratesApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { useAppStore } from "@/store/useStore";
+import type { RateDTO } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Home, Landmark, Wallet } from "lucide-react";
 import { useState } from "react";

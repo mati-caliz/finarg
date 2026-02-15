@@ -1,13 +1,18 @@
 package com.finarg.shared.enums;
 
+import com.finarg.shared.constants.UiColors;
+import lombok.Getter;
+
 public enum GapLevel {
-    LOW(0, 30, "#22c55e", "Low gap - Stable market"),
-    MEDIUM(30, 60, "#eab308", "Moderate gap - Attention"),
-    HIGH(60, Double.MAX_VALUE, "#ef4444", "High gap - Exchange tension");
+    LOW(0, 30, UiColors.GREEN, "Low gap - Stable market"),
+    MEDIUM(30, 60, UiColors.YELLOW, "Moderate gap - Attention"),
+    HIGH(60, Double.MAX_VALUE, UiColors.RED, "High gap - Exchange tension");
 
     private final double minPercent;
     private final double maxPercent;
+    @Getter
     private final String color;
+    @Getter
     private final String description;
 
     GapLevel(double minPercent, double maxPercent, String color, String description) {
@@ -15,14 +20,6 @@ public enum GapLevel {
         this.maxPercent = maxPercent;
         this.color = color;
         this.description = description;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public static GapLevel fromPercentage(double percentage) {

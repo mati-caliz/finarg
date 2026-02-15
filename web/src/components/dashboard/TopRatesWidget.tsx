@@ -6,38 +6,25 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { ratesApi } from "@/lib/api";
 import { CACHE_TIMES } from "@/lib/constants";
 import { formatPercent } from "@/lib/utils";
+import type { TopInvestmentRatesResponse } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Landmark, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
-interface RateDTO {
-  id: string;
-  name: string;
-  tna: number;
-  tea?: number;
-  product?: string;
-  term?: string;
-  date?: string;
-  limit?: number;
-  logo?: string;
-  link?: string;
-  isBestRate?: boolean;
-}
-
 export function TopInvestmentRatesWidget() {
   const { translate } = useTranslation();
 
-  const { data: topRates, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["rates", "top-investment", "ar"],
     queryFn: async () => {
       const response = await ratesApi.getTopInvestment("ar", 2);
-      return (response.data as RateDTO[]) ?? [];
+      return response.data as TopInvestmentRatesResponse;
     },
     staleTime: CACHE_TIMES.REALTIME_STALE,
   });
 
-  const topWallets = topRates?.filter((r) => !r.term).slice(0, 2);
-  const topBanks = topRates?.filter((r) => !!r.term).slice(0, 2);
+  const topWallets = data?.topWallets;
+  const topBanks = data?.topBanks;
 
   if (isLoading) {
     return <Skeleton className="h-[260px] w-full rounded-xl" />;

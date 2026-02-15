@@ -5,6 +5,7 @@ import com.finarg.quotes.client.argentina.ArgentinaDatosClient.FciRateResponse;
 import com.finarg.quotes.client.argentina.ArgentinaDatosClient.FixedTermRateResponse;
 import com.finarg.rates.client.FciClient;
 import com.finarg.rates.dto.RateDTO;
+import com.finarg.rates.dto.TopInvestmentRatesDTO;
 import com.finarg.shared.enums.Country;
 import com.finarg.shared.util.BigDecimalUtils;
 import com.finarg.shared.util.StringUtils;
@@ -248,7 +249,7 @@ public class RatesService {
         return sorted;
     }
 
-    public List<RateDTO> getTopInvestmentRates(Country country, int limit) {
+    public TopInvestmentRatesDTO getTopInvestmentRates(Country country, int limit) {
         List<RateDTO> wallets = self.getWalletRates(country);
         List<RateDTO> banks = self.getFixedTermRates(country);
 
@@ -262,9 +263,10 @@ public class RatesService {
                 .limit(limit)
                 .toList();
 
-        List<RateDTO> result = new ArrayList<>(topWallets);
-        result.addAll(topBanks);
-        return result;
+        return TopInvestmentRatesDTO.builder()
+                .topWallets(topWallets)
+                .topBanks(topBanks)
+                .build();
     }
 
     public List<RateDTO> getTopMortgageRates(Country country, int limit) {

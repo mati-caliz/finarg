@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
 import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
@@ -51,7 +52,7 @@ public class MetalsAPIClient {
 
             log.debug("Received {} metals prices", results.size());
             return results;
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching metals prices: {}", e.getMessage(), e);
             return Map.of();
         }

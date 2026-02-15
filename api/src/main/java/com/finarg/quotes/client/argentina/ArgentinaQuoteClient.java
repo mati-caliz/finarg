@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.finarg.shared.util.BigDecimalUtils;
+import org.springframework.web.reactive.function.client.WebClientException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -70,7 +71,7 @@ public class ArgentinaQuoteClient implements QuoteClient {
             ambitoClient.getEuroOficialQuote().ifPresent(result::add);
             ambitoClient.getEuroBlueQuote().ifPresent(result::add);
 
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error generating all quotes: {}", e.getMessage());
         }
         return result;
@@ -124,7 +125,7 @@ public class ArgentinaQuoteClient implements QuoteClient {
                         .map(this::mapToQuoteDTO)
                         .block();
             }
-        } catch (Exception e) {
+        } catch (WebClientException e) {
             log.error("Error fetching single quote {}: {}", type, e.getMessage());
             return null;
         }
