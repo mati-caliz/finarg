@@ -529,7 +529,7 @@ export function Sidebar() {
               </div>
             )}
 
-            <div className="px-3 pb-3">
+            <div className="hidden">
               <GoogleAd
                 adSlot="9876543210"
                 adFormat="auto"
