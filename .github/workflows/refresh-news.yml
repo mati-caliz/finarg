@@ -12,10 +12,14 @@ on:
           - production
           - staging
 
+permissions:
+  contents: read
+
 jobs:
   refresh-news:
     name: Trigger News Aggregation
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code
