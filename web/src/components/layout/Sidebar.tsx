@@ -6,7 +6,7 @@ import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
-import { useAppStore } from "@/store/useStore";
+import { useAppStore, useAuthStore } from "@/store/useStore";
 import {
   AlertTriangle,
   ArrowLeftRight,
@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronRight,
   CreditCard,
+  Crown,
   DollarSign,
   Gauge,
   Landmark,
@@ -24,6 +25,7 @@ import {
   Menu,
   Newspaper,
   Percent,
+  Sparkles,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -305,9 +307,13 @@ function NavCategory({
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, toggleSidebar, setSidebarOpen, selectedCountry } = useAppStore();
+  const { subscription, isAuthenticated } = useAuthStore();
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
+
+  const showPremiumButton =
+    !isAuthenticated || (subscription && (subscription.plan === "FREE" || !subscription.plan));
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -434,6 +440,28 @@ export function Sidebar() {
               return null;
             })}
           </nav>
+
+          {showPremiumButton && (
+            <div className="px-3 pb-3">
+              <Link href="/planes" onClick={() => toggleSidebar()}>
+                <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 p-4 cursor-pointer group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
+                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8" />
+
+                  <div className="relative flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 flex-shrink-0">
+                      <Crown className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-white leading-tight">Hacerse Premium</p>
+                      <p className="text-xs text-white/90 mt-0.5">Sin límites + Sin ads</p>
+                    </div>
+                    <Sparkles className="h-4 w-4 text-white/80 flex-shrink-0" />
+                  </div>
+                </div>
+              </Link>
+            </div>
+          )}
 
           <div className="px-3 pb-3">
             <GoogleAd
