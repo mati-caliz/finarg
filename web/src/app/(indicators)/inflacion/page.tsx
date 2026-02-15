@@ -187,17 +187,11 @@ export default function InflationPage() {
                           setChartMonthsLimit(p.value);
                         }
                       }}
-                      className={`relative ${isLocked ? "pr-8" : ""}`}
+                      className="gap-1"
                     >
-                      {translate(p.labelKey)}
-                      {p.premium && (
-                        <Crown
-                          className={`h-3 w-3 ml-1 ${
-                            isLocked
-                              ? "text-yellow-600 dark:text-yellow-500"
-                              : "text-muted-foreground"
-                          }`}
-                        />
+                      <span>{translate(p.labelKey)}</span>
+                      {isLocked && (
+                        <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />
                       )}
                     </Button>
                   );
@@ -283,17 +277,11 @@ export default function InflationPage() {
                           setChartMonthsLimit(p.value);
                         }
                       }}
-                      className={`relative ${isLocked ? "pr-8" : ""}`}
+                      className="gap-1"
                     >
-                      {translate(p.labelKey)}
-                      {p.premium && (
-                        <Crown
-                          className={`h-3 w-3 ml-1 ${
-                            isLocked
-                              ? "text-yellow-600 dark:text-yellow-500"
-                              : "text-muted-foreground"
-                          }`}
-                        />
+                      <span>{translate(p.labelKey)}</span>
+                      {isLocked && (
+                        <Crown className="h-3 w-3 text-yellow-600 dark:text-yellow-500" />
                       )}
                     </Button>
                   );
