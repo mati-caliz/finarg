@@ -82,8 +82,14 @@ services:
       # JWT
       JWT_SECRET: ${JWT_SECRET}
       # Mail
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_SMTP_AUTH: ${MAIL_SMTP_AUTH:-true}
+      MAIL_SMTP_STARTTLS: ${MAIL_SMTP_STARTTLS:-true}
+      # Feedback
+      FEEDBACK_NOTIFICATION_EMAIL: ${FEEDBACK_NOTIFICATION_EMAIL:-}
       # Google OAuth
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       # CORS
