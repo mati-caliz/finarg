@@ -64,6 +64,7 @@ public class SecurityConfig {
                                 "/api/v1/news/**",
                                 "/api/v1/{country}/feriados/**",
                                 "/api/v1/countries",
+                                "/api/v1/feedback",
                                 "/actuator/health"
                         ).permitAll()
                         .requestMatchers(

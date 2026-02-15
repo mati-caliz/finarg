@@ -457,3 +457,21 @@ export interface Holiday {
   isNational: boolean;
   daysUntil: number;
 }
+
+export interface FeedbackRequest {
+  rating: number;
+  comment?: string;
+  email?: string;
+  url: string;
+  timestamp: string;
+}
+
+export interface FeedbackResponse {
+  id: number;
+  rating: number;
+  comment?: string;
+  email?: string;
+  url: string;
+  timestamp: string;
+  createdAt: string;
+}
