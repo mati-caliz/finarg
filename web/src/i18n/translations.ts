@@ -84,6 +84,8 @@ export const translations = {
     ratesComparatorDesc: "Compará TNA de billeteras virtuales y plazos fijos de bancos",
     rateComparatorSubtitle: "Compará TNA de inversiones",
     bestRates: "Mejores Tasas",
+    bestInvestments: "Mejores Inversiones",
+    bestMortgages: "Mejores Créditos",
     virtualWallets: "Billeteras Virtuales",
     fixedTermDeposits: "Plazos Fijos",
     walletRates: "Billeteras virtuales",

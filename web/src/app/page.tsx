@@ -93,10 +93,20 @@ const NextHolidayWidget = dynamic(
   },
 );
 
-const TopRatesWidget = dynamic(
+const TopInvestmentRatesWidget = dynamic(
   () =>
     import("@/components/dashboard/TopRatesWidget").then((mod) => ({
-      default: mod.TopRatesWidget,
+      default: mod.TopInvestmentRatesWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
+const TopMortgagesWidget = dynamic(
+  () =>
+    import("@/components/dashboard/TopMortgagesWidget").then((mod) => ({
+      default: mod.TopMortgagesWidget,
     })),
   {
     loading: () => <Skeleton className="h-full w-full rounded-xl" />,
@@ -253,8 +263,13 @@ export default function DashboardPage() {
               </div>
             )}
             {countryConfig.features.exchangeBands && (
-              <div className="flex-1">
+              <div className="shrink-0">
                 <BandsWidget officialQuote={quotes?.find((q) => q.type === "oficial")} />
+              </div>
+            )}
+            {selectedCountry === "ar" && countryConfig.features.rates && (
+              <div className="shrink-0">
+                <TopInvestmentRatesWidget />
               </div>
             )}
           </div>
@@ -406,7 +421,7 @@ export default function DashboardPage() {
                 </Card>
               )}
 
-            {countryConfig.features.rates && <TopRatesWidget />}
+            {countryConfig.features.rates && <TopMortgagesWidget />}
           </div>
         )}
 
