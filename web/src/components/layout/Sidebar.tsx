@@ -375,7 +375,9 @@ export function Sidebar() {
   }, [setSidebarOpen]);
 
   useEffect(() => {
-    if (sidebarOpen && window.innerWidth < 1024) {
+    const isMobile = window.innerWidth < 1024;
+
+    if (sidebarOpen && isMobile) {
       const scrollY = window.scrollY;
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
@@ -390,6 +392,8 @@ export function Sidebar() {
         window.scrollTo(0, scrollY);
       };
     }
+
+    return undefined;
   }, [sidebarOpen]);
 
   const reservesKeyMap: Record<string, TranslationKey> = {
