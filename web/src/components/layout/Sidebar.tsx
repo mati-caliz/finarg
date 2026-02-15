@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleAd } from "@/components/GoogleAd";
 import { Button } from "@/components/ui/button";
 import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -428,6 +429,14 @@ export function Sidebar() {
               return null;
             })}
           </nav>
+
+          <div className="px-3 pb-3">
+            <GoogleAd
+              adSlot="9876543210"
+              adFormat="auto"
+              style={{ minHeight: "250px", maxWidth: "100%" }}
+            />
+          </div>
 
           <div className="border-t border-white/10 p-4">
             <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
