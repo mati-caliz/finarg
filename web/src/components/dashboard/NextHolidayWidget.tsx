@@ -28,7 +28,23 @@ export function NextHolidayWidget() {
     );
   }
 
-  if (error || !holidays || holidays.length === 0) {
+  if (error) {
+    return (
+      <Card className="border-t-[3px] border-t-violet-500">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <CalendarDays className="w-4 h-4" />
+            {translate("nextHoliday")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">Error al cargar feriados</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!holidays || holidays.length === 0) {
     return null;
   }
 
