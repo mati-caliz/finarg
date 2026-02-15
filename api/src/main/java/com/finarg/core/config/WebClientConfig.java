@@ -120,6 +120,11 @@ public class WebClientConfig {
     @Value("${external.apis.eleconomista.timeout:10000}")
     private int eleconomistaTimeout;
 
+    @Value("${external.apis.argentina-holidays.base-url:https://nolaborables.com.ar/api/v2/feriados}")
+    private String argentinaHolidaysBaseUrl;
+    @Value("${external.apis.argentina-holidays.timeout:10000}")
+    private int argentinaHolidaysTimeout;
+
     private WebClient createStandardWebClient(String baseUrl, int timeout) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(timeout));
@@ -321,5 +326,10 @@ public class WebClientConfig {
                 .defaultHeader("Accept", "application/rss+xml, application/xml, text/xml")
                 .defaultHeader("User-Agent", USER_AGENT)
                 .build();
+    }
+
+    @Bean("argentinaHolidaysWebClient")
+    public WebClient argentinaHolidaysWebClient() {
+        return createStandardWebClient(argentinaHolidaysBaseUrl, argentinaHolidaysTimeout);
     }
 }

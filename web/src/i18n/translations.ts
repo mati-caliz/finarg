@@ -11,6 +11,14 @@ export const translations = {
     reserves: "Reservas",
     news: "Noticias",
     tools: "Herramientas",
+    holidays: "Feriados",
+
+    nextHoliday: "Próximo Feriado",
+    today: "Hoy",
+    tomorrow: "Mañana",
+    days: "días",
+    nationalHoliday: "Feriado Nacional",
+    upcomingHolidays: "Próximos feriados",
 
     market: "Mercado",
     indicators: "Indicadores",
@@ -267,7 +275,6 @@ export const translations = {
     expenseRatio: "Ratio de Gastos",
     errorLoadingData: "Error al cargar los datos",
     day: "día",
-    days: "días",
     tnaRate: "Tasa TNA",
     minimum: "Mínima",
     maximum: "Máxima",

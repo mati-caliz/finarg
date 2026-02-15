@@ -95,7 +95,11 @@
       "Bash(javac:*)",
       "Bash(mvn dependency:purge-local-repository:*)",
       "Bash(mvn dependency:tree:*)",
-      "WebFetch(domain:www.ambito.com)"
+      "WebFetch(domain:www.ambito.com)",
+      "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/dto/HolidayResponseDTO.java:*)",
+      "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/client/ArgentinaHolidaysClient.java:*)",
+      "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/service/HolidayService.java:*)",
+      "Bash(/home/matiascaliz/Escritorio/frontend-components/finarg/api/src/main/java/com/finarg/holidays/controller/HolidayController.java:*)"
     ]
   }
 }

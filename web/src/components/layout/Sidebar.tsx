@@ -112,7 +112,7 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
       },
       {
         key: "news" as TranslationKey,
-        href: "/noticias",
+        href: "/noticias-financieras-argentina",
         icon: Newspaper,
         feature: null,
         isNew: true,

@@ -80,6 +80,16 @@ const CryptoWidget = dynamic(
   },
 );
 
+const NextHolidayWidget = dynamic(
+  () =>
+    import("@/components/dashboard/NextHolidayWidget").then((mod) => ({
+      default: mod.NextHolidayWidget,
+    })),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-xl" />,
+  },
+);
+
 export default function DashboardPage() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
@@ -190,6 +200,7 @@ export default function DashboardPage() {
               </Link>
             )}
             {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
+            <NextHolidayWidget />
             {countryConfig.features.inflation && (
               <Link href="/inflacion" className="block shrink-0">
                 <Card className="border-t-[3px] border-t-red-400 transition-all hover:shadow-lg hover:border-red-300 cursor-pointer min-h-[160px]">

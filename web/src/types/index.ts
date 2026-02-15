@@ -382,3 +382,11 @@ export interface NewsListResponse {
   currentPage: number;
   pageSize: number;
 }
+
+export interface Holiday {
+  date: string;
+  name: string;
+  type: string;
+  isNational: boolean;
+  daysUntil: number;
+}
