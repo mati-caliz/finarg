@@ -57,8 +57,17 @@ public class Subscription {
 
     private LocalDateTime cancelledAt;
 
-    @Column(name = "mercadopago_subscription_id")
-    private String mercadoPagoSubscriptionId;
+    @Column(name = "mobbex_subscriber_id")
+    private String mobbexSubscriberId;
+
+    @Column(name = "mobbex_execution_id")
+    private String mobbexExecutionId;
+
+    @Column(name = "last_payment_date")
+    private LocalDateTime lastPaymentDate;
+
+    @Column(name = "next_billing_date")
+    private LocalDateTime nextBillingDate;
 
     @Column(name = "stripe_subscription_id")
     private String stripeSubscriptionId;

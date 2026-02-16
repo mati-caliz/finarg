@@ -13,4 +13,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     Optional<Subscription> findTopByUserAndStatusOrderByEndDateDesc(User user, SubscriptionStatus status);
 
+    Optional<Subscription> findByMobbexSubscriberId(String mobbexSubscriberId);
+
 }

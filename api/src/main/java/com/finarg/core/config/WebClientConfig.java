@@ -126,6 +126,15 @@ public class WebClientConfig {
     @Value("${external.apis.argentina-holidays.timeout:10000}")
     private int argentinaHolidaysTimeout;
 
+    @Value("${mobbex.base-url}")
+    private String mobbexBaseUrl;
+    @Value("${mobbex.timeout:15000}")
+    private int mobbexTimeout;
+    @Value("${mobbex.api-key}")
+    private String mobbexApiKey;
+    @Value("${mobbex.access-token}")
+    private String mobbexAccessToken;
+
     private WebClient createStandardWebClient(String baseUrl, int timeout) {
         HttpClient httpClient = HttpClient.create()
                 .responseTimeout(Duration.ofMillis(timeout));
@@ -326,5 +335,15 @@ public class WebClientConfig {
     @Bean("argentinaHolidaysWebClient")
     public WebClient argentinaHolidaysWebClient() {
         return createStandardWebClient(argentinaHolidaysBaseUrl, argentinaHolidaysTimeout);
+    }
+
+    @Bean("mobbexWebClient")
+    public WebClient mobbexWebClient() {
+        return createWebClientWithHeaders(mobbexBaseUrl, mobbexTimeout, Map.of(
+                "x-api-key", mobbexApiKey,
+                "x-access-token", mobbexAccessToken,
+                HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE,
+                HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE
+        ));
     }
 }

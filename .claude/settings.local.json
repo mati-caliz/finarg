@@ -105,7 +105,8 @@
       "Bash(sort:*)",
       "Bash(ANALYZE=true npm run build:*)",
       "Bash(fi)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "WebFetch(domain:mobbex.dev)"
     ]
   }
 }
