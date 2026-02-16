@@ -151,3 +151,10 @@ exchange-bands:
 feedback:
   notification:
     email: ${FEEDBACK_NOTIFICATION_EMAIL:}
+
+mobbex:
+  base-url: https://api.mobbex.com/p
+  timeout: 15000
+  api-key: ${MOBBEX_API_KEY:}
+  access-token: ${MOBBEX_ACCESS_TOKEN:}
+  subscription-plan-id: ${MOBBEX_SUBSCRIPTION_PLAN_ID:}

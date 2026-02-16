@@ -1,5 +1,7 @@
 package com.finarg.subscription.service;
 
+import com.finarg.payment.service.MobbexService;
+import com.finarg.subscription.dto.CheckoutURLDTO;
 import com.finarg.subscription.dto.CreateSubscriptionRequestDTO;
 import com.finarg.subscription.dto.PlanFeaturesDTO;
 import com.finarg.subscription.dto.PricingResponseDTO;
@@ -28,6 +30,7 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final UsageTrackingService usageTrackingService;
+    private final MobbexService mobbexService;
 
     public Subscription getActiveSubscription(User user) {
         return subscriptionRepository
@@ -51,7 +54,7 @@ public class SubscriptionService {
     }
 
     @Transactional
-    public void createSubscription(User user, CreateSubscriptionRequestDTO request) {
+    public CheckoutURLDTO createSubscription(User user, CreateSubscriptionRequestDTO request) {
         Subscription currentSub = getActiveSubscription(user);
         if (currentSub.getId() != null && currentSub.getStatus() == SubscriptionStatus.ACTIVE) {
             currentSub.setStatus(SubscriptionStatus.CANCELLED);
@@ -75,7 +78,22 @@ public class SubscriptionService {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        subscription = subscriptionRepository.save(subscription);
+
+        String checkoutUrl = mobbexService.createSubscriberAndGetCheckoutUrl(user, subscription);
+
+        if (checkoutUrl == null) {
+            subscription.setStatus(SubscriptionStatus.CANCELLED);
+            subscriptionRepository.save(subscription);
+            throw new RuntimeException("Failed to create Mobbex checkout");
+        }
+
         subscriptionRepository.save(subscription);
+
+        return CheckoutURLDTO.builder()
+                .checkoutUrl(checkoutUrl)
+                .subscriptionId(subscription.getId().toString())
+                .build();
     }
 
     @Transactional
@@ -206,8 +224,4 @@ public class SubscriptionService {
         };
     }
 
-    public Subscription getSubscriptionById(Long id) {
-        return subscriptionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Subscription not found"));
-    }
 }

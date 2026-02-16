@@ -65,6 +65,7 @@ public class SecurityConfig {
                                 "/api/v1/{country}/feriados/**",
                                 "/api/v1/countries",
                                 "/api/v1/feedback",
+                                "/api/v1/webhooks/mobbex",
                                 "/actuator/health"
                         ).permitAll()
                         .requestMatchers(
