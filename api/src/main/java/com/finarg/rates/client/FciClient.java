@@ -15,6 +15,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,19 +98,17 @@ public class FciClient {
         Map<String, FciFundData> previousMap = previousData.stream()
                 .collect(Collectors.toMap(FciFundData::getFundName, fund -> fund, (a, b) -> a));
 
-        return latestData.stream()
+        Map<String, BigDecimal> result = new HashMap<>();
+        latestData.stream()
                 .filter(latest -> previousMap.containsKey(latest.getFundName()))
-                .collect(Collectors.toMap(
-                        FciFundData::getFundName,
-                        latest -> {
-                            FciFundData previous = previousMap.get(latest.getFundName());
-                            return calculateTna(latest.getShareValue(), previous.getShareValue(), latest.getDate(), previous.getDate());
-                        },
-                        (a, b) -> a
-                ))
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .forEach(latest -> {
+                    FciFundData previous = previousMap.get(latest.getFundName());
+                    BigDecimal tna = calculateTna(latest.getShareValue(), previous.getShareValue(), latest.getDate(), previous.getDate());
+                    if (tna != null) {
+                        result.putIfAbsent(latest.getFundName(), tna);
+                    }
+                });
+        return result;
     }
 
     private static long resolveDaysBetween(String previousDate, String currentDate) {
