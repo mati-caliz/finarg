@@ -61,8 +61,4 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### What happens next?" >> $GITHUB_STEP_SUMMARY
           echo "1. Scrapers fetch news from Infobae and El Economista" >> $GITHUB_STEP_SUMMARY
-          echo "2. Ollama AI analyzes each article" >> $GITHUB_STEP_SUMMARY
-          echo "3. Summaries and key points are generated" >> $GITHUB_STEP_SUMMARY
-          echo "4. News are saved to database" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "⏱️ This process takes approximately 2-5 minutes." >> $GITHUB_STEP_SUMMARY
+          echo "2. News are saved to database" >> $GITHUB_STEP_SUMMARY

@@ -60,27 +60,6 @@ services:
     security_opt:
       - no-new-privileges:true
 
-  ollama:
-    image: ollama/ollama:0.6.2
-    container_name: finarg-ollama
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - ai-network
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '1.0'
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    security_opt:
-      - no-new-privileges:true
-
   backend:
     build:
       context: ./api
@@ -91,8 +70,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      ollama:
-        condition: service_started
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -120,7 +97,6 @@ services:
     networks:
       - db-network
       - app-network
-      - ai-network
     restart: always
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
@@ -233,8 +209,6 @@ volumes:
     driver: local
   redis_data:
     driver: local
-  ollama_data:
-    driver: local
 
 networks:
   db-network:
@@ -242,8 +216,5 @@ networks:
     internal: true
   app-network:
     driver: bridge
-  ai-network:
-    driver: bridge
-    internal: true
   shared-nginx:
     external: true

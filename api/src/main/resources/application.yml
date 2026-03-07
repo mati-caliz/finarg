@@ -114,9 +114,6 @@ external:
     iol:
       base-url: https://api.invertironline.com
       timeout: 15000
-    ollama:
-      base-url: http://ollama:11434
-      timeout: 30000
     argentina-holidays:
       base-url: https://date.nager.at/api/v3/publicholidays
       timeout: 10000

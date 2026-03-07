@@ -111,11 +111,6 @@ public class WebClientConfig {
     @Value("${external.apis.dolarito.auth-client:f7d471ab0a4ff2b7947759d985ed1db0}")
     private String dolaritoAuthClient;
 
-    @Value("${external.apis.ollama.base-url:http://localhost:11434}")
-    private String ollamaBaseUrl;
-    @Value("${external.apis.ollama.timeout:30000}")
-    private int ollamaTimeout;
-
     @Value("${external.apis.eleconomista.base-url:https://eleconomista.com.ar}")
     private String eleconomistaBaseUrl;
     @Value("${external.apis.eleconomista.timeout:10000}")
@@ -317,11 +312,6 @@ public class WebClientConfig {
                 .defaultHeader("origin", "https://www.dolarito.ar")
                 .defaultHeader("referer", "https://www.dolarito.ar/")
                 .build();
-    }
-
-    @Bean("ollamaWebClient")
-    public WebClient ollamaWebClient() {
-        return createStandardWebClient(ollamaBaseUrl, ollamaTimeout);
     }
 
     @Bean("eleconomistaWebClient")
