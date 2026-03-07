@@ -1,12 +1,11 @@
 package com.finarg.news.service;
 
 import com.finarg.news.client.NewsScraperClient;
-import com.finarg.news.client.OllamaClient;
-import com.finarg.news.dto.AiAnalysisDTO;
 import com.finarg.news.dto.NewsArticleResponseDTO;
 import com.finarg.news.dto.NewsListResponseDTO;
 import com.finarg.news.dto.RawNewsDTO;
 import com.finarg.news.entity.NewsArticle;
+import com.finarg.news.enums.AiSentiment;
 import com.finarg.news.enums.NewsCategory;
 import com.finarg.news.repository.NewsArticleRepository;
 import com.finarg.shared.enums.Country;
@@ -30,7 +29,6 @@ import java.util.Optional;
 public class NewsService {
 
     private final NewsArticleRepository newsArticleRepository;
-    private final OllamaClient ollamaClient;
     private final List<NewsScraperClient> newsScraperClients;
 
     @Cacheable(value = "news", key = "'latest_' + #country.code + '_' + #page + '_' + #size")
@@ -97,12 +95,6 @@ public class NewsService {
             }
 
             try {
-                log.debug("Analyzing article with AI: {}", rawNews.getTitle());
-                AiAnalysisDTO analysis = ollamaClient.analyzeArticle(
-                    rawNews.getTitle(),
-                    rawNews.getContent()
-                );
-
                 NewsArticle article = NewsArticle.builder()
                         .title(rawNews.getTitle())
                         .content(rawNews.getContent())
@@ -113,15 +105,12 @@ public class NewsService {
                         .publishedDate(rawNews.getPublishedDate())
                         .isOfficial(rawNews.getIsOfficial())
                         .country(Country.ARGENTINA)
-                        .aiSummary(analysis.getSummary())
-                        .sentiment(analysis.getSentiment())
-                        .category(analysis.getCategory())
-                        .keyPoints(String.join("; ", analysis.getKeyPoints()))
+                        .sentiment(AiSentiment.NEUTRAL)
+                        .category(NewsCategory.ECONOMY_GENERAL)
                         .build();
 
                 newsArticleRepository.save(article);
-                log.info("Saved news article: {} (Category: {}, Sentiment: {})",
-                    article.getTitle(), article.getCategory(), article.getSentiment());
+                log.info("Saved news article: {}", article.getTitle());
             } catch (Exception e) {
                 log.error("Error processing news article '{}': {}",
                     rawNews.getTitle(), e.getMessage());
