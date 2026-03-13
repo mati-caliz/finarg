@@ -1,7 +1,7 @@
 # Multi-stage build para optimizar el tamaño de la imagen
 
 # Stage 1: Build
-FROM maven:3.9-eclipse-temurin-17-alpine@sha256:d50b6f8862731c9b7386bfd35a766613df46d09042ac6eb537f446d8e0e4d534 AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # Copiar archivos de configuración de Maven primero (para cache de dependencias)
@@ -14,11 +14,11 @@ COPY src ./src
 RUN mvn clean package -DskipTests -Dcheckstyle.skip=true -B
 
 # Stage 2: Runtime
-FROM eclipse-temurin:17-jre-alpine@sha256:7aa804a1824d18d06c68598fe1c2953b5b203823731be7b9298bb3e0f1920b0d
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 
 # Crear usuario no-root para seguridad
-RUN addgroup -g 1001 -S spring && adduser -u 1001 -S spring -G spring
+RUN groupadd -g 1001 spring && useradd -u 1001 -g spring spring
 USER spring:spring
 
 # Copiar el JAR desde la etapa de build
