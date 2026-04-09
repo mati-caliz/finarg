@@ -17,7 +17,7 @@ const securityHeaders = [
   },
   {
     key: "X-Frame-Options",
-    value: "DENY",
+    value: "ALLOW-FROM https://matiascaliz.com.ar",
   },
   {
     key: "Referrer-Policy",
@@ -48,7 +48,7 @@ const securityHeaders = [
       "frame-src https://accounts.google.com",
       "base-uri 'self'",
       "form-action 'self'",
-      "frame-ancestors 'none'",
+      "frame-ancestors 'self' https://matiascaliz.com.ar",
     ]
       .filter(Boolean)
       .join("; "),
