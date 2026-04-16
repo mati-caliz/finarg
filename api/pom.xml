@@ -25,23 +25,149 @@
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <spotless.version>2.44.4</spotless.version>
         <poi.version>5.5.1</poi.version>
+
+        <!-- Security override properties (recognized by spring-boot-starter-parent BOM) -->
+        <netty.version>4.1.132.Final</netty.version>
+        <spring-security.version>6.5.9</spring-security.version>
+        <hibernate.version>6.6.48.Final</hibernate.version>
+        <jackson-bom.version>2.18.6</jackson-bom.version>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
-            <!-- Override transitive dependency to fix CVE-2025-48924 -->
+
+            <!-- ============================================================ -->
+            <!-- EXISTING OVERRIDES                                           -->
+            <!-- ============================================================ -->
+
+            <!-- CVE-2025-48924: commons-lang3 uncontrolled recursion DoS -->
+            <!-- Fixed in 3.18.0; we pin to 3.20.0 -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
 
-            <!-- Override transitive dependency from POI to fix CVE-2024-25710 and CVE-2024-26308 -->
+            <!-- CVE-2024-25710, CVE-2024-26308: commons-compress loop/OOM -->
+            <!-- Fixed in 1.26.0; we pin to 1.27.1 -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.27.1</version>
             </dependency>
+
+            <!-- ============================================================ -->
+            <!-- NETTY — CVE-2025-24970 (fixed 4.1.118), CVE-2025-25193     -->
+            <!-- (fixed 4.1.119), CVE-2025-58056 (fixed 4.1.125),           -->
+            <!-- CVE-2025-67735 (fixed 4.1.129), CVE-2026-33870 +           -->
+            <!-- CVE-2026-33871 (fixed 4.1.132).                            -->
+            <!-- SB 3.5.10 ships 4.1.130; override entire BOM to 4.1.132.  -->
+            <!-- Handled via <netty.version> property above (SB recognizes) -->
+            <!-- ============================================================ -->
+
+            <!-- ============================================================ -->
+            <!-- SPRING SECURITY — CVE-2026-22732: HTTP security headers     -->
+            <!-- silently not written (CRITICAL). Fixed in 6.5.9.           -->
+            <!-- SB 3.5.10 ships 6.5.7; override via property above.        -->
+            <!-- ============================================================ -->
+
+            <!-- ============================================================ -->
+            <!-- HIBERNATE ORM — CVE-2026-0603: second-order SQL injection   -->
+            <!-- via InlineIdsOrClauseBuilder (CVSS 8.3 HIGH).              -->
+            <!-- Fixed in 6.6.42; pin to latest 6.6.x available.           -->
+            <!-- SB 3.5.10 ships 6.6.41; override via property above.       -->
+            <!-- ============================================================ -->
+
+            <!-- ============================================================ -->
+            <!-- JACKSON CORE — GHSA-72hv-8253-57qq: async parser number    -->
+            <!-- length constraint bypass → DoS (published Feb 2026).       -->
+            <!-- Also covers CVE-2025-52999 (stack overflow, fixed 2.15.0). -->
+            <!-- SB 3.5.10 ships 2.19.4 (vulnerable to GHSA async bypass);  -->
+            <!-- downgrade to the 2.18 LTS fixed branch (2.18.6).          -->
+            <!-- Handled via <jackson-bom.version> property above.          -->
+            <!-- ============================================================ -->
+
+            <!-- ============================================================ -->
+            <!-- NIMBUS JOSE+JWT — CVE-2025-53864: uncontrolled recursion in -->
+            <!-- deeply-nested JWT JSON claim sets → DoS (CVSS 5.8 MEDIUM). -->
+            <!-- SB 3.5.10 / Spring Security 6.5.7 ship 9.37.4 (vulnerable).-->
+            <!-- Fixed in 10.0.2.                                           -->
+            <!-- ============================================================ -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>10.0.2</version>
+            </dependency>
+
+            <!-- ============================================================ -->
+            <!-- BOUNCY CASTLE — CVE-2025-8916: excessive allocation in cert -->
+            <!-- path processing → DoS (affects BC 1.44–1.78).             -->
+            <!-- Also covers CVE-2024-30172 (infinite loop, fixed 1.78) and -->
+            <!-- CVE-2024-30171 (timing attack, fixed 1.78).               -->
+            <!-- jjwt-impl 0.12.6 pulls bcprov-jdk18on:1.78 (vulnerable).  -->
+            <!-- Fixed in 1.79; pin to latest stable 1.84.                  -->
+            <!-- ============================================================ -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.84</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.84</version>
+            </dependency>
+
+            <!-- ============================================================ -->
+            <!-- PROTOBUF-JAVA — CVE-2024-7254: StackOverflow on nested      -->
+            <!-- unknown fields parsing → DoS (CVSS 8.7 HIGH).             -->
+            <!-- google-api-client 2.8.0 pulls protobuf as test scope, but   -->
+            <!-- pin defensively in case it leaks to compile scope.         -->
+            <!-- Fixed in 3.25.5 / 4.28.2; pin to latest 4.x stable.       -->
+            <!-- ============================================================ -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>4.29.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>4.29.4</version>
+            </dependency>
+
+            <!-- ============================================================ -->
+            <!-- APACHE HTTPCLIENT5 — CVE-2025-27820: PSL domain check       -->
+            <!-- disabled in 5.4.x → cookie/hostname bypass (CVSS 7.5 HIGH) -->
+            <!-- Only affects 5.4.x; SB 3.5.10 ships 5.5.2 (clean), but    -->
+            <!-- webdrivermanager 6.3.3 declares httpclient5 which may       -->
+            <!-- resolve to a vulnerable version without this pin.           -->
+            <!-- Fixed in 5.4.3; pin to 5.5.2 (current SB-managed version).-->
+            <!-- ============================================================ -->
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>5.5.2</version>
+            </dependency>
+
+            <!-- ============================================================ -->
+            <!-- LOGBACK — CVE-2025-11226: ACE via conditional config file   -->
+            <!-- processing (requires Janino on classpath). Fixed in 1.5.19.-->
+            <!-- SB 3.5.10 ships 1.5.25 which already exceeds the fix,      -->
+            <!-- but logstash-logback-encoder 8.1 may pull an older version;-->
+            <!-- pin as a safety net so Maven always resolves to >= 1.5.25.  -->
+            <!-- ============================================================ -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.5.25</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.5.25</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
     
