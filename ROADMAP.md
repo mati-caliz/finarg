@@ -69,6 +69,10 @@ political_events(id, date, title, category, description)   -- para anotar series
 Un mismo indicador puede tener varias `source` (ej: pobreza INDEC vs UTDT vs UCA):
 mostrar la discrepancia entre mediciones es una feature, no un problema.
 
+Lo que no encaja en la tabla genérica usa tablas propias; el conector sobrescribe `persist()`
+y sigue registrando en `scrape_runs`. Primer caso: votaciones del Congreso, en
+`congress_votes` (cabecera de cada acta) + `congress_vote_details` (voto por diputado).
+
 ## Inventario de fuentes por indicador
 
 | Indicador | Fuente | Acceso | Frecuencia | Dificultad |
@@ -142,24 +146,29 @@ idempotente):
   (~7.5k filas, source `bcra`). Convive con la mensual de datosgobar bajo el mismo `indicator_code`:
   dos `source` para el mismo indicador, primer caso del comparador de mediciones.
 - `seed-events`: 19 hitos políticos curados 2001-2024 en `political_events` (para anotar series).
+- `congreso` (datos.hcdn.gob.ar): votaciones nominales de Diputados en tablas propias
+  (`congress_votes` 999 actas 2011-2020 + `congress_vote_details` ~257k votos por diputado).
+  Recursos resueltos dinámicamente vía la API CKAN (clasificados por formato JSON + keyword
+  cabecera/detalle): al agregarse un período nuevo entra solo, sin URLs hardcodeadas.
 
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 
-**Pendiente:** inflación de
-alta frecuencia (consultoras/Alphacast — fuentes frágiles), Nowcast pobreza + ICG/ICC (UTDT, PDFs)
-— habilitan el comparador de mediciones (INDEC vs UTDT vs UCA), Congreso (modelar tablas propias,
-no encaja en indicator_history), y portar los módulos scraper-only. Integrar `scraper` al compose.
+**Pendiente:** inflación de alta frecuencia (consultoras/Alphacast — fuentes frágiles),
+Nowcast pobreza + ICG/ICC (UTDT, PDFs) — habilitan el comparador de mediciones
+(INDEC vs UTDT vs UCA), portar los módulos scraper-only, y el Senado (datos abiertos, para
+completar el Congreso). Integrar `scraper` al compose.
 
 - Orden de conectores, de menor a mayor riesgo:
-  1. Los de dificultad baja portados del Java (datos.gob.ar, BCRA, dolarapi, riesgo país):
+  1. ✅ Los de dificultad baja portados del Java (datos.gob.ar, BCRA, dolarapi, riesgo país):
      validan la arquitectura con fuentes conocidas.
-  2. CBA/CBT, RIPTE, índice de salarios, pobreza oficial INDEC.
-  3. inflacionverdadera.com (inflación diaria).
-  4. ICG/ICC de UTDT y Nowcast de pobreza UTDT (PDFs — el más difícil, hacerlo al final
+  2. ✅ CBA/CBT, RIPTE, índice de salarios, pobreza oficial INDEC.
+  3. ✅ Congreso Diputados (datos.hcdn.gob.ar, API CKAN — más accesible de lo previsto).
+  4. inflacionverdadera.com (inflación diaria).
+  5. ICG/ICC de UTDT y Nowcast de pobreza UTDT (PDFs — el más difícil, hacerlo al final
      con lo demás ya andando).
-  5. Congreso (datos.hcdn.gob.ar + Senado).
-  6. Portar los módulos scraper-only que quedaron en Java como referencia: `investments`
+  6. Senado (datos abiertos) para completar el Congreso.
+  7. Portar los módulos scraper-only que quedaron en Java como referencia: `investments`
      (bonos, cauciones, cedears, ETFs, letras, metales, acciones), `news`, `crypto`, `holidays`.
      Escriben a la base pero sin UI por ahora (data disponible para features futuras).
 - Scheduling con cron del host (una entrada por cadencia: 15min cotizaciones, diaria,

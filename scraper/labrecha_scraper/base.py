@@ -37,8 +37,40 @@ class Connector(ABC):
         )
 
     @abstractmethod
-    def fetch(self) -> list[IndicatorPoint]:
+    def fetch(self) -> object:
         raise NotImplementedError
+
+    def persist(self, session: Session, data: object) -> int:
+        return _upsert(session, data)
+
+
+UPSERT_BATCH_SIZE = 5000
+
+
+def upsert_rows(
+    session: Session,
+    model: type,
+    rows: list[dict],
+    index_elements: list[str],
+    batch_size: int = UPSERT_BATCH_SIZE,
+) -> int:
+    if not rows:
+        return 0
+    update_columns = [column for column in rows[0] if column not in index_elements]
+    total = 0
+    for start in range(0, len(rows), batch_size):
+        chunk = rows[start : start + batch_size]
+        statement = insert(model).values(chunk)
+        if update_columns:
+            statement = statement.on_conflict_do_update(
+                index_elements=index_elements,
+                set_={column: statement.excluded[column] for column in update_columns},
+            )
+        else:
+            statement = statement.on_conflict_do_nothing(index_elements=index_elements)
+        session.execute(statement)
+        total += len(chunk)
+    return total
 
 
 def _upsert(session: Session, points: list[IndicatorPoint]) -> int:
@@ -69,8 +101,8 @@ def run_job(session: Session, connector: Connector) -> ScrapeRun:
     session.commit()
 
     try:
-        points = connector.fetch()
-        upserted = _upsert(session, points)
+        data = connector.fetch()
+        upserted = connector.persist(session, data)
         run.rows_upserted = upserted
         run.status = "success"
         run.finished_at = func.now()

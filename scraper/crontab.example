@@ -13,3 +13,6 @@ COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
 35 7 * * *    $COMPOSE run --rm scraper run inflacion    >> /var/log/labrecha/inflacion.log 2>&1
 40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
 45 7 * * *    $COMPOSE run --rm scraper run reservas_bcra >> /var/log/labrecha/reservas_bcra.log 2>&1
+
+# Congreso: votaciones nominales, baja frecuencia (por sesión). Semanal, lunes 08:00.
+0 8 * * 1     $COMPOSE run --rm scraper run congreso     >> /var/log/labrecha/congreso.log 2>&1
