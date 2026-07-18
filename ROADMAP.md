@@ -150,6 +150,10 @@ idempotente):
   (`congress_votes` 999 actas 2011-2020 + `congress_vote_details` ~257k votos por diputado).
   Recursos resueltos dinámicamente vía la API CKAN (clasificados por formato JSON + keyword
   cabecera/detalle): al agregarse un período nuevo entra solo, sin URLs hardcodeadas.
+- `crypto` (CoinGecko): `cripto_{btc,eth,bnb,xrp,ada,sol}` como snapshot diario en USD
+  (portado del scraper-only Java).
+- `holidays` (Nager.Date): feriados de Argentina 2010-2027 en tabla propia `holidays`
+  con PK `(date, name)` — la fuente tiene días con dos feriados (portado del scraper-only Java).
 
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
@@ -171,9 +175,9 @@ on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por 
   5. ICG/ICC de UTDT y Nowcast de pobreza UTDT (PDFs — el más difícil, hacerlo al final
      con lo demás ya andando).
   6. Senado (datos abiertos) para completar el Congreso.
-  7. Portar los módulos scraper-only que quedaron en Java como referencia: `investments`
-     (bonos, cauciones, cedears, ETFs, letras, metales, acciones), `news`, `crypto`, `holidays`.
-     Escriben a la base pero sin UI por ahora (data disponible para features futuras).
+  7. Portar los módulos scraper-only que quedaron en Java como referencia: ✅ `crypto`,
+     ✅ `holidays`; falta `investments` (bonos, cauciones, cedears, ETFs, letras, metales,
+     acciones) y `news`. Escriben a la base pero sin UI por ahora (data para features futuras).
 - Scheduling con cron del host (una entrada por cadencia: 15min cotizaciones, diaria,
   semanal, mensual). Idempotencia por upsert sobre el índice único.
 - Backfill histórico de cada serie hasta donde la fuente lo permita.

@@ -34,6 +34,8 @@ Algunos indicadores no encajan en la tabla genérica y usan tablas propias: `con
 | `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `indice_salarios`, `pobreza_personas`, `base_monetaria`, `recaudacion_tributaria`, `emae` | diaria |
 | `reservas_bcra` | BCRA (API v4.0) | `reservas_internacionales` diaria desde 1996 (`source=bcra`) | diaria |
 | `congreso` | datos.hcdn.gob.ar | votaciones nominales de Diputados (tablas `congress_votes` / `congress_vote_details`) | semanal |
+| `crypto` | CoinGecko | `cripto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
+| `holidays` | Nager.Date | feriados de Argentina (tabla `holidays`, PK `(date, name)`) | mensual |
 
 `political_events` se puebla con un set curado de hitos (elecciones, cambios de gobierno, DNUs,
 medidas económicas) vía `seed-events` — datos curados, no scrapeados. Habilitan anotar las series
@@ -44,8 +46,8 @@ en la UI (Fase 3).
 datos.gob.ar (`source=datosgobar`) y la diaria del BCRA (`source=bcra`, desde 1996). Es el primer
 caso real del comparador de mediciones.
 
-Pendientes: `investments`/`news`/`crypto`/`holidays` (scraper-only, portar del Java) y las fuentes
-frágiles (inflación diaria de inflacionverdadera.com, Nowcast pobreza UTDT, ICG/ICC), que van después.
+Pendientes: `investments` y `news` (scraper-only, portar del Java) y las fuentes frágiles
+(inflación diaria de inflacionverdadera.com, Nowcast pobreza UTDT, ICG/ICC), que van después.
 
 ## Agregar un conector
 
