@@ -125,10 +125,21 @@ Tests: los que fallan son pre-existentes (verificado con git stash); se borró s
 
 **Criterio de salida**: ✅ la app compila, funciona solo-Argentina, sin login, `next build` OK.
 
-### Fase 1 — Scraper Python (≈2-3 semanas, el corazón del pivot)
+### Fase 1 — Scraper Python (≈2-3 semanas, el corazón del pivot) — 🚧 EN CURSO
 
-- Crear `scraper/` (Python 3.12, uv, SQLAlchemy + Pydantic, httpx, un job = un módulo).
-- Crear tablas `indicator_history`, `scrape_runs`, `political_events`.
+**Hecho (2026-07-17):** estructura `scraper/` creada (SQLAlchemy + httpx + pydantic, un job =
+un módulo), tablas `indicator_history` / `scrape_runs` / `political_events`, connector base con
+tracking de corridas y upsert idempotente, CLI (`init-db`/`list`/`run`/`status`), Dockerfile +
+crontab de ejemplo. Primeros 4 conectores verificados end-to-end contra Postgres (9917 filas,
+re-run idempotente): `dolar` (dolarapi), `inflacion` mensual+interanual y `riesgo_pais`
+(argentinadatos), `series_datosgob` (CBA nacional + IPC nivel general). Histórico profundo
+(IPC desde 1943, riesgo país desde 1999).
+
+**Pendiente:** reservas BCRA (el endpoint v3 daba 410 en la prueba; portar desde el cliente Java
+que funciona), RIPTE/índice de salarios y pobreza INDEC (más series de datos.gob.ar), inflación
+diaria (inflacionverdadera.com), Nowcast pobreza + ICG/ICC (UTDT, PDFs), Congreso, y portar los
+módulos scraper-only. Integrar el servicio `scraper` al docker-compose.
+
 - Orden de conectores, de menor a mayor riesgo:
   1. Los de dificultad baja portados del Java (datos.gob.ar, BCRA, dolarapi, riesgo país):
      validan la arquitectura con fuentes conocidas.
