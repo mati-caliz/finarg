@@ -22,6 +22,9 @@ SERIES: dict[str, SeriesSpec] = {
     "158.1_REPTE_0_0_5": SeriesSpec("ripte", "ARS"),
     "149.1_TL_INDIIOS_OCTU_0_21": SeriesSpec("indice_salarios", "indice"),
     "64.2_POBLACION_NUA_0_0_34_74": SeriesSpec("pobreza_personas", "%", Decimal(100)),
+    "331.1_SALDO_BASERIA__15": SeriesSpec("base_monetaria", "ARS_millones"),
+    "172.3_TL_RECAION_M_0_0_17": SeriesSpec("recaudacion_tributaria", "ARS_millones"),
+    "143.2_NO_PR_2004_A_21": SeriesSpec("emae", "indice"),
 }
 
 
