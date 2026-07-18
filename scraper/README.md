@@ -27,7 +27,11 @@ requisito porque los scrapers de HTML/PDF son frágiles y no deben escribir dato
 | `dolar` | dolarapi.com | `dolar_{oficial,blue,mep,ccl,tarjeta,...}` | 15 min |
 | `inflacion` | argentinadatos | `ipc_mensual`, `ipc_interanual` | diaria |
 | `riesgo_pais` | argentinadatos | `riesgo_pais` (histórico completo) | diaria |
-| `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `pobreza_personas` | diaria |
+| `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `indice_salarios`, `pobreza_personas` | diaria |
+
+`political_events` se puebla con un set curado de hitos (elecciones, cambios de gobierno, DNUs,
+medidas económicas) vía `seed-events` — datos curados, no scrapeados. Habilitan anotar las series
+en la UI (Fase 3).
 
 `pobreza_personas` es semestral (EPH, total nacional) y se guarda en % (la fuente da fracción).
 `reservas_internacionales` acá es la serie mensual de datos.gob.ar; la diaria del BCRA se sumará
@@ -49,6 +53,7 @@ python -m labrecha_scraper init-db      # crear tablas
 python -m labrecha_scraper list         # jobs disponibles
 python -m labrecha_scraper run dolar    # un job
 python -m labrecha_scraper run all      # todos
+python -m labrecha_scraper seed-events  # sembrar hitos políticos curados
 python -m labrecha_scraper status       # última corrida de cada job
 ```
 

@@ -10,6 +10,7 @@ from labrecha_scraper.base import run_job
 from labrecha_scraper.db import SessionLocal, engine
 from labrecha_scraper.models import Base, ScrapeRun
 from labrecha_scraper.registry import CONNECTORS, get_connector
+from labrecha_scraper.seed_events import seed_events
 
 
 def _configure_logging() -> None:
@@ -42,6 +43,12 @@ def _run(job: str) -> int:
     return failures
 
 
+def _seed_events() -> None:
+    with SessionLocal() as session:
+        count = seed_events(session)
+    print(f"political_events sembrados/actualizados: {count}")
+
+
 def _status() -> None:
     with SessionLocal() as session:
         for name in sorted(CONNECTORS):
@@ -67,6 +74,7 @@ def main(argv: list[str] | None = None) -> int:
 
     subparsers.add_parser("init-db", help="crear tablas si no existen")
     subparsers.add_parser("list", help="listar jobs disponibles")
+    subparsers.add_parser("seed-events", help="sembrar hitos políticos curados")
     subparsers.add_parser("status", help="última corrida de cada job")
     run_parser = subparsers.add_parser("run", help="correr un job o 'all'")
     run_parser.add_argument("job", help="nombre del job o 'all'")
@@ -78,6 +86,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "list":
         _list_jobs()
+        return 0
+    if args.command == "seed-events":
+        _seed_events()
         return 0
     if args.command == "status":
         _status()
