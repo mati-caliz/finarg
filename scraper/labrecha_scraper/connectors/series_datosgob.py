@@ -7,9 +7,20 @@ from labrecha_scraper.base import Connector, IndicatorPoint
 
 SERIES_URL = "https://apis.datos.gob.ar/series/api/series/"
 
-SERIES: dict[str, str] = {
-    "444.1_CANASTA_BARIA_0_0_26_47": "cba_nacional",
-    "148.3_INIVELNAL_DICI_M_26": "ipc_nivel_general",
+
+class SeriesSpec:
+    def __init__(self, code: str, unit: str, factor: Decimal = Decimal(1)) -> None:
+        self.code = code
+        self.unit = unit
+        self.factor = factor
+
+
+SERIES: dict[str, SeriesSpec] = {
+    "444.1_CANASTA_BARIA_0_0_26_47": SeriesSpec("cba_nacional", "ARS"),
+    "148.3_INIVELNAL_DICI_M_26": SeriesSpec("ipc_nivel_general", "indice"),
+    "174.1_RRVAS_IDOS_0_0_36": SeriesSpec("reservas_internacionales", "USD_millones"),
+    "158.1_REPTE_0_0_5": SeriesSpec("ripte", "ARS"),
+    "64.2_POBLACION_NUA_0_0_34_74": SeriesSpec("pobreza_personas", "%", Decimal(100)),
 }
 
 
@@ -20,11 +31,11 @@ class SeriesDatosGobConnector(Connector):
     def fetch(self) -> list[IndicatorPoint]:
         points: list[IndicatorPoint] = []
         with self.build_client() as client:
-            for series_id, indicator_code in SERIES.items():
-                points.extend(self._fetch_series(client, series_id, indicator_code))
+            for series_id, spec in SERIES.items():
+                points.extend(self._fetch_series(client, series_id, spec))
         return points
 
-    def _fetch_series(self, client, series_id: str, indicator_code: str) -> list[IndicatorPoint]:
+    def _fetch_series(self, client, series_id: str, spec: SeriesSpec) -> list[IndicatorPoint]:
         response = client.get(
             SERIES_URL,
             params={"ids": series_id, "limit": 5000, "sort": "asc", "format": "json"},
@@ -37,11 +48,11 @@ class SeriesDatosGobConnector(Connector):
                 continue
             result.append(
                 IndicatorPoint(
-                    indicator_code=indicator_code,
+                    indicator_code=spec.code,
                     source=self.source,
                     date=date.fromisoformat(row[0]),
-                    value=Decimal(str(row[1])),
-                    meta={"series_id": series_id},
+                    value=Decimal(str(row[1])) * spec.factor,
+                    meta={"series_id": series_id, "unit": spec.unit},
                 )
             )
         return result
