@@ -136,10 +136,12 @@ idempotente):
 - `inflacion` (argentinadatos): `ipc_mensual` + `ipc_interanual` (desde 1943).
 - `riesgo_pais` (argentinadatos): histórico desde 1999.
 - `series_datosgob` (datos.gob.ar): `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`
-  (mensual), `ripte`, `indice_salarios`, `pobreza_personas` (total nacional, semestral, en %).
+  (mensual), `ripte`, `indice_salarios`, `pobreza_personas` (total nacional, semestral, en %),
+  `base_monetaria`, `recaudacion_tributaria`, `emae`. → 19 indicadores, ~12k filas históricas.
 - `seed-events`: 19 hitos políticos curados 2001-2024 en `political_events` (para anotar series).
 
-Fuente descartada: inflacionverdadera.com (página estática, data como imagen).
+Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
+Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 
 **Pendiente:** reservas diarias BCRA (endpoint v3 daba 410; portar del cliente Java), inflación de
 alta frecuencia (consultoras/Alphacast — fuentes frágiles), Nowcast pobreza + ICG/ICC (UTDT, PDFs)
