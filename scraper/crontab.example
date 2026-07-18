@@ -12,3 +12,4 @@ COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
 30 7 * * *    $COMPOSE run --rm scraper run riesgo_pais  >> /var/log/labrecha/riesgo_pais.log 2>&1
 35 7 * * *    $COMPOSE run --rm scraper run inflacion    >> /var/log/labrecha/inflacion.log 2>&1
 40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
+45 7 * * *    $COMPOSE run --rm scraper run reservas_bcra >> /var/log/labrecha/reservas_bcra.log 2>&1

@@ -138,12 +138,15 @@ idempotente):
 - `series_datosgob` (datos.gob.ar): `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`
   (mensual), `ripte`, `indice_salarios`, `pobreza_personas` (total nacional, semestral, en %),
   `base_monetaria`, `recaudacion_tributaria`, `emae`. → 19 indicadores, ~12k filas históricas.
+- `reservas_bcra` (BCRA API v4.0, variable 1): `reservas_internacionales` **diaria** desde 1996
+  (~7.5k filas, source `bcra`). Convive con la mensual de datosgobar bajo el mismo `indicator_code`:
+  dos `source` para el mismo indicador, primer caso del comparador de mediciones.
 - `seed-events`: 19 hitos políticos curados 2001-2024 en `political_events` (para anotar series).
 
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 
-**Pendiente:** reservas diarias BCRA (endpoint v3 daba 410; portar del cliente Java), inflación de
+**Pendiente:** inflación de
 alta frecuencia (consultoras/Alphacast — fuentes frágiles), Nowcast pobreza + ICG/ICC (UTDT, PDFs)
 — habilitan el comparador de mediciones (INDEC vs UTDT vs UCA), Congreso (modelar tablas propias,
 no encaja en indicator_history), y portar los módulos scraper-only. Integrar `scraper` al compose.
