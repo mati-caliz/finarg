@@ -68,3 +68,16 @@ python -m labrecha_scraper status       # última corrida de cada job
 
 Configuración por entorno (ver `.env.example`): `DATABASE_URL`, `HTTP_TIMEOUT_SECONDS`,
 `HTTP_USER_AGENT`.
+
+### Vía Docker Compose
+
+El servicio `scraper` está en el `docker-compose.yml` raíz bajo el profile `scraper`, así que no
+arranca con `docker compose up` (es un job de cron, no un servicio). Se invoca on-demand y habla con
+el servicio `postgres` por la red interna:
+
+```bash
+docker compose run --rm scraper status
+docker compose run --rm scraper run all
+```
+
+Es la forma que usa `crontab.example`.
