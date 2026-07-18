@@ -59,4 +59,7 @@ class PoliticalEvent(Base):
     category: Mapped[str] = mapped_column(String(60))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    __table_args__ = (Index("ix_political_events_date", "date"),)
+    __table_args__ = (
+        UniqueConstraint("date", "title", name="uq_event_date_title"),
+        Index("ix_political_events_date", "date"),
+    )

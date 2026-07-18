@@ -20,6 +20,7 @@ SERIES: dict[str, SeriesSpec] = {
     "148.3_INIVELNAL_DICI_M_26": SeriesSpec("ipc_nivel_general", "indice"),
     "174.1_RRVAS_IDOS_0_0_36": SeriesSpec("reservas_internacionales", "USD_millones"),
     "158.1_REPTE_0_0_5": SeriesSpec("ripte", "ARS"),
+    "149.1_TL_INDIIOS_OCTU_0_21": SeriesSpec("indice_salarios", "indice"),
     "64.2_POBLACION_NUA_0_0_34_74": SeriesSpec("pobreza_personas", "%", Decimal(100)),
 }
 
