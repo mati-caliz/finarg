@@ -157,7 +157,10 @@ Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 **Pendiente:** inflación de alta frecuencia (consultoras/Alphacast — fuentes frágiles),
 Nowcast pobreza + ICG/ICC (UTDT, PDFs) — habilitan el comparador de mediciones
 (INDEC vs UTDT vs UCA), portar los módulos scraper-only, y el Senado (datos abiertos, para
-completar el Congreso). Integrar `scraper` al compose.
+completar el Congreso).
+
+El `scraper` ya está integrado al `docker-compose.yml` (servicio bajo profile `scraper`, se corre
+on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por la red interna).
 
 - Orden de conectores, de menor a mayor riesgo:
   1. ✅ Los de dificultad baja portados del Java (datos.gob.ar, BCRA, dolarapi, riesgo país):

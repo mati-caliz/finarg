@@ -144,6 +144,33 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    image: labrecha-scraper
+    profiles:
+      - scraper
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-finarg}:${DB_PASSWORD:-finarg123}@postgres:5432/${DB_NAME:-finarg}
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
+      HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
+    networks:
+      - finarg-network
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   postgres_data:
     driver: local
