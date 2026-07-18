@@ -1,6 +1,5 @@
 "use client";
 
-import { Paywall } from "@/components/Paywall";
 import { GovernmentLegend } from "@/components/charts/GovernmentLegend";
 import { PeriodSelector } from "@/components/charts/PeriodSelector";
 import type { ChartPeriod } from "@/components/charts/PeriodSelector";
@@ -12,7 +11,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { reservesApi } from "@/lib/api";
 import { CACHE_TIMES } from "@/lib/constants";
 import { formatDateDayShort, generateReferenceAreas } from "@/lib/utils";
-import { useAuthStore } from "@/store/useStore";
 import type { Reserves } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { Building2, RefreshCw } from "lucide-react";
@@ -33,25 +31,21 @@ const AreaChart = dynamic(
 
 export default function ReservesPage() {
   const { translate } = useTranslation();
-  const { subscription } = useAuthStore();
   const [period, setPeriod] = useState(365);
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const PERIODS: ChartPeriod[] = useMemo(
     () => [
-      { value: 7, labelKey: "days7" as const, premium: false },
-      { value: 30, labelKey: "days30" as const, premium: false },
-      { value: 90, labelKey: "months3" as const, premium: false },
-      { value: 180, labelKey: "months6" as const, premium: false },
-      { value: 365, labelKey: "year1" as const, premium: false },
-      { value: 730, labelKey: "year2" as const, premium: false },
-      { value: 1095, labelKey: "year3" as const, premium: true },
-      { value: 1825, labelKey: "year5" as const, premium: true },
-      { value: 3650, labelKey: "year10" as const, premium: true },
-      { value: 5475, labelKey: "year15" as const, premium: true },
-      { value: 7000, labelKey: "max" as const, premium: true },
+      { value: 7, labelKey: "days7" as const },
+      { value: 30, labelKey: "days30" as const },
+      { value: 90, labelKey: "months3" as const },
+      { value: 180, labelKey: "months6" as const },
+      { value: 365, labelKey: "year1" as const },
+      { value: 730, labelKey: "year2" as const },
+      { value: 1095, labelKey: "year3" as const },
+      { value: 1825, labelKey: "year5" as const },
+      { value: 3650, labelKey: "year10" as const },
+      { value: 5475, labelKey: "year15" as const },
+      { value: 7000, labelKey: "max" as const },
     ],
     [],
   );
@@ -120,13 +114,7 @@ export default function ReservesPage() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">{translate("historicalEvolution")}</CardTitle>
-            <PeriodSelector
-              periods={PERIODS}
-              selected={period}
-              onChange={setPeriod}
-              isPremium={isPremium}
-              onPremiumClick={() => setShowPaywall(true)}
-            />
+            <PeriodSelector periods={PERIODS} selected={period} onChange={setPeriod} />
           </div>
         </CardHeader>
         <CardContent>
@@ -203,14 +191,6 @@ export default function ReservesPage() {
           </div>
         </CardContent>
       </Card>
-
-      {showPaywall && (
-        <Paywall
-          feature={translate("advancedHistoricalData")}
-          description="Para ver datos de mas de 2 anos necesitas Premium. Accede a graficos historicos completos de hasta 25 anos."
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
     </div>
   );
 }

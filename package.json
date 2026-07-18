@@ -1,8 +1,8 @@
 {
-  "name": "finarg",
+  "name": "labrecha",
   "version": "1.0.0",
   "private": true,
-  "description": "Monorepo for FinArg - Frontend and Backend",
+  "description": "La Brecha - Monorepo (scraper + API + web) de indicadores económicos y políticos de Argentina",
   "scripts": {
     "dev": "./scripts/run-local.sh",
     "dev:docker": "./scripts/run-docker.sh",

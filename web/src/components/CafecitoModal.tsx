@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuthStore } from "@/store/useStore";
 import { Coffee, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -11,16 +10,10 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const SHOW_DELAY_MS = 8000;
 
 export function CafecitoModal() {
-  const { subscription } = useAuthStore();
   const [isVisible, setIsVisible] = useState(false);
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
-    const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
-    if (isPremium) {
-      return;
-    }
-
     const lastClosedStr = localStorage.getItem(STORAGE_KEY);
     if (lastClosedStr) {
       const lastClosed = Number.parseInt(lastClosedStr, 10);
@@ -36,7 +29,7 @@ export function CafecitoModal() {
     }, SHOW_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [subscription?.plan]);
+  }, []);
 
   const handleClose = () => {
     setIsVisible(false);
@@ -66,7 +59,7 @@ export function CafecitoModal() {
             </div>
             <div className="flex-1">
               <h3 className="font-bold text-amber-900 dark:text-amber-100 mb-1">
-                ¿Te gusta FinLatam?
+                ¿Te gusta La Brecha?
               </h3>
               <p className="text-sm text-amber-800 dark:text-amber-200 mb-3 leading-relaxed">
                 ¡Invitame un cafecito! Tu apoyo ayuda a mantener el sitio funcionando y mejorando.

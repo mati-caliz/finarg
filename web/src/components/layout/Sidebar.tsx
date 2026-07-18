@@ -1,32 +1,25 @@
 "use client";
 
-import { GoogleAd } from "@/components/GoogleAd";
-import { InvestmentsPremiumModal } from "@/components/InvestmentsPremiumModal";
 import { Button } from "@/components/ui/button";
 import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
-import { useAppStore, useAuthStore } from "@/store/useStore";
+import { useAppStore } from "@/store/useStore";
 import {
   AlertTriangle,
-  ArrowLeftRight,
   BarChart2,
   Calculator,
-  CalendarDays,
   ChevronDown,
   ChevronRight,
   CreditCard,
-  Crown,
   DollarSign,
   Gauge,
   Landmark,
   LayoutDashboard,
   LineChart,
   Menu,
-  Newspaper,
   Percent,
-  Sparkles,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -73,22 +66,10 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         feature: "quotes" as const,
       },
       {
-        key: "exchangeRatesComparator" as TranslationKey,
-        href: "/conversor-monedas",
-        icon: ArrowLeftRight,
-        feature: "quotes" as const,
-      },
-      {
         key: "ratesComparator" as TranslationKey,
         href: "/comparador-tasas",
         icon: BarChart2,
         feature: "rates" as const,
-      },
-      {
-        key: "investmentsTitle" as TranslationKey,
-        href: "/inversiones",
-        icon: TrendingUp,
-        feature: null,
       },
     ],
   },
@@ -113,19 +94,6 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
         href: "/riesgo-pais",
         icon: AlertTriangle,
         feature: null,
-      },
-      {
-        key: "news" as TranslationKey,
-        href: "/noticias-financieras-argentina",
-        icon: Newspaper,
-        feature: null,
-      },
-      {
-        key: "holidays" as TranslationKey,
-        href: "/feriados",
-        icon: CalendarDays,
-        feature: null,
-        isNew: true,
       },
     ],
   },
@@ -162,13 +130,8 @@ const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
 ];
 
 function CountrySelector() {
-  const { setSelectedCountry } = useAppStore();
   const countryConfig = getCountryConfig("ar");
   const { translate } = useTranslation();
-
-  useEffect(() => {
-    setSelectedCountry("ar");
-  }, [setSelectedCountry]);
 
   return (
     <div className="space-y-1">
@@ -176,7 +139,6 @@ function CountrySelector() {
         <span className="text-lg">{countryConfig.flag}</span>
         <span className="text-white/90">{translate(countryConfig.code as TranslationKey)}</span>
       </div>
-      <p className="text-xs text-white/40 px-1">{translate("otherCountriesComingSoon")}</p>
     </div>
   );
 }
@@ -188,8 +150,6 @@ interface NavItemProps {
   translate: (key: TranslationKey) => string;
   selectedCountry: string;
   reservesKeyMap: Record<string, TranslationKey>;
-  subscription?: { plan: string } | null;
-  onInvestmentsClick?: () => void;
 }
 
 function NavItem({
@@ -199,15 +159,9 @@ function NavItem({
   translate,
   selectedCountry,
   reservesKeyMap,
-  subscription,
-  onInvestmentsClick,
 }: NavItemProps) {
   const isActive = pathname === item.href;
   const isComingSoon = item.isComingSoon || item.href === "#";
-  const isPremiumFeature = item.key === "investmentsTitle";
-  const isFreeUser = !subscription || subscription.plan === "FREE";
-  const showPremiumBadge = isPremiumFeature && isFreeUser;
-  const shouldBlockAccess = isPremiumFeature && isFreeUser;
   const displayName =
     item.feature === "reserves"
       ? translate(reservesKeyMap[selectedCountry] || "reserves")
@@ -219,11 +173,6 @@ function NavItem({
       onClick={(e) => {
         if (isComingSoon) {
           e.preventDefault();
-          return;
-        }
-        if (shouldBlockAccess && onInvestmentsClick) {
-          e.preventDefault();
-          onInvestmentsClick();
           return;
         }
         if (window.innerWidth < 1024) {
@@ -240,12 +189,6 @@ function NavItem({
     >
       <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
       <span className={cn("flex-1", isComingSoon && "opacity-50")}>{displayName}</span>
-      {showPremiumBadge && (
-        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-gradient-to-r from-yellow-500 to-orange-500 text-white uppercase tracking-wide flex items-center gap-0.5">
-          <Crown className="h-2.5 w-2.5" />
-          Pro
-        </span>
-      )}
       {item.isNew && (
         <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
           Nuevo
@@ -270,8 +213,6 @@ interface NavCategoryProps {
   reservesKeyMap: Record<string, TranslationKey>;
   isOpen: boolean;
   onToggle: () => void;
-  subscription?: { plan: string } | null;
-  onInvestmentsClick?: () => void;
 }
 
 function NavCategory({
@@ -284,8 +225,6 @@ function NavCategory({
   reservesKeyMap,
   isOpen,
   onToggle,
-  subscription,
-  onInvestmentsClick,
 }: NavCategoryProps) {
   const filteredItems = category.items.filter((item) => {
     if (!item.feature) {
@@ -321,8 +260,6 @@ function NavCategory({
               translate={translate}
               selectedCountry={selectedCountry}
               reservesKeyMap={reservesKeyMap}
-              subscription={subscription}
-              onInvestmentsClick={onInvestmentsClick}
             />
           ))}
         </div>
@@ -334,14 +271,9 @@ function NavCategory({
 export function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, toggleSidebar, setSidebarOpen, selectedCountry } = useAppStore();
-  const { subscription, isAuthenticated } = useAuthStore();
   const countryConfig = getCountryConfig(selectedCountry);
   const { translate } = useTranslation();
   const [openCategory, setOpenCategory] = useState<string | null>(null);
-  const [isInvestmentsModalOpen, setIsInvestmentsModalOpen] = useState(false);
-
-  const showPremiumButton =
-    !isAuthenticated || (subscription && (subscription.plan === "FREE" || !subscription.plan));
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -398,10 +330,6 @@ export function Sidebar() {
 
   const reservesKeyMap: Record<string, TranslationKey> = {
     ar: "bcraReserves",
-    co: "banrepReserves",
-    br: "bcbReserves",
-    cl: "bcchReserves",
-    uy: "bcuReserves",
   };
 
   const isCategory = (item: NavigationItem | NavigationCategory): item is NavigationCategory => {
@@ -455,7 +383,7 @@ export function Sidebar() {
               <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/20">
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
-              <span className="text-xl font-bold text-white">FinLatam</span>
+              <span className="text-xl font-bold text-white">La Brecha</span>
             </Link>
           </div>
 
@@ -478,8 +406,6 @@ export function Sidebar() {
                     reservesKeyMap={reservesKeyMap}
                     isOpen={openCategory === item.key}
                     onToggle={() => setOpenCategory(openCategory === item.key ? null : item.key)}
-                    subscription={subscription}
-                    onInvestmentsClick={() => setIsInvestmentsModalOpen(true)}
                   />
                 );
               }
@@ -494,8 +420,6 @@ export function Sidebar() {
                     translate={translate}
                     selectedCountry={selectedCountry}
                     reservesKeyMap={reservesKeyMap}
-                    subscription={subscription}
-                    onInvestmentsClick={() => setIsInvestmentsModalOpen(true)}
                   />
                 );
               }
@@ -505,38 +429,6 @@ export function Sidebar() {
           </nav>
 
           <div className="mt-auto">
-            {showPremiumButton && (
-              <div className="px-3 pb-3">
-                <Link href="/planes" onClick={() => toggleSidebar()}>
-                  <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-yellow-500 to-orange-500 p-4 cursor-pointer group hover:shadow-lg transition-all duration-300">
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10" />
-                    <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8" />
-
-                    <div className="relative flex items-center gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 flex-shrink-0">
-                        <Crown className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-white leading-tight">
-                          Hacerse Premium
-                        </p>
-                        <p className="text-xs text-white/90 mt-0.5">Sin límites + Sin ads</p>
-                      </div>
-                      <Sparkles className="h-4 w-4 text-white/80 flex-shrink-0" />
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            )}
-
-            <div className="hidden">
-              <GoogleAd
-                adSlot="9876543210"
-                adFormat="auto"
-                style={{ minHeight: "250px", maxWidth: "100%" }}
-              />
-            </div>
-
             <div className="border-t border-white/10 p-4">
               <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
               <p className="text-xs text-white/40 text-center mt-1">
@@ -546,11 +438,6 @@ export function Sidebar() {
           </div>
         </div>
       </aside>
-
-      <InvestmentsPremiumModal
-        isOpen={isInvestmentsModalOpen}
-        onClose={() => setIsInvestmentsModalOpen(false)}
-      />
     </>
   );
 }

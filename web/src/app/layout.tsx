@@ -4,10 +4,8 @@ import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 import { CafecitoModal } from "@/components/CafecitoModal";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
-import { UpgradeBannerWrapper } from "@/components/UpgradeBannerWrapper";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { EarlyHints } from "./early-hints";
@@ -23,14 +21,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FinLatam - App Financiera Latinoamerica",
+  title: "La Brecha - Indicadores económicos de Argentina",
   description:
-    "Cotizaciones, calculadoras y herramientas financieras para Argentina, Colombia, Brasil, Chile y Uruguay",
+    "Inflación, reservas del BCRA, riesgo país, cotizaciones y calculadoras financieras de Argentina",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "FinLatam",
+    title: "La Brecha",
   },
   formatDetection: {
     telephone: false,
@@ -38,17 +36,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
-    url: "https://finlatam.app",
-    siteName: "FinLatam",
-    title: "FinLatam - App Financiera Latinoamerica",
-    description:
-      "Cotizaciones del dolar, calculadoras y herramientas financieras para Latinoamerica",
+    url: "https://labrecha.ar",
+    siteName: "La Brecha",
+    title: "La Brecha - Indicadores económicos de Argentina",
+    description: "Inflación, reservas del BCRA, riesgo país y cotizaciones del dólar en Argentina",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FinLatam - App Financiera Latinoamerica",
-    description:
-      "Cotizaciones del dolar, calculadoras y herramientas financieras para Latinoamerica",
+    title: "La Brecha - Indicadores económicos de Argentina",
+    description: "Inflación, reservas del BCRA, riesgo país y cotizaciones del dólar en Argentina",
   },
 };
 
@@ -114,12 +110,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Sidebar />
             <div className="lg:pl-64">
               <Navbar />
-              <UpgradeBannerWrapper />
               <main className="p-4 lg:p-6">{children}</main>
             </div>
           </div>
           <CafecitoModal />
-          <FeedbackWidget />
         </Providers>
         <ServiceWorkerRegistration />
         <Suspense fallback={null}>

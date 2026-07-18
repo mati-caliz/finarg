@@ -1,7 +1,6 @@
 "use client";
 
 import { logger } from "@/lib/logger";
-import { useAuthStore } from "@/store/useStore";
 import { useEffect } from "react";
 
 interface GoogleAdProps {
@@ -12,10 +11,8 @@ interface GoogleAdProps {
 }
 
 export function GoogleAd({ adSlot, adFormat = "auto", className = "", style }: GoogleAdProps) {
-  const { subscription } = useAuthStore();
-
   useEffect(() => {
-    if (subscription?.plan === "FREE" && typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       try {
         const w = window as Window & { adsbygoogle?: unknown[] };
         if (!w.adsbygoogle) {
@@ -26,11 +23,7 @@ export function GoogleAd({ adSlot, adFormat = "auto", className = "", style }: G
         logger.error("AdSense error:", err);
       }
     }
-  }, [subscription?.plan]);
-
-  if (subscription?.plan !== "FREE") {
-    return null;
-  }
+  }, []);
 
   return (
     <div className={`google-ad-container ${className}`} style={style}>

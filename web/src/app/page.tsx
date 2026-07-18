@@ -4,7 +4,6 @@ import { QuoteCard } from "@/components/dashboard/QuoteCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCountryConfig } from "@/config/countries";
 import { useCountryRisk } from "@/hooks/useCountryRisk";
-import { useCrypto } from "@/hooks/useCrypto";
 import { useGap, useQuotes } from "@/hooks/useQuotes";
 import { useReserves } from "@/hooks/useReserves";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -35,20 +34,6 @@ const CountryRiskWidget = dynamic(
   () =>
     import("@/components/dashboard/CountryRiskWidget").then((mod) => ({
       default: mod.CountryRiskWidget,
-    })),
-  { loading: () => <Skeleton className="h-full w-full rounded-xl" /> },
-);
-
-const CryptoWidget = dynamic(
-  () =>
-    import("@/components/dashboard/CryptoWidget").then((mod) => ({ default: mod.CryptoWidget })),
-  { loading: () => <Skeleton className="h-full w-full rounded-xl" /> },
-);
-
-const NextHolidayWidget = dynamic(
-  () =>
-    import("@/components/dashboard/NextHolidayWidget").then((mod) => ({
-      default: mod.NextHolidayWidget,
     })),
   { loading: () => <Skeleton className="h-full w-full rounded-xl" /> },
 );
@@ -85,14 +70,6 @@ const SocialIndicatorsCard = dynamic(
   { loading: () => <Skeleton className="h-full w-full rounded-xl" /> },
 );
 
-const OtherCurrenciesSection = dynamic(
-  () =>
-    import("@/components/dashboard/OtherCurrenciesSection").then((mod) => ({
-      default: mod.OtherCurrenciesSection,
-    })),
-  { loading: () => <Skeleton className="h-32 w-full rounded-xl" /> },
-);
-
 const ToolsGrid = dynamic(
   () => import("@/components/dashboard/ToolsGrid").then((mod) => ({ default: mod.ToolsGrid })),
   { loading: () => <Skeleton className="h-48 w-full rounded-xl" /> },
@@ -107,7 +84,6 @@ export default function DashboardPage() {
   const { data: gap } = useGap();
   const { data: reserves } = useReserves(selectedCountry);
   const { data: countryRisk } = useCountryRisk();
-  const { data: cryptoList } = useCrypto();
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -146,8 +122,6 @@ export default function DashboardPage() {
                 <CountryRiskWidget countryRisk={countryRisk} />
               </Link>
             )}
-            {cryptoList && cryptoList.length > 0 && <CryptoWidget cryptoList={cryptoList} />}
-            <NextHolidayWidget />
             {countryConfig.features.inflation && <InflationWidget />}
           </div>
         )}
@@ -190,11 +164,8 @@ export default function DashboardPage() {
             {countryConfig.features.rates && <TopMortgagesWidget />}
           </div>
         )}
-
-        {countryConfig.features.inflation && selectedCountry !== "ar" && <InflationWidget />}
       </div>
 
-      <OtherCurrenciesSection />
       <ToolsGrid />
     </div>
   );

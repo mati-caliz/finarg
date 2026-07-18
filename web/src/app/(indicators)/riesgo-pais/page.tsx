@@ -1,6 +1,5 @@
 "use client";
 
-import { Paywall } from "@/components/Paywall";
 import { GovernmentLegend } from "@/components/charts/GovernmentLegend";
 import { PeriodSelector } from "@/components/charts/PeriodSelector";
 import type { ChartPeriod } from "@/components/charts/PeriodSelector";
@@ -12,7 +11,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { countryRiskApi } from "@/lib/api";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatDateShort, generateReferenceAreas } from "@/lib/utils";
-import { useAuthStore } from "@/store/useStore";
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
@@ -31,22 +29,18 @@ const LineChart = dynamic(
 
 export default function CountryRiskPage() {
   const { translate } = useTranslation();
-  const { subscription } = useAuthStore();
   const { data: currentRisk, isLoading: isLoadingCurrent } = useCountryRisk();
   const { data: history, isLoading: isLoadingHistory } = useCountryRiskHistory();
   const [daysLimit, setDaysLimit] = useState(365);
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const chartPeriods: ChartPeriod[] = useMemo(
     () => [
-      { value: 365, labelKey: "year1" as const, premium: false },
-      { value: 730, labelKey: "year2" as const, premium: false },
-      { value: 1825, labelKey: "year5" as const, premium: true },
-      { value: 3650, labelKey: "year10" as const, premium: true },
-      { value: 7300, labelKey: "year20" as const, premium: true },
-      { value: 999999, labelKey: "max" as const, premium: true },
+      { value: 365, labelKey: "year1" as const },
+      { value: 730, labelKey: "year2" as const },
+      { value: 1825, labelKey: "year5" as const },
+      { value: 3650, labelKey: "year10" as const },
+      { value: 7300, labelKey: "year20" as const },
+      { value: 999999, labelKey: "max" as const },
     ],
     [],
   );
@@ -124,13 +118,7 @@ export default function CountryRiskPage() {
         <CardHeader>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <CardTitle className="text-lg">{translate("countryRiskHistory")}</CardTitle>
-            <PeriodSelector
-              periods={chartPeriods}
-              selected={daysLimit}
-              onChange={setDaysLimit}
-              isPremium={isPremium}
-              onPremiumClick={() => setShowPaywall(true)}
-            />
+            <PeriodSelector periods={chartPeriods} selected={daysLimit} onChange={setDaysLimit} />
           </div>
         </CardHeader>
         <CardContent>
@@ -227,14 +215,6 @@ export default function CountryRiskPage() {
           </div>
         </CardContent>
       </Card>
-
-      {showPaywall && (
-        <Paywall
-          feature={translate("advancedHistoricalData")}
-          description="Para ver datos de más de 2 años necesitas Premium. Accede a graficos historicos completos de hasta 25 anos."
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
     </div>
   );
 }

@@ -1,19 +1,5 @@
 import type { CountryCode } from "@/config/countries";
-import type {
-  CompoundInterestRequest,
-  CreateSubscriptionRequest,
-  CurrencyConversionRequest,
-  CurrencyConversionResponse,
-  ExchangeRateComparison,
-  FeedbackRequest,
-  FeedbackResponse,
-  Holiday,
-  IncomeTaxRequest,
-  NewsArticle,
-  NewsListResponse,
-  PricingResponse,
-  SubscriptionResponse,
-} from "@/types";
+import type { CompoundInterestRequest, IncomeTaxRequest } from "@/types";
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
@@ -34,18 +20,6 @@ export const cachedApi = axios.create({
     "Content-Type": "application/json",
   },
 });
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
-    }
-    return Promise.reject(error);
-  },
-);
 
 export const quotesApi = {
   getAllByCountry: (country: CountryCode) => cachedApi.get(`/${country}/quotes`),
@@ -106,75 +80,4 @@ export const ratesApi = {
     cachedApi.get("/rates/top-investment", { params: { country, limit } }),
   getTopMortgages: (country = "ar", limit = 2) =>
     cachedApi.get("/rates/top-mortgages", { params: { country, limit } }),
-};
-
-export const exchangeRateComparisonApi = {
-  compareRates: (country: CountryCode) =>
-    cachedApi.get<ExchangeRateComparison>(`/${country}/exchange-rates/comparison`),
-};
-
-export const currencyConversionApi = {
-  convert: (data: CurrencyConversionRequest) =>
-    api.post<CurrencyConversionResponse>("/currency/convert", data),
-};
-
-export const authApi = {
-  login: (email: string, password: string) => api.post("/auth/login", { email, password }),
-  register: (email: string, password: string, name: string) =>
-    api.post("/auth/register", { email, password, name }),
-  loginWithGoogle: (idToken: string) => api.post("/auth/google", { idToken }),
-};
-
-export const cryptoApi = {
-  getCurrent: () => cachedApi.get("/crypto"),
-};
-
-export const investmentsApi = {
-  getStocks: () => cachedApi.get("/investments/stocks/popular"),
-  getCedears: () => cachedApi.get("/investments/cedears"),
-  getBonds: () => cachedApi.get("/investments/bonds"),
-  getEtfs: () => cachedApi.get("/investments/etf/popular"),
-  getMetals: () => cachedApi.get("/investments/metals"),
-  getLetras: () => cachedApi.get("/investments/letras"),
-  getCauciones: () => cachedApi.get("/investments/cauciones"),
-};
-
-export const newsApi = {
-  getLatest: (country: CountryCode = "ar", page = 0, size = 20) =>
-    cachedApi.get<NewsListResponse>("/news", { params: { country, page, size } }),
-
-  getByCategory: (category: string, country: CountryCode = "ar", page = 0, size = 20) =>
-    cachedApi.get<NewsListResponse>(`/news/category/${category}`, {
-      params: { country, page, size },
-    }),
-
-  getOfficial: (country: CountryCode = "ar", page = 0, size = 20) =>
-    cachedApi.get<NewsListResponse>("/news/official", { params: { country, page, size } }),
-
-  getById: (id: number) => cachedApi.get<NewsArticle>(`/news/${id}`),
-};
-
-export const holidaysApi = {
-  getAll: (country: CountryCode = "ar", year?: number) =>
-    cachedApi.get<Holiday[]>(`/${country}/feriados`, { params: { year } }),
-  getUpcoming: (country: CountryCode = "ar") =>
-    cachedApi.get<Holiday[]>(`/${country}/feriados/upcoming`),
-};
-
-export const subscriptionsApi = {
-  getPricing: () => api.get<PricingResponse>("/subscriptions/pricing"),
-  getCurrent: () => api.get<SubscriptionResponse>("/subscriptions/current"),
-  create: (data: CreateSubscriptionRequest) =>
-    api.post<SubscriptionResponse>("/subscriptions", data),
-  createCheckout: (subscriptionId: number) =>
-    api.post<{ checkoutUrl: string; subscriptionId: string }>(
-      `/subscriptions/${subscriptionId}/checkout`,
-    ),
-  cancel: () => api.delete("/subscriptions"),
-};
-
-export const feedbackApi = {
-  submit: (data: FeedbackRequest) => api.post<FeedbackResponse>("/feedback", data),
-  getAll: () => api.get<FeedbackResponse[]>("/feedback"),
-  getByRating: (rating: number) => api.get<FeedbackResponse[]>(`/feedback/rating/${rating}`),
 };

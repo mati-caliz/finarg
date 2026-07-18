@@ -29,9 +29,7 @@ interface InflationChartProps {
   governments: Government[];
   type: "monthly" | "yearOverYear";
   periods: ChartPeriod[];
-  isPremium: boolean;
   onPeriodChange: (value: number) => void;
-  onPremiumClick: () => void;
 }
 
 function getVisibleGovernments(inflationData: Inflation[], governments: Government[]) {
@@ -56,9 +54,7 @@ export function InflationChart({
   governments,
   type,
   periods,
-  isPremium,
   onPeriodChange,
-  onPremiumClick,
 }: InflationChartProps) {
   const { translate } = useTranslation();
 
@@ -121,13 +117,7 @@ export function InflationChart({
       <CardHeader>
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle className="text-lg">{translate(titleKey)}</CardTitle>
-          <PeriodSelector
-            periods={periods}
-            selected={chartMonthsLimit}
-            onChange={onPeriodChange}
-            isPremium={isPremium}
-            onPremiumClick={onPremiumClick}
-          />
+          <PeriodSelector periods={periods} selected={chartMonthsLimit} onChange={onPeriodChange} />
         </div>
       </CardHeader>
       <CardContent>{renderChart()}</CardContent>

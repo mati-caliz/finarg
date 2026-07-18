@@ -546,7 +546,7 @@ export const translations = {
     netFmi: "Netas (FMI)",
     netEstimated: "Netas (estimadas)",
 
-    footerVersion: "FinLatam v2.0.0",
+    footerVersion: "La Brecha v2.0.0",
     otherCountriesComingSoon: "Otros países próximamente",
     comingSoon: "Próximamente",
 
@@ -944,7 +944,7 @@ export const translations = {
     netFmi: "Líquidas (FMI)",
     netEstimated: "Líquidas (estimadas)",
 
-    footerVersion: "FinLatam v2.0.0",
+    footerVersion: "La Brecha v2.0.0",
     otherCountriesComingSoon: "Outros países em breve",
     comingSoon: "Em breve",
 
@@ -1469,7 +1469,7 @@ export const translations = {
     netFmi: "Net (IMF)",
     netEstimated: "Net (estimated)",
 
-    footerVersion: "FinLatam v2.0.0",
+    footerVersion: "La Brecha v2.0.0",
     otherCountriesComingSoon: "Other countries coming soon",
     comingSoon: "Coming Soon",
 

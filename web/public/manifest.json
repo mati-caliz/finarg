@@ -1,7 +1,7 @@
 {
-  "name": "FinArg - App Financiera Argentina",
-  "short_name": "FinArg",
-  "description": "Cotizaciones del dólar, calculadoras y herramientas financieras para Argentina",
+  "name": "La Brecha - Indicadores económicos de Argentina",
+  "short_name": "La Brecha",
+  "description": "Inflación, reservas del BCRA, riesgo país y cotizaciones del dólar en Argentina",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
@@ -32,10 +32,10 @@
       "url": "/calculadora-sueldo-neto"
     },
     {
-      "name": "Simulador de Inversiones",
-      "short_name": "Simulador",
-      "description": "Simular inversiones y comparar rendimientos",
-      "url": "/simulador-de-inversiones"
+      "name": "Inflación",
+      "short_name": "Inflación",
+      "description": "Inflación mensual e interanual de Argentina",
+      "url": "/inflacion"
     }
   ],
   "related_applications": [],
