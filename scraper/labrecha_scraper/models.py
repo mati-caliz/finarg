@@ -6,6 +6,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Index,
+    Integer,
     Numeric,
     String,
     Text,
@@ -62,4 +63,46 @@ class PoliticalEvent(Base):
     __table_args__ = (
         UniqueConstraint("date", "title", name="uq_event_date_title"),
         Index("ix_political_events_date", "date"),
+    )
+
+
+class CongressVote(Base):
+    __tablename__ = "congress_votes"
+
+    acta_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    session_source_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    period_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    period_type: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    session_type: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    meeting_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    session_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    ballot_number: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    time: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    majority_base: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    majority_type: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    title: Mapped[str | None] = mapped_column(Text, nullable=True)
+    result: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    president_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    affirmative_votes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    negative_votes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    abstentions: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    absents: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    __table_args__ = (Index("ix_congress_votes_date", "date"),)
+
+
+class CongressVoteDetail(Base):
+    __tablename__ = "congress_vote_details"
+
+    vote_detail_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    acta_id: Mapped[str] = mapped_column(String(20))
+    deputy_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    bloc: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    district: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    vote: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    __table_args__ = (
+        Index("ix_congress_vote_details_acta", "acta_id"),
+        Index("ix_congress_vote_details_bloc", "bloc"),
     )

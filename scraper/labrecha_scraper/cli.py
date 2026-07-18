@@ -22,7 +22,8 @@ def _configure_logging() -> None:
 
 def _init_db() -> None:
     Base.metadata.create_all(engine)
-    print("tablas creadas/verificadas: indicator_history, scrape_runs, political_events")
+    tables = ", ".join(sorted(Base.metadata.tables))
+    print(f"tablas creadas/verificadas: {tables}")
 
 
 def _list_jobs() -> None:
