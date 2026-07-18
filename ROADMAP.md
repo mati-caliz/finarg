@@ -129,16 +129,22 @@ Tests: los que fallan son pre-existentes (verificado con git stash); se borró s
 
 **Hecho (2026-07-17):** estructura `scraper/` creada (SQLAlchemy + httpx + pydantic, un job =
 un módulo), tablas `indicator_history` / `scrape_runs` / `political_events`, connector base con
-tracking de corridas y upsert idempotente, CLI (`init-db`/`list`/`run`/`status`), Dockerfile +
-crontab de ejemplo. Primeros 4 conectores verificados end-to-end contra Postgres (9917 filas,
-re-run idempotente): `dolar` (dolarapi), `inflacion` mensual+interanual y `riesgo_pais`
-(argentinadatos), `series_datosgob` (CBA nacional + IPC nivel general). Histórico profundo
-(IPC desde 1943, riesgo país desde 1999).
+tracking de corridas y upsert idempotente, CLI (`init-db`/`list`/`run`/`seed-events`/`status`),
+Dockerfile + crontab de ejemplo. Conectores verificados end-to-end contra Postgres (re-run
+idempotente):
+- `dolar` (dolarapi): oficial/blue/MEP/CCL/tarjeta/cripto/mayorista.
+- `inflacion` (argentinadatos): `ipc_mensual` + `ipc_interanual` (desde 1943).
+- `riesgo_pais` (argentinadatos): histórico desde 1999.
+- `series_datosgob` (datos.gob.ar): `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`
+  (mensual), `ripte`, `indice_salarios`, `pobreza_personas` (total nacional, semestral, en %).
+- `seed-events`: 19 hitos políticos curados 2001-2024 en `political_events` (para anotar series).
 
-**Pendiente:** reservas BCRA (el endpoint v3 daba 410 en la prueba; portar desde el cliente Java
-que funciona), RIPTE/índice de salarios y pobreza INDEC (más series de datos.gob.ar), inflación
-diaria (inflacionverdadera.com), Nowcast pobreza + ICG/ICC (UTDT, PDFs), Congreso, y portar los
-módulos scraper-only. Integrar el servicio `scraper` al docker-compose.
+Fuente descartada: inflacionverdadera.com (página estática, data como imagen).
+
+**Pendiente:** reservas diarias BCRA (endpoint v3 daba 410; portar del cliente Java), inflación de
+alta frecuencia (consultoras/Alphacast — fuentes frágiles), Nowcast pobreza + ICG/ICC (UTDT, PDFs)
+— habilitan el comparador de mediciones (INDEC vs UTDT vs UCA), Congreso (modelar tablas propias,
+no encaja en indicator_history), y portar los módulos scraper-only. Integrar `scraper` al compose.
 
 - Orden de conectores, de menor a mayor riesgo:
   1. Los de dificultad baja portados del Java (datos.gob.ar, BCRA, dolarapi, riesgo país):
