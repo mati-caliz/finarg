@@ -1,6 +1,5 @@
 "use client";
 
-import { Paywall } from "@/components/Paywall";
 import { QueryError } from "@/components/QueryError";
 import type { ChartPeriod } from "@/components/charts/PeriodSelector";
 import { PeriodSelector } from "@/components/charts/PeriodSelector";
@@ -16,7 +15,7 @@ import { quotesApi } from "@/lib/api";
 import { CACHE_TIMES } from "@/lib/constants";
 import { queryKeys } from "@/lib/queryKeys";
 import { formatCurrencySimple } from "@/lib/utils";
-import { useAppStore, useAuthStore } from "@/store/useStore";
+import { useAppStore } from "@/store/useStore";
 import type { Quote } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { TrendingDown, TrendingUp } from "lucide-react";
@@ -36,7 +35,6 @@ type BaseCurrency = "usd" | "eur" | "brl" | "clp" | "uyu" | "pyg" | "bob" | "cny
 export default function QuotesPage() {
   const selectedCountry = useAppStore((state) => state.selectedCountry);
   const countryConfig = getCountryConfig(selectedCountry);
-  const { subscription } = useAuthStore();
   const { translate } = useTranslation();
   const hasCurrencyGroups = selectedCountry === "ar";
 
@@ -44,22 +42,19 @@ export default function QuotesPage() {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [period, setPeriod] = useState(30);
-  const [showPaywall, setShowPaywall] = useState(false);
-
-  const isPremium = subscription?.plan === "PREMIUM" || subscription?.plan === "PROFESSIONAL";
 
   const periods: ChartPeriod[] = useMemo(
     () => [
-      { value: 7, labelKey: "days7", premium: false },
-      { value: 30, labelKey: "days30", premium: false },
-      { value: 90, labelKey: "months3", premium: false },
-      { value: 180, labelKey: "months6", premium: false },
-      { value: 365, labelKey: "year1", premium: false },
-      { value: 730, labelKey: "year2", premium: false },
-      { value: 1095, labelKey: "year3", premium: true },
-      { value: 1825, labelKey: "year5", premium: true },
-      { value: 3650, labelKey: "year10", premium: true },
-      { value: 5500, labelKey: "max", premium: true },
+      { value: 7, labelKey: "days7" },
+      { value: 30, labelKey: "days30" },
+      { value: 90, labelKey: "months3" },
+      { value: 180, labelKey: "months6" },
+      { value: 365, labelKey: "year1" },
+      { value: 730, labelKey: "year2" },
+      { value: 1095, labelKey: "year3" },
+      { value: 1825, labelKey: "year5" },
+      { value: 3650, labelKey: "year10" },
+      { value: 5500, labelKey: "max" },
     ],
     [],
   );
@@ -314,13 +309,7 @@ export default function QuotesPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <CardTitle className="text-lg">{translate("history")}</CardTitle>
-                  <PeriodSelector
-                    periods={periods}
-                    selected={period}
-                    onChange={setPeriod}
-                    isPremium={isPremium}
-                    onPremiumClick={() => setShowPaywall(true)}
-                  />
+                  <PeriodSelector periods={periods} selected={period} onChange={setPeriod} />
                 </div>
                 {hasCurrencyGroups &&
                   currencyTypes.filter((t) => hasChartHistory(t.value)).length > 1 && (
@@ -362,14 +351,6 @@ export default function QuotesPage() {
         skeletonCount={currencyTypes.length || 4}
         selectedCountry={selectedCountry}
       />
-
-      {showPaywall && (
-        <Paywall
-          feature={translate("advancedHistoricalData")}
-          description={translate("paywallHistoricalDescription")}
-          onClose={() => setShowPaywall(false)}
-        />
-      )}
     </div>
   );
 }

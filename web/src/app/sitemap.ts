@@ -1,100 +1,31 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://finlatamio.com";
+  const baseUrl = "https://labrecha.ar";
   const lastModified = new Date();
 
-  const countries = [
-    "ar",
-    "argentina",
-    "co",
-    "colombia",
-    "br",
-    "brasil",
-    "cl",
-    "chile",
-    "uy",
-    "uruguay",
+  const routes: {
+    path: string;
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+    priority: number;
+  }[] = [
+    { path: "", changeFrequency: "hourly", priority: 1 },
+    { path: "/cotizaciones", changeFrequency: "hourly", priority: 0.9 },
+    { path: "/inflacion", changeFrequency: "daily", priority: 0.85 },
+    { path: "/reservas-bcra", changeFrequency: "daily", priority: 0.8 },
+    { path: "/riesgo-pais", changeFrequency: "daily", priority: 0.8 },
+    { path: "/bandas-cambiarias", changeFrequency: "daily", priority: 0.7 },
+    { path: "/comparador-tasas", changeFrequency: "daily", priority: 0.8 },
+    { path: "/calculadora-sueldo-neto", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/calculadora-interes-compuesto", changeFrequency: "monthly", priority: 0.6 },
+    { path: "/calculadora-cuotas-contado", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/calculadora-ajuste-inflacion", changeFrequency: "monthly", priority: 0.6 },
   ];
 
-  return [
-    {
-      url: baseUrl,
-      lastModified,
-      changeFrequency: "hourly" as const,
-      priority: 1,
-    },
-    ...countries.map((country) => ({
-      url: `${baseUrl}/resumen-financiero-${country}`,
-      lastModified,
-      changeFrequency: "hourly" as const,
-      priority: 0.95,
-    })),
-    {
-      url: `${baseUrl}/cotizaciones`,
-      lastModified,
-      changeFrequency: "hourly" as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/inflacion`,
-      lastModified,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/reservas-bcra`,
-      lastModified,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/bandas-cambiarias`,
-      lastModified,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/comparador-tasas`,
-      lastModified,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/conversor-monedas`,
-      lastModified,
-      changeFrequency: "hourly" as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/calculadora-sueldo-neto`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/calculadora-interes-compuesto`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/calculadora-cuotas-contado`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/simulador-de-inversiones`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/login`,
-      lastModified,
-      changeFrequency: "yearly" as const,
-      priority: 0.3,
-    },
-  ];
+  return routes.map((route) => ({
+    url: `${baseUrl}${route.path}`,
+    lastModified,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 }

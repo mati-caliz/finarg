@@ -5,17 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getCountryConfig } from "@/config/countries";
 import { useTranslation } from "@/hooks/useTranslation";
 import type { TranslationKey } from "@/i18n/translations";
-import { useAppStore, useAuthStore } from "@/store/useStore";
-import {
-  ArrowLeftRight,
-  BarChart3,
-  Calculator,
-  CreditCard,
-  Crown,
-  Percent,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import { useAppStore } from "@/store/useStore";
+import { BarChart3, Calculator, CreditCard, Percent, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
@@ -71,17 +62,6 @@ const TOOL_CARDS: ToolCardConfig[] = [
     featureFlag: "rates",
   },
   {
-    href: "/conversor-monedas",
-    titleKey: "exchangeRateComparator",
-    subtitleKey: "exchangeRateComparatorSubtitle",
-    icon: ArrowLeftRight,
-    borderColor: "border-l-blue-500",
-    iconColor: "text-blue-500",
-    iconBg: "bg-blue-500/10",
-    iconHoverBg: "group-hover:bg-blue-500/20",
-    shadowColor: "hover:shadow-blue-500/5",
-  },
-  {
     href: "/calculadora-interes-compuesto",
     titleKey: "compoundInterestCalculator",
     subtitleKey: "compoundInterestSubtitle",
@@ -133,42 +113,9 @@ function ToolCard({ config }: { config: ToolCardConfig }) {
   );
 }
 
-function PremiumUpsellCard() {
-  const { translate } = useTranslation();
-
-  return (
-    <Link href="/planes">
-      <Card className="group cursor-pointer border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 h-[140px] relative overflow-hidden">
-        <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-          {translate("popular")}
-        </div>
-        <CardContent className="pt-6 h-full flex items-center">
-          <div className="flex items-center justify-between w-full gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Crown className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
-                <p className="font-bold text-yellow-900 dark:text-yellow-100">
-                  {translate("upgradeToPremium")}
-                </p>
-              </div>
-              <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                {translate("premiumFeatures")}
-              </p>
-            </div>
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500/20 group-hover:bg-yellow-500/30 transition-colors shrink-0">
-              <Sparkles className="h-6 w-6 text-yellow-600 dark:text-yellow-500" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 export function ToolsGrid() {
   const { translate } = useTranslation();
   const selectedCountry = useAppStore((state) => state.selectedCountry);
-  const { subscription } = useAuthStore();
   const countryConfig = getCountryConfig(selectedCountry);
 
   const visibleTools = TOOL_CARDS.filter((card) => {
@@ -186,7 +133,6 @@ export function ToolsGrid() {
         {visibleTools.map((config) => (
           <ToolCard key={config.href} config={config} />
         ))}
-        {(!subscription || subscription.plan === "FREE") && <PremiumUpsellCard />}
       </div>
       <GoogleAd
         adSlot="1234567890"

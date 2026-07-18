@@ -1,6 +1,11 @@
-# FinArg
+# La Brecha
 
-Aplicación financiera para seguimiento de cotizaciones, inflación y análisis de mercado argentino.
+Plataforma de indicadores económicos y políticos de Argentina: inflación, reservas del BCRA,
+riesgo país, cotizaciones y calculadoras. En transición hacia un enfoque de métricas
+político-económicas difíciles de conseguir (ver [ROADMAP.md](ROADMAP.md)).
+
+> Anteriormente llamada **FinArg**. El paquete backend `com.finarg` se renombrará a `com.labrecha`
+> recién en la Fase 2 (migración a Python/FastAPI), ya que ese código se reescribe entonces.
 
 ## 🚀 Quick Start
 
