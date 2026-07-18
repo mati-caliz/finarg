@@ -1,0 +1,14 @@
+# La Brecha — cron del host invocando el scraper vía docker compose.
+# Instalar con: crontab crontab.example  (ajustar rutas y zona horaria).
+# Cadencias por frecuencia real de cada fuente.
+
+SHELL=/bin/bash
+COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
+
+# Cotizaciones del dólar: cada 15 minutos en horario de mercado.
+*/15 * * * *  $COMPOSE run --rm scraper run dolar        >> /var/log/labrecha/dolar.log 2>&1
+
+# Indicadores diarios: una vez al día (07:30).
+30 7 * * *    $COMPOSE run --rm scraper run riesgo_pais  >> /var/log/labrecha/riesgo_pais.log 2>&1
+35 7 * * *    $COMPOSE run --rm scraper run inflacion    >> /var/log/labrecha/inflacion.log 2>&1
+40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
