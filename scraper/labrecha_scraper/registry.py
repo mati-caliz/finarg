@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from labrecha_scraper.base import Connector
 from labrecha_scraper.connectors.congreso import CongresoConnector
+from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
+from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.inflacion import InflacionConnector
 from labrecha_scraper.connectors.reservas_bcra import ReservasBcraConnector
 from labrecha_scraper.connectors.riesgo_pais import RiesgoPaisConnector
@@ -12,7 +14,9 @@ CONNECTORS: dict[str, Connector] = {
     connector.name: connector
     for connector in (
         CongresoConnector(),
+        CryptoConnector(),
         DolarConnector(),
+        HolidaysConnector(),
         InflacionConnector(),
         ReservasBcraConnector(),
         RiesgoPaisConnector(),

@@ -14,5 +14,11 @@ COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
 40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
 45 7 * * *    $COMPOSE run --rm scraper run reservas_bcra >> /var/log/labrecha/reservas_bcra.log 2>&1
 
+# Cripto: snapshot diario (la fuente sólo da precio spot). 07:50.
+50 7 * * *    $COMPOSE run --rm scraper run crypto       >> /var/log/labrecha/crypto.log 2>&1
+
 # Congreso: votaciones nominales, baja frecuencia (por sesión). Semanal, lunes 08:00.
 0 8 * * 1     $COMPOSE run --rm scraper run congreso     >> /var/log/labrecha/congreso.log 2>&1
+
+# Feriados: cambian poco; refresco mensual (día 1, 08:10) trae el año siguiente.
+10 8 1 * *    $COMPOSE run --rm scraper run holidays     >> /var/log/labrecha/holidays.log 2>&1

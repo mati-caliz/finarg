@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     Date,
     DateTime,
     Index,
@@ -106,3 +107,14 @@ class CongressVoteDetail(Base):
         Index("ix_congress_vote_details_acta", "acta_id"),
         Index("ix_congress_vote_details_bloc", "bloc"),
     )
+
+
+class Holiday(Base):
+    __tablename__ = "holidays"
+
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
+    name: Mapped[str] = mapped_column(String(160), primary_key=True)
+    local_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    is_global: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    is_fixed: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    types: Mapped[str | None] = mapped_column(String(120), nullable=True)
