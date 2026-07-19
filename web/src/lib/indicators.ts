@@ -40,6 +40,7 @@ export const SOURCE_LABELS: Record<string, string> = {
   argentinadatos: "Argentina Datos",
   dolarapi: "DolarAPI",
   coingecko: "CoinGecko",
+  utdt: "UTDT",
 };
 
 export function sourceLabel(source: string): string {
@@ -55,6 +56,7 @@ export const PERIOD_LABELS: Record<string, string> = {
   ipc_interanual: "mensual",
   pobreza_personas: "semestral",
   desempleo: "trimestral",
+  confianza_gobierno: "mensual",
 };
 
 export const FEATURED_INDICATOR_CODES = [
@@ -66,6 +68,7 @@ export const FEATURED_INDICATOR_CODES = [
   "ipc_interanual",
   "pobreza_personas",
   "desempleo",
+  "confianza_gobierno",
 ] as const;
 
 export const FEATURED_INDICATORS: IndicatorDisplay[] = [
@@ -161,6 +164,18 @@ export const FEATURED_INDICATORS: IndicatorDisplay[] = [
     variationSuffix: " pp",
     sparkPoints: 16,
   },
+  {
+    code: "confianza_gobierno",
+    label: "Confianza en el gobierno",
+    unit: "pts",
+    href: "/indicador/confianza_gobierno",
+    goodWhen: "up",
+    preferredSource: "utdt",
+    format: (value) => formatNumberAR(value, 2),
+    variation: "delta",
+    variationSuffix: " pts",
+    sparkPoints: 24,
+  },
 ];
 
 export const INDICATOR_BY_CODE: Record<string, IndicatorDisplay> = Object.fromEntries(
@@ -189,6 +204,7 @@ export const SOURCE_METHODOLOGY: Record<string, string> = {
     "Datos históricos compilados por Argentina Datos a partir de publicaciones oficiales del INDEC y el mercado.",
   dolarapi: "Cotización de referencia publicada por DolarAPI.",
   coingecko: "Precio de mercado informado por CoinGecko.",
+  utdt: "Índice de Confianza en el Gobierno (ICG) de la Escuela de Gobierno de la UTDT, escala 0 a 5.",
 };
 
 export const RANGE_MONTHS: Record<string, number> = {
