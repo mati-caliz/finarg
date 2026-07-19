@@ -412,11 +412,17 @@ base monetaria (ya ingerida) + tasa de política monetaria (connector `tasas_bcr
 API). Criterio de salida: contadores en Home con disclaimer de proyección; `scrape_runs` verde para
 `tasas_bcra`.
 
-**5.b — Calculadoras personales.** *Impacto fiscal*: nuevo endpoint `/calculators/tax-impact`
-(sueldo bruto + gastos mensuales → desglose IVA, Ganancias, IIBB, aportes; reusa la escala de
-`income_tax`). *Tax Freedom Day*: deriva del anterior, devuelve "días al año trabajando para el
-Estado" + fecha de liberación. UI en la sección calculadoras ya existente, con componentes core.
-Criterio de salida: ambas verificadas contra la API con casos de consistencia interna.
+**5.b — Calculadoras personales.** ✅ HECHO (2026-07-19). Endpoint `/calculators/tax-impact`
+(`api-py/labrecha_api/tax_impact.py`): sueldo bruto + gastos mensuales → desglose anual/mensual de
+Impuesto a las Ganancias (reusa `calculate_income_tax`), IVA embebido (21% sobre el gasto), Ingresos
+Brutos (alícuota provincial representativa 4%, declarada) y aportes de seguridad social, con % de cada
+uno sobre el ingreso. Incluye el **Tax Freedom Day**: presión total, "días trabajando para el Estado"
+y fecha de liberación en el año. Verificado: suma de ítems == total (consistencia interna), 200 con
+payload correcto y 422 ante input inválido, tanto en local (uvicorn) como en el contenedor. UI en
+`/calculadora-impacto-fiscal` (form + card con la fecha de liberación destacada en ámbar + `DataTable`
+del desglose), sumada al Sidebar y al sitemap. Disclaimer explícito de supuestos (IVA 21%, IIBB 4%
+representativo, aportes ≠ impuestos, sin internos ni tasas municipales). `tsc`/`biome`/`next build` +
+`compileall`/`ruff` verdes.
 
 **5.c — Progress bars políticos.** *Promesómetro fiscal*: connector `resultado_fiscal` (Sec.
 Hacienda vía datos.gob.ar) → `indicator_history`; widget dona/barra "emisión acumulada del mes vs

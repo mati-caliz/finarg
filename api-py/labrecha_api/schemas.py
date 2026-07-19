@@ -177,6 +177,32 @@ class IncomeTaxRequest(BaseModel):
     other_deductions: list[CustomDeduction] | None = None
 
 
+class TaxImpactRequest(BaseModel):
+    gross_monthly_salary: Decimal = Field(gt=0)
+    monthly_expenses: Decimal = Field(ge=0)
+    retired: bool = False
+    iibb_rate: Decimal = Field(default=Decimal("4"), ge=0, le=15)
+
+
+class TaxImpactItem(BaseModel):
+    concept: str
+    category: str
+    annual_amount: Decimal
+    monthly_amount: Decimal
+    share_of_income: Decimal
+
+
+class TaxImpactResponse(BaseModel):
+    gross_annual_income: Decimal
+    annual_expenses: Decimal
+    total_annual: Decimal
+    total_monthly: Decimal
+    total_pressure: Decimal
+    days_for_the_state: int
+    tax_freedom_date: date
+    items: list[TaxImpactItem]
+
+
 class TaxBracketOut(BaseModel):
     bracket: int
     from_amount: Decimal

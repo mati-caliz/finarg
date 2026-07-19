@@ -17,7 +17,10 @@ from labrecha_api.schemas import (
     IncomeTaxResponse,
     InflationAdjustmentRequest,
     InflationAdjustmentResponse,
+    TaxImpactRequest,
+    TaxImpactResponse,
 )
+from labrecha_api.tax_impact import calculate_tax_impact
 
 router = APIRouter(prefix="/calculators", tags=["calculators"])
 
@@ -74,6 +77,11 @@ def compound_interest(request: CompoundInterestRequest) -> CompoundInterestRespo
 @router.post("/income-tax", response_model=IncomeTaxResponse)
 def income_tax(request: IncomeTaxRequest) -> IncomeTaxResponse:
     return calculate_income_tax(request)
+
+
+@router.post("/tax-impact", response_model=TaxImpactResponse)
+def tax_impact(request: TaxImpactRequest) -> TaxImpactResponse:
+    return calculate_tax_impact(request)
 
 
 @router.post("/inflation-adjustment", response_model=InflationAdjustmentResponse)
