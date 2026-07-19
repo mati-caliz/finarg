@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from labrecha_scraper.base import Connector
+from labrecha_scraper.connectors.bcra_tasas import BcraTasasConnector
+from labrecha_scraper.connectors.big_mac import BigMacConnector
 from labrecha_scraper.connectors.congreso import CongresoConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
@@ -16,6 +18,8 @@ from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
 CONNECTORS: dict[str, Connector] = {
     connector.name: connector
     for connector in (
+        BcraTasasConnector(),
+        BigMacConnector(),
         CongresoConnector(),
         CryptoConnector(),
         DolarConnector(),
