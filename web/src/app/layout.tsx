@@ -74,14 +74,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es" className={`${archivo.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
         <EarlyHints />
-        <link
-          rel="preconnect"
-          href={process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:8080"}
-        />
-        <link
-          rel="dns-prefetch"
-          href={process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:8080"}
-        />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/icon.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

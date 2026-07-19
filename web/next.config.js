@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === "production";
-const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
 
 const securityHeaders = [
   {
@@ -38,13 +37,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://www.bcra.gob.ar https://icon.horse https://icons.com.ar https://lh3.googleusercontent.com https://www.google.com https://*.gstatic.com https://www.google-analytics.com",
-      [
-        "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com",
-        !isProd && "http://localhost:8080",
-        backendUrl.replace("/api/v1", ""),
-      ]
-        .filter(Boolean)
-        .join(" "),
+      "connect-src 'self' https://accounts.google.com https://www.bcra.gob.ar https://icon.horse https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://www.googletagmanager.com",
       "frame-src https://accounts.google.com",
       "base-uri 'self'",
       "form-action 'self'",
@@ -156,22 +149,15 @@ const nextConfig = {
   async redirects() {
     return [
       { source: "/ganancias", destination: "/calculadora-sueldo-neto", permanent: true },
-      { source: "/simulador", destination: "/simulador-de-inversiones", permanent: true },
-      { source: "/reservas", destination: "/reservas-bcra", permanent: true },
-      { source: "/tasas", destination: "/comparador-tasas", permanent: true },
-      { source: "/conversor-universal", destination: "/conversor-monedas", permanent: true },
-    ];
-  },
-  async rewrites() {
-    return [
+      { source: "/reservas", destination: "/indicador/reservas_internacionales", permanent: true },
       {
-        source: "/api/data/:path*",
-        destination: `${process.env.BACKEND_URL || "http://localhost:8080"}/api/v1/:path*`,
+        source: "/reservas-bcra",
+        destination: "/indicador/reservas_internacionales",
+        permanent: true,
       },
-      {
-        source: "/api/backend/:path*",
-        destination: `${process.env.BACKEND_URL || "http://localhost:8080"}/api/v1/:path*`,
-      },
+      { source: "/cotizaciones", destination: "/indicador/dolar_blue", permanent: true },
+      { source: "/inflacion", destination: "/indicador/ipc_mensual", permanent: true },
+      { source: "/riesgo-pais", destination: "/indicador/riesgo_pais", permanent: true },
     ];
   },
 };

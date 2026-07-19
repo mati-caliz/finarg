@@ -90,25 +90,68 @@ services:
     tmpfs:
       - /tmp
 
+  api-py:
+    build:
+      context: ./api-py
+      dockerfile: Dockerfile
+    image: labrecha-api
+    container_name: labrecha-api-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://finlatamio.com,https://www.finlatamio.com}
+    networks:
+      - db-network
+      - app-network
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+
   frontend:
     build:
       context: ./web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID}
-        BACKEND_URL: http://backend:8080
     container_name: web-prod
     depends_on:
-      backend:
+      api-py:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID}
-      BACKEND_INTERNAL_URL: http://backend:8080/api/v1
-      BACKEND_URL: http://backend:8080
+      LABRECHA_API_INTERNAL_URL: http://api-py:8000
     networks:
       - app-network
       - shared-nginx
