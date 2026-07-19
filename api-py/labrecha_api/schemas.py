@@ -151,3 +151,68 @@ class InflationAdjustmentResponse(BaseModel):
     to_date: date
     cumulative_inflation: Decimal
     months_elapsed: int
+
+
+class CustomDeduction(BaseModel):
+    concept: str
+    amount: Decimal
+
+
+class IncomeTaxRequest(BaseModel):
+    gross_monthly_salary: Decimal = Field(gt=0)
+    retired: bool = False
+    health_insurance: Decimal | None = None
+    retirement: Decimal | None = None
+    union_dues: Decimal | None = None
+    union_dues_percent: Decimal | None = None
+    has_spouse: bool = False
+    number_of_children: int = Field(default=0, ge=0)
+    children_with_disabilities_count: int = Field(default=0, ge=0)
+    housing_rent: Decimal | None = None
+    domestic_service: Decimal | None = None
+    education_expenses: Decimal | None = None
+    life_insurance: Decimal | None = None
+    donations: Decimal | None = None
+    medical_fees: Decimal | None = None
+    other_deductions: list[CustomDeduction] | None = None
+
+
+class TaxBracketOut(BaseModel):
+    bracket: int
+    from_amount: Decimal
+    to_amount: Decimal
+    rate: Decimal
+    taxable_base: Decimal
+    bracket_tax: Decimal
+
+
+class IncomeTaxCalculationDetails(BaseModel):
+    minimum_exemption: Decimal
+    special_deduction: Decimal
+    family_allowances: Decimal
+    personal_deductions: Decimal
+    total_allowed_deductions: Decimal
+
+
+class IncomeTaxDeductionBreakdown(BaseModel):
+    retirement: Decimal
+    health_insurance: Decimal
+    law_19032: Decimal
+    union_dues: Decimal
+    income_tax: Decimal
+    total: Decimal
+
+
+class IncomeTaxResponse(BaseModel):
+    gross_monthly_salary: Decimal
+    gross_annual_salary: Decimal
+    monthly_legal_deductions: Decimal
+    total_deductions: Decimal
+    taxable_income: Decimal
+    annual_tax: Decimal
+    monthly_tax: Decimal
+    effective_rate: Decimal
+    net_monthly_salary: Decimal
+    calculation_details: IncomeTaxCalculationDetails
+    deduction_breakdown: IncomeTaxDeductionBreakdown
+    tax_brackets: list[TaxBracketOut]

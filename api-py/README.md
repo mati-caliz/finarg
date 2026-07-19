@@ -24,6 +24,7 @@ Convive con el backend Java (`api/`) durante la transición; se apaga Spring cua
 | GET | `/news` | Noticias. Filtros: `source`, `category`, `limit`, `offset`. |
 | POST | `/calculators/compound-interest` | Interés compuesto (capital, tasa, plazo, frecuencia, aportes). |
 | POST | `/calculators/inflation-adjustment` | Ajuste por inflación entre dos meses usando `ipc_mensual`. |
+| POST | `/calculators/income-tax` | Sueldo neto (Impuesto a las Ganancias): deducciones legales, cargas de familia, deducciones personales y escala progresiva. |
 | GET | `/scrape-runs` | Última corrida de cada job del scraper (monitoreo). |
 
 Docs interactivas en `/docs` (Swagger) y `/redoc`.
@@ -36,8 +37,10 @@ uvicorn labrecha_api.main:app --reload
 
 Configuración por entorno (ver `.env.example`): `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`.
 
+Las tres calculadoras del Java están portadas. Los importes de la escala de Ganancias son
+constantes en `income_tax.py` (período fiscal vigente al portar); actualizarlas es editar ese módulo.
+
 ## Pendiente (próximos slices de Fase 2)
 
-- Portar la calculadora de sueldo neto (Impuesto a las Ganancias) del Java.
 - Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis hace falta sirviendo desde PostgreSQL local.
