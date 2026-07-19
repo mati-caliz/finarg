@@ -1,5 +1,7 @@
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
+import { InflationClockCard } from "@/components/home/InflationClockCard";
+import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
 import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
 
 export default function HomePage() {
@@ -48,8 +50,19 @@ export default function HomePage() {
         ))}
       </section>
 
-      <section>
+      <section
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        }}
+      >
+        <InflationClockCard />
         <BrechaMedicionesCard />
+      </section>
+
+      <section>
+        <MonitorBcraCard />
       </section>
     </div>
   );
