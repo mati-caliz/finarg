@@ -1,8 +1,8 @@
 const CACHE_VERSION = "v3";
-const STATIC_CACHE = `finarg-static-${CACHE_VERSION}`;
-const DYNAMIC_CACHE = `finarg-dynamic-${CACHE_VERSION}`;
-const API_CACHE = `finarg-api-${CACHE_VERSION}`;
-const CHUNKS_CACHE = `finarg-chunks-${CACHE_VERSION}`;
+const STATIC_CACHE = `labrecha-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `labrecha-dynamic-${CACHE_VERSION}`;
+const API_CACHE = `labrecha-api-${CACHE_VERSION}`;
+const CHUNKS_CACHE = `labrecha-chunks-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
   "/",
