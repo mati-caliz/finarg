@@ -424,12 +424,18 @@ del desglose), sumada al Sidebar y al sitemap. Disclaimer explícito de supuesto
 representativo, aportes ≠ impuestos, sin internos ni tasas municipales). `tsc`/`biome`/`next build` +
 `compileall`/`ruff` verdes.
 
-**5.c — Progress bars políticos.** *Promesómetro fiscal*: connector `resultado_fiscal` (Sec.
-Hacienda vía datos.gob.ar) → `indicator_history`; widget dona/barra "emisión acumulada del mes vs
-meta" y "resultado financiero vs meta" (barra tipo IndicadorTile de brecha). *Termómetro del empleo*:
-connector `empleo_sipa` con 3 `indicator_code` (formal privado / público / informal), barra apilada
-100% que se mueve mes a mes. Criterio de salida: `scrape_runs` verde para ambos connectors; widgets
-con fuente + fecha.
+**5.c — Progress bars políticos.** 🚧 EN CURSO. **Hecho (2026-07-19) — Promesómetro fiscal:** dos series
+nuevas en `series_datosgob` (`resultado_primario` = IMIG `452.3...`; `resultado_financiero` mensual base
+caja `378.9...`, ambas de Secretaría de Hacienda vía datos.gob.ar, en ARS millones, hasta 2026-05).
+Corrida verde. Widget `PromesometroFiscalCard` en la Home: en vez de inventar una meta numérica, mide la
+promesa real del gobierno ("superávit financiero") como **racha de meses consecutivos con resultado
+financiero > 0** (hoy 4 meses, feb–may 2026, cortados por el déficit estacional de enero), con tira de
+los últimos 12 meses (verde superávit / rojo déficit) y los resultados financiero + primario del mes en
+billones con signo y color. Fuente+fecha visibles. Verificado `tsc`/`biome`/`next build` +
+`ruff`/`compileall` verdes. **Pendiente 5.c:** *Termómetro del empleo* (connector `empleo_sipa`, 3
+`indicator_code` formal privado / público / informal, barra apilada 100%) — requiere research de la
+fuente (SIPA para registrados + EPH para informalidad; el split 3-vías mensual no es una serie directa).
+Criterio de salida: `scrape_runs` verde para ambos connectors; widgets con fuente + fecha.
 
 **5.d — Radar de crédito + Coparticipación (mapa).** *Radar de crédito*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector

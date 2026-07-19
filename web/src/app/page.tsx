@@ -2,6 +2,7 @@ import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
 import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
+import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
 import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
 
 export default function HomePage() {
@@ -61,7 +62,14 @@ export default function HomePage() {
         <BrechaMedicionesCard />
       </section>
 
-      <section>
+      <section
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+        }}
+      >
+        <PromesometroFiscalCard />
         <MonitorBcraCard />
       </section>
     </div>
