@@ -36,6 +36,7 @@ Algunos indicadores no encajan en la tabla genérica y usan tablas propias: `con
 | `congreso` | datos.hcdn.gob.ar | votaciones nominales de Diputados (tablas `congress_votes` / `congress_vote_details`) | semanal |
 | `crypto` | CoinGecko | `cripto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
 | `holidays` | Nager.Date | feriados de Argentina (tabla `holidays`, PK `(date, name)`) | mensual |
+| `news` | El Economista (RSS) | artículos a la tabla `news_articles` (ingesta cruda, sin resumen AI) | diaria |
 
 `political_events` se puebla con un set curado de hitos (elecciones, cambios de gobierno, DNUs,
 medidas económicas) vía `seed-events` — datos curados, no scrapeados. Habilitan anotar las series
@@ -46,8 +47,15 @@ en la UI (Fase 3).
 datos.gob.ar (`source=datosgobar`) y la diaria del BCRA (`source=bcra`, desde 1996). Es el primer
 caso real del comparador de mediciones.
 
-Pendientes: `investments` y `news` (scraper-only, portar del Java) y las fuentes frágiles
-(inflación diaria de inflacionverdadera.com, Nowcast pobreza UTDT, ICG/ICC), que van después.
+La ingesta de `news` guarda el artículo crudo (título, contenido, fuente, fecha, imagen) con
+`category=ECONOMY_GENERAL` fijo; la clasificación por categoría y el resumen AI que hacía el módulo
+Java quedan para más adelante. Es idempotente por `source_url` (no repisa artículos ya guardados).
+Sumar feeds es agregar una entrada a `FEEDS` en el conector.
+
+Pendientes: fuentes frágiles (inflación diaria de inflacionverdadera.com, Nowcast pobreza UTDT,
+ICG/ICC), que van después. `investments` (bonos, cauciones, cedears, ETFs, letras, acciones) se
+descartó por ahora: no tiene fuente gratis viable — dolarito, que alimentaba la mayoría, está detrás
+de Cloudflare (403); Finnhub necesita API key; bonos eran datos hardcodeados; metales se eliminó.
 
 ## Agregar un conector
 

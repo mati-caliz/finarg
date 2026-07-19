@@ -6,6 +6,7 @@ from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.inflacion import InflacionConnector
+from labrecha_scraper.connectors.news import NewsConnector
 from labrecha_scraper.connectors.reservas_bcra import ReservasBcraConnector
 from labrecha_scraper.connectors.riesgo_pais import RiesgoPaisConnector
 from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
@@ -18,6 +19,7 @@ CONNECTORS: dict[str, Connector] = {
         DolarConnector(),
         HolidaysConnector(),
         InflacionConnector(),
+        NewsConnector(),
         ReservasBcraConnector(),
         RiesgoPaisConnector(),
         SeriesDatosGobConnector(),

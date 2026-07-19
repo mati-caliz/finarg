@@ -109,6 +109,24 @@ class CongressVoteDetail(Base):
     )
 
 
+class NewsArticle(Base):
+    __tablename__ = "news_articles"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String(500))
+    content: Mapped[str] = mapped_column(Text)
+    summary: Mapped[str] = mapped_column(String(1000))
+    source: Mapped[str] = mapped_column(String(255))
+    source_url: Mapped[str] = mapped_column(String(2048), unique=True)
+    country: Mapped[str] = mapped_column(String(255))
+    category: Mapped[str] = mapped_column(String(255))
+    published_date: Mapped[datetime] = mapped_column(DateTime)
+    image_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    is_official: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+
 class Holiday(Base):
     __tablename__ = "holidays"
 

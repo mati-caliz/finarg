@@ -52,6 +52,7 @@ def upsert_rows(
     model: type,
     rows: list[dict],
     index_elements: list[str],
+    update_on_conflict: bool = True,
     batch_size: int = UPSERT_BATCH_SIZE,
 ) -> int:
     if not rows:
@@ -61,7 +62,7 @@ def upsert_rows(
     for start in range(0, len(rows), batch_size):
         chunk = rows[start : start + batch_size]
         statement = insert(model).values(chunk)
-        if update_columns:
+        if update_on_conflict and update_columns:
             statement = statement.on_conflict_do_update(
                 index_elements=index_elements,
                 set_={column: statement.excluded[column] for column in update_columns},
