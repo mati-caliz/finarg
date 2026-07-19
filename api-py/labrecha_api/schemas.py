@@ -1,7 +1,8 @@
 from datetime import date, datetime
 from decimal import Decimal
+from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class IndicatorSourceSummary(BaseModel):
@@ -103,3 +104,50 @@ class NewsArticleOut(BaseModel):
     category: str
     published_date: datetime
     image_url: str | None
+
+
+class CompoundingFrequency(str, Enum):
+    MONTHLY = "MONTHLY"
+    QUARTERLY = "QUARTERLY"
+    YEARLY = "YEARLY"
+
+    @property
+    def periods_per_year(self) -> int:
+        return {"MONTHLY": 12, "QUARTERLY": 4, "YEARLY": 1}[self.value]
+
+
+class CompoundInterestRequest(BaseModel):
+    initial_capital: Decimal = Field(gt=0)
+    annual_rate: Decimal = Field(ge=0, le=200)
+    years: int = Field(ge=1, le=50)
+    compounding_frequency: CompoundingFrequency
+    periodic_contribution: Decimal = Field(default=Decimal(0), ge=0)
+
+
+class CompoundInterestPeriod(BaseModel):
+    period: int
+    principal: Decimal
+    interest: Decimal
+    total: Decimal
+
+
+class CompoundInterestResponse(BaseModel):
+    final_amount: Decimal
+    total_contributions: Decimal
+    total_interest: Decimal
+    periods: list[CompoundInterestPeriod]
+
+
+class InflationAdjustmentRequest(BaseModel):
+    amount: Decimal = Field(gt=0)
+    from_date: date
+    to_date: date
+
+
+class InflationAdjustmentResponse(BaseModel):
+    original_amount: Decimal
+    adjusted_amount: Decimal
+    from_date: date
+    to_date: date
+    cumulative_inflation: Decimal
+    months_elapsed: int
