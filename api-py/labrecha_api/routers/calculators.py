@@ -7,11 +7,14 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
+from labrecha_api.income_tax import calculate_income_tax
 from labrecha_api.models import IndicatorHistory
 from labrecha_api.schemas import (
     CompoundInterestPeriod,
     CompoundInterestRequest,
     CompoundInterestResponse,
+    IncomeTaxRequest,
+    IncomeTaxResponse,
     InflationAdjustmentRequest,
     InflationAdjustmentResponse,
 )
@@ -66,6 +69,11 @@ def compound_interest(request: CompoundInterestRequest) -> CompoundInterestRespo
         total_interest=_money(running_total - total_contributions),
         periods=periods,
     )
+
+
+@router.post("/income-tax", response_model=IncomeTaxResponse)
+def income_tax(request: IncomeTaxRequest) -> IncomeTaxResponse:
+    return calculate_income_tax(request)
 
 
 @router.post("/inflation-adjustment", response_model=InflationAdjustmentResponse)

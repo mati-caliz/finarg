@@ -203,12 +203,13 @@ Endpoints genéricos verificados contra la base: `/indicators` (catálogo con fu
 Endpoints de las tablas propias: `/congress/votes` (+ `/{acta_id}` y `/details`),
 `/senate/members` + `/senate/blocs`, `/holidays`, `/news`. Todos verificados contra la base.
 
-Calculadoras portadas: `/calculators/compound-interest` (interés compuesto) y
-`/calculators/inflation-adjustment` (ajuste por IPC entre dos meses, sobre `ipc_mensual`).
-Verificadas: 100k al 10% anual → 110k; inflación 2024 → 117,68% (≈ oficial INDEC).
+Las tres calculadoras portadas: `/calculators/compound-interest`, `/calculators/inflation-adjustment`
+(ajuste por IPC sobre `ipc_mensual`) e `/calculators/income-tax` (sueldo neto, Impuesto a las
+Ganancias: deducciones legales con efecto aguinaldo, cargas de familia, deducciones personales y
+escala progresiva). Verificadas: 100k al 10% anual → 110k; inflación 2024 → 117,68% (≈ INDEC);
+Ganancias con consistencia interna (suma de tramos = impuesto anual, bases = neto imponible).
 
 **Pendiente:**
-- Portar la calculadora de sueldo neto (Impuesto a las Ganancias), la más compleja.
 - Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis sigue haciendo falta: sirviendo desde PostgreSQL local probablemente
   alcance; si se saca, se saca también del compose.
