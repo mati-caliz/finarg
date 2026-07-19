@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from labrecha_api.config import settings
 from labrecha_api.routers import (
+    calculators,
     congress,
     events,
     holidays,
@@ -32,3 +33,4 @@ app.include_router(congress.router)
 app.include_router(senate.router)
 app.include_router(holidays.router)
 app.include_router(news.router)
+app.include_router(calculators.router)

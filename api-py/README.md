@@ -22,6 +22,8 @@ Convive con el backend Java (`api/`) durante la transición; se apaga Spring cua
 | GET | `/senate/blocs` | Composición agregada por bloque. |
 | GET | `/holidays` | Feriados. Filtros: `year`, `date_from`, `date_to`. |
 | GET | `/news` | Noticias. Filtros: `source`, `category`, `limit`, `offset`. |
+| POST | `/calculators/compound-interest` | Interés compuesto (capital, tasa, plazo, frecuencia, aportes). |
+| POST | `/calculators/inflation-adjustment` | Ajuste por inflación entre dos meses usando `ipc_mensual`. |
 | GET | `/scrape-runs` | Última corrida de cada job del scraper (monitoreo). |
 
 Docs interactivas en `/docs` (Swagger) y `/redoc`.
@@ -36,6 +38,6 @@ Configuración por entorno (ver `.env.example`): `DATABASE_URL`, `CORS_ALLOWED_O
 
 ## Pendiente (próximos slices de Fase 2)
 
-- Portar las tres calculadoras del Java (sueldo neto, interés compuesto, ajuste por inflación).
+- Portar la calculadora de sueldo neto (Impuesto a las Ganancias) del Java.
 - Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis hace falta sirviendo desde PostgreSQL local.
