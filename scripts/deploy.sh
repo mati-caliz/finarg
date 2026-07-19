@@ -2,11 +2,11 @@
 
 set -e
 
-echo "🚀 Iniciando deploy de Finarg..."
+echo "🚀 Iniciando deploy de La Brecha..."
 
 if [ ! -f .env ]; then
     echo "❌ Error: Archivo .env no encontrado"
-    echo "Copia .env.example a .env y configura las variables"
+    echo "Copia .env.production.example a .env y configura las variables"
     exit 1
 fi
 
@@ -14,11 +14,6 @@ fi
 set -a
 source .env
 set +a
-
-if [ -z "$JWT_SECRET" ]; then
-    echo "❌ Error: JWT_SECRET no configurado en .env"
-    exit 1
-fi
 
 # Detectar si usa docker-compose o docker compose
 if command -v docker-compose &> /dev/null; then
@@ -49,10 +44,7 @@ $DOCKER_COMPOSE -f docker-compose.prod.yml ps
 echo ""
 echo "✅ Deploy completado!"
 echo ""
-echo "📊 Endpoints:"
-echo "  - Frontend: http://localhost:3000"
-echo "  - Backend: http://localhost:8080"
-echo "  - API Docs: http://localhost:8080/swagger-ui.html"
+echo "📊 Servicios: postgres + api-py + web (ver 'docker compose -f docker-compose.prod.yml ps')"
 echo ""
 echo "📝 Ver logs:"
 echo "  $DOCKER_COMPOSE -f docker-compose.prod.yml logs -f"

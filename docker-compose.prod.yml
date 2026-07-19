@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: finarg-postgres-prod
+    container_name: labrecha-postgres-prod
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
@@ -118,7 +118,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: finarg-nginx
+    container_name: labrecha-nginx
     profiles:
       - legacy-edge
     depends_on:

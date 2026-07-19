@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# FinArg - Lighthouse Audit Script
+# La Brecha - Lighthouse Audit Script
 # Runs Lighthouse audit and generates a summary report
 
 set -e
@@ -25,7 +25,7 @@ SUMMARY_REPORT="$OUTPUT_DIR/lighthouse-summary-$TIMESTAMP-$FORM_FACTOR.txt"
 mkdir -p "$OUTPUT_DIR"
 
 echo -e "${BLUE}========================================${NC}"
-echo -e "${BLUE}  FinArg Lighthouse Audit${NC}"
+echo -e "${BLUE}  La Brecha Lighthouse Audit${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
 echo -e "URL: ${YELLOW}$URL${NC}"
@@ -146,7 +146,7 @@ echo ""
 # Save summary to file
 {
     echo "========================================="
-    echo "  FinArg Lighthouse Audit Summary"
+    echo "  La Brecha Lighthouse Audit Summary"
     echo "========================================="
     echo ""
     echo "Date: $(date)"

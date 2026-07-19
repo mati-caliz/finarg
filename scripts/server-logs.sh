@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# Script para ver logs del servidor
+# Ver logs del servidor en producción.
 # Uso: ./scripts/server-logs.sh [servicio] [líneas]
-# Ejemplos:
-#   ./scripts/server-logs.sh backend 100
-#   ./scripts/server-logs.sh frontend
+#   ./scripts/server-logs.sh api-py 100
+#   ./scripts/server-logs.sh web
 #   ./scripts/server-logs.sh
 
-SERVICE=${1:-backend}
+SERVICE=${1:-api-py}
 LINES=${2:-100}
 
 cd "$(dirname "$0")/.."
@@ -15,4 +14,4 @@ cd "$(dirname "$0")/.."
 echo "📋 Mostrando últimas $LINES líneas de logs de $SERVICE..."
 echo "─────────────────────────────────────────────────────────"
 
-docker compose -f docker-compose.prod.yml logs --tail=$LINES --follow $SERVICE
+docker compose -f docker-compose.prod.yml logs --tail="$LINES" --follow "$SERVICE"
