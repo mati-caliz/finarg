@@ -305,13 +305,19 @@ repuntaron a las rutas nuevas (`/reservas`,`/reservas-bcra`→`/indicador/reserv
 tenía) + `frontend` apunta a `http://api-py:8000` y depende de él. Verificado end-to-end (GET cacheado
 + POST) y ambos compose parsean.
 
-**Pendiente (necesita edición coordinada del nginx compartido — NO hacer a ciegas):** el módulo
-Java sigue en pie porque `nginx/nginx.conf` (que además sirve gastronova/portfolio/jobhunter en
-prod) tiene `upstream backend { server backend:8080; }` y rutas `/api/`+`/actuator/health` hacia él;
-si se saca el servicio `backend` del compose sin editar el nginx a la vez, nginx puede no levantar y
-tirar los otros sitios. Retiro del Java = borrar `api/` + su servicio en ambos compose + sacar esas
-directivas del nginx, todo junto. Falta también adaptar CI (`ci.yml` tiene build de Java/Maven) y
-sumar el `scraper` al compose prod.
+**Hecho (2026-07-19) — Spring apagado:** retirado el backend Java de forma coordinada. Borrado el
+módulo `api/` completo; sacado el servicio `backend` de ambos compose (y de `depends_on` del nginx
+prod); en `nginx/nginx.conf` (compartido) removidos —quirúrgicamente— el `upstream backend` y las
+locations `/api/` + `/actuator/health` del server de finlatamio, dejando intactos los otros sitios
+(gastronova/portfolio/jobhunter; llaves balanceadas 30/30, 8 `server_name` intactos). CI (`ci.yml`):
+reemplazado el job Maven/Java por un `python-check` (byte-compile de `api-py`) + type-check del front;
+filtros y summary actualizados. Verificado: compose dev/prod parsean, `ci.yml` es YAML válido,
+`compileall labrecha_api` OK, `next build` verde. La app corre 100% sobre el stack nuevo
+(FastAPI + scraper Python), sin rastros de Spring.
+
+**Pendiente Fase 4:** sumar el `scraper` al compose prod (+ cron), CI de Python más completo
+(ruff/pytest en vez de sólo byte-compile) y el resto del lanzamiento (dominio, monitoreo de
+`scrape_runs`, actualizar CLAUDE.md/README que aún describen el stack Spring viejo).
 
 ### Fase 4 — Infra y lanzamiento (detalle original)
 

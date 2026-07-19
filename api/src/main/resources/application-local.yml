@@ -1,3 +1,0 @@
-spring:
-  cache:
-    type: simple  # Caché en memoria (sin Redis)
