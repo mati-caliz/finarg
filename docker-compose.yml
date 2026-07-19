@@ -28,32 +28,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  redis:
-    image: redis:7-alpine
-    container_name: api-redis
-    ports:
-      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - finarg-network
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
   backend:
     build:
       context: ./api
@@ -61,8 +35,6 @@ services:
     container_name: api
     depends_on:
       postgres:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     environment:
       # Database
@@ -74,9 +46,6 @@ services:
       # Hibernate
       HIBERNATE_DDL_AUTO: ${HIBERNATE_DDL_AUTO:-update}
       HIBERNATE_SHOW_SQL: ${HIBERNATE_SHOW_SQL:-false}
-      # Redis
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
       # JWT
       JWT_SECRET: ${JWT_SECRET}
       # Mail
@@ -206,8 +175,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:
