@@ -31,8 +31,17 @@ Docs interactivas en `/docs` (Swagger) y `/redoc`.
 
 ## Uso
 
+Local:
+
 ```bash
 uvicorn labrecha_api.main:app --reload
+```
+
+Vía Docker Compose (servicio `api-py`, publicado en `127.0.0.1:8000`, habla con `postgres` por la
+red interna):
+
+```bash
+docker compose up -d api-py
 ```
 
 Configuración por entorno (ver `.env.example`): `DATABASE_URL`, `CORS_ALLOWED_ORIGINS`.
@@ -42,5 +51,5 @@ constantes en `income_tax.py` (período fiscal vigente al portar); actualizarlas
 
 ## Pendiente (próximos slices de Fase 2)
 
-- Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis hace falta sirviendo desde PostgreSQL local.
+- (Fase 3) Apuntar el frontend a esta API y apagar el backend Java.

@@ -144,6 +144,39 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  api-py:
+    build:
+      context: ./api-py
+      dockerfile: Dockerfile
+    image: labrecha-api
+    container_name: labrecha-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-finarg}:${DB_PASSWORD:-finarg123}@postgres:5432/${DB_NAME:-finarg}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001}
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - finarg-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   scraper:
     build:
       context: ./scraper
