@@ -4,6 +4,7 @@ from labrecha_scraper.base import Connector
 from labrecha_scraper.connectors.bcra_tasas import BcraTasasConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
 from labrecha_scraper.connectors.congreso import CongresoConnector
+from labrecha_scraper.connectors.credito_bcra import CreditoBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
@@ -21,6 +22,7 @@ CONNECTORS: dict[str, Connector] = {
         BcraTasasConnector(),
         BigMacConnector(),
         CongresoConnector(),
+        CreditoBcraConnector(),
         CryptoConnector(),
         DolarConnector(),
         HolidaysConnector(),

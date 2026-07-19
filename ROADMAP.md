@@ -450,7 +450,16 @@ de medición distinta a SIPA) se muestra **fuera** de la barra de registrados, c
 mezclar bases inconsistentes. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
 **5.c COMPLETA.**
 
-**5.d — Radar de crédito + Coparticipación (mapa).** *Radar de crédito*: connector `credito_bcra`
+**5.d — Radar de crédito + Coparticipación (mapa).** 🚧 EN CURSO. **Hecho (2026-07-19) — Radar de
+crédito:** connector `credito_bcra` (BCRA API v4.0, unidad por variable) → `tasa_prestamos_personales`
+(var 144, 64,8% TNA), `tasa_adelantos_cuenta_corriente` (var 13, 25,6% TNA) y `prestamos_sector_privado`
+(var 117, stock ~$101 billones, diario). Corrida verde (13.687 filas). Widget `RadarCreditoCard` en la
+Home: dos tiles de tasas activas + el stock de crédito al sector privado en billones con variación
+nominal ~30 días (rotulada nominal). **Hallazgo:** la morosidad/irregularidad de cartera **no está en la
+API monetarias** del BCRA (vive en el "Informe sobre Bancos", fuente frágil) → queda pendiente y así se
+dice en el disclaimer del widget. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
+**Pendiente 5.d:** *Coparticipación* (connector + tabla propia + mapa SVG self-contained).
+*Radar de crédito (versión original)*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
 `coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,
 metadata)`; componente `ArgentinaMap` (SVG de provincias, sin librería externa de mapas para respetar
