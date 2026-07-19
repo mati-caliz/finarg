@@ -29,6 +29,8 @@ SERIES: dict[str, SeriesSpec] = {
     "431.1_EXPECTATIVANA_M_0_0_29_85": SeriesSpec("expectativas_inflacion_rem", "%"),
     "57.1_SMVMM_0_M_34": SeriesSpec("salario_minimo", "ARS"),
     "453.1_SERIE_ORIGNAL_0_0_14_46": SeriesSpec("produccion_industrial", "indice"),
+    "452.3_RESULTADO_RIO_0_M_18_54": SeriesSpec("resultado_primario", "ARS_millones"),
+    "378.9_RESULTADO_017_0_M_18_90": SeriesSpec("resultado_financiero", "ARS_millones"),
 }
 
 
