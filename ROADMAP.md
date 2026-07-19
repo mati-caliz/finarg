@@ -154,6 +154,8 @@ idempotente):
   (portado del scraper-only Java).
 - `holidays` (Nager.Date): feriados de Argentina 2010-2027 en tabla propia `holidays`
   con PK `(date, name)` — la fuente tiene días con dos feriados (portado del scraper-only Java).
+- `news` (El Economista RSS): ingesta cruda de artículos a `news_articles` (idempotente por
+  `source_url`, sin resumen AI ni clasificación de categoría). Sumar feeds = una entrada en `FEEDS`.
 
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
@@ -176,8 +178,9 @@ on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por 
      con lo demás ya andando).
   6. Senado (datos abiertos) para completar el Congreso.
   7. Portar los módulos scraper-only que quedaron en Java como referencia: ✅ `crypto`,
-     ✅ `holidays`; falta `investments` (bonos, cauciones, cedears, ETFs, letras, metales,
-     acciones) y `news`. Escriben a la base pero sin UI por ahora (data para features futuras).
+     ✅ `holidays`, ✅ `news`. `investments` (bonos, cauciones, cedears, ETFs, letras, acciones)
+     se descarta: sin fuente gratis viable (dolarito tras Cloudflare 403, Finnhub requiere key,
+     bonos hardcodeados, metales eliminado). `metales` eliminado del backend a pedido.
 - Scheduling con cron del host (una entrada por cadencia: 15min cotizaciones, diaria,
   semanal, mensual). Idempotencia por upsert sobre el índice único.
 - Backfill histórico de cada serie hasta donde la fuente lo permita.
