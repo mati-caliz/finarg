@@ -7,7 +7,7 @@ import {
   politicalEventsApi,
   senateApi,
 } from "@/lib/labrechaApi";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 
 export const labrechaKeys = {
   indicators: ["labrecha", "indicators"] as const,
@@ -34,6 +34,20 @@ export function useIndicatorSeries(code: string, params?: IndicatorSeriesParams)
     queryKey: labrechaKeys.indicatorSeries(code, params),
     queryFn: () => indicatorsApi.series(code, params),
     enabled: code.length > 0,
+  });
+}
+
+export function useIndicatorSeriesMulti(
+  code: string,
+  sources: string[],
+  params?: IndicatorSeriesParams,
+) {
+  return useQueries({
+    queries: sources.map((source) => ({
+      queryKey: labrechaKeys.indicatorSeries(code, { ...params, source }),
+      queryFn: () => indicatorsApi.series(code, { ...params, source }),
+      enabled: code.length > 0,
+    })),
   });
 }
 
