@@ -27,6 +27,8 @@ SERIES: dict[str, SeriesSpec] = {
     "143.2_NO_PR_2004_A_21": SeriesSpec("emae", "indice"),
     "42.3_EPH_PUNTUATAL_0_M_30": SeriesSpec("desempleo", "%", Decimal(100)),
     "431.1_EXPECTATIVANA_M_0_0_29_85": SeriesSpec("expectativas_inflacion_rem", "%"),
+    "57.1_SMVMM_0_M_34": SeriesSpec("salario_minimo", "ARS"),
+    "453.1_SERIE_ORIGNAL_0_0_14_46": SeriesSpec("produccion_industrial", "indice"),
 }
 
 
