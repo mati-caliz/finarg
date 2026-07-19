@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, timezone
+from datetime import timezone
 from datetime import datetime as datetime_type
 from decimal import Decimal
 
