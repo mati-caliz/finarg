@@ -156,14 +156,17 @@ idempotente):
   con PK `(date, name)` — la fuente tiene días con dos feriados (portado del scraper-only Java).
 - `news` (El Economista RSS): ingesta cruda de artículos a `news_articles` (idempotente por
   `source_url`, sin resumen AI ni clasificación de categoría). Sumar feeds = una entrada en `FEEDS`.
+- `senado` (Senado datos abiertos): composición actual del Senado (72 senadores) en tabla propia
+  `senators` (bloque, provincia, partido, mandato). Export JSON oficial. Las votaciones del Senado
+  se descartaron por ahora (sólo HTML frágil en `/votaciones/actas`, sin JSON/CSV).
 
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 
-**Pendiente:** inflación de alta frecuencia (consultoras/Alphacast — fuentes frágiles),
-Nowcast pobreza + ICG/ICC (UTDT, PDFs) — habilitan el comparador de mediciones
-(INDEC vs UTDT vs UCA), portar los módulos scraper-only, y el Senado (datos abiertos, para
-completar el Congreso).
+**Pendiente:** sólo las fuentes frágiles — inflación de alta frecuencia (consultoras/Alphacast),
+Nowcast pobreza + ICG/ICC (UTDT, PDFs/JS) — que habilitan el comparador de mediciones
+(INDEC vs UTDT vs UCA). El resto (fuentes de dificultad baja/media, módulos scraper-only,
+composición del Senado, integración al compose) está hecho.
 
 El `scraper` ya está integrado al `docker-compose.yml` (servicio bajo profile `scraper`, se corre
 on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por la red interna).
@@ -176,7 +179,8 @@ on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por 
   4. inflacionverdadera.com (inflación diaria).
   5. ICG/ICC de UTDT y Nowcast de pobreza UTDT (PDFs — el más difícil, hacerlo al final
      con lo demás ya andando).
-  6. Senado (datos abiertos) para completar el Congreso.
+  6. ✅ Senado: composición actual (datos abiertos, JSON oficial). Votaciones del Senado
+     descartadas (sólo HTML frágil).
   7. Portar los módulos scraper-only que quedaron en Java como referencia: ✅ `crypto`,
      ✅ `holidays`, ✅ `news`. `investments` (bonos, cauciones, cedears, ETFs, letras, acciones)
      se descarta: sin fuente gratis viable (dolarito tras Cloudflare 403, Finnhub requiere key,

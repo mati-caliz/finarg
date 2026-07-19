@@ -127,6 +127,26 @@ class NewsArticle(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class Senator(Base):
+    __tablename__ = "senators"
+
+    senator_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    last_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    first_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    bloc: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    province: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    party: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    mandate_start: Mapped[date | None] = mapped_column(Date, nullable=True)
+    mandate_end: Mapped[date | None] = mapped_column(Date, nullable=True)
+    email: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
+
+    __table_args__ = (
+        Index("ix_senators_bloc", "bloc"),
+        Index("ix_senators_province", "province"),
+    )
+
+
 class Holiday(Base):
     __tablename__ = "holidays"
 
