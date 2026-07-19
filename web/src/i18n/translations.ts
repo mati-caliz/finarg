@@ -257,7 +257,6 @@ export const translations = {
     cedears: "CEDEARs",
     bonds: "Bonos",
     etf: "ETFs",
-    metals: "Metales",
     ticker: "Ticker",
     companyName: "Empresa",
     currentPrice: "Precio Actual",

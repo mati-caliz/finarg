@@ -16,7 +16,6 @@ const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
   { pattern: /investments\/cedears/, revalidate: 300 },
   { pattern: /investments\/bonds/, revalidate: 1800 },
   { pattern: /investments\/etf/, revalidate: 300 },
-  { pattern: /investments\/metals/, revalidate: 300 },
   { pattern: /rates/, revalidate: 1800 },
   { pattern: /news/, revalidate: 300 },
   { pattern: /feriados/, revalidate: 86400 },
