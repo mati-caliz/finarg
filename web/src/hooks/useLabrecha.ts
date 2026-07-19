@@ -84,6 +84,14 @@ export function useCongressVotes(params?: {
   });
 }
 
+export function useCongressVote(actaId: string) {
+  return useQuery({
+    queryKey: labrechaKeys.congressVote(actaId),
+    queryFn: () => congressApi.vote(actaId),
+    enabled: actaId.length > 0,
+  });
+}
+
 export function useCongressVoteDetails(actaId: string, params?: { vote?: string; bloc?: string }) {
   return useQuery({
     queryKey: labrechaKeys.congressVoteDetails(actaId, params),

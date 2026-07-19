@@ -1,69 +1,224 @@
 "use client";
 
-import { FaqAccordion } from "@/components/calculators/FaqAccordion";
-import { IncomeTaxForm } from "@/components/calculators/income-tax/IncomeTaxForm";
-import { IncomeTaxResults } from "@/components/calculators/income-tax/IncomeTaxResults";
-import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "@/hooks/useTranslation";
-import type { TranslationKey } from "@/i18n/translations";
-import { incomeTaxApi } from "@/lib/api";
-import type { IncomeTaxRequest, IncomeTaxResponse } from "@/types";
+import { Button, Card, DataTable } from "@/components/core";
+import { formatMoneyAR, formatNumberAR } from "@/lib/indicators";
+import { calculatorsApi } from "@/lib/labrechaApi";
+import type { IncomeTaxRequest } from "@/lib/labrechaApi";
 import { useMutation } from "@tanstack/react-query";
-import { Calculator } from "lucide-react";
 import { useState } from "react";
 
-const faqItems: { questionKey: TranslationKey; answerKey: TranslationKey }[] = [
-  { questionKey: "faqNetVsGrossQuestion", answerKey: "faqNetVsGrossAnswer" },
-  { questionKey: "faqWhatIsIncomeTaxQuestion", answerKey: "faqWhatIsIncomeTaxAnswer" },
-  { questionKey: "faqWhatAreDeductionsQuestion", answerKey: "faqWhatAreDeductionsAnswer" },
-  { questionKey: "faqValuesDisclaimerQuestion", answerKey: "faqValuesDisclaimerAnswer" },
+const fieldStyle = { display: "flex", flexDirection: "column" as const, gap: 4 };
+const inputStyle = {
+  padding: "8px 10px",
+  borderRadius: "var(--radius-md)",
+  border: "1px solid var(--border-2)",
+  background: "var(--surface-card)",
+  color: "var(--text-body)",
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.9375rem",
+};
+const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--text-secondary)" };
+const checkboxRow = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  fontSize: "0.875rem",
+  color: "var(--text-body)",
+};
+
+const DEDUCTION_LABELS: { key: string; label: string }[] = [
+  { key: "retirement", label: "Jubilación (11%)" },
+  { key: "health_insurance", label: "Obra social (3%)" },
+  { key: "law_19032", label: "Ley 19.032 (3%)" },
+  { key: "union_dues", label: "Sindicato" },
+  { key: "income_tax", label: "Impuesto a las Ganancias" },
+  { key: "total", label: "Total descuentos" },
 ];
 
 export default function IncomeTaxPage() {
-  const { translate } = useTranslation();
-  const [result, setResult] = useState<IncomeTaxResponse | null>(null);
-  const [grossMonthlySalary, setGrossMonthlySalary] = useState(0);
+  const [grossSalary, setGrossSalary] = useState(2000000);
+  const [hasSpouse, setHasSpouse] = useState(false);
+  const [children, setChildren] = useState(0);
+  const [housingRent, setHousingRent] = useState(0);
+  const [retired, setRetired] = useState(false);
 
-  const calculateMutation = useMutation({
-    mutationFn: async (data: IncomeTaxRequest) => {
-      const response = await incomeTaxApi.calculate(data);
-      return response.data as IncomeTaxResponse;
-    },
-    onSuccess: (data) => {
-      setResult(data);
-    },
+  const mutation = useMutation({
+    mutationFn: (body: IncomeTaxRequest) => calculatorsApi.incomeTax(body),
   });
 
-  const handleFormSubmit = (data: IncomeTaxRequest) => {
-    setGrossMonthlySalary(data.grossMonthlySalary);
-    calculateMutation.mutate(data);
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    mutation.mutate({
+      gross_monthly_salary: grossSalary,
+      has_spouse: hasSpouse,
+      number_of_children: children,
+      housing_rent: housingRent || undefined,
+      retired,
+    });
   };
 
+  const result = mutation.data;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{translate("incomeTaxTitle")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">{translate("incomeTaxSubtitle")}</p>
+    <div
+      style={{
+        maxWidth: "var(--container-max)",
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--sp-6)",
+      }}
+    >
+      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <h1
+          style={{
+            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
+            margin: 0,
+          }}
+        >
+          Calculadora de sueldo neto
+        </h1>
+        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
+          Estimá tu sueldo de bolsillo con las deducciones de ley y el Impuesto a las Ganancias.
+        </p>
+      </header>
+
+      <div
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          alignItems: "start",
+        }}
+      >
+        <Card title="Tu situación">
+          <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Sueldo bruto mensual (ARS)</span>
+              <input
+                type="number"
+                min={0}
+                value={grossSalary}
+                onChange={(event) => setGrossSalary(Number(event.target.value))}
+                style={inputStyle}
+              />
+            </label>
+            <div style={{ display: "flex", gap: 12 }}>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Hijos a cargo</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={children}
+                  onChange={(event) => setChildren(Number(event.target.value))}
+                  style={inputStyle}
+                />
+              </label>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Alquiler mensual (ARS)</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={housingRent}
+                  onChange={(event) => setHousingRent(Number(event.target.value))}
+                  style={inputStyle}
+                />
+              </label>
+            </div>
+            <label style={checkboxRow}>
+              <input
+                type="checkbox"
+                checked={hasSpouse}
+                onChange={(event) => setHasSpouse(event.target.checked)}
+              />
+              Cónyuge a cargo
+            </label>
+            <label style={checkboxRow}>
+              <input
+                type="checkbox"
+                checked={retired}
+                onChange={(event) => setRetired(event.target.checked)}
+              />
+              Soy jubilado / pensionado
+            </label>
+            <Button variant="primary" disabled={mutation.isPending}>
+              {mutation.isPending ? "Calculando…" : "Calcular sueldo neto"}
+            </Button>
+          </form>
+        </Card>
+
+        {result ? (
+          <Card
+            title="Tu sueldo de bolsillo"
+            footer={
+              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+                Cálculo estimativo según deducciones legales y escala vigente de Ganancias.
+              </span>
+            }
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Neto mensual</div>
+                <div
+                  className="num"
+                  style={{ fontSize: "var(--fs-num-xl)", fontWeight: 600, lineHeight: 1.1 }}
+                >
+                  {formatMoneyAR(Number.parseFloat(result.net_monthly_salary))}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                    Ganancias mensual
+                  </div>
+                  <div className="num" style={{ fontWeight: 600, color: "var(--neg)" }}>
+                    {formatMoneyAR(Number.parseFloat(result.monthly_tax))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                    Alícuota efectiva
+                  </div>
+                  <div className="num" style={{ fontWeight: 600 }}>
+                    {formatNumberAR(Number.parseFloat(result.effective_rate), 1)}%
+                  </div>
+                </div>
+              </div>
+              <DataTable
+                columns={[
+                  { key: "concepto", label: "Descuento" },
+                  { key: "monto", label: "Mensual", align: "right", numeric: true },
+                ]}
+                rows={DEDUCTION_LABELS.filter((item) => result.deduction_breakdown[item.key]).map(
+                  (item) => ({
+                    id: item.key,
+                    cells: [
+                      item.label,
+                      formatMoneyAR(Number.parseFloat(result.deduction_breakdown[item.key])),
+                    ],
+                  }),
+                )}
+              />
+            </div>
+          </Card>
+        ) : (
+          <Card>
+            <p
+              style={{
+                color: "var(--text-muted)",
+                fontSize: "0.875rem",
+                margin: 0,
+                textAlign: "center",
+                padding: "40px 0",
+              }}
+            >
+              {mutation.isError
+                ? "No se pudo calcular. Revisá los valores ingresados."
+                : "Completá tu situación y presioná Calcular."}
+            </p>
+          </Card>
+        )}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <IncomeTaxForm onSubmit={handleFormSubmit} isPending={calculateMutation.isPending} />
-
-        <div className="space-y-6">
-          {result !== null ? (
-            <IncomeTaxResults result={result} grossMonthlySalary={grossMonthlySalary} />
-          ) : (
-            <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
-              <CardContent className="text-center">
-                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">{translate("completeFormMessage")}</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-
-      <FaqAccordion items={faqItems} />
     </div>
   );
 }

@@ -1,302 +1,139 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { getCountryConfig } from "@/config/countries";
-import { useTranslation } from "@/hooks/useTranslation";
-import type { TranslationKey } from "@/i18n/translations";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
-  AlertTriangle,
-  BarChart2,
+  Banknote,
   Calculator,
   ChevronDown,
   ChevronRight,
-  CreditCard,
-  DollarSign,
-  Gauge,
+  Home,
   Landmark,
-  LayoutDashboard,
   LineChart,
   Menu,
-  Percent,
-  TrendingUp,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface NavigationItem {
-  key: TranslationKey;
+interface NavLeaf {
+  label: string;
+  href: string;
+}
+
+interface NavGroup {
+  label: string;
+  icon: React.ElementType;
+  items: NavLeaf[];
+}
+
+interface NavTop {
+  label: string;
   href: string;
   icon: React.ElementType;
-  feature: "quotes" | "inflation" | "reserves" | "rates" | "incomeTax" | null;
-  isNew?: boolean;
-  isComingSoon?: boolean;
 }
 
-interface NavigationCategory {
-  key: TranslationKey;
-  icon: React.ElementType;
-  items: NavigationItem[];
-}
+const TOP_LINKS: NavTop[] = [
+  { label: "Inicio", href: "/", icon: Home },
+  { label: "Congreso", href: "/congreso", icon: Landmark },
+];
 
-const baseNavigationCategories: (NavigationItem | NavigationCategory)[] = [
+const GROUPS: NavGroup[] = [
   {
-    key: "dashboard" as TranslationKey,
-    href: "/",
-    icon: LayoutDashboard,
-    feature: null,
-  },
-  {
-    key: "market" as TranslationKey,
-    icon: DollarSign,
-    items: [
-      {
-        key: "quotes" as TranslationKey,
-        href: "/cotizaciones",
-        icon: LineChart,
-        feature: "quotes" as const,
-      },
-      {
-        key: "exchangeBands" as TranslationKey,
-        href: "/bandas-cambiarias",
-        icon: Gauge,
-        feature: "quotes" as const,
-      },
-      {
-        key: "ratesComparator" as TranslationKey,
-        href: "/comparador-tasas",
-        icon: BarChart2,
-        feature: "rates" as const,
-      },
-    ],
-  },
-  {
-    key: "indicators" as TranslationKey,
+    label: "Indicadores",
     icon: LineChart,
     items: [
-      {
-        key: "inflation" as TranslationKey,
-        href: "/inflacion",
-        icon: Percent,
-        feature: "inflation" as const,
-      },
-      {
-        key: "reserves" as TranslationKey,
-        href: "/reservas-bcra",
-        icon: Landmark,
-        feature: "reserves" as const,
-      },
-      {
-        key: "countryRisk" as TranslationKey,
-        href: "/riesgo-pais",
-        icon: AlertTriangle,
-        feature: null,
-      },
+      { label: "Dólar", href: "/indicador/dolar_blue" },
+      { label: "Inflación", href: "/indicador/ipc_mensual" },
+      { label: "Riesgo país", href: "/indicador/riesgo_pais" },
+      { label: "Reservas", href: "/indicador/reservas_internacionales" },
+      { label: "Pobreza", href: "/indicador/pobreza_personas" },
+      { label: "Desempleo", href: "/indicador/desempleo" },
     ],
   },
   {
-    key: "calculators" as TranslationKey,
+    label: "Calculadoras",
     icon: Calculator,
     items: [
-      {
-        key: "incomeTaxCalculator" as TranslationKey,
-        href: "/calculadora-sueldo-neto",
-        icon: Calculator,
-        feature: "incomeTax" as const,
-      },
-      {
-        key: "compoundInterestCalculator" as TranslationKey,
-        href: "/calculadora-interes-compuesto",
-        icon: TrendingUp,
-        feature: null,
-      },
-      {
-        key: "adjustmentCalculator" as TranslationKey,
-        href: "/calculadora-ajuste-inflacion",
-        icon: Percent,
-        feature: "inflation" as const,
-      },
-      {
-        key: "installmentsVsCashCalculator" as TranslationKey,
-        href: "/calculadora-cuotas-contado",
-        icon: CreditCard,
-        feature: null,
-      },
+      { label: "Sueldo neto", href: "/calculadora-sueldo-neto" },
+      { label: "Interés compuesto", href: "/calculadora-interes-compuesto" },
+      { label: "Ajuste por inflación", href: "/calculadora-ajuste-inflacion" },
     ],
   },
 ];
 
-function CountrySelector() {
-  const countryConfig = getCountryConfig("ar");
-  const { translate } = useTranslation();
-
+function BrandMark() {
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg bg-white/10 backdrop-blur-sm border border-white/10">
-        <span className="text-lg">{countryConfig.flag}</span>
-        <span className="text-white/90">{translate(countryConfig.code as TranslationKey)}</span>
-      </div>
-    </div>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        fontFamily: "var(--font-sans)",
+        fontWeight: 800,
+        fontSize: "1.25rem",
+        color: "var(--text-body)",
+        letterSpacing: "-0.02em",
+      }}
+    >
+      La
+      <span style={{ width: 3, height: 20, background: "var(--brecha)", borderRadius: 2 }} />
+      Brecha
+    </span>
   );
 }
 
-interface NavItemProps {
-  item: NavigationItem;
-  pathname: string;
-  toggleSidebar: () => void;
-  translate: (key: TranslationKey) => string;
-  selectedCountry: string;
-  reservesKeyMap: Record<string, TranslationKey>;
+function leafActive(pathname: string, href: string): boolean {
+  return pathname === href;
 }
 
-function NavItem({
-  item,
-  pathname,
-  toggleSidebar,
-  translate,
-  selectedCountry,
-  reservesKeyMap,
-}: NavItemProps) {
-  const isActive = pathname === item.href;
-  const isComingSoon = item.isComingSoon || item.href === "#";
-  const displayName =
-    item.feature === "reserves"
-      ? translate(reservesKeyMap[selectedCountry] || "reserves")
-      : translate(item.key);
+interface LeafLinkProps {
+  item: NavLeaf;
+  pathname: string;
+  onNavigate: () => void;
+}
 
+function LeafLink({ item, pathname, onNavigate }: LeafLinkProps) {
+  const active = leafActive(pathname, item.href);
   return (
     <Link
       href={item.href}
-      onClick={(e) => {
-        if (isComingSoon) {
-          e.preventDefault();
-          return;
-        }
-        if (window.innerWidth < 1024) {
-          toggleSidebar();
-        }
+      onClick={onNavigate}
+      style={{
+        display: "block",
+        padding: "6px 10px",
+        borderRadius: "var(--radius-md)",
+        fontSize: "0.8125rem",
+        fontWeight: active ? 600 : 500,
+        color: active ? "var(--accent-strong)" : "var(--text-secondary)",
+        background: active ? "var(--accent-soft)" : "transparent",
+        textDecoration: "none",
+        transition: "background 120ms ease-out,color 120ms ease-out",
       }}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
-        isActive
-          ? "bg-[hsl(152_69%_24%)] text-white shadow-lg shadow-primary/25"
-          : "text-white/60 hover:bg-white/10 hover:text-white",
-        isComingSoon && "cursor-default",
-      )}
     >
-      <item.icon className={cn("h-5 w-5 shrink-0", isComingSoon && "opacity-50")} />
-      <span className={cn("flex-1", isComingSoon && "opacity-50")}>{displayName}</span>
-      {item.isNew && (
-        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-green-700 text-white uppercase tracking-wide">
-          Nuevo
-        </span>
-      )}
-      {isComingSoon && (
-        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-amber-700 text-white uppercase tracking-wide">
-          {translate("comingSoon")}
-        </span>
-      )}
+      {item.label}
     </Link>
-  );
-}
-
-interface NavCategoryProps {
-  category: NavigationCategory;
-  pathname: string;
-  toggleSidebar: () => void;
-  translate: (key: TranslationKey) => string;
-  selectedCountry: string;
-  countryConfig: ReturnType<typeof getCountryConfig>;
-  reservesKeyMap: Record<string, TranslationKey>;
-  isOpen: boolean;
-  onToggle: () => void;
-}
-
-function NavCategory({
-  category,
-  pathname,
-  toggleSidebar,
-  translate,
-  selectedCountry,
-  countryConfig,
-  reservesKeyMap,
-  isOpen,
-  onToggle,
-}: NavCategoryProps) {
-  const filteredItems = category.items.filter((item) => {
-    if (!item.feature) {
-      return true;
-    }
-    return countryConfig.features[item.feature];
-  });
-
-  if (filteredItems.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="space-y-1">
-      <button
-        onClick={onToggle}
-        className="flex items-center gap-2 w-full px-3 py-2 text-sm font-semibold text-white/70 hover:text-white/90 hover:bg-white/5 rounded-lg transition-all duration-200"
-        type="button"
-      >
-        <category.icon className="h-4 w-4 shrink-0" />
-        <span className="flex-1 text-left">{translate(category.key)}</span>
-        {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-      </button>
-
-      {isOpen && (
-        <div className="ml-2 space-y-0.5 border-l border-white/10 pl-2">
-          {filteredItems.map((item) => (
-            <NavItem
-              key={item.key}
-              item={item}
-              pathname={pathname}
-              toggleSidebar={toggleSidebar}
-              translate={translate}
-              selectedCountry={selectedCountry}
-              reservesKeyMap={reservesKeyMap}
-            />
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarOpen, toggleSidebar, setSidebarOpen, selectedCountry } = useAppStore();
-  const countryConfig = getCountryConfig(selectedCountry);
-  const { translate } = useTranslation();
-  const [openCategory, setOpenCategory] = useState<string | null>(null);
+  const { sidebarOpen, toggleSidebar, setSidebarOpen } = useAppStore();
+  const activeGroup = GROUPS.find((group) => group.items.some((item) => item.href === pathname));
+  const [openGroup, setOpenGroup] = useState<string | null>(activeGroup?.label ?? "Indicadores");
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
     const handleResize = () => {
       if (timeoutId !== undefined) {
         clearTimeout(timeoutId);
       }
       timeoutId = setTimeout(() => {
-        if (window.innerWidth >= 1024) {
-          setSidebarOpen(true);
-        } else {
-          setSidebarOpen(false);
-        }
+        setSidebarOpen(window.innerWidth >= 1024);
       }, 150);
     };
-
-    if (window.innerWidth >= 1024) {
-      setSidebarOpen(true);
-    } else {
-      setSidebarOpen(false);
-    }
-
+    setSidebarOpen(window.innerWidth >= 1024);
     window.addEventListener("resize", handleResize);
     return () => {
       if (timeoutId !== undefined) {
@@ -308,14 +145,12 @@ export function Sidebar() {
 
   useEffect(() => {
     const isMobile = window.innerWidth < 1024;
-
     if (sidebarOpen && isMobile) {
       const scrollY = window.scrollY;
       document.body.style.position = "fixed";
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = "100%";
       document.body.style.overflow = "hidden";
-
       return () => {
         document.body.style.position = "";
         document.body.style.top = "";
@@ -324,37 +159,46 @@ export function Sidebar() {
         window.scrollTo(0, scrollY);
       };
     }
-
     return undefined;
   }, [sidebarOpen]);
 
-  const reservesKeyMap: Record<string, TranslationKey> = {
-    ar: "bcraReserves",
-  };
-
-  const isCategory = (item: NavigationItem | NavigationCategory): item is NavigationCategory => {
-    return "items" in item;
+  const closeOnMobile = () => {
+    if (window.innerWidth < 1024) {
+      toggleSidebar();
+    }
   };
 
   return (
     <>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
+      <button
+        type="button"
+        className="fixed top-3 left-3 z-50 lg:hidden"
         onClick={toggleSidebar}
         aria-label={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 40,
+          height: 40,
+          borderRadius: "var(--radius-md)",
+          border: "1px solid var(--border-1)",
+          background: "var(--surface-card)",
+          color: "var(--text-secondary)",
+        }}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
+      </button>
 
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 z-40 lg:hidden"
+          style={{ background: "rgba(20,25,31,0.4)" }}
           onClick={toggleSidebar}
-          onKeyDown={(e) => e.key === "Enter" && toggleSidebar()}
+          onKeyDown={(event) => event.key === "Enter" && toggleSidebar()}
           role="button"
           tabIndex={0}
+          aria-label="Cerrar menú"
         />
       )}
 
@@ -364,77 +208,115 @@ export function Sidebar() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
         style={{
-          background:
-            "linear-gradient(180deg, hsl(var(--sidebar-start)) 0%, hsl(var(--sidebar-end)) 100%)",
+          background: "var(--surface-card)",
+          borderRight: "1px solid var(--border-1)",
         }}
       >
         <div className="flex h-full flex-col">
-          <div className="flex h-16 items-center justify-center border-b border-white/10">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5"
-              aria-label="Ir al inicio"
-              onClick={() => {
-                if (window.innerWidth < 1024) {
-                  toggleSidebar();
-                }
-              }}
-            >
-              <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/20">
-                <DollarSign className="h-5 w-5 text-primary" />
-              </div>
-              <span className="text-xl font-bold text-white">La Brecha</span>
+          <div
+            className="flex h-16 items-center px-5"
+            style={{ borderBottom: "1px solid var(--border-1)" }}
+          >
+            <Link href="/" aria-label="Ir al inicio" onClick={closeOnMobile}>
+              <BrandMark />
             </Link>
           </div>
 
-          <div className="p-4 border-b border-white/10">
-            <CountrySelector />
-          </div>
-
           <nav className="flex-1 space-y-1 p-3 overflow-y-auto overscroll-none min-h-0">
-            {baseNavigationCategories.map((item) => {
-              if (isCategory(item)) {
-                return (
-                  <NavCategory
-                    key={item.key}
-                    category={item}
-                    pathname={pathname}
-                    toggleSidebar={toggleSidebar}
-                    translate={translate}
-                    selectedCountry={selectedCountry}
-                    countryConfig={countryConfig}
-                    reservesKeyMap={reservesKeyMap}
-                    isOpen={openCategory === item.key}
-                    onToggle={() => setOpenCategory(openCategory === item.key ? null : item.key)}
-                  />
-                );
-              }
+            {TOP_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeOnMobile}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "8px 10px",
+                    borderRadius: "var(--radius-md)",
+                    fontSize: "0.875rem",
+                    fontWeight: active ? 600 : 500,
+                    color: active ? "var(--accent-strong)" : "var(--text-body)",
+                    background: active ? "var(--accent-soft)" : "transparent",
+                    textDecoration: "none",
+                  }}
+                >
+                  <link.icon className="h-4 w-4 shrink-0" />
+                  {link.label}
+                </Link>
+              );
+            })}
 
-              if (!item.feature || countryConfig.features[item.feature]) {
-                return (
-                  <NavItem
-                    key={item.key}
-                    item={item}
-                    pathname={pathname}
-                    toggleSidebar={toggleSidebar}
-                    translate={translate}
-                    selectedCountry={selectedCountry}
-                    reservesKeyMap={reservesKeyMap}
-                  />
-                );
-              }
-
-              return null;
+            {GROUPS.map((group) => {
+              const open = openGroup === group.label;
+              return (
+                <div key={group.label}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenGroup(open ? null : group.label)}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      width: "100%",
+                      padding: "8px 10px",
+                      borderRadius: "var(--radius-md)",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontFamily: "var(--font-sans)",
+                      fontSize: "0.875rem",
+                      fontWeight: 600,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    <group.icon className="h-4 w-4 shrink-0" />
+                    <span style={{ flex: 1, textAlign: "left" }}>{group.label}</span>
+                    {open ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                  {open && (
+                    <div
+                      className="space-y-0.5"
+                      style={{
+                        marginLeft: 17,
+                        paddingLeft: 10,
+                        borderLeft: "1px solid var(--border-1)",
+                      }}
+                    >
+                      {group.items.map((item) => (
+                        <LeafLink
+                          key={item.href}
+                          item={item}
+                          pathname={pathname}
+                          onNavigate={closeOnMobile}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
             })}
           </nav>
 
-          <div className="mt-auto">
-            <div className="border-t border-white/10 p-4">
-              <p className="text-xs text-white/40 text-center">{translate("footerVersion")}</p>
-              <p className="text-xs text-white/40 text-center mt-1">
-                {countryConfig.flag} {countryConfig.shortName}
-              </p>
-            </div>
+          <div className="p-4" style={{ borderTop: "1px solid var(--border-1)" }}>
+            <p
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.6875rem",
+                color: "var(--text-muted)",
+              }}
+            >
+              <Banknote className="h-3.5 w-3.5" />
+              Observatorio económico · Argentina
+            </p>
           </div>
         </div>
       </aside>

@@ -1,3 +1,4 @@
+import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -10,15 +11,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: number;
   }[] = [
     { path: "", changeFrequency: "hourly", priority: 1 },
-    { path: "/cotizaciones", changeFrequency: "hourly", priority: 0.9 },
-    { path: "/inflacion", changeFrequency: "daily", priority: 0.85 },
-    { path: "/reservas-bcra", changeFrequency: "daily", priority: 0.8 },
-    { path: "/riesgo-pais", changeFrequency: "daily", priority: 0.8 },
-    { path: "/bandas-cambiarias", changeFrequency: "daily", priority: 0.7 },
-    { path: "/comparador-tasas", changeFrequency: "daily", priority: 0.8 },
+    { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
+    ...FEATURED_INDICATOR_CODES.map((code) => ({
+      path: `/indicador/${code}`,
+      changeFrequency: "daily" as const,
+      priority: 0.85,
+    })),
     { path: "/calculadora-sueldo-neto", changeFrequency: "monthly", priority: 0.7 },
     { path: "/calculadora-interes-compuesto", changeFrequency: "monthly", priority: 0.6 },
-    { path: "/calculadora-cuotas-contado", changeFrequency: "monthly", priority: 0.7 },
     { path: "/calculadora-ajuste-inflacion", changeFrequency: "monthly", priority: 0.6 },
   ];
 

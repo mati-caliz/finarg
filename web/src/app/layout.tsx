@@ -115,7 +115,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
         <Providers>
-          <div className="min-h-screen bg-background">
+          <div
+            className="min-h-screen"
+            style={{ background: "var(--bg-page)", color: "var(--text-body)" }}
+          >
             <Sidebar />
             <div className="lg:pl-64">
               <Navbar />
