@@ -46,3 +46,60 @@ class ScrapeRunOut(BaseModel):
     finished_at: datetime | None
     rows_upserted: int
     error: str | None
+
+
+class CongressVoteOut(BaseModel):
+    acta_id: str
+    period_number: int | None
+    session_type: str | None
+    date: date | None
+    title: str | None
+    result: str | None
+    president_name: str | None
+    affirmative_votes: int | None
+    negative_votes: int | None
+    abstentions: int | None
+    absents: int | None
+
+
+class CongressVoteDetailOut(BaseModel):
+    acta_id: str
+    deputy_name: str | None
+    bloc: str | None
+    district: str | None
+    vote: str | None
+
+
+class SenatorOut(BaseModel):
+    senator_id: str
+    last_name: str | None
+    first_name: str | None
+    bloc: str | None
+    province: str | None
+    party: str | None
+    mandate_start: date | None
+    mandate_end: date | None
+
+
+class BlocSummary(BaseModel):
+    bloc: str | None
+    count: int
+
+
+class HolidayOut(BaseModel):
+    date: date
+    name: str
+    local_name: str | None
+    is_global: bool | None
+    is_fixed: bool | None
+    types: str | None
+
+
+class NewsArticleOut(BaseModel):
+    title: str
+    summary: str
+    source: str
+    source_url: str
+    category: str
+    published_date: datetime
+    image_url: str | None

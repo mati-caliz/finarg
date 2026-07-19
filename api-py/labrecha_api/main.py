@@ -2,7 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from labrecha_api.config import settings
-from labrecha_api.routers import events, indicators, status
+from labrecha_api.routers import (
+    congress,
+    events,
+    holidays,
+    indicators,
+    news,
+    senate,
+    status,
+)
 
 app = FastAPI(
     title="La Brecha API",
@@ -20,3 +28,7 @@ app.add_middleware(
 app.include_router(status.router)
 app.include_router(indicators.router)
 app.include_router(events.router)
+app.include_router(congress.router)
+app.include_router(senate.router)
+app.include_router(holidays.router)
+app.include_router(news.router)
