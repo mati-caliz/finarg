@@ -209,8 +209,11 @@ Ganancias: deducciones legales con efecto aguinaldo, cargas de familia, deduccio
 escala progresiva). Verificadas: 100k al 10% anual → 110k; inflación 2024 → 117,68% (≈ INDEC);
 Ganancias con consistencia interna (suma de tramos = impuesto anual, bases = neto imponible).
 
+La app FastAPI ya está en el `docker-compose` (servicio `api-py`, publicado en `127.0.0.1:8000`,
+con healthcheck sobre `/health`; habla con `postgres` por la red interna). Verificada corriendo en
+contenedor (healthy, sirviendo indicadores y calculadoras).
+
 **Pendiente:**
-- Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis sigue haciendo falta: sirviendo desde PostgreSQL local probablemente
   alcance; si se saca, se saca también del compose.
 - Cuando el frontend consuma 100% FastAPI: borrar el módulo Java y su Dockerfile.
