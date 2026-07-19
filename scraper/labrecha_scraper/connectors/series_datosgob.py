@@ -31,6 +31,15 @@ SERIES: dict[str, SeriesSpec] = {
     "453.1_SERIE_ORIGNAL_0_0_14_46": SeriesSpec("produccion_industrial", "indice"),
     "452.3_RESULTADO_RIO_0_M_18_54": SeriesSpec("resultado_primario", "ARS_millones"),
     "378.9_RESULTADO_017_0_M_18_90": SeriesSpec("resultado_financiero", "ARS_millones"),
+    "151.1_AARIADOTAC_2012_M_26": SeriesSpec("empleo_asalariado_privado", "miles_personas"),
+    "151.1_AARIADOTAC_2012_M_25": SeriesSpec("empleo_asalariado_publico", "miles_personas"),
+    "151.1_IPENDIETAC_2012_M_34": SeriesSpec("empleo_independiente_autonomo", "miles_personas"),
+    "151.1_IPENDIETAC_2012_M_36": SeriesSpec("empleo_independiente_monotributo", "miles_personas"),
+    "151.1_IPENDIETAC_2012_M_43": SeriesSpec(
+        "empleo_independiente_monotributo_social", "miles_personas"
+    ),
+    "151.1_AARIADOTAC_2012_M_40": SeriesSpec("empleo_casas_particulares", "miles_personas"),
+    "52.2_ASDJ_0_0_37": SeriesSpec("empleo_no_registrado", "%", Decimal(100)),
 }
 
 

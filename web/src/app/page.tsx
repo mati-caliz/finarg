@@ -3,6 +3,7 @@ import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected
 import { InflationClockCard } from "@/components/home/InflationClockCard";
 import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
 import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
+import { TermometroEmpleoCard } from "@/components/home/TermometroEmpleoCard";
 import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
 
 export default function HomePage() {
@@ -71,6 +72,7 @@ export default function HomePage() {
       >
         <PromesometroFiscalCard />
         <MonitorBcraCard />
+        <TermometroEmpleoCard />
       </section>
     </div>
   );

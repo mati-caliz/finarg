@@ -437,6 +437,19 @@ billones con signo y color. Fuente+fecha visibles. Verificado `tsc`/`biome`/`nex
 fuente (SIPA para registrados + EPH para informalidad; el split 3-vías mensual no es una serie directa).
 Criterio de salida: `scrape_runs` verde para ambos connectors; widgets con fuente + fecha.
 
+**Hecho (2026-07-19) — Termómetro del empleo:** 7 series nuevas en `series_datosgob`. Composición del
+empleo **registrado** (SIPA, sin estacionalidad, mensual hasta 2026-03, en miles de personas):
+`empleo_asalariado_privado`, `empleo_asalariado_publico`, `empleo_independiente_autonomo`,
+`empleo_independiente_monotributo`, `empleo_independiente_monotributo_social`,
+`empleo_casas_particulares`. Y la fuente de "en negro" que faltaba: `empleo_no_registrado` =
+**tasa de asalariados sin descuento jubilatorio** (EPH INDEC, `52.2_ASDJ...`, trimestral, factor 100).
+Widget `TermometroEmpleoCard` en la Home: barra apilada 100% de 4 segmentos (privado 48% / público 26% /
+independientes 22% / casas particulares 3%, total 12,8M registrados) con leyenda (millones + %), más un
+callout aparte con el empleo no registrado (37,9%). **Decisión de honestidad:** el "en negro" (EPH, base
+de medición distinta a SIPA) se muestra **fuera** de la barra de registrados, con disclaimer, en vez de
+mezclar bases inconsistentes. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
+**5.c COMPLETA.**
+
 **5.d — Radar de crédito + Coparticipación (mapa).** *Radar de crédito*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
 `coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,
