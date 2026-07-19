@@ -193,15 +193,20 @@ on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por 
 **Criterio de salida**: `scrape_runs` muestra corridas verdes de todas las fuentes de
 dificultad baja/media, y al menos pobreza + inflación diaria pobladas con histórico.
 
-### Fase 2 — API FastAPI (≈1-2 semanas)
+### Fase 2 — API FastAPI (≈1-2 semanas) — 🚧 EN CURSO
 
-- Crear la app FastAPI dentro de `api/` nueva (o `api-py/` durante la transición):
-  endpoints de lectura sobre `indicator_history` + los actuales de cotizaciones,
-  reservas, inflación, riesgo, bandas.
+**Hecho:** app FastAPI en `api-py/` (modelos de lectura propios, desacoplados del scraper).
+Endpoints genéricos verificados contra la base: `/indicators` (catálogo con fuentes y rangos),
+`/indicators/{code}` (serie con filtros `source`/`date_from`/`date_to`/`limit`/`order`),
+`/indicators/{code}/sources` (comparador de mediciones — ej. reservas bcra vs datosgobar),
+`/political-events` y `/scrape-runs` (monitoreo). `/health` + docs en `/docs`.
+
+**Pendiente:**
+- Endpoints para Congreso (`congress_votes`/`congress_vote_details`), Senado (`senators`),
+  feriados (`holidays`) y noticias (`news_articles`).
 - Portar las tres calculadoras (sueldo neto, interés compuesto, ajuste por inflación):
   la lógica ya está resuelta en Java, es traducción directa.
-- Endpoint `/indicators/{code}` genérico con filtros de fuente y rango de fechas,
-  y `/indicators/{code}/sources` para el comparador de mediciones.
+- Sumar la app FastAPI al `docker-compose`.
 - Evaluar si Redis sigue haciendo falta: sirviendo desde PostgreSQL local probablemente
   alcance; si se saca, se saca también del compose.
 - Cuando el frontend consuma 100% FastAPI: borrar el módulo Java y su Dockerfile.
