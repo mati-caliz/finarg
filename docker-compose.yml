@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - finarg-network
+      - labrecha-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finarg}"]
       interval: 10s
@@ -69,7 +69,7 @@ services:
     ports:
       - "127.0.0.1:8080:8080"
     networks:
-      - finarg-network
+      - labrecha-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
@@ -101,7 +101,7 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     networks:
-      - finarg-network
+      - labrecha-network
     restart: unless-stopped
     deploy:
       resources:
@@ -128,7 +128,7 @@ services:
     ports:
       - "127.0.0.1:8000:8000"
     networks:
-      - finarg-network
+      - labrecha-network
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -161,7 +161,7 @@ services:
       HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
       HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
     networks:
-      - finarg-network
+      - labrecha-network
     restart: "no"
     deploy:
       resources:
@@ -178,5 +178,5 @@ volumes:
     driver: local
 
 networks:
-  finarg-network:
+  labrecha-network:
     driver: bridge
