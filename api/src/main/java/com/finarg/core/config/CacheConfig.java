@@ -7,14 +7,13 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.serializer.SerializationException;
 
 @Slf4j
 @Configuration
 public class CacheConfig implements CachingConfigurer {
 
     private static boolean isDeserializationError(RuntimeException exception) {
-        if (exception instanceof SerializationException || exception instanceof ClassCastException) {
+        if (exception instanceof ClassCastException) {
             return true;
         }
         Throwable cause = exception.getCause();

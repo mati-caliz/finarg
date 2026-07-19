@@ -193,7 +193,7 @@ on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por 
 **Criterio de salida**: `scrape_runs` muestra corridas verdes de todas las fuentes de
 dificultad baja/media, y al menos pobreza + inflación diaria pobladas con histórico.
 
-### Fase 2 — API FastAPI (≈1-2 semanas) — 🚧 EN CURSO
+### Fase 2 — API FastAPI (≈1-2 semanas) — ✅ COMPLETADA (backend nuevo listo)
 
 **Hecho:** app FastAPI en `api-py/` (modelos de lectura propios, desacoplados del scraper).
 Endpoints genéricos verificados contra la base: `/indicators` (catálogo con fuentes y rangos),
@@ -213,12 +213,15 @@ La app FastAPI ya está en el `docker-compose` (servicio `api-py`, publicado en 
 con healthcheck sobre `/health`; habla con `postgres` por la red interna). Verificada corriendo en
 contenedor (healthy, sirviendo indicadores y calculadoras).
 
-**Pendiente:**
-- Evaluar si Redis sigue haciendo falta: sirviendo desde PostgreSQL local probablemente
-  alcance; si se saca, se saca también del compose.
-- Cuando el frontend consuma 100% FastAPI: borrar el módulo Java y su Dockerfile.
+**Redis eliminado.** La FastAPI sirve directo desde PostgreSQL local y no lo usa; Bucket4j (rate
+limiting del Java) es en memoria. Se sacó el servicio `redis` de ambos compose (dev y prod), la
+dependencia `spring-boot-starter-data-redis`, `RedisConfig`, la config `spring.data.redis`/
+`spring.cache.type=redis` de los `application*.yml` y las env `REDIS_*`. El backend Java sigue
+andando con caché en memoria (`spring.cache.type=simple` → `ConcurrentMapCacheManager`); compila OK.
 
-**Criterio de salida**: Spring apagado, `web/` funcionando contra FastAPI sin regresiones.
+**Cierre:** el backend nuevo (FastAPI) está completo, en el compose y sin Redis. Lo único que resta
+para apagar Spring es apuntar `web/` a la nueva API — eso es la Fase 3 (rediseño de frontend), donde
+además se borra el módulo Java y su Dockerfile. Hasta entonces conviven, ya sin Redis.
 
 ### Fase 3 — Rediseño frontend + nombre (≈2-3 semanas)
 

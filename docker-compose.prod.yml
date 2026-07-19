@@ -31,35 +31,6 @@ services:
     security_opt:
       - no-new-privileges:true
 
-  redis:
-    image: redis:7-alpine
-    container_name: finarg-redis-prod
-    volumes:
-      - redis_data:/data
-    networks:
-      - db-network
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: always
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
-        reservations:
-          memory: 128M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    security_opt:
-      - no-new-privileges:true
-
   backend:
     build:
       context: ./api
@@ -67,8 +38,6 @@ services:
     container_name: api-prod
     depends_on:
       postgres:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     environment:
       DB_HOST: postgres
@@ -78,9 +47,6 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       HIBERNATE_DDL_AUTO: update
       HIBERNATE_SHOW_SQL: false
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
@@ -206,8 +172,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
 
 networks:
