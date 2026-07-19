@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Archivo, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
@@ -11,12 +11,21 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { EarlyHints } from "./early-hints";
 import { Providers } from "./providers";
 
-const inter = Inter({
+const archivo = Archivo({
   subsets: ["latin"],
   display: "swap",
   preload: true,
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-archivo",
+  adjustFontFallback: true,
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-mono",
   adjustFontFallback: true,
 });
 
@@ -62,7 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const adsenseId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID;
 
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang="es" className={`${archivo.variable} ${plexMono.variable}`} suppressHydrationWarning>
       <head>
         <EarlyHints />
         <link
@@ -86,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
       </head>
-      <body className={inter.className}>
+      <body className={archivo.className}>
         {gaMeasurementId && (
           <>
             <Script

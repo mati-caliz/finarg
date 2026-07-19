@@ -223,7 +223,33 @@ andando con caché en memoria (`spring.cache.type=simple` → `ConcurrentMapCach
 para apagar Spring es apuntar `web/` a la nueva API — eso es la Fase 3 (rediseño de frontend), donde
 además se borra el módulo Java y su Dockerfile. Hasta entonces conviven, ya sin Redis.
 
-### Fase 3 — Rediseño frontend + nombre (≈2-3 semanas)
+### Fase 3 — Rediseño frontend + nombre (≈2-3 semanas) — 🚧 EN CURSO
+
+**Hecho (2026-07-19) — fundamento de diseño + Home:** se adoptó el "La Brecha Design System"
+(Claude Design, dirección "Observatorio claro"). Tokens portados a `web/src/app/globals.css`
+(paleta papel/tinta, azul institucional, semánticos alza/baja/**brecha ámbar**/evento violeta,
+tipografía Archivo + IBM Plex Mono vía `next/font`, espaciado, sombras). Tema unificado bajo
+`[data-theme]` (next-themes + Tailwind `darkMode` a `data-theme`). Componentes core portados 1:1
+como TSX tipados en `web/src/components/core/` (IndicatorTile, Sparkline, VariationBadge,
+SourceChip/SourceAttribution, Card, Badge, Button, Tabs/RangeSelector, DataTable, EventDot, VoteBar/
+VoteCard, AnnotatedSeriesChart con relleno de brecha + eventos). Home reescrita como
+"Estado del país": grilla de tiles conectados a la FastAPI (`useLabrecha`/`labrechaApi`) con
+último valor, variación (pct o pp según indicador), sparkline y atribución de fuente+fecha, más la
+card estrella del comparador de mediciones (reservas BCRA vs datos.gob.ar, brecha en USD y %).
+Verificado: `tsc`, `biome check` y `next build` en verde; Home sirve el shell con datos reales.
+
+**Hecho (2026-07-19) — página por indicador:** ruta dinámica `/indicador/[code]` con header
+(valor/variación/atribución), `RangeSelector`, serie anotada con `political_events` vía
+`AnnotatedSeriesChart`, y —cuando el indicador tiene ≥2 fuentes— el **comparador**: series alineadas
+en un eje común (union + resample carry-forward/back-fill, downsample a ≤400 puntos), relleno de
+brecha ámbar, tabla de discrepancia (último valor + brecha vs fuente primaria) y metodología por
+fuente. Helpers puros en `lib/series.ts` (alineación, eventos→índices, rangos) testeados; hook
+`useIndicatorSeriesMulti` (useQueries) para traer una serie por fuente. Verificado: `tsc`/`biome`/
+`next build` verdes, rutas `/indicador/reservas_internacionales` y `/indicador/riesgo_pais` 200 OK.
+
+**Pendiente:** sección Congreso (VoteCard + composición del Senado), portar calculadoras al look
+nuevo, migrar/quitar los widgets viejos del dashboard (QuoteCard/GapGauge/ReservesWidget) y el
+Sidebar/Navbar al design system, y completar el rename de backend `com.finarg`→`com.labrecha`.
 
 - Nueva arquitectura de información. Home = "estado del país" con:
   - Inflación: oficial mensual + curva diaria/semanal privada en el mismo gráfico.
