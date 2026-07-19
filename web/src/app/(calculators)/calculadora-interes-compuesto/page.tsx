@@ -1,71 +1,231 @@
 "use client";
 
-import { FaqAccordion } from "@/components/calculators/FaqAccordion";
-import { CompoundInterestForm } from "@/components/calculators/compound-interest/CompoundInterestForm";
-import { CompoundInterestResults } from "@/components/calculators/compound-interest/CompoundInterestResults";
-import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "@/hooks/useTranslation";
-import type { TranslationKey } from "@/i18n/translations";
-import { compoundInterestApi } from "@/lib/api";
-import type { CompoundInterestRequest, CompoundInterestResponse } from "@/types";
+import { Button, Card, DataTable } from "@/components/core";
+import { formatMoneyAR } from "@/lib/indicators";
+import { calculatorsApi } from "@/lib/labrechaApi";
+import type { CompoundInterestRequest } from "@/lib/labrechaApi";
 import { useMutation } from "@tanstack/react-query";
-import { Calculator } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-const faqItems: { questionKey: TranslationKey; answerKey: TranslationKey }[] = [
-  { questionKey: "faqCompoundInterestQuestion", answerKey: "faqCompoundInterestAnswer" },
-  { questionKey: "faqCompoundingFrequencyQuestion", answerKey: "faqCompoundingFrequencyAnswer" },
-  { questionKey: "faqPeriodicContributionQuestion", answerKey: "faqPeriodicContributionAnswer" },
-  { questionKey: "faqCompoundVsSimpleQuestion", answerKey: "faqCompoundVsSimpleAnswer" },
+const FREQUENCIES: { value: CompoundInterestRequest["compounding_frequency"]; label: string }[] = [
+  { value: "MONTHLY", label: "Mensual" },
+  { value: "QUARTERLY", label: "Trimestral" },
+  { value: "YEARLY", label: "Anual" },
 ];
 
-export default function CompoundInterestCalculatorPage() {
-  const { translate } = useTranslation();
-  const [result, setResult] = useState<CompoundInterestResponse | null>(null);
-  const initialCapitalRef = useRef(0);
+const fieldStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: 4,
+};
 
-  const calculateMutation = useMutation({
-    mutationFn: async (data: CompoundInterestRequest) => {
-      const response = await compoundInterestApi.calculate(data);
-      return response.data as CompoundInterestResponse;
-    },
-    onSuccess: (data) => {
-      setResult(data);
-    },
+const inputStyle = {
+  padding: "8px 10px",
+  borderRadius: "var(--radius-md)",
+  border: "1px solid var(--border-2)",
+  background: "var(--surface-card)",
+  color: "var(--text-body)",
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.9375rem",
+};
+
+const labelStyle = {
+  fontSize: "0.75rem",
+  fontWeight: 600,
+  color: "var(--text-secondary)",
+};
+
+export default function CompoundInterestCalculatorPage() {
+  const [initialCapital, setInitialCapital] = useState(100000);
+  const [annualRate, setAnnualRate] = useState(40);
+  const [years, setYears] = useState(5);
+  const [frequency, setFrequency] =
+    useState<CompoundInterestRequest["compounding_frequency"]>("MONTHLY");
+  const [contribution, setContribution] = useState(0);
+
+  const mutation = useMutation({
+    mutationFn: (body: CompoundInterestRequest) => calculatorsApi.compoundInterest(body),
   });
 
-  const handleSubmit = (data: CompoundInterestRequest) => {
-    initialCapitalRef.current = data.initialCapital;
-    calculateMutation.mutate(data);
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    mutation.mutate({
+      initial_capital: initialCapital,
+      annual_rate: annualRate,
+      years,
+      compounding_frequency: frequency,
+      periodic_contribution: contribution || undefined,
+    });
   };
 
+  const result = mutation.data;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{translate("compoundInterestTitle")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {translate("compoundInterestSubtitle")}
+    <div
+      style={{
+        maxWidth: "var(--container-max)",
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--sp-6)",
+      }}
+    >
+      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <h1
+          style={{
+            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
+            margin: 0,
+          }}
+        >
+          Calculadora de interés compuesto
+        </h1>
+        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
+          Proyectá cómo crece un capital con capitalización periódica y aportes.
         </p>
+      </header>
+
+      <div
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          alignItems: "start",
+        }}
+      >
+        <Card title="Parámetros">
+          <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Capital inicial (ARS)</span>
+              <input
+                type="number"
+                min={0}
+                value={initialCapital}
+                onChange={(event) => setInitialCapital(Number(event.target.value))}
+                style={inputStyle}
+              />
+            </label>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Tasa nominal anual (%)</span>
+              <input
+                type="number"
+                min={0}
+                step="0.1"
+                value={annualRate}
+                onChange={(event) => setAnnualRate(Number(event.target.value))}
+                style={inputStyle}
+              />
+            </label>
+            <div style={{ display: "flex", gap: 12 }}>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Años</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={years}
+                  onChange={(event) => setYears(Number(event.target.value))}
+                  style={inputStyle}
+                />
+              </label>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Capitalización</span>
+                <select
+                  value={frequency}
+                  onChange={(event) =>
+                    setFrequency(
+                      event.target.value as CompoundInterestRequest["compounding_frequency"],
+                    )
+                  }
+                  style={inputStyle}
+                >
+                  {FREQUENCIES.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Aporte por período (ARS, opcional)</span>
+              <input
+                type="number"
+                min={0}
+                value={contribution}
+                onChange={(event) => setContribution(Number(event.target.value))}
+                style={inputStyle}
+              />
+            </label>
+            <Button variant="primary" disabled={mutation.isPending}>
+              {mutation.isPending ? "Calculando…" : "Calcular"}
+            </Button>
+          </form>
+        </Card>
+
+        {result ? (
+          <Card title="Resultado">
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Monto final</div>
+                <div
+                  className="num"
+                  style={{ fontSize: "var(--fs-num-xl)", fontWeight: 600, lineHeight: 1.1 }}
+                >
+                  {formatMoneyAR(Number.parseFloat(result.final_amount))}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Aportado</div>
+                  <div className="num" style={{ fontWeight: 600 }}>
+                    {formatMoneyAR(Number.parseFloat(result.total_contributions))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                    Interés ganado
+                  </div>
+                  <div className="num" style={{ fontWeight: 600, color: "var(--pos)" }}>
+                    {formatMoneyAR(Number.parseFloat(result.total_interest))}
+                  </div>
+                </div>
+              </div>
+              <DataTable
+                columns={[
+                  { key: "period", label: "Período", numeric: true },
+                  { key: "principal", label: "Capital", align: "right", numeric: true },
+                  { key: "interest", label: "Interés", align: "right", numeric: true },
+                  { key: "total", label: "Total", align: "right", numeric: true },
+                ]}
+                rows={result.periods.map((period) => ({
+                  id: String(period.period),
+                  cells: [
+                    period.period,
+                    formatMoneyAR(Number.parseFloat(period.principal)),
+                    formatMoneyAR(Number.parseFloat(period.interest)),
+                    formatMoneyAR(Number.parseFloat(period.total)),
+                  ],
+                }))}
+              />
+            </div>
+          </Card>
+        ) : (
+          <Card>
+            <p
+              style={{
+                color: "var(--text-muted)",
+                fontSize: "0.875rem",
+                margin: 0,
+                textAlign: "center",
+                padding: "40px 0",
+              }}
+            >
+              {mutation.isError
+                ? "No se pudo calcular. Revisá los valores e intentá de nuevo."
+                : "Completá los parámetros y presioná Calcular."}
+            </p>
+          </Card>
+        )}
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CompoundInterestForm onSubmit={handleSubmit} isPending={calculateMutation.isPending} />
-
-        <div className="space-y-6">
-          {result ? (
-            <CompoundInterestResults result={result} initialCapital={initialCapitalRef.current} />
-          ) : (
-            <Card className="bg-card h-full min-h-[400px] flex items-center justify-center">
-              <CardContent className="text-center">
-                <Calculator className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">{translate("completeFormMessage")}</p>
-              </CardContent>
-            </Card>
-          )}
-        </div>
-      </div>
-
-      <FaqAccordion items={faqItems} />
     </div>
   );
 }

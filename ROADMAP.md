@@ -247,9 +247,36 @@ fuente. Helpers puros en `lib/series.ts` (alineación, eventos→índices, rango
 `useIndicatorSeriesMulti` (useQueries) para traer una serie por fuente. Verificado: `tsc`/`biome`/
 `next build` verdes, rutas `/indicador/reservas_internacionales` y `/indicador/riesgo_pais` 200 OK.
 
-**Pendiente:** sección Congreso (VoteCard + composición del Senado), portar calculadoras al look
-nuevo, migrar/quitar los widgets viejos del dashboard (QuoteCard/GapGauge/ReservesWidget) y el
-Sidebar/Navbar al design system, y completar el rename de backend `com.finarg`→`com.labrecha`.
+**Hecho (2026-07-19) — sección Congreso:** `/congreso` con composición del Senado (barra apilada
+por bloque + mayoría marcada, sobre `/senate/blocs`, 72 bancas) y grilla de últimas votaciones de
+Diputados (`VoteCard` sobre `/congress/votes`). Detalle en `/congreso/votacion/[actaId]`: cabecera
+con tanteo (`VoteBar`) + resultado, y **voto por bloque** agregando `/congress/votes/{id}/details`
+(`tallyByBloc` en `lib/congress.ts`). Verificado `tsc`/`biome`/`next build`, rutas 200 OK.
+
+**Hecho (2026-07-19) — navegación + primera calculadora:** Sidebar y Navbar reescritos sobre el
+design system (sidebar claro "Observatorio claro", marca "La Brecha" con barra ámbar, IA nueva:
+Inicio · Indicadores → `/indicador/[code]` · Congreso · Calculadoras), shell entero en fondo papel
+(`--bg-page`). Se sacaron selector de país, feature-gating y traducciones muertas. Calculadora de
+**interés compuesto** reescrita como página autocontenida sobre la FastAPI (`/calculators/
+compound-interest`) con componentes core (form + resumen + `DataTable`); cálculo verificado
+(100k @10% 1 año → 110.000). `next build` verde.
+
+**Hecho (2026-07-19) — calculadoras nuevas + poda de lo viejo:** sueldo neto (`/calculators/
+income-tax`) y ajuste por inflación (`/calculators/inflation-adjustment`) reescritas sobre la FastAPI
+con componentes core (verificadas contra la API). "Cuotas vs contado" removida (sin endpoint en la
+FastAPI). Retiradas todas las páginas/rutas viejas que pegaban a la API Spring (`/cotizaciones`,
+`/inflacion`, `/reservas-bcra`, `/riesgo-pais`, `/bandas-cambiarias`, `/comparador-tasas`) y su código
+huérfano: `components/{dashboard,quotes,comparison,converter,indicators,charts,calculators}`, hooks
+`use{Quotes,Reserves,Inflation,CountryRisk,SocialIndicators,Governments}`, `lib/api.ts`,
+`UpgradeBanner`, `GoogleOAuthWrapper` y sus tests. `sitemap.ts` apunta a la IA nueva (indicadores +
+congreso). La app ahora expone SÓLO rutas del stack nuevo (FastAPI). `tsc`/`biome` (78 archivos)/
+`next build` verdes; los 5 tests que fallan son pre-existentes (ErrorBoundary/Button/Card/QueryError/
+test-utils, componentes no tocados).
+
+**Pendiente:** único ítem grande restante = completar el rename backend `com.finarg`→`com.labrecha`
+(Python ya usa `labrecha_*`; falta el módulo Java, que se apaga al no quedar nada del frontend
+apuntándolo). Menores: `config/countries` quedó sólo por `store`/`queryKeys`/`types` (simplificable a
+Argentina fija), y limpiar traducciones/`i18n` muertas.
 
 - Nueva arquitectura de información. Home = "estado del país" con:
   - Inflación: oficial mensual + curva diaria/semanal privada en el mismo gráfico.

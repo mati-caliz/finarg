@@ -1,57 +1,69 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/hooks/useTranslation";
-import { Coffee, Sparkles } from "lucide-react";
+import { Coffee } from "lucide-react";
 import Link from "next/link";
 
 export function Navbar() {
-  const { translate } = useTranslation();
-
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
+    <header
+      className="sticky top-0 z-30 h-16 backdrop-blur-xl"
+      style={{
+        borderBottom: "1px solid var(--border-1)",
+        background: "color-mix(in srgb, var(--bg-page) 82%, transparent)",
+      }}
+    >
       <div className="flex h-full items-center justify-between gap-4 px-4 lg:px-6">
         <div className="flex-1 min-w-0 ml-12 lg:ml-0">
           <Link
             href="/"
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit"
+            className="w-fit"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              color: "var(--text-secondary)",
+              fontSize: "0.9375rem",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
           >
-            <Sparkles className="h-4 w-4 text-primary hidden sm:block" />
-            <h1 className="text-base sm:text-lg font-semibold truncate">
-              {translate("financialPanel")}
-            </h1>
+            <span
+              className="lg:hidden"
+              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+            >
+              La
+              <span
+                style={{ width: 3, height: 16, background: "var(--brecha)", borderRadius: 2 }}
+              />
+              Brecha
+            </span>
+            <span className="hidden lg:inline">Observatorio político-económico</span>
           </Link>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 hidden sm:flex border-amber-200 dark:border-amber-800 hover:bg-amber-50 dark:hover:bg-amber-950 hover:text-amber-700 dark:hover:text-amber-400"
-            asChild
+          <a
+            href="https://cafecito.app/finlatam"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 12px",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-2)",
+              background: "var(--surface-card)",
+              color: "var(--brecha-strong)",
+              fontSize: "0.8125rem",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
           >
-            <a href="https://cafecito.app/finlatam" target="_blank" rel="noopener noreferrer">
-              <Coffee className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-              <span>{translate("buyCoffee")}</span>
-            </a>
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-9 w-9 shrink-0 sm:hidden border-amber-200 dark:border-amber-800"
-            aria-label="Invitame un cafecito"
-            asChild
-          >
-            <a
-              href="https://cafecito.app/finlatam"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center"
-            >
-              <Coffee className="h-5 w-5 text-amber-600 dark:text-amber-500" />
-            </a>
-          </Button>
+            <Coffee className="h-4 w-4" />
+            <span className="hidden sm:inline">Invitame un café</span>
+          </a>
           <ThemeToggle />
         </div>
       </div>

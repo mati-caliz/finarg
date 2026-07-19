@@ -1,223 +1,174 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { useAdjustInflation } from "@/hooks/useInflation";
-import { useTranslation } from "@/hooks/useTranslation";
-import { formatCurrency, formatPercent } from "@/lib/utils";
-import type { InflationAdjustment } from "@/types";
-import { Calculator, DollarSign, Loader2 } from "lucide-react";
+import { Button, Card } from "@/components/core";
+import { formatMoneyAR, formatNumberAR } from "@/lib/indicators";
+import { calculatorsApi } from "@/lib/labrechaApi";
+import type { InflationAdjustmentRequest } from "@/lib/labrechaApi";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-export default function InflationAdjustmentCalculatorPage() {
-  const { translate } = useTranslation();
-  const [originalAmount, setOriginalAmount] = useState<number>(100000);
-  const [startDate, setStartDate] = useState<string>("2023-01-01");
-  const [endDate, setEndDate] = useState<string>(new Date().toISOString().split("T")[0]);
-  const [adjustmentResult, setAdjustmentResult] = useState<InflationAdjustment | null>(null);
+const fieldStyle = { display: "flex", flexDirection: "column" as const, gap: 4 };
+const inputStyle = {
+  padding: "8px 10px",
+  borderRadius: "var(--radius-md)",
+  border: "1px solid var(--border-2)",
+  background: "var(--surface-card)",
+  color: "var(--text-body)",
+  fontFamily: "var(--font-mono)",
+  fontSize: "0.9375rem",
+};
+const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--text-secondary)" };
 
-  const adjustMutation = useAdjustInflation();
+function monthLabel(month: string): string {
+  const [year, monthNumber] = month.split("-");
+  return `${monthNumber}/${year}`;
+}
 
-  const handleAdjust = (e: React.FormEvent) => {
-    e.preventDefault();
-    adjustMutation.mutate(
-      { amount: originalAmount, fromDate: startDate, toDate: endDate },
-      {
-        onSuccess: (data) => {
-          setAdjustmentResult(data);
-        },
-      },
-    );
+export default function InflationAdjustmentPage() {
+  const [amount, setAmount] = useState(100000);
+  const [fromMonth, setFromMonth] = useState("2023-01");
+  const [toMonth, setToMonth] = useState("2025-12");
+
+  const mutation = useMutation({
+    mutationFn: (body: InflationAdjustmentRequest) => calculatorsApi.inflationAdjustment(body),
+  });
+
+  const onSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    mutation.mutate({
+      amount,
+      from_date: `${fromMonth}-01`,
+      to_date: `${toMonth}-01`,
+    });
   };
 
+  const result = mutation.data;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{translate("adjustmentCalculator")}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {translate("adjustmentCalculatorDesc")}
+    <div
+      style={{
+        maxWidth: "var(--container-max)",
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--sp-6)",
+      }}
+    >
+      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <h1
+          style={{
+            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
+            margin: 0,
+          }}
+        >
+          Ajuste por inflación
+        </h1>
+        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
+          Cuánto vale hoy un monto de otra fecha, según el IPC del INDEC.
         </p>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-card lg:self-start">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Calculator className="h-5 w-5 text-primary" />
-              {translate("adjustmentCalculator")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <form onSubmit={handleAdjust} className="space-y-3">
-              <div>
-                <label
-                  htmlFor="originalAmount"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("originalAmount")}
-                </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="originalAmount"
-                    type="number"
-                    placeholder="100000"
-                    value={originalAmount || ""}
-                    onChange={(e) => setOriginalAmount(Number.parseFloat(e.target.value) || 0)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="startDate"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("startDate")}
-                </label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  max={endDate}
+      <div
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          alignItems: "start",
+        }}
+      >
+        <Card title="Parámetros">
+          <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <label style={fieldStyle}>
+              <span style={labelStyle}>Monto (ARS)</span>
+              <input
+                type="number"
+                min={0}
+                value={amount}
+                onChange={(event) => setAmount(Number(event.target.value))}
+                style={inputStyle}
+              />
+            </label>
+            <div style={{ display: "flex", gap: 12 }}>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Desde</span>
+                <input
+                  type="month"
+                  value={fromMonth}
+                  max={toMonth}
+                  onChange={(event) => setFromMonth(event.target.value)}
+                  style={inputStyle}
                 />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="endDate"
-                  className="block text-sm font-medium text-muted-foreground mb-2"
-                >
-                  {translate("endDate")}
-                </label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  min={startDate}
-                  max={new Date().toISOString().split("T")[0]}
+              </label>
+              <label style={{ ...fieldStyle, flex: 1 }}>
+                <span style={labelStyle}>Hasta</span>
+                <input
+                  type="month"
+                  value={toMonth}
+                  min={fromMonth}
+                  onChange={(event) => setToMonth(event.target.value)}
+                  style={inputStyle}
                 />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={adjustMutation.isPending || originalAmount <= 0}
-              >
-                {adjustMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {translate("calculating")}
-                  </>
-                ) : (
-                  translate("calculateAdjustment")
-                )}
-              </Button>
-            </form>
-
-            {adjustmentResult && (
-              <div className="mt-4 p-4 bg-primary/10 rounded-lg border border-primary/20">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("originalAmount")}
-                    </span>
-                    <span className="text-foreground">
-                      {formatCurrency(adjustmentResult.originalAmount)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("monthsElapsed")}
-                    </span>
-                    <span className="text-foreground">{adjustmentResult.monthsElapsed}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground text-sm">
-                      {translate("cumulativeInflation")}
-                    </span>
-                    <span className="text-red-500">
-                      +
-                      {formatPercent(
-                        adjustmentResult.cumulativeInflation ??
-                          adjustmentResult.accumulatedInflation ??
-                          0,
-                      )}
-                    </span>
-                  </div>
-                  <div className="pt-3 border-t border-border">
-                    <div className="flex justify-between items-center">
-                      <span className="text-foreground font-medium">
-                        {translate("adjustedAmount")}
-                      </span>
-                      <span className="text-2xl font-bold text-primary">
-                        {formatCurrency(adjustmentResult.adjustedAmount)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {translate("maintainPurchasingPower")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
+              </label>
+            </div>
+            <Button variant="primary" disabled={mutation.isPending}>
+              {mutation.isPending ? "Calculando…" : "Actualizar valor"}
+            </Button>
+          </form>
         </Card>
 
-        <Card className="bg-card">
-          <CardHeader>
-            <CardTitle className="text-lg">{translate("howItWorks")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-2">
-                {translate("whatIsInflationAdjustment")}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {translate("inflationAdjustmentExplanation")}
+        {result ? (
+          <Card
+            title="Resultado"
+            footer={
+              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+                Fuente: IPC nivel general (INDEC) · {result.months_elapsed} meses
+              </span>
+            }
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  Valor equivalente en {monthLabel(toMonth)}
+                </div>
+                <div
+                  className="num"
+                  style={{ fontSize: "var(--fs-num-xl)", fontWeight: 600, lineHeight: 1.1 }}
+                >
+                  {formatMoneyAR(Number.parseFloat(result.adjusted_amount))}
+                </div>
+              </div>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", margin: 0 }}>
+                {formatMoneyAR(Number.parseFloat(result.original_amount))} de{" "}
+                {monthLabel(fromMonth)} equivalen a{" "}
+                {formatMoneyAR(Number.parseFloat(result.adjusted_amount))} de {monthLabel(toMonth)}.
               </p>
+              <div>
+                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  Inflación acumulada del período
+                </div>
+                <div className="num" style={{ fontWeight: 600, color: "var(--neg)" }}>
+                  {formatNumberAR(Number.parseFloat(result.cumulative_inflation), 1)}%
+                </div>
+              </div>
             </div>
-
-            <div>
-              <h3 className="text-sm font-semibold text-foreground mb-2">
-                {translate("howToUse")}
-              </h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex gap-2">
-                  <span className="text-primary font-bold">1.</span>
-                  <span>{translate("adjustmentStep1")}</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-primary font-bold">2.</span>
-                  <span>{translate("adjustmentStep2")}</span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-primary font-bold">3.</span>
-                  <span>{translate("adjustmentStep3")}</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
-              <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-                <Calculator className="h-4 w-4 text-amber-500" />
-                {translate("practicalExample")}
-              </h3>
-              <p className="text-sm text-muted-foreground">{translate("adjustmentExample")}</p>
-            </div>
-
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <h3 className="text-sm font-semibold text-foreground mb-2">
-                {translate("dataSource")}
-              </h3>
-              <p className="text-sm text-muted-foreground">{translate("inflationDataSource")}</p>
-            </div>
-          </CardContent>
-        </Card>
+          </Card>
+        ) : (
+          <Card>
+            <p
+              style={{
+                color: "var(--text-muted)",
+                fontSize: "0.875rem",
+                margin: 0,
+                textAlign: "center",
+                padding: "40px 0",
+              }}
+            >
+              {mutation.isError
+                ? "No se pudo calcular. Revisá las fechas (debe haber IPC publicado para el rango)."
+                : "Elegí un monto y un rango de meses."}
+            </p>
+          </Card>
+        )}
       </div>
     </div>
   );
