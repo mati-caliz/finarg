@@ -26,6 +26,12 @@ export function formatMoneyAR(value: number, fractionDigits = 0): string {
   return `$ ${formatNumberAR(value, fractionDigits)}`;
 }
 
+const MILLONES_POR_BILLON = 1_000_000;
+
+export function formatBillonesAR(valueInMillones: number, fractionDigits = 2): string {
+  return `$ ${formatNumberAR(valueInMillones / MILLONES_POR_BILLON, fractionDigits)} billones`;
+}
+
 export function formatDateAR(isoDate: string): string {
   const [year, month, day] = isoDate.split("-");
   if (!year || !month || !day) {

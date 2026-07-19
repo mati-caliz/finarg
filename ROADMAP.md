@@ -384,8 +384,27 @@ progress bars políticos, calculadoras personales y un pipeline de IA sobre el B
 
 #### Sub-fases (de menor a mayor riesgo)
 
-**5.a — Contadores y monitores sobre datos existentes (frontend + poco scraper).** Componente
-`LiveCounter` genérico: recibe valor base + fecha + tasa (diaria/horaria/por-segundo derivada del
+**5.a — Contadores y monitores sobre datos existentes (frontend + poco scraper).** 🚧 EN CURSO.
+**Hecho (2026-07-19):** componente core `LiveCounter` (`web/src/components/core/LiveCounter.tsx`) que
+anima con `requestAnimationFrame` (y cae a intervalo de 1s bajo `prefers-reduced-motion`), sin
+mismatch de hidratación (arranca en el valor base y tickea en efecto) y sólo re-renderiza al cambiar
+el string formateado. Helpers puros en `web/src/lib/liveCounter.ts` (`projectedValue`,
+`startOfCurrentMonth`, `daysInMonth`, `monthlyRateToPerSecond`) con 9 tests. Primer contador:
+**Inflación clock** (`InflationClockCard` en la Home) que proyecta linealmente el último `ipc_mensual`
+oficial sobre los días del mes, con badge "Proyección", fuente+fecha y disclaimer de que no es una
+medición.
+
+**Hecho (2026-07-19) — Monitor BCRA:** se registraron en el scraper dos connectors que estaban escritos
+pero sin registrar (`bcra_tasas` → `tasa_tamar` + `tasa_plazo_fijo`, TNA % diaria desde 2004 vía BCRA
+API v4.0; y `big_mac` → índice Big Mac de Argentina, The Economist). Corridos verdes (`bcra_tasas` 5948
+filas, `big_mac` 129). Card `MonitorBcraCard` en la Home: base monetaria (ya ingerida, formateada en
+billones con variación mensual, "emisión cero" = baja es buena) + tasa de referencia (TAMAR) + plazo
+fijo minorista, cada una con fuente+fecha. **Hallazgo:** la variable BCRA "Tasa de política monetaria"
+(id 160) quedó **discontinuada en 2025-07** al cambiar el esquema monetario; la referencia viva hoy es
+TAMAR (id 44), que es la que se muestra. Verificado `tsc`/`biome`/`next build` + `compileall`/`ruff`
+verdes. **Pendiente 5.a:** Base monetaria clock (contador en vivo), Gasto público por segundo (falta
+ingerir el presupuesto anual).
+Componente `LiveCounter` genérico: recibe valor base + fecha + tasa (diaria/horaria/por-segundo derivada del
 último informe) y anima con `requestAnimationFrame`, con rótulo de proyección y fuente. Aplicaciones:
 *Inflación clock* (proyecta el IPC del mes desde el último mensual/REM), *Deuda/Base monetaria clock*,
 *Gasto público por segundo* (presupuesto anual / segundos del año). **Monitor BCRA**: tile combinado
