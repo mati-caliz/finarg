@@ -57,6 +57,7 @@ const GROUPS: NavGroup[] = [
     icon: Calculator,
     items: [
       { label: "Sueldo neto", href: "/calculadora-sueldo-neto" },
+      { label: "Impacto fiscal", href: "/calculadora-impacto-fiscal" },
       { label: "Interés compuesto", href: "/calculadora-interes-compuesto" },
       { label: "Ajuste por inflación", href: "/calculadora-ajuste-inflacion" },
     ],

@@ -178,6 +178,32 @@ export interface IncomeTaxResponse {
   tax_brackets: Array<Record<string, string | number>>;
 }
 
+export interface TaxImpactRequest {
+  gross_monthly_salary: number;
+  monthly_expenses: number;
+  retired?: boolean;
+  iibb_rate?: number;
+}
+
+export interface TaxImpactItem {
+  concept: string;
+  category: string;
+  annual_amount: string;
+  monthly_amount: string;
+  share_of_income: string;
+}
+
+export interface TaxImpactResponse {
+  gross_annual_income: string;
+  annual_expenses: string;
+  total_annual: string;
+  total_monthly: string;
+  total_pressure: string;
+  days_for_the_state: number;
+  tax_freedom_date: string;
+  items: TaxImpactItem[];
+}
+
 async function get<T>(path: string, params?: object): Promise<T> {
   const response = await labrechaApi.get<T>(path, { params });
   return response.data;
@@ -236,4 +262,5 @@ export const calculatorsApi = {
   inflationAdjustment: (body: InflationAdjustmentRequest) =>
     post<InflationAdjustmentResponse>("/calculators/inflation-adjustment", body),
   incomeTax: (body: IncomeTaxRequest) => post<IncomeTaxResponse>("/calculators/income-tax", body),
+  taxImpact: (body: TaxImpactRequest) => post<TaxImpactResponse>("/calculators/tax-impact", body),
 };

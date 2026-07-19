@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     })),
     { path: "/calculadora-sueldo-neto", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/calculadora-impacto-fiscal", changeFrequency: "monthly", priority: 0.7 },
     { path: "/calculadora-interes-compuesto", changeFrequency: "monthly", priority: 0.6 },
     { path: "/calculadora-ajuste-inflacion", changeFrequency: "monthly", priority: 0.6 },
   ];
