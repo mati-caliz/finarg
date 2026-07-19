@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const LABRECHA_API_URL = process.env.NEXT_PUBLIC_LABRECHA_API_URL || "http://localhost:8000";
+const LABRECHA_API_URL = process.env.NEXT_PUBLIC_LABRECHA_API_URL || "/api/data";
 
 export const labrechaApi = axios.create({
   baseURL: LABRECHA_API_URL,

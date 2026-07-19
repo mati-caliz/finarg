@@ -96,8 +96,10 @@ services:
         NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     container_name: web
     depends_on:
-      backend:
+      api-py:
         condition: service_healthy
+    environment:
+      LABRECHA_API_INTERNAL_URL: http://api-py:8000
     ports:
       - "127.0.0.1:3000:3000"
     networks:

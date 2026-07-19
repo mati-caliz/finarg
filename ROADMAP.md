@@ -291,7 +291,29 @@ Argentina fija), y limpiar traducciones/`i18n` muertas.
 
 **Criterio de salida**: UI nueva desplegable, sin rastros de "FinArg" ni de features podadas.
 
-### Fase 4 — Infra y lanzamiento (≈1 semana)
+### Fase 4 — Infra y lanzamiento (≈1 semana) — 🚧 EN CURSO
+
+**Hecho (2026-07-19) — wiring del frontend nuevo a la FastAPI (patrón BFF):** el front pega
+same-origin a `/api/data/...` y el route handler `web/src/app/api/data/[...path]/route.ts` proxya a
+la FastAPI (`LABRECHA_API_INTERNAL_URL`, default api-py:8000) con **caché ISR por ruta** (GET) y
+reenvío de POST (calculadoras). Escalable para lectura alta, sin exponer api-py ni tocar el nginx
+compartido (la ruta `/api/data/`→frontend ya existe). Se quitó el rewrite viejo de `next.config.js`
+que apuntaba al Java, se sacó el backend del CSP `connect-src`, y los redirects viejos se
+repuntaron a las rutas nuevas (`/reservas`,`/reservas-bcra`→`/indicador/reservas_internacionales`,
+`/cotizaciones`→`/indicador/dolar_blue`, `/inflacion`→`/indicador/ipc_mensual`,
+`/riesgo-pais`→`/indicador/riesgo_pais`). Compose dev y prod: agregado servicio `api-py` (prod no lo
+tenía) + `frontend` apunta a `http://api-py:8000` y depende de él. Verificado end-to-end (GET cacheado
++ POST) y ambos compose parsean.
+
+**Pendiente (necesita edición coordinada del nginx compartido — NO hacer a ciegas):** el módulo
+Java sigue en pie porque `nginx/nginx.conf` (que además sirve gastronova/portfolio/jobhunter en
+prod) tiene `upstream backend { server backend:8080; }` y rutas `/api/`+`/actuator/health` hacia él;
+si se saca el servicio `backend` del compose sin editar el nginx a la vez, nginx puede no levantar y
+tirar los otros sitios. Retiro del Java = borrar `api/` + su servicio en ambos compose + sacar esas
+directivas del nginx, todo junto. Falta también adaptar CI (`ci.yml` tiene build de Java/Maven) y
+sumar el `scraper` al compose prod.
+
+### Fase 4 — Infra y lanzamiento (detalle original)
 
 - `docker-compose` final: postgres + api (FastAPI) + web + cron del scraper
   (contenedor con crond o cron del host invocando `docker compose run scraper <job>`).

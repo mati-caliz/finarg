@@ -1,31 +1,20 @@
 import type { NextRequest } from "next/server";
 
 const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
-  { pattern: /exchange-bands/, revalidate: 86400 },
-  { pattern: /governments/, revalidate: 3600 },
-  { pattern: /history/, revalidate: 3600 },
-  { pattern: /inflation/, revalidate: 3600 },
-  { pattern: /indicators/, revalidate: 3600 },
-  { pattern: /reserves/, revalidate: 1800 },
-  { pattern: /country-risk/, revalidate: 1800 },
-  { pattern: /quotes/, revalidate: 300 },
-  { pattern: /gap/, revalidate: 300 },
-  { pattern: /crypto/, revalidate: 300 },
-  { pattern: /investments\/crypto/, revalidate: 300 },
-  { pattern: /investments\/stocks/, revalidate: 300 },
-  { pattern: /investments\/cedears/, revalidate: 300 },
-  { pattern: /investments\/bonds/, revalidate: 1800 },
-  { pattern: /investments\/etf/, revalidate: 300 },
-  { pattern: /rates/, revalidate: 1800 },
-  { pattern: /news/, revalidate: 300 },
-  { pattern: /feriados/, revalidate: 86400 },
+  { pattern: /^political-events/, revalidate: 86400 },
+  { pattern: /^congress/, revalidate: 86400 },
+  { pattern: /^senate/, revalidate: 86400 },
+  { pattern: /^holidays/, revalidate: 86400 },
+  { pattern: /^scrape-runs/, revalidate: 300 },
+  { pattern: /^news/, revalidate: 900 },
+  { pattern: /^indicators/, revalidate: 1800 },
 ];
 
 function getBackendUrl(): string {
   return (
-    process.env.BACKEND_INTERNAL_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://localhost:8080/api/v1"
+    process.env.LABRECHA_API_INTERNAL_URL ||
+    process.env.NEXT_PUBLIC_LABRECHA_API_URL ||
+    "http://localhost:8000"
   );
 }
 
@@ -35,7 +24,7 @@ function getRevalidateTime(path: string): number {
       return rule.revalidate;
     }
   }
-  return 300;
+  return 1800;
 }
 
 export async function GET(
@@ -46,16 +35,12 @@ export async function GET(
   const pathStr = path.join("/");
   const searchParams = request.nextUrl.searchParams.toString();
   const queryString = searchParams ? `?${searchParams}` : "";
-  const backendUrl = getBackendUrl();
-  const url = `${backendUrl}/${pathStr}${queryString}`;
+  const url = `${getBackendUrl()}/${pathStr}${queryString}`;
   const revalidate = getRevalidateTime(pathStr);
 
   const res = await fetch(url, {
     next: { revalidate },
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers: { Accept: "application/json" },
   });
 
   if (!res.ok) {
@@ -69,4 +54,24 @@ export async function GET(
       "Cache-Control": `public, s-maxage=${revalidate}, stale-while-revalidate=${revalidate * 2}`,
     },
   });
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string[] }> },
+) {
+  const { path } = await params;
+  const pathStr = path.join("/");
+  const url = `${getBackendUrl()}/${pathStr}`;
+  const body = await request.text();
+
+  const res = await fetch(url, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body,
+  });
+
+  const data = await res.json().catch(() => ({ error: "Invalid response" }));
+  return Response.json(data, { status: res.status });
 }
