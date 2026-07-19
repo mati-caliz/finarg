@@ -164,10 +164,17 @@ idempotente):
 Fuentes frágiles descartadas: inflacionverdadera.com (página estática, data como imagen) y el
 Nowcast de pobreza de UTDT (app Shiny en shinyapps.io, sin CSV/JSON legible).
 
-**Pendiente:** sólo las fuentes frágiles — inflación de alta frecuencia (consultoras/Alphacast),
-Nowcast pobreza + ICG/ICC (UTDT, PDFs/JS) — que habilitan el comparador de mediciones
-(INDEC vs UTDT vs UCA). El resto (fuentes de dificultad baja/media, módulos scraper-only,
-composición del Senado, integración al compose) está hecho.
+**ICG (confianza en el gobierno) HECHO (2026-07-19):** conector `icg` (source `utdt`,
+indicator_code `confianza_gobierno`, escala 0-5). La página del ICG de UTDT no da Excel/CSV (los ZIP
+son PDFs mensuales), PERO el texto de la página trae el archivo narrativo mensual ("El ICG de junio
+fue de 2,07 puntos…"): se scrapea con regex y se reconstruyen las fechas caminando hacia atrás desde
+el mes ancla, verificando contra los meses nombrados (falla ruidosa si el HTML cambia). 31 meses
+(2023-12→2026-06) upserted y verificados vía la API; cableado a la Home + su página de indicador.
+
+**Pendiente:** el resto de las fuentes frágiles — inflación de alta frecuencia (Alphacast requiere
+API key; consultoras sólo prensa) y Nowcast de pobreza UTDT (app Shiny, sin datos legibles). El ICC
+(confianza del consumidor, UTDT CIF) probablemente se pueda con el mismo patrón que el ICG. El resto
+(fuentes de dificultad baja/media, módulos scraper-only, Senado, compose) está hecho.
 
 El `scraper` ya está integrado al `docker-compose.yml` (servicio bajo profile `scraper`, se corre
 on-demand con `docker compose run --rm scraper <job>`; habla con `postgres` por la red interna).
@@ -343,6 +350,102 @@ decide. La carpeta root LOCAL sigue `finarg` (renombrar con `mv` desde afuera de
   públicamente y siempre con atribución; ante la duda, dejar la fuente afuera.
 - **Migración FastAPI más larga de lo esperado**: la Fase 1 no depende de ella; si se
   atrasa, Spring puede convivir leyendo `indicator_history` como plan B temporal.
+
+### Fase 5 — Features de engagement (métricas "que se mueven") — 🔜 PLANIFICADA (2026-07-19)
+
+Con la plataforma andando (scraper + FastAPI + BFF) y `indicator_history` como tabla genérica,
+sumar indicadores nuevos es barato. Esta fase apila **features de enganche**: contadores en vivo,
+progress bars políticos, calculadoras personales y un pipeline de IA sobre el Boletín Oficial.
+
+**Principios que no cambian** (heredados del resto del roadmap):
+- Ningún número sin **fuente + fecha** visibles. Los contadores "en vivo" son *proyecciones*: se
+  rotula explícito "proyección sobre el último dato oficial de \<fuente\> (\<fecha\>)".
+- Preferir fuentes con API sobre scraping frágil. Fuente sin API viable → research spike, no se
+  promete en la UI hasta tener el dato verde en `scrape_runs`.
+- Reusar `indicator_history` + los indicadores ya ingeridos antes de crear tablas nuevas.
+
+#### Veredicto de factibilidad por feature
+
+| Feature | Dato nuevo | Fuente candidata | Encaje | Veredicto |
+|---|---|---|---|---|
+| Contadores dinámicos (clocks) | Ninguno | Series ya ingeridas + tasa derivada | Frontend puro | 🟢 Quick win |
+| Monitor BCRA (base + tasa política) | Tasa de política monetaria | BCRA API (`base_monetaria` ya está) | `indicator_history` | 🟢 Fácil |
+| Promesómetro fiscal (emisión vs meta / resultado) | Resultado fiscal mensual | Sec. Hacienda (datos.gob.ar) | `indicator_history` | 🟢 Fácil |
+| Gasto público por segundo | Presupuesto anual vigente | Presupuesto Abierto / Sec. Hacienda | Constante + clock | 🟢 Fácil |
+| Calculadora impacto fiscal (IVA/Ganancias/IIBB) | Ninguno (alícuotas) | Extiende `/calculators/income-tax` | Calculadora nueva | 🟢 Fácil |
+| Tax Freedom Day / días para el Estado | Ninguno | Deriva de impacto fiscal | Calculadora | 🟢 Fácil |
+| Termómetro del empleo (privado/público/informal) | Empleo por categoría | SIPA / EPH vía datos.gob.ar | `indicator_history` (3 codes) | 🟡 Media |
+| Radar de crédito (tasas, morosidad) | Tasas activas, irregularidad de cartera | BCRA API | `indicator_history` | 🟡 Media |
+| Coparticipación por provincia | Envíos y aportes por provincia | Min. Economía / datos.gob.ar | Tabla propia + mapa | 🟡 Media |
+| Congresómetro (tracker de leyes) | Estado de trámite de proyectos | HCDN/Senado trámite parlamentario | Tabla propia | 🟡 Media |
+| Boletín Oficial con IA + Impuestómetro | Resúmenes + count de impuestos | boletinoficial.gob.ar + LLM | Tabla propia + pipeline IA | 🟠 Alta |
+| Monitor de vivienda (m2/alquileres CABA) | Precios inmobiliarios | Zonaprop/Argenprop (Cloudflare), Prop. index | Research spike | 🔴 Data-hard |
+| Termómetro de subsidios (luz/gas/transporte) | Costo real vs subsidiado | ASAP / Sec. Energía (disperso) | Research spike | 🔴 Data-hard |
+
+#### Sub-fases (de menor a mayor riesgo)
+
+**5.a — Contadores y monitores sobre datos existentes (frontend + poco scraper).** Componente
+`LiveCounter` genérico: recibe valor base + fecha + tasa (diaria/horaria/por-segundo derivada del
+último informe) y anima con `requestAnimationFrame`, con rótulo de proyección y fuente. Aplicaciones:
+*Inflación clock* (proyecta el IPC del mes desde el último mensual/REM), *Deuda/Base monetaria clock*,
+*Gasto público por segundo* (presupuesto anual / segundos del año). **Monitor BCRA**: tile combinado
+base monetaria (ya ingerida) + tasa de política monetaria (connector `tasas_bcra` nuevo sobre BCRA
+API). Criterio de salida: contadores en Home con disclaimer de proyección; `scrape_runs` verde para
+`tasas_bcra`.
+
+**5.b — Calculadoras personales.** *Impacto fiscal*: nuevo endpoint `/calculators/tax-impact`
+(sueldo bruto + gastos mensuales → desglose IVA, Ganancias, IIBB, aportes; reusa la escala de
+`income_tax`). *Tax Freedom Day*: deriva del anterior, devuelve "días al año trabajando para el
+Estado" + fecha de liberación. UI en la sección calculadoras ya existente, con componentes core.
+Criterio de salida: ambas verificadas contra la API con casos de consistencia interna.
+
+**5.c — Progress bars políticos.** *Promesómetro fiscal*: connector `resultado_fiscal` (Sec.
+Hacienda vía datos.gob.ar) → `indicator_history`; widget dona/barra "emisión acumulada del mes vs
+meta" y "resultado financiero vs meta" (barra tipo IndicadorTile de brecha). *Termómetro del empleo*:
+connector `empleo_sipa` con 3 `indicator_code` (formal privado / público / informal), barra apilada
+100% que se mueve mes a mes. Criterio de salida: `scrape_runs` verde para ambos connectors; widgets
+con fuente + fecha.
+
+**5.d — Radar de crédito + Coparticipación (mapa).** *Radar de crédito*: connector `credito_bcra`
+(tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
+`coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,
+metadata)`; componente `ArgentinaMap` (SVG de provincias, sin librería externa de mapas para respetar
+el CSP de assets self-contained) coloreado por saldo neto envío-aporte. Research spike previo para
+confirmar granularidad y disponibilidad de "lo que aporta cada provincia". Criterio de salida: mapa
+interactivo con tooltip fuente+fecha; connectors verdes.
+
+**5.e — Congresómetro (tracker de leyes).** Tabla propia `bill_tracking(bill_id, title, chamber,
+stage, stage_date, metadata)` alimentada del trámite parlamentario (HCDN/Senado). Panel visual con el
+recorrido "En comisiones → Media sanción Diputados → Senado → Sancionada". Presentismo de legisladores
+= sub-ítem opcional (dato más frágil), sólo si la fuente lo expone limpio. Se apoya en las tablas de
+Congreso ya existentes (`congress_votes`, `senators`). Criterio de salida: estado de ≥3 leyes clave
+trackeado con fecha de última actualización.
+
+**5.f — Boletín Oficial con IA + Impuestómetro (el feature diferencial).** Pipeline nocturno: connector
+`boletin_oficial` baja las normas del día (boletinoficial.gob.ar / primera+segunda sección), un paso
+de IA (Claude vía la API de Anthropic) filtra las relevantes (impuestos, regulaciones, alícuotas) y las
+resume en 3 viñetas → tabla `boletin_summaries(date, norma_id, title, summary, category, impact_tags)`.
+Alimenta dos features: (1) **feed changelog** en el dashboard; (2) **Impuestómetro** = count curado de
+impuestos vigentes (dataset semilla `taxes(code, name, jurisdiction, status, effective_date)`) que el
+pipeline actualiza al detectar derogaciones/creaciones, mostrando el número gigante + timeline "Derogado
+X en provincia Y (hace 2 días)". **Consideraciones**: costo recurrente de LLM (batchear, cachear por
+`norma_id`), el resumen se marca "generado por IA, verificá contra la fuente" con link al Boletín, y el
+count arranca de un dataset semilla curado a mano (no confiar el número base sólo a la IA). Research
+spike previo sobre el acceso a boletinoficial.gob.ar (¿API/estructura estable?). Criterio de salida:
+feed poblado ≥1 semana con corridas verdes; Impuestómetro con número auditado contra la semilla.
+
+**5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
+- *Monitor de vivienda* (m2/alquileres CABA por barrio, ROI): las fuentes ricas (Zonaprop/Argenprop)
+  están tras Cloudflare y su reuso es legalmente gris; evaluar Propiedades.com index, reportes del
+  Colegio de Escribanos (compraventas CABA, API) o el índice de alquileres del BCRA/INDEC como proxies
+  API-friendly antes de intentar scraping.
+- *Termómetro de subsidios* (costo real vs subsidiado en luz/gas/transporte): dato disperso
+  (ASAP, Sec. de Energía, cuadros tarifarios). Spike para ver si hay serie consolidada; si no, se
+  arma con supuestos declarados y disclaimer fuerte, o se difiere.
+
+**Criterio de salida de la fase**: Home con al menos los contadores en vivo, un progress bar político
+y las calculadoras personales; el pipeline del Boletín Oficial corriendo aunque sea en beta. Todo con
+fuente+fecha, ningún dato dudoso escrito en silencio.
 
 ## Orden de ejecución y reversibilidad
 
