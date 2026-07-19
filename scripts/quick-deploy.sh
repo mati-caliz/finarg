@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🚀 Quick Deploy - Finarg"
+echo "🚀 Quick Deploy - La Brecha"
 echo ""
 
 # Verificar que estamos en el directorio correcto
@@ -23,18 +23,18 @@ else
 fi
 
 echo "Selecciona qué servicio actualizar:"
-echo "  1) Backend"
+echo "  1) API (FastAPI)"
 echo "  2) Frontend"
 echo "  3) Ambos"
-echo "  4) Todo (incluyendo DB y Redis)"
+echo "  4) Todo (incluyendo DB)"
 echo ""
 read -p "Opción [1-4]: " option
 
 case $option in
     1)
-        echo "📦 Rebuilding backend..."
-        $DOCKER_COMPOSE -f docker-compose.prod.yml up -d --build backend
-        echo "✅ Backend actualizado"
+        echo "📦 Rebuilding API..."
+        $DOCKER_COMPOSE -f docker-compose.prod.yml up -d --build api-py
+        echo "✅ API actualizada"
         ;;
     2)
         echo "📦 Rebuilding frontend..."
@@ -42,9 +42,9 @@ case $option in
         echo "✅ Frontend actualizado"
         ;;
     3)
-        echo "📦 Rebuilding backend y frontend..."
-        $DOCKER_COMPOSE -f docker-compose.prod.yml up -d --build backend frontend
-        echo "✅ Backend y Frontend actualizados"
+        echo "📦 Rebuilding API y frontend..."
+        $DOCKER_COMPOSE -f docker-compose.prod.yml up -d --build api-py frontend
+        echo "✅ API y Frontend actualizados"
         ;;
     4)
         echo "📦 Rebuilding todos los servicios..."
@@ -69,5 +69,5 @@ echo ""
 echo "✅ Deploy completado!"
 echo ""
 echo "📝 Ver logs:"
-echo "  $DOCKER_COMPOSE -f docker-compose.prod.yml logs -f backend"
+echo "  $DOCKER_COMPOSE -f docker-compose.prod.yml logs -f api-py"
 echo "  $DOCKER_COMPOSE -f docker-compose.prod.yml logs -f frontend"

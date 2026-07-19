@@ -1,387 +1,77 @@
 #!/bin/bash
 
-# Script to run FinArg full stack locally (backend + frontend)
-# Usage:
-#   ./scripts/run-local.sh              # Start backend and frontend
-#   ./scripts/run-local.sh --clean      # Start with clean database
-#
-# This runs WITHOUT Docker for fast development with hot-reload
-# Changes to code will be reflected automatically
+# Corre La Brecha en modo desarrollo local con hot-reload:
+#   PostgreSQL en Docker + FastAPI (uvicorn) + frontend (Next) locales.
+# Uso: ./scripts/run-local.sh
 
 set -e
 
-# Parse arguments
-CLEAN_DB=false
-
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --clean)
-            CLEAN_DB=true
-            shift
-            ;;
-        --help|-h)
-            echo "Usage: $0 [OPTIONS]"
-            echo ""
-            echo "Options:"
-            echo "  (no args)       Start backend and frontend"
-            echo "  --clean         Force clean PostgreSQL + Redis (use if errors occur)"
-            echo "  --help, -h      Show this help message"
-            echo ""
-            echo "Examples:"
-            echo "  $0                       # Just start"
-            echo "  $0 --clean               # Force clean + start"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Use --help for usage information"
-            exit 1
-            ;;
-    esac
-done
-
-# Colors for output
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Get the project root directory
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-API_DIR="${PROJECT_ROOT}/api"
+API_DIR="${PROJECT_ROOT}/api-py"
 WEB_DIR="${PROJECT_ROOT}/web"
 
 echo -e "${BLUE}================================${NC}"
-echo -e "${GREEN}[FinArg]${NC} Starting Full Stack Development (Local Mode)"
+echo -e "${GREEN}[La Brecha]${NC} Desarrollo local (hot-reload)"
 echo -e "${BLUE}================================${NC}"
-echo -e "${YELLOW}💡 Hot-reload enabled - changes will be reflected automatically${NC}"
-echo ""
 
-# ========================================
-# 1. Check .env files
-# ========================================
-echo -e "${GREEN}[1/8]${NC} Checking environment files..."
-
-# Backend .env
-if [ ! -f "${API_DIR}/.env" ]; then
-    echo -e "${RED}[ERROR]${NC} Backend .env file not found at ${API_DIR}/.env"
-    echo -e "${YELLOW}[INFO]${NC} Creating .env from .env.example..."
-    
-    if [ -f "${API_DIR}/.env.example" ]; then
-        cp "${API_DIR}/.env.example" "${API_DIR}/.env"
-        echo -e "${YELLOW}[WARN]${NC} Please configure ${API_DIR}/.env with your settings"
-        exit 1
-    else
-        echo -e "${RED}[ERROR]${NC} .env.example not found. Cannot create .env file."
-        exit 1
-    fi
+if ! docker info > /dev/null 2>&1; then
+    echo -e "${RED}[ERROR]${NC} Docker no está corriendo."
+    exit 1
 fi
 
-# Frontend .env.local
-if [ ! -f "${WEB_DIR}/.env.local" ]; then
-    echo -e "${YELLOW}[WARN]${NC} Frontend .env.local not found"
-    if [ -f "${WEB_DIR}/.env.example" ]; then
-        echo -e "${YELLOW}[INFO]${NC} Creating .env.local from .env.example..."
-        cp "${WEB_DIR}/.env.example" "${WEB_DIR}/.env.local"
-    fi
+echo -e "${GREEN}[1/4]${NC} Levantando PostgreSQL..."
+cd "${PROJECT_ROOT}" || exit 1
+docker compose up -d postgres > /dev/null 2>&1
+sleep 3
+
+echo -e "${GREEN}[2/4]${NC} Preparando la API (FastAPI)..."
+cd "${API_DIR}" || exit 1
+if [ ! -d ".venv" ]; then
+    echo -e "${YELLOW}[INFO]${NC} Creando venv e instalando dependencias (primera vez)..."
+    python3 -m venv .venv
+    ./.venv/bin/pip install -q -e .
 fi
 
-echo -e "${GREEN}[✓]${NC} Environment files ready"
-echo ""
-
-# ========================================
-# 2. Load backend environment variables
-# ========================================
-echo -e "${GREEN}[2/8]${NC} Loading backend environment variables..."
-set -a
-source "${API_DIR}/.env"
-set +a
-echo -e "${GREEN}[✓]${NC} Backend environment loaded"
-echo ""
-
-# ========================================
-# 3. Deep clean Docker volumes if scraping
-# ========================================
-if [ "$SCRAPE_ALL" = true ] || [ -n "$SCRAPE_NEIGHBORHOOD" ] || [ "$CLEAN_DB" = true ]; then
-    echo -e "${GREEN}[3/8]${NC} Deep cleaning Docker volumes..."
-    cd "${PROJECT_ROOT}" || exit 1
-
-    # Check if Docker is running
-    echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
-    if ! docker info > /dev/null 2>&1; then
-        echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
-        exit 1
-    fi
-    echo -e "${GREEN}[✓]${NC} Docker daemon is running"
-
-    # Stop all containers
-    echo -e "${YELLOW}[INFO]${NC} Stopping Docker containers..."
-    docker compose down > /dev/null 2>&1 || true
-
-    # Remove Redis and PostgreSQL volumes
-    echo -e "${YELLOW}[INFO]${NC} Removing Redis and PostgreSQL volumes..."
-    REDIS_VOLUME=$(docker volume ls -q | grep -E 'redis|cache' | head -1)
-    POSTGRES_VOLUME=$(docker volume ls -q | grep -E 'postgres|db' | head -1)
-
-    if [ -n "$REDIS_VOLUME" ]; then
-        docker volume rm "$REDIS_VOLUME" > /dev/null 2>&1 || true
-        echo -e "${GREEN}[✓]${NC} Redis volume removed"
-    fi
-
-    if [ -n "$POSTGRES_VOLUME" ]; then
-        docker volume rm "$POSTGRES_VOLUME" > /dev/null 2>&1 || true
-        echo -e "${GREEN}[✓]${NC} PostgreSQL volume removed"
-    fi
-
-    # Start fresh containers
-    echo -e "${YELLOW}[INFO]${NC} Starting fresh containers..."
-    docker compose up -d postgres redis > /dev/null 2>&1
-    echo -e "${GREEN}[✓]${NC} Waiting for containers to be ready..."
-    sleep 10
-
-    echo -e "${GREEN}[✓]${NC} Deep clean complete - starting with fresh data"
-else
-    echo -e "${GREEN}[3/8]${NC} Checking Docker services..."
-    cd "${PROJECT_ROOT}" || exit 1
-
-    # Check if Docker is running
-    echo -e "${YELLOW}[DEBUG]${NC} Checking if Docker daemon is running..."
-    if ! docker info > /dev/null 2>&1; then
-        echo -e "${RED}[ERROR]${NC} Docker is not running. Please start Docker."
-        exit 1
-    fi
-    echo -e "${GREEN}[✓]${NC} Docker daemon is running"
+echo -e "${GREEN}[3/4]${NC} Preparando el frontend..."
+cd "${WEB_DIR}" || exit 1
+if [ ! -f ".env.local" ] && [ -f ".env.example" ]; then
+    cp ".env.example" ".env.local"
 fi
-
-# Stop Docker backend/frontend if running (we'll run them locally)
-echo -e "${YELLOW}[DEBUG]${NC} Checking Docker Compose services..."
-if docker compose ps 2>/dev/null | grep -q "backend.*Up"; then
-    echo -e "${YELLOW}[WARN]${NC} Docker backend is running on port 8080. Stopping it..."
-    docker compose stop backend
-fi
-
-if docker compose ps 2>/dev/null | grep -q "frontend.*Up"; then
-    echo -e "${YELLOW}[WARN]${NC} Docker frontend is running on port 3000. Stopping it..."
-    docker compose stop frontend
-fi
-
-# Stop any Maven/Java processes running the backend
-echo -e "${YELLOW}[DEBUG]${NC} Checking for backend processes..."
-
-# Check and kill Maven processes
-MAVEN_PIDS=$(pgrep -f "spring-boot:run" 2>/dev/null || true)
-if [ -n "$MAVEN_PIDS" ]; then
-    echo -e "${YELLOW}[WARN]${NC} Found Maven processes, stopping them..."
-    echo "$MAVEN_PIDS" | xargs kill -15 2>/dev/null || true
-    sleep 2
-    # Force kill if still running
-    echo "$MAVEN_PIDS" | xargs kill -9 2>/dev/null || true
-fi
-
-# Check and kill FinArg Java processes
-FINARG_PIDS=$(pgrep -f "FinArgApplication" 2>/dev/null || true)
-if [ -n "$FINARG_PIDS" ]; then
-    echo -e "${YELLOW}[WARN]${NC} Found FinArg processes, stopping them..."
-    echo "$FINARG_PIDS" | xargs kill -15 2>/dev/null || true
-    sleep 2
-    echo "$FINARG_PIDS" | xargs kill -9 2>/dev/null || true
-fi
-
-# Force kill anything on port 8080
-PORT_8080_PIDS=$(lsof -ti:8080 2>/dev/null || true)
-if [ -n "$PORT_8080_PIDS" ]; then
-    echo -e "${YELLOW}[WARN]${NC} Found processes on port 8080, killing them..."
-    echo "$PORT_8080_PIDS" | xargs kill -9 2>/dev/null || true
-fi
-
-# Wait for database connections to close
-if [ "$CLEAN_DB" = true ]; then
-    echo -e "${YELLOW}[INFO]${NC} Waiting for database connections to close..."
-    sleep 5
-fi
-
-echo -e "${GREEN}[✓]${NC} Backend cleanup complete"
-
-# Stop any Node processes on port 3000
-echo -e "${YELLOW}[DEBUG]${NC} Checking port 3000..."
-PORT_3000_PIDS=$(lsof -ti:3000 2>/dev/null || true)
-if [ -n "$PORT_3000_PIDS" ]; then
-    echo -e "${YELLOW}[WARN]${NC} Found processes on port 3000, killing them..."
-    echo "$PORT_3000_PIDS" | xargs kill -9 2>/dev/null || true
-    sleep 2
-fi
-echo -e "${GREEN}[✓]${NC} Frontend cleanup complete"
-
-# Start PostgreSQL and Redis if not running
-echo -e "${YELLOW}[DEBUG]${NC} Checking PostgreSQL and Redis..."
-if ! docker compose ps 2>/dev/null | grep -q "postgres.*Up"; then
-    echo -e "${YELLOW}[INFO]${NC} Starting PostgreSQL and Redis..."
-    docker compose up -d postgres redis
-    echo -e "${GREEN}[INFO]${NC} Waiting for services to be ready..."
-    sleep 5
-else
-    echo -e "${GREEN}[✓]${NC} PostgreSQL and Redis already running"
-fi
-
-echo -e "${GREEN}[✓]${NC} Infrastructure ready (PostgreSQL + Redis)"
-echo ""
-
-# ========================================
-# 4. Clear Redis cache (prevents DevTools ClassCastException)
-# ========================================
-echo -e "${GREEN}[4/8]${NC} Clearing Redis cache..."
-REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
-if [ -n "$REDIS_CONTAINER" ]; then
-    echo -e "${YELLOW}[DEBUG]${NC} Flushing Redis cache to prevent DevTools class loader issues..."
-    docker exec "$REDIS_CONTAINER" redis-cli FLUSHALL > /dev/null 2>&1 || true
-    echo -e "${GREEN}[✓]${NC} Redis cache cleared (prevents ClassCastException on hot-reload)"
-else
-    echo -e "${YELLOW}[WARN]${NC} Redis container not found, skipping cache clear"
-fi
-echo ""
-
-# ========================================
-# 5. Verify clean state
-# ========================================
-if [ "$CLEAN_DB" = true ]; then
-    echo -e "${GREEN}[5/8]${NC} Verifying clean state..."
-
-    # Verify Redis is empty
-    REDIS_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i redis | head -1)
-    if [ -n "$REDIS_CONTAINER" ]; then
-        REDIS_KEYS=$(docker exec "$REDIS_CONTAINER" redis-cli DBSIZE 2>/dev/null | grep -oP '\d+' || echo "0")
-        echo -e "${GREEN}[✓]${NC} Redis is clean (0 keys)"
-    fi
-
-    # Verify PostgreSQL is ready
-    POSTGRES_CONTAINER=$(docker ps --format "{{.Names}}" | grep -i postgres | head -1)
-    if [ -n "$POSTGRES_CONTAINER" ]; then
-        echo -e "${GREEN}[✓]${NC} PostgreSQL is clean (fresh volume)"
-    fi
-
-    echo -e "${GREEN}[✓]${NC} All caches cleared"
-else
-    echo -e "${GREEN}[5/8]${NC} Skipping cache cleanup"
-fi
-
-echo ""
-
-# ========================================
-# 6. Check npm dependencies and clear Next.js cache
-# ========================================
-echo -e "${GREEN}[6/8]${NC} Checking frontend dependencies..."
-if [ ! -d "${WEB_DIR}/node_modules" ]; then
-    echo -e "${YELLOW}[INFO]${NC} Installing frontend dependencies..."
-    cd "${WEB_DIR}" || exit 1
+if [ ! -d "node_modules" ]; then
+    echo -e "${YELLOW}[INFO]${NC} Instalando dependencias del frontend..."
     npm install
 fi
 
-# Clear Next.js cache to force recompilation
-echo -e "${YELLOW}[DEBUG]${NC} Clearing Next.js cache..."
-cd "${WEB_DIR}" || exit 1
-rm -rf .next 2>/dev/null || true
-echo -e "${GREEN}[✓]${NC} Frontend cache cleared"
-
-echo -e "${GREEN}[✓]${NC} Frontend dependencies ready"
-echo ""
-
-# ========================================
-# 7. Run Checkstyle validation
-# ========================================
-echo -e "${GREEN}[7/8]${NC} Running checkstyle validation..."
-cd "${API_DIR}" || exit 1
-
-CHECKSTYLE_OUTPUT=$(mktemp)
-if mvn checkstyle:check > "$CHECKSTYLE_OUTPUT" 2>&1; then
-    echo -e "${GREEN}[✓]${NC} Checkstyle validation passed"
-else
-    echo -e "${RED}[✗]${NC} Checkstyle validation failed"
-    echo ""
-    echo -e "${YELLOW}Checkstyle Errors:${NC}"
-    echo -e "${RED}==================${NC}"
-
-    grep -A 5 "\[ERROR\]" "$CHECKSTYLE_OUTPUT" | grep -v "^\[INFO\]" | sed 's/^\[ERROR\]/  /' || cat "$CHECKSTYLE_OUTPUT"
-
-    echo -e "${RED}==================${NC}"
-    echo ""
-    echo -e "${YELLOW}[WARN]${NC} Code style issues detected. Please fix them before continuing."
-    echo -e "${YELLOW}[INFO]${NC} You can run 'mvn spotless:apply' to auto-format the code."
-    echo ""
-
-    read -p "Do you want to continue anyway? (y/N): " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        rm "$CHECKSTYLE_OUTPUT"
-        echo -e "${RED}[ABORTED]${NC} Please fix checkstyle errors and try again."
-        exit 1
-    fi
-fi
-rm "$CHECKSTYLE_OUTPUT"
-echo ""
-
-# ========================================
-# 8. Start backend and frontend
-# ========================================
-echo -e "${GREEN}[8/8]${NC} Starting services..."
+echo -e "${GREEN}[4/4]${NC} Iniciando servicios..."
 echo ""
 echo -e "${BLUE}================================${NC}"
-echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
 echo -e "${GREEN}Frontend:${NC} http://localhost:3000"
-echo -e "${GREEN}Swagger:${NC}  http://localhost:8080/swagger-ui.html"
+echo -e "${GREEN}API:${NC}      http://localhost:8000/docs"
 echo -e "${BLUE}================================${NC}"
+echo -e "${YELLOW}[INFO]${NC} Ctrl+C para detener todo."
 echo ""
 
-# Show scraping plan
-if [ "$SCRAPE_ALL" = true ]; then
-    echo -e "${YELLOW}[INFO]${NC} Will scrape ALL neighborhoods after backend is ready"
-elif [ -n "$SCRAPE_NEIGHBORHOOD" ]; then
-    echo -e "${YELLOW}[INFO]${NC} Will scrape $SCRAPE_NEIGHBORHOOD after backend is ready"
-fi
-
-echo -e "${YELLOW}[INFO]${NC} Press Ctrl+C to stop all services"
-echo ""
-
-# Function to cleanup on exit
 cleanup() {
     echo ""
-    echo -e "${YELLOW}[INFO]${NC} Stopping services..."
+    echo -e "${YELLOW}[INFO]${NC} Deteniendo servicios..."
     # shellcheck disable=SC2046
-    kill $(jobs -p) 2>/dev/null
-    wait
-    echo -e "${GREEN}[✓]${NC} All services stopped"
+    kill $(jobs -p) 2>/dev/null || true
+    wait 2>/dev/null || true
+    echo -e "${GREEN}[✓]${NC} Servicios detenidos"
     exit 0
 }
-
 trap cleanup SIGINT SIGTERM
 
-# Start backend in background with 'local' profile
 cd "${API_DIR}" || exit 1
-if [ -f "${API_DIR}/settings.xml" ]; then
-    mvn spring-boot:run -Dspring-boot.run.profiles=local -s "${API_DIR}/settings.xml" 2>&1 | sed "s/^/[BACKEND] /" &
-else
-    mvn spring-boot:run -Dspring-boot.run.profiles=local 2>&1 | sed "s/^/[BACKEND] /" &
-fi
-BACKEND_PID=$!
+./.venv/bin/uvicorn labrecha_api.main:app --reload --port 8000 2>&1 | sed "s/^/[API] /" &
 
-# Wait a bit for backend to start
-sleep 8
-
-# Start frontend in background
 cd "${WEB_DIR}" || exit 1
-npm run dev 2>&1 | sed "s/^/[FRONTEND] /" &
-FRONTEND_PID=$!
+LABRECHA_API_INTERNAL_URL=http://localhost:8000 npm run dev 2>&1 | sed "s/^/[WEB] /" &
 
-# Wait for frontend to start
-sleep 5
-
-echo ""
-echo -e "${BLUE}================================${NC}"
-echo -e "${GREEN}Backend:${NC}  http://localhost:8080"
-echo -e "${GREEN}Frontend:${NC} http://localhost:3000"
-echo -e "${GREEN}Swagger:${NC}  http://localhost:8080/swagger-ui.html"
-echo -e "${BLUE}================================${NC}"
-echo ""
-
-# Wait for both processes
-wait $BACKEND_PID $FRONTEND_PID
+wait

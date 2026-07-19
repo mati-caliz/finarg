@@ -172,7 +172,7 @@ self.addEventListener("sync", (event) => {
 });
 
 self.addEventListener("push", (event) => {
-  let data = { title: "FinArg", body: "Nueva actualización" };
+  let data = { title: "La Brecha", body: "Nueva actualización" };
 
   if (event.data) {
     data = event.data.json();

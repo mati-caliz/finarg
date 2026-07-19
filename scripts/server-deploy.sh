@@ -7,7 +7,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo "🚀 Deploy de FinArg a Producción"
+echo "🚀 Deploy de La Brecha a Producción"
 echo "═══════════════════════════════════════════════════════════"
 
 # Verificar que estamos en la rama correcta
@@ -46,8 +46,9 @@ echo "🏥 Verificando health..."
 max_attempts=20
 attempt=0
 while [ $attempt -lt $max_attempts ]; do
-  if curl -f http://localhost:8080/api/v1/actuator/health >/dev/null 2>&1; then
-    echo "✅ Backend funcionando correctamente!"
+  if docker compose -f docker-compose.prod.yml exec -T api-py \
+      python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" >/dev/null 2>&1; then
+    echo "✅ API funcionando correctamente!"
     break
   fi
   attempt=$((attempt + 1))
@@ -56,7 +57,7 @@ while [ $attempt -lt $max_attempts ]; do
 done
 
 if [ $attempt -eq $max_attempts ]; then
-  echo "❌ El backend no respondió. Ejecutá ./scripts/server-debug.sh para más información"
+  echo "❌ La API no respondió. Ejecutá ./scripts/server-debug.sh para más información"
   exit 1
 fi
 
@@ -68,9 +69,6 @@ docker compose -f docker-compose.prod.yml ps
 echo ""
 echo "✅ Deploy completado exitosamente!"
 echo ""
-echo "🔗 URLs:"
-echo "  - Frontend: http://localhost:3000"
-echo "  - Backend: http://localhost:8080"
-echo "  - Health: http://localhost:8080/api/v1/actuator/health"
+echo "🔗 Sitio: https://labrecha.ar"
 echo ""
-echo "📋 Para ver logs: ./scripts/server-logs.sh backend"
+echo "📋 Para ver logs: docker compose -f docker-compose.prod.yml logs -f api-py"

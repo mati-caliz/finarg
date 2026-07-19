@@ -9,7 +9,7 @@ on:
         type: choice
         options:
           - frontend
-          - backend
+          - api-py
           - both
 
 permissions:
@@ -45,13 +45,13 @@ jobs:
               docker compose -f docker-compose.prod.yml build frontend --no-cache
             fi
 
-            if [ "${{ inputs.service }}" = "backend" ] || [ "${{ inputs.service }}" = "both" ]; then
-              echo "🔨 Force rebuilding backend (no cache)..."
-              docker compose -f docker-compose.prod.yml build backend --no-cache
+            if [ "${{ inputs.service }}" = "api-py" ] || [ "${{ inputs.service }}" = "both" ]; then
+              echo "🔨 Force rebuilding API (no cache)..."
+              docker compose -f docker-compose.prod.yml build api-py --no-cache
             fi
 
             echo "🚀 Restarting services..."
-            docker compose -f docker-compose.prod.yml up -d --force-recreate ${{ inputs.service == 'both' && 'frontend backend' || inputs.service }}
+            docker compose -f docker-compose.prod.yml up -d --force-recreate ${{ inputs.service == 'both' && 'frontend api-py' || inputs.service }}
 
             echo "⏳ Waiting for services to be healthy..."
             sleep 20
