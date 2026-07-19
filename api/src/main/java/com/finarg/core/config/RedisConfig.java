@@ -79,7 +79,6 @@ public class RedisConfig {
         cacheConfigurations.put("stocks", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("etfs", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("cedears", defaultConfig.entryTtl(Duration.ofMinutes(30)));
-        cacheConfigurations.put("metals", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("letras", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("cauciones", defaultConfig.entryTtl(Duration.ofMinutes(30)));
         cacheConfigurations.put("news", defaultConfig.entryTtl(Duration.ofMinutes(30)));

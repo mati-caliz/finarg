@@ -386,15 +386,6 @@ export interface Etf {
   lastUpdate: string;
 }
 
-export interface Metal {
-  metalType: string;
-  unit: string;
-  priceUsd: number;
-  change24h: number;
-  changePercent24h: number;
-  lastUpdate: string;
-}
-
 export interface Letra {
   ticker: string;
   name: string;

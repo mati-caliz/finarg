@@ -87,11 +87,6 @@ public class WebClientConfig {
     @Value("${external.apis.coingecko.timeout:10000}")
     private int coinGeckoTimeout;
 
-    @Value("${external.apis.metals-api.base-url:https://api.metals.live/v1}")
-    private String metalsApiBaseUrl;
-    @Value("${external.apis.metals-api.timeout:10000}")
-    private int metalsApiTimeout;
-
     @Value("${external.apis.finnhub.base-url:https://finnhub.io/api/v1}")
     private String finnhubBaseUrl;
     @Value("${external.apis.finnhub.timeout:15000}")
@@ -204,11 +199,6 @@ public class WebClientConfig {
     @Bean("uruguayApiWebClient")
     public WebClient uruguayApiWebClient() {
         return createStandardWebClient(uruguayApiBaseUrl, uruguayApiTimeout);
-    }
-
-    @Bean("metalsApiWebClient")
-    public WebClient metalsApiWebClient() {
-        return createStandardWebClient(metalsApiBaseUrl, metalsApiTimeout);
     }
 
     @Bean("coinGeckoWebClient")

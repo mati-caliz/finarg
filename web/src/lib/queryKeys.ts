@@ -35,7 +35,6 @@ export const queryKeys = {
     cedears: () => ["investments", "cedears"] as const,
     bonds: () => ["investments", "bonds"] as const,
     etf: () => ["investments", "etf"] as const,
-    metals: () => ["investments", "metals"] as const,
     letras: () => ["investments", "letras"] as const,
     cauciones: () => ["investments", "cauciones"] as const,
   },
