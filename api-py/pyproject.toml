@@ -1,0 +1,21 @@
+[project]
+name = "labrecha-api"
+version = "0.1.0"
+description = "La Brecha - API de lectura (FastAPI) sobre los indicadores ingeridos en PostgreSQL"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "sqlalchemy>=2.0",
+    "psycopg2-binary>=2.9",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["labrecha_api*"]
