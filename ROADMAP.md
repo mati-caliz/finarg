@@ -200,10 +200,10 @@ Endpoints genéricos verificados contra la base: `/indicators` (catálogo con fu
 `/indicators/{code}` (serie con filtros `source`/`date_from`/`date_to`/`limit`/`order`),
 `/indicators/{code}/sources` (comparador de mediciones — ej. reservas bcra vs datosgobar),
 `/political-events` y `/scrape-runs` (monitoreo). `/health` + docs en `/docs`.
+Endpoints de las tablas propias: `/congress/votes` (+ `/{acta_id}` y `/details`),
+`/senate/members` + `/senate/blocs`, `/holidays`, `/news`. Todos verificados contra la base.
 
 **Pendiente:**
-- Endpoints para Congreso (`congress_votes`/`congress_vote_details`), Senado (`senators`),
-  feriados (`holidays`) y noticias (`news_articles`).
 - Portar las tres calculadoras (sueldo neto, interés compuesto, ajuste por inflación):
   la lógica ya está resuelta en Java, es traducción directa.
 - Sumar la app FastAPI al `docker-compose`.
