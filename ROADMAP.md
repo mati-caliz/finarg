@@ -315,9 +315,15 @@ filtros y summary actualizados. Verificado: compose dev/prod parsean, `ci.yml` e
 `compileall labrecha_api` OK, `next build` verde. La app corre 100% sobre el stack nuevo
 (FastAPI + scraper Python), sin rastros de Spring.
 
-**Pendiente Fase 4:** sumar el `scraper` al compose prod (+ cron), CI de Python más completo
-(ruff/pytest en vez de sólo byte-compile) y el resto del lanzamiento (dominio, monitoreo de
-`scrape_runs`, actualizar CLAUDE.md/README que aún describen el stack Spring viejo).
+**Hecho (2026-07-19) — infra/calidad sin-server:** `scraper` agregado al compose de prod (profile
+on-demand, hardening). CI de Python ampliado: corre `ruff` (lint) sobre `api-py` + `scraper` además
+del byte-compile (config en `ruff.toml`). README/CLAUDE.md/scripts ya actualizados (ver más arriba).
+
+**Pendiente Fase 4 — requiere el server (no hacer sin acceso al VPS):** cron del host para las
+corridas del scraper, registrar/apuntar `labrecha.ar` (DNS), monitoreo/alerta sobre `scrape_runs`, y
+renombrar la carpeta de deploy del VPS (`/home/deploy/finarg` en deploy.yml/force-rebuild.yml) si se
+decide. La carpeta root LOCAL sigue `finarg` (renombrar con `mv` desde afuera de la sesión); la DB
+`finarg` se deja (base real con datos en Postgres compartido).
 
 ### Fase 4 — Infra y lanzamiento (detalle original)
 
