@@ -37,6 +37,7 @@ Algunos indicadores no encajan en la tabla genérica y usan tablas propias: `con
 | `crypto` | CoinGecko | `cripto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
 | `holidays` | Nager.Date | feriados de Argentina (tabla `holidays`, PK `(date, name)`) | mensual |
 | `news` | El Economista (RSS) | artículos a la tabla `news_articles` (ingesta cruda, sin resumen AI) | diaria |
+| `senado` | Senado (datos abiertos) | composición actual del Senado (tabla `senators`: bloque, provincia, partido, mandato) | semanal |
 
 `political_events` se puebla con un set curado de hitos (elecciones, cambios de gobierno, DNUs,
 medidas económicas) vía `seed-events` — datos curados, no scrapeados. Habilitan anotar las series
