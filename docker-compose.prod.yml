@@ -116,6 +116,39 @@ services:
     tmpfs:
       - /tmp
 
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    image: labrecha-scraper
+    profiles:
+      - scraper
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
+      HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
+    networks:
+      - db-network
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+
   nginx:
     image: nginx:alpine
     container_name: labrecha-nginx
