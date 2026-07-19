@@ -25,6 +25,8 @@ SERIES: dict[str, SeriesSpec] = {
     "331.1_SALDO_BASERIA__15": SeriesSpec("base_monetaria", "ARS_millones"),
     "172.3_TL_RECAION_M_0_0_17": SeriesSpec("recaudacion_tributaria", "ARS_millones"),
     "143.2_NO_PR_2004_A_21": SeriesSpec("emae", "indice"),
+    "42.3_EPH_PUNTUATAL_0_M_30": SeriesSpec("desempleo", "%", Decimal(100)),
+    "431.1_EXPECTATIVANA_M_0_0_29_85": SeriesSpec("expectativas_inflacion_rem", "%"),
 }
 
 

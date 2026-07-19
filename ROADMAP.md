@@ -141,7 +141,8 @@ idempotente):
 - `riesgo_pais` (argentinadatos): histórico desde 1999.
 - `series_datosgob` (datos.gob.ar): `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`
   (mensual), `ripte`, `indice_salarios`, `pobreza_personas` (total nacional, semestral, en %),
-  `base_monetaria`, `recaudacion_tributaria`, `emae`. → 19 indicadores, ~12k filas históricas.
+  `base_monetaria`, `recaudacion_tributaria`, `emae`, `desempleo` (EPH, trimestral, en %),
+  `expectativas_inflacion_rem` (REM mediana 12m, mensual). → ~13k filas históricas.
 - `reservas_bcra` (BCRA API v4.0, variable 1): `reservas_internacionales` **diaria** desde 1996
   (~7.5k filas, source `bcra`). Convive con la mensual de datosgobar bajo el mismo `indicator_code`:
   dos `source` para el mismo indicador, primer caso del comparador de mediciones.

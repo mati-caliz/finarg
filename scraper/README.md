@@ -31,7 +31,7 @@ Algunos indicadores no encajan en la tabla genérica y usan tablas propias: `con
 | `dolar` | dolarapi.com | `dolar_{oficial,blue,mep,ccl,tarjeta,...}` | 15 min |
 | `inflacion` | argentinadatos | `ipc_mensual`, `ipc_interanual` | diaria |
 | `riesgo_pais` | argentinadatos | `riesgo_pais` (histórico completo) | diaria |
-| `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `indice_salarios`, `pobreza_personas`, `base_monetaria`, `recaudacion_tributaria`, `emae` | diaria |
+| `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `indice_salarios`, `pobreza_personas`, `base_monetaria`, `recaudacion_tributaria`, `emae`, `desempleo`, `expectativas_inflacion_rem` | diaria |
 | `reservas_bcra` | BCRA (API v4.0) | `reservas_internacionales` diaria desde 1996 (`source=bcra`) | diaria |
 | `congreso` | datos.hcdn.gob.ar | votaciones nominales de Diputados (tablas `congress_votes` / `congress_vote_details`) | semanal |
 | `crypto` | CoinGecko | `cripto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
