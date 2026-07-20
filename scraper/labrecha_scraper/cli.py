@@ -11,6 +11,7 @@ from labrecha_scraper.db import SessionLocal, engine
 from labrecha_scraper.models import Base, ScrapeRun
 from labrecha_scraper.registry import CONNECTORS, get_connector
 from labrecha_scraper.seed_events import seed_events
+from labrecha_scraper.seed_taxes import seed_taxes
 
 
 def _configure_logging() -> None:
@@ -50,6 +51,12 @@ def _seed_events() -> None:
     print(f"political_events sembrados/actualizados: {count}")
 
 
+def _seed_taxes() -> None:
+    with SessionLocal() as session:
+        count = seed_taxes(session)
+    print(f"indicadores de tributos (IARAF) sembrados/actualizados: {count}")
+
+
 def _status() -> None:
     with SessionLocal() as session:
         for name in sorted(CONNECTORS):
@@ -76,6 +83,7 @@ def main(argv: list[str] | None = None) -> int:
     subparsers.add_parser("init-db", help="crear tablas si no existen")
     subparsers.add_parser("list", help="listar jobs disponibles")
     subparsers.add_parser("seed-events", help="sembrar hitos políticos curados")
+    subparsers.add_parser("seed-taxes", help="sembrar conteo de tributos (IARAF)")
     subparsers.add_parser("status", help="última corrida de cada job")
     run_parser = subparsers.add_parser("run", help="correr un job o 'all'")
     run_parser.add_argument("job", help="nombre del job o 'all'")
@@ -90,6 +98,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "seed-events":
         _seed_events()
+        return 0
+    if args.command == "seed-taxes":
+        _seed_taxes()
         return 0
     if args.command == "status":
         _status()

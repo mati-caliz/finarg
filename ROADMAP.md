@@ -499,6 +499,17 @@ count arranca de un dataset semilla curado a mano (no confiar el número base s�
 spike previo sobre el acceso a boletinoficial.gob.ar (¿API/estructura estable?). Criterio de salida:
 feed poblado ≥1 semana con corridas verdes; Impuestómetro con número auditado contra la semilla.
 
+**Hecho (2026-07-20) — Impuestómetro (sin IA):** el "número gigante" ya está, sembrado desde una fuente
+citable (no inventado). Comando CLI `seed-taxes` (`seed_taxes.py`) upserta a `indicator_history`
+(source `iaraf`) las cifras del **IARAF — Vademécum Tributario**: `tributos_total/nacionales/
+provinciales/municipales` para 2023 (148 = 45+25+78) y 2024 (155 = 46+25+84), verificadas contra la
+fuente y aritméticamente consistentes. Widget `ImpuestometroCard` en la Home: número gigante (155) con
+variación vs. año previo (+7, baja es buena), desglose Nación/provincias/municipios con barras, y la
+nota "10 tributos = 92% de la recaudación (IVA 27%)", con atribución IARAF + fecha. **Pendiente 5.f:** el
+**changelog/feed** de altas y bajas de impuestos y el **Traductor del Boletín Oficial con IA** (pipeline
+nocturno con la API de Anthropic) — implican costo recurrente de LLM, key configurada y scraping de
+boletinoficial.gob.ar; son una decisión de producto a definir antes de encararlos.
+
 **5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
 - *Monitor de vivienda* (m2/alquileres CABA por barrio, ROI): las fuentes ricas (Zonaprop/Argenprop)
   están tras Cloudflare y su reuso es legalmente gris; evaluar Propiedades.com index, reportes del

@@ -47,6 +47,8 @@ export const SOURCE_LABELS: Record<string, string> = {
   dolarapi: "DolarAPI",
   coingecko: "CoinGecko",
   utdt: "UTDT",
+  iaraf: "IARAF",
+  hcdn: "HCDN",
 };
 
 export function sourceLabel(source: string): string {

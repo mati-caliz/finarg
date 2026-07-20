@@ -1,5 +1,6 @@
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
+import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
 import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
 import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
@@ -75,6 +76,7 @@ export default function HomePage() {
         <MonitorBcraCard />
         <TermometroEmpleoCard />
         <RadarCreditoCard />
+        <ImpuestometroCard />
       </section>
     </div>
   );
