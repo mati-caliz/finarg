@@ -17,6 +17,7 @@ export const labrechaKeys = {
   politicalEvents: (params?: object) => ["labrecha", "political-events", params ?? {}] as const,
   congressVotes: (params?: object) => ["labrecha", "congress", "votes", params ?? {}] as const,
   congressVote: (actaId: string) => ["labrecha", "congress", "votes", actaId] as const,
+  congressLaws: (params?: object) => ["labrecha", "congress", "laws", params ?? {}] as const,
   congressVoteDetails: (actaId: string, params?: object) =>
     ["labrecha", "congress", "votes", actaId, "details", params ?? {}] as const,
   senateMembers: (params?: object) => ["labrecha", "senate", "members", params ?? {}] as const,
@@ -81,6 +82,19 @@ export function useCongressVotes(params?: {
   return useQuery({
     queryKey: labrechaKeys.congressVotes(params),
     queryFn: () => congressApi.votes(params),
+  });
+}
+
+export function useCongressLaws(params?: {
+  date_from?: string;
+  date_to?: string;
+  chamber?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return useQuery({
+    queryKey: labrechaKeys.congressLaws(params),
+    queryFn: () => congressApi.laws(params),
   });
 }
 

@@ -70,6 +70,20 @@ class CongressVoteDetail(Base):
     vote: Mapped[str | None] = mapped_column(String(20))
 
 
+class SanctionedLaw(Base):
+    __tablename__ = "sanctioned_laws"
+
+    law_number: Mapped[str] = mapped_column(String(20), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(String(40))
+    sanctioning_chamber: Mapped[str | None] = mapped_column(String(40))
+    initial_file: Mapped[str | None] = mapped_column(String(40))
+    first_half_sanction: Mapped[date | None] = mapped_column(Date)
+    second_half_sanction: Mapped[date | None] = mapped_column(Date)
+    final_sanction: Mapped[date | None] = mapped_column(Date)
+    title: Mapped[str | None] = mapped_column(Text)
+    summary: Mapped[str | None] = mapped_column(Text)
+
+
 class Senator(Base):
     __tablename__ = "senators"
 

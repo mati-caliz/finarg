@@ -71,6 +71,18 @@ class CongressVoteDetailOut(BaseModel):
     vote: str | None
 
 
+class SanctionedLawOut(BaseModel):
+    law_number: str
+    project_id: str | None
+    sanctioning_chamber: str | None
+    initial_file: str | None
+    first_half_sanction: date | None
+    second_half_sanction: date | None
+    final_sanction: date | None
+    title: str | None
+    summary: str | None
+
+
 class SenatorOut(BaseModel):
     senator_id: str
     last_name: str | None

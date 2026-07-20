@@ -7,8 +7,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import CongressVote, CongressVoteDetail
-from labrecha_api.schemas import CongressVoteDetailOut, CongressVoteOut
+from labrecha_api.models import CongressVote, CongressVoteDetail, SanctionedLaw
+from labrecha_api.schemas import CongressVoteDetailOut, CongressVoteOut, SanctionedLawOut
 
 router = APIRouter(prefix="/congress", tags=["congress"])
 
@@ -57,6 +57,46 @@ def list_votes(
         .offset(offset)
     )
     return [_to_vote_out(vote) for vote in session.scalars(statement).all()]
+
+
+@router.get("/laws", response_model=list[SanctionedLawOut])
+def list_laws(
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
+    chamber: str | None = Query(default=None),
+    limit: int = Query(default=30, ge=1, le=500),
+    offset: int = Query(default=0, ge=0),
+    session: Session = Depends(get_session),
+) -> list[SanctionedLawOut]:
+    conditions = []
+    if date_from is not None:
+        conditions.append(SanctionedLaw.final_sanction >= date_from)
+    if date_to is not None:
+        conditions.append(SanctionedLaw.final_sanction <= date_to)
+    if chamber is not None:
+        conditions.append(SanctionedLaw.sanctioning_chamber == chamber)
+
+    statement = (
+        select(SanctionedLaw)
+        .where(*conditions)
+        .order_by(SanctionedLaw.final_sanction.desc().nullslast(), SanctionedLaw.law_number.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    return [
+        SanctionedLawOut(
+            law_number=law.law_number,
+            project_id=law.project_id,
+            sanctioning_chamber=law.sanctioning_chamber,
+            initial_file=law.initial_file,
+            first_half_sanction=law.first_half_sanction,
+            second_half_sanction=law.second_half_sanction,
+            final_sanction=law.final_sanction,
+            title=law.title,
+            summary=law.summary,
+        )
+        for law in session.scalars(statement).all()
+    ]
 
 
 @router.get("/votes/{acta_id}", response_model=CongressVoteOut)

@@ -147,6 +147,22 @@ class Senator(Base):
     )
 
 
+class SanctionedLaw(Base):
+    __tablename__ = "sanctioned_laws"
+
+    law_number: Mapped[str] = mapped_column(String(20), primary_key=True)
+    project_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    sanctioning_chamber: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    initial_file: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    first_half_sanction: Mapped[date | None] = mapped_column(Date, nullable=True)
+    second_half_sanction: Mapped[date | None] = mapped_column(Date, nullable=True)
+    final_sanction: Mapped[date | None] = mapped_column(Date, nullable=True)
+    title: Mapped[str | None] = mapped_column(Text, nullable=True)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (Index("ix_sanctioned_laws_final", "final_sanction"),)
+
+
 class Holiday(Base):
     __tablename__ = "holidays"
 
