@@ -458,7 +458,11 @@ Home: dos tiles de tasas activas + el stock de crédito al sector privado en bil
 nominal ~30 días (rotulada nominal). **Hallazgo:** la morosidad/irregularidad de cartera **no está en la
 API monetarias** del BCRA (vive en el "Informe sobre Bancos", fuente frágil) → queda pendiente y así se
 dice en el disclaimer del widget. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
-**Pendiente 5.d:** *Coparticipación* (connector + tabla propia + mapa SVG self-contained).
+**Pendiente 5.d:** *Coparticipación* (connector + tabla propia + mapa SVG self-contained). **Spike
+(2026-07-19):** el desglose mensual por provincia **no está en la API de series** de datos.gob.ar (solo
+agregados nacionales de transferencias); el detalle por jurisdicción vive en datasets CSV del Ministerio
+de Economía. Eso + el SVG de las 24 provincias desde cero es una pieza grande: se difiere a un slice
+propio con research de la fuente CSV, después del Congresómetro.
 *Radar de crédito (versión original)*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
 `coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,
@@ -467,12 +471,20 @@ el CSP de assets self-contained) coloreado por saldo neto envío-aporte. Researc
 confirmar granularidad y disponibilidad de "lo que aporta cada provincia". Criterio de salida: mapa
 interactivo con tooltip fuente+fecha; connectors verdes.
 
-**5.e — Congresómetro (tracker de leyes).** Tabla propia `bill_tracking(bill_id, title, chamber,
-stage, stage_date, metadata)` alimentada del trámite parlamentario (HCDN/Senado). Panel visual con el
-recorrido "En comisiones → Media sanción Diputados → Senado → Sancionada". Presentismo de legisladores
-= sub-ítem opcional (dato más frágil), sólo si la fuente lo expone limpio. Se apoya en las tablas de
-Congreso ya existentes (`congress_votes`, `senators`). Criterio de salida: estado de ≥3 leyes clave
-trackeado con fecha de última actualización.
+**5.e — Congresómetro (tracker de leyes).** ✅ HECHO (2026-07-20). Vertical completo: tabla propia
+`sanctioned_laws` (número de ley PK, cámara sancionadora, expediente, fechas de 1ª/2ª media sanción y
+sanción definitiva, título, sumario) + connector `leyes` (HCDN CKAN: cruza `leyes-sancionadas` con
+`proyectos-parlamentarios` para el título por `PROYECTO_ID` y `leyes-sumario` para el sumario, dedup por
+número de ley, normaliza el BOM embebido en las claves del JSON). Corrida verde: 1337 leyes, 500/500
+recientes con título. Endpoint `/congress/laws` (filtros date_from/date_to/chamber, orden por sanción
+definitiva desc) + modelo/schema de lectura. Frontend: panel "Últimas leyes sancionadas" en `/congreso`
+(`RecentLaws`) con card por ley = número + cámara + título + **timeline de trámite** (1ª media sanción →
+2ª media sanción → sanción definitiva, con fechas y pasos alcanzados en verde) + expediente y fuente.
+**Hallazgos:** (1) `leyes-sumario` corta en feb-2020 → los títulos recientes salen de
+`proyectos-parlamentarios` (~53MB, 113k proyectos, se baja con timeout largo y se retienen sólo los
+títulos en memoria); (2) el JSON de HCDN trae un BOM dentro del nombre de la primera clave. Presentismo
+de legisladores queda como sub-ítem opcional pendiente. Verificado `tsc`/`biome`/`next build` +
+`ruff`/`compileall` verdes.
 
 **5.f — Boletín Oficial con IA + Impuestómetro (el feature diferencial).** Pipeline nocturno: connector
 `boletin_oficial` baja las normas del día (boletinoficial.gob.ar / primera+segunda sección), un paso

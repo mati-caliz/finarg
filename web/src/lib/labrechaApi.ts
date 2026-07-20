@@ -67,6 +67,18 @@ export interface CongressVoteDetail {
   vote: string | null;
 }
 
+export interface SanctionedLaw {
+  law_number: string;
+  project_id: string | null;
+  sanctioning_chamber: string | null;
+  initial_file: string | null;
+  first_half_sanction: string | null;
+  second_half_sanction: string | null;
+  final_sanction: string | null;
+  title: string | null;
+  summary: string | null;
+}
+
 export interface Senator {
   senator_id: string;
   last_name: string | null;
@@ -238,6 +250,13 @@ export const congressApi = {
   vote: (actaId: string) => get<CongressVote>(`/congress/votes/${actaId}`),
   voteDetails: (actaId: string, params?: { vote?: string; bloc?: string }) =>
     get<CongressVoteDetail[]>(`/congress/votes/${actaId}/details`, params),
+  laws: (params?: {
+    date_from?: string;
+    date_to?: string;
+    chamber?: string;
+    limit?: number;
+    offset?: number;
+  }) => get<SanctionedLaw[]>("/congress/laws", params),
 };
 
 export const senateApi = {

@@ -1,4 +1,5 @@
 import { LatestVotes } from "@/components/congress/LatestVotes";
+import { RecentLaws } from "@/components/congress/RecentLaws";
 import { SenateComposition } from "@/components/congress/SenateComposition";
 import type { Metadata } from "next";
 
@@ -35,6 +36,18 @@ export default function CongresoPage() {
       </header>
 
       <SenateComposition />
+
+      <section style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
+        <h2
+          style={{
+            font: "var(--fw-semibold) var(--fs-h3)/var(--lh-heading) var(--font-sans)",
+            margin: 0,
+          }}
+        >
+          Últimas leyes sancionadas
+        </h2>
+        <RecentLaws />
+      </section>
 
       <section style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
         <h2
