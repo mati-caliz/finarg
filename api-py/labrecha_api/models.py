@@ -84,6 +84,14 @@ class SanctionedLaw(Base):
     summary: Mapped[str | None] = mapped_column(Text)
 
 
+class CoparticipacionShare(Base):
+    __tablename__ = "coparticipacion_shares"
+
+    province: Mapped[str] = mapped_column(String(60), primary_key=True)
+    coefficient: Mapped[Decimal] = mapped_column(Numeric(12, 8))
+    source: Mapped[str] = mapped_column(String(40))
+
+
 class BoletinSummary(Base):
     __tablename__ = "boletin_summaries"
 

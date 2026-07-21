@@ -10,6 +10,7 @@ from labrecha_scraper.base import run_job
 from labrecha_scraper.db import SessionLocal, engine
 from labrecha_scraper.models import Base, ScrapeRun
 from labrecha_scraper.registry import CONNECTORS, get_connector
+from labrecha_scraper.seed_coparticipacion import seed_coparticipacion
 from labrecha_scraper.seed_events import seed_events
 from labrecha_scraper.seed_taxes import seed_taxes
 
@@ -57,6 +58,12 @@ def _seed_taxes() -> None:
     print(f"indicadores de tributos (IARAF) sembrados/actualizados: {count}")
 
 
+def _seed_coparticipacion() -> None:
+    with SessionLocal() as session:
+        count = seed_coparticipacion(session)
+    print(f"coeficientes de coparticipación (CFI) sembrados/actualizados: {count}")
+
+
 def _status() -> None:
     with SessionLocal() as session:
         for name in sorted(CONNECTORS):
@@ -84,6 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     subparsers.add_parser("list", help="listar jobs disponibles")
     subparsers.add_parser("seed-events", help="sembrar hitos políticos curados")
     subparsers.add_parser("seed-taxes", help="sembrar conteo de tributos (IARAF)")
+    subparsers.add_parser("seed-coparticipacion", help="sembrar coeficientes Ley 23.548 (CFI)")
     subparsers.add_parser("status", help="última corrida de cada job")
     run_parser = subparsers.add_parser("run", help="correr un job o 'all'")
     run_parser.add_argument("job", help="nombre del job o 'all'")
@@ -101,6 +109,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.command == "seed-taxes":
         _seed_taxes()
+        return 0
+    if args.command == "seed-coparticipacion":
+        _seed_coparticipacion()
         return 0
     if args.command == "status":
         _status()

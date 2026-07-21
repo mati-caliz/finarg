@@ -6,6 +6,7 @@ from labrecha_api.routers import (
     boletin,
     calculators,
     congress,
+    coparticipacion,
     events,
     holidays,
     indicators,
@@ -35,4 +36,5 @@ app.include_router(senate.router)
 app.include_router(holidays.router)
 app.include_router(news.router)
 app.include_router(boletin.router)
+app.include_router(coparticipacion.router)
 app.include_router(calculators.router)

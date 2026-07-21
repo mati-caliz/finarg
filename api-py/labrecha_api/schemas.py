@@ -71,6 +71,12 @@ class CongressVoteDetailOut(BaseModel):
     vote: str | None
 
 
+class CoparticipacionShareOut(BaseModel):
+    province: str
+    coefficient: Decimal
+    share_pct: Decimal
+
+
 class BoletinSummaryOut(BaseModel):
     norma_id: str
     date: date
