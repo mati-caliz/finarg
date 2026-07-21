@@ -195,6 +195,20 @@ class BoletinSummary(Base):
     __table_args__ = (Index("ix_boletin_summaries_date", "date"),)
 
 
+class TaxChange(Base):
+    __tablename__ = "tax_changes"
+
+    norma_id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    date: Mapped[date] = mapped_column(Date)
+    change_type: Mapped[str] = mapped_column(String(20))
+    tax_name: Mapped[str] = mapped_column(Text)
+    jurisdiction: Mapped[str] = mapped_column(String(20))
+    title: Mapped[str] = mapped_column(Text)
+    url: Mapped[str] = mapped_column(String(300))
+
+    __table_args__ = (Index("ix_tax_changes_date", "date"),)
+
+
 class Holiday(Base):
     __tablename__ = "holidays"
 

@@ -95,6 +95,16 @@ class BoletinSummaryOut(BaseModel):
     url: str
 
 
+class TaxChangeOut(BaseModel):
+    norma_id: str
+    date: date
+    change_type: str
+    tax_name: str
+    jurisdiction: str
+    title: str
+    url: str
+
+
 class BlocAttendanceOut(BaseModel):
     bloc: str
     total_votes: int

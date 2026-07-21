@@ -13,6 +13,7 @@ from labrecha_api.routers import (
     news,
     senate,
     status,
+    taxes,
     vivienda,
 )
 
@@ -38,5 +39,6 @@ app.include_router(holidays.router)
 app.include_router(news.router)
 app.include_router(boletin.router)
 app.include_router(coparticipacion.router)
+app.include_router(taxes.router)
 app.include_router(vivienda.router)
 app.include_router(calculators.router)

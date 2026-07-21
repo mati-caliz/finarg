@@ -9,6 +9,7 @@ import {
   newsApi,
   politicalEventsApi,
   senateApi,
+  taxesApi,
 } from "@/lib/labrechaApi";
 import { useQueries, useQuery } from "@tanstack/react-query";
 
@@ -30,6 +31,7 @@ export const labrechaKeys = {
   news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
   boletin: (params?: object) => ["labrecha", "boletin", params ?? {}] as const,
   coparticipacion: ["labrecha", "coparticipacion"] as const,
+  taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
   rentByBarrio: ["labrecha", "vivienda", "rent-by-barrio"] as const,
 };
 
@@ -170,6 +172,18 @@ export function useCoparticipacion() {
   return useQuery({
     queryKey: labrechaKeys.coparticipacion,
     queryFn: () => coparticipacionApi.shares(),
+  });
+}
+
+export function useTaxChanges(params?: {
+  change_type?: string;
+  jurisdiction?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return useQuery({
+    queryKey: labrechaKeys.taxChanges(params),
+    queryFn: () => taxesApi.changes(params),
   });
 }
 

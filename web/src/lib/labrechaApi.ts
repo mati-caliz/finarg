@@ -135,6 +135,16 @@ export interface BoletinSummary {
   url: string;
 }
 
+export interface TaxChange {
+  norma_id: string;
+  date: string;
+  change_type: string;
+  tax_name: string;
+  jurisdiction: string;
+  title: string;
+  url: string;
+}
+
 export interface NewsArticle {
   title: string;
   summary: string;
@@ -310,6 +320,15 @@ export const newsApi = {
 export const boletinApi = {
   summaries: (params?: { category?: string; limit?: number; offset?: number }) =>
     get<BoletinSummary[]>("/boletin/summaries", params),
+};
+
+export const taxesApi = {
+  changes: (params?: {
+    change_type?: string;
+    jurisdiction?: string;
+    limit?: number;
+    offset?: number;
+  }) => get<TaxChange[]>("/taxes/changes", params),
 };
 
 export const coparticipacionApi = {
