@@ -546,10 +546,17 @@ contenedor del scraper; bounded por `MAX_AVISOS_PER_RUN` para respetar la suscri
 del Impuestómetro seedeado a mano).
 
 **5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
-- *Monitor de vivienda* (m2/alquileres CABA por barrio, ROI): las fuentes ricas (Zonaprop/Argenprop)
-  están tras Cloudflare y su reuso es legalmente gris; evaluar Propiedades.com index, reportes del
-  Colegio de Escribanos (compraventas CABA, API) o el índice de alquileres del BCRA/INDEC como proxies
-  API-friendly antes de intentar scraping.
+- *Monitor de vivienda* — **spike resuelto (2026-07-21): hay fuente oficial limpia, no hace falta
+  scrapear Zonaprop/Argenprop.** El portal **Buenos Aires Data** (`data.buenosaires.gob.ar`, CKAN de la
+  Dirección Gral. de Estadísticas y Censos de CABA) publica el dataset **`mercado-inmobiliario`** con
+  recursos **CSV** (además de XLSX): "Precio promedio alquiler", "Actividad inmobiliaria - venta" y
+  "Monto de préstamos hipotecarios en UVA" (escrituras del Colegio de Escribanos). Complemento nacional:
+  el **ICL** (Índice para Contratos de Locación, BCRA — Ley 27.551) como serie de referencia de ajuste
+  de alquileres. **Plan cuando se retome:** connector `vivienda_caba` (CKAN `package_show` de CABA como
+  hace `congreso`/`leyes`, resolviendo el CSV por nombre) → precio de alquiler y actividad de venta a
+  tablas propias o a `indicator_history`; frontend con evolución + (opcional) desglose por barrio, incluso
+  reusando el mapa de burbujas / centroides ya construido para barrios de CABA. Zonaprop/Argenprop quedan
+  descartados (Cloudflare + reuso legalmente gris) al haber fuente oficial.
 - *Termómetro de subsidios* ✅ HECHO (2026-07-21). El split "costo real vs subsidiado del usuario"
   no está como serie, pero sí el **gasto fiscal en subsidios económicos** (IMIG, base caja): dos series
   nuevas en `series_datosgob` — `subsidios_energia` (`452.2_ENERGIA...`) y `subsidios_transporte`
