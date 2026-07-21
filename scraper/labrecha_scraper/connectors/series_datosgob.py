@@ -40,6 +40,8 @@ SERIES: dict[str, SeriesSpec] = {
     ),
     "151.1_AARIADOTAC_2012_M_40": SeriesSpec("empleo_casas_particulares", "miles_personas"),
     "52.2_ASDJ_0_0_37": SeriesSpec("empleo_no_registrado", "%", Decimal(100)),
+    "452.2_ENERGIAGIA_0_T_7_56": SeriesSpec("subsidios_energia", "ARS_millones"),
+    "452.2_TRANSPORTERTE_0_T_10_32": SeriesSpec("subsidios_transporte", "ARS_millones"),
 }
 
 
