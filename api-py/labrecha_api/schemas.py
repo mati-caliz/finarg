@@ -77,6 +77,14 @@ class CoparticipacionShareOut(BaseModel):
     share_pct: Decimal
 
 
+class RentByBarrioOut(BaseModel):
+    barrio: str
+    comuna: str | None
+    date: date
+    price: Decimal
+    rooms: str | None
+
+
 class BoletinSummaryOut(BaseModel):
     norma_id: str
     date: date

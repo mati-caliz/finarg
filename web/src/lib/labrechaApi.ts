@@ -111,6 +111,14 @@ export interface Holiday {
   types: string | null;
 }
 
+export interface RentByBarrio {
+  barrio: string;
+  comuna: string | null;
+  date: string;
+  price: string;
+  rooms: string | null;
+}
+
 export interface CoparticipacionShare {
   province: string;
   coefficient: string;
@@ -306,6 +314,10 @@ export const boletinApi = {
 
 export const coparticipacionApi = {
   shares: () => get<CoparticipacionShare[]>("/coparticipacion"),
+};
+
+export const viviendaApi = {
+  rentByBarrio: () => get<RentByBarrio[]>("/vivienda/rent-by-barrio"),
 };
 
 export const calculatorsApi = {

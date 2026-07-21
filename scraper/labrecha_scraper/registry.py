@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from labrecha_scraper.base import Connector
+from labrecha_scraper.connectors.alquiler_caba import AlquilerCabaConnector
 from labrecha_scraper.connectors.bcra_tasas import BcraTasasConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
 from labrecha_scraper.connectors.boletin_oficial import BoletinOficialConnector
@@ -10,6 +11,7 @@ from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.icg import IcgConnector
+from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
 from labrecha_scraper.connectors.inflacion import InflacionConnector
 from labrecha_scraper.connectors.leyes import LeyesConnector
 from labrecha_scraper.connectors.news import NewsConnector
@@ -21,6 +23,7 @@ from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
 CONNECTORS: dict[str, Connector] = {
     connector.name: connector
     for connector in (
+        AlquilerCabaConnector(),
         BcraTasasConnector(),
         BigMacConnector(),
         BoletinOficialConnector(),
@@ -29,6 +32,7 @@ CONNECTORS: dict[str, Connector] = {
         CryptoConnector(),
         DolarConnector(),
         HolidaysConnector(),
+        IclBcraConnector(),
         IcgConnector(),
         InflacionConnector(),
         LeyesConnector(),

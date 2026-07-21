@@ -3,6 +3,7 @@ import {
   boletinApi,
   congressApi,
   coparticipacionApi,
+  viviendaApi,
   holidaysApi,
   indicatorsApi,
   newsApi,
@@ -29,6 +30,7 @@ export const labrechaKeys = {
   news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
   boletin: (params?: object) => ["labrecha", "boletin", params ?? {}] as const,
   coparticipacion: ["labrecha", "coparticipacion"] as const,
+  rentByBarrio: ["labrecha", "vivienda", "rent-by-barrio"] as const,
 };
 
 export function useIndicators() {
@@ -168,5 +170,12 @@ export function useCoparticipacion() {
   return useQuery({
     queryKey: labrechaKeys.coparticipacion,
     queryFn: () => coparticipacionApi.shares(),
+  });
+}
+
+export function useRentByBarrio() {
+  return useQuery({
+    queryKey: labrechaKeys.rentByBarrio,
+    queryFn: () => viviendaApi.rentByBarrio(),
   });
 }
