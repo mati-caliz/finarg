@@ -1,3 +1,5 @@
+name: labrecha
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -132,7 +134,14 @@ services:
       HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
     networks:
       - db-network
+      - app-network
     restart: "no"
+    volumes:
+      # Boletin Oficial: traductor IA via CLI claude headless (suscripcion del
+      # host, sin API key). Binario nativo + credenciales OAuth del usuario deploy.
+      - /home/deploy/.local/bin/claude:/usr/local/bin/claude:ro
+      - /home/deploy/.claude:/root/.claude
+      - /home/deploy/.claude.json:/root/.claude.json
     deploy:
       resources:
         limits:
@@ -144,8 +153,8 @@ services:
         max-file: "3"
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
+    # Sin cap_drop ALL: el CLI claude headless (Boletin) necesita el set de caps
+    # default de Docker; se conservan no-new-privileges + limite de RAM + tmpfs.
     tmpfs:
       - /tmp
 
