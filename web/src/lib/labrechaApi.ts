@@ -104,6 +104,12 @@ export interface Holiday {
   types: string | null;
 }
 
+export interface CoparticipacionShare {
+  province: string;
+  coefficient: string;
+  share_pct: string;
+}
+
 export interface BoletinSummary {
   norma_id: string;
   date: string;
@@ -288,6 +294,10 @@ export const newsApi = {
 export const boletinApi = {
   summaries: (params?: { category?: string; limit?: number; offset?: number }) =>
     get<BoletinSummary[]>("/boletin/summaries", params),
+};
+
+export const coparticipacionApi = {
+  shares: () => get<CoparticipacionShare[]>("/coparticipacion"),
 };
 
 export const calculatorsApi = {

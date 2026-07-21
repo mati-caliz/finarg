@@ -1,5 +1,6 @@
 import { BoletinFeedCard } from "@/components/home/BoletinFeedCard";
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
+import { CoparticipacionCard } from "@/components/home/CoparticipacionCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
@@ -80,8 +81,16 @@ export default function HomePage() {
         <ImpuestometroCard />
       </section>
 
-      <section>
+      <section
+        style={{
+          display: "grid",
+          gap: "var(--sp-4)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
+          alignItems: "start",
+        }}
+      >
         <BoletinFeedCard />
+        <CoparticipacionCard />
       </section>
     </div>
   );

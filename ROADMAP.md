@@ -458,11 +458,19 @@ Home: dos tiles de tasas activas + el stock de crédito al sector privado en bil
 nominal ~30 días (rotulada nominal). **Hallazgo:** la morosidad/irregularidad de cartera **no está en la
 API monetarias** del BCRA (vive en el "Informe sobre Bancos", fuente frágil) → queda pendiente y así se
 dice en el disclaimer del widget. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
-**Pendiente 5.d:** *Coparticipación* (connector + tabla propia + mapa SVG self-contained). **Spike
-(2026-07-19):** el desglose mensual por provincia **no está en la API de series** de datos.gob.ar (solo
-agregados nacionales de transferencias); el detalle por jurisdicción vive en datasets CSV del Ministerio
-de Economía. Eso + el SVG de las 24 provincias desde cero es una pieza grande: se difiere a un slice
-propio con research de la fuente CSV, después del Congresómetro.
+**Hecho (2026-07-21) — Coparticipación:** el desglose **mensual** por provincia no existe como serie/CSV
+limpia (solo agregados nacionales; el detalle vive en Excels de la DNAP). Se pivoteó a la **distribución
+secundaria de la Ley 23.548** — el reparto estructural por ley, dato fijo y citable: coeficientes
+exactos extraídos del PDF de la **Comisión Federal de Impuestos** (columna "Coparticipación Federal
+Ley 23548", vigencia estable). Comando CLI `seed-coparticipacion` (`seed_coparticipacion.py`) siembra 24
+jurisdicciones en tabla propia `coparticipacion_shares` (suma 0,6111 = total provincias+CABA, verificado
+contra la fuente). Endpoint `/coparticipacion` (calcula el % del reparto = coef/total) + modelo/schema.
+Widget `CoparticipacionCard` en la Home: **ranking de barras** de las 24 provincias por su tajada del
+reparto (Buenos Aires 20,4% · Santa Fe 8,3% · Córdoba 8,25% …), con atribución CFI + Ley 23.548 y
+aclaración de que es el reparto por ley, no las transferencias efectivas del mes. **Decisión:** se usó
+ranking de barras en vez de mapa SVG geográfico — sin paths precisos de las 24 provincias, un mapa
+dibujado a mano sería inexacto (choca con la regla de no-dato-dudoso). El **choropleth geográfico** queda
+como mejora opcional (requiere un asset SVG real de provincias). **5.d COMPLETA** (radar + coparticipación).
 *Radar de crédito (versión original)*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
 `coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,
