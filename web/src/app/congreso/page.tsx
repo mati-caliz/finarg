@@ -1,3 +1,4 @@
+import { BlocAttendance } from "@/components/congress/BlocAttendance";
 import { LatestVotes } from "@/components/congress/LatestVotes";
 import { RecentLaws } from "@/components/congress/RecentLaws";
 import { SenateComposition } from "@/components/congress/SenateComposition";
@@ -60,6 +61,8 @@ export default function CongresoPage() {
         </h2>
         <LatestVotes />
       </section>
+
+      <BlocAttendance />
     </div>
   );
 }

@@ -1,14 +1,25 @@
 from __future__ import annotations
 
 from datetime import date
+from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
 from labrecha_api.models import CongressVote, CongressVoteDetail, SanctionedLaw
-from labrecha_api.schemas import CongressVoteDetailOut, CongressVoteOut, SanctionedLawOut
+from labrecha_api.schemas import (
+    BlocAttendanceOut,
+    CongressVoteDetailOut,
+    CongressVoteOut,
+    SanctionedLawOut,
+)
+
+ABSENT_VOTE = "AUSENTE"
+MIN_BLOC_VOTES = 1000
+PCT_PRECISION = Decimal("0.1")
+ONE_HUNDRED = Decimal(100)
 
 router = APIRouter(prefix="/congress", tags=["congress"])
 
@@ -57,6 +68,32 @@ def list_votes(
         .offset(offset)
     )
     return [_to_vote_out(vote) for vote in session.scalars(statement).all()]
+
+
+@router.get("/attendance", response_model=list[BlocAttendanceOut])
+def bloc_attendance(session: Session = Depends(get_session)) -> list[BlocAttendanceOut]:
+    present = func.sum(case((CongressVoteDetail.vote != ABSENT_VOTE, 1), else_=0))
+    total = func.count()
+    statement = (
+        select(CongressVoteDetail.bloc, total.label("total"), present.label("present"))
+        .where(CongressVoteDetail.bloc.is_not(None))
+        .group_by(CongressVoteDetail.bloc)
+        .having(total >= MIN_BLOC_VOTES)
+    )
+    rows = [
+        BlocAttendanceOut(
+            bloc=bloc,
+            total_votes=int(total_votes),
+            present_votes=int(present_votes),
+            attendance_pct=(
+                (Decimal(int(present_votes)) / Decimal(int(total_votes)) * ONE_HUNDRED).quantize(
+                    PCT_PRECISION, rounding=ROUND_HALF_UP
+                )
+            ),
+        )
+        for bloc, total_votes, present_votes in session.execute(statement).all()
+    ]
+    return sorted(rows, key=lambda row: row.attendance_pct, reverse=True)
 
 
 @router.get("/laws", response_model=list[SanctionedLawOut])

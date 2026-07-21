@@ -87,6 +87,13 @@ class BoletinSummaryOut(BaseModel):
     url: str
 
 
+class BlocAttendanceOut(BaseModel):
+    bloc: str
+    total_votes: int
+    present_votes: int
+    attendance_pct: Decimal
+
+
 class SanctionedLawOut(BaseModel):
     law_number: str
     project_id: str | None
