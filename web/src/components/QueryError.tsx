@@ -2,8 +2,20 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "@/hooks/useTranslation";
 import { AlertCircle, Clock, RefreshCw, ServerCrash, WifiOff } from "lucide-react";
+
+const ERROR_MESSAGES = {
+  errorTitle: "Error",
+  errorGeneric: "Ocurrió un error inesperado. Intentá nuevamente.",
+  errorUnauthorized: "Sesión expirada o no autorizado. Iniciá sesión nuevamente.",
+  errorNoConnection: "Sin conexión",
+  errorNetwork: "No se pudo conectar con el servidor. Verificá tu conexión a internet.",
+  errorTimeOutTitle: "Tiempo agotado",
+  errorTimeout: "La solicitud tardó demasiado. Intentá nuevamente.",
+  errorServerTitle: "Error del servidor",
+  errorServer: "El servidor no está disponible. Intentá más tarde.",
+  retry: "Reintentar",
+} as const;
 
 interface QueryErrorProps {
   error: Error | null;
@@ -17,8 +29,6 @@ interface AxiosError extends Error {
 }
 
 export function QueryError({ error, onRetry, title, compact = false }: QueryErrorProps) {
-  const { translate } = useTranslation();
-
   const status = (error as AxiosError)?.response?.status;
   const isUnauthorized = status === 401;
 
@@ -41,8 +51,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
     if (isUnauthorized) {
       return {
         icon: AlertCircle,
-        title: title || translate("errorTitle"),
-        message: translate("errorUnauthorized"),
+        title: title || ERROR_MESSAGES.errorTitle,
+        message: ERROR_MESSAGES.errorUnauthorized,
         color: "text-red-500",
         bgColor: "bg-red-500/10",
       };
@@ -51,8 +61,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
     if (isNetworkError) {
       return {
         icon: WifiOff,
-        title: title || translate("errorNoConnection"),
-        message: translate("errorNetwork"),
+        title: title || ERROR_MESSAGES.errorNoConnection,
+        message: ERROR_MESSAGES.errorNetwork,
         color: "text-yellow-500",
         bgColor: "bg-yellow-500/10",
       };
@@ -61,8 +71,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
     if (isTimeoutError) {
       return {
         icon: Clock,
-        title: title || translate("errorTimeOutTitle"),
-        message: translate("errorTimeout"),
+        title: title || ERROR_MESSAGES.errorTimeOutTitle,
+        message: ERROR_MESSAGES.errorTimeout,
         color: "text-orange-500",
         bgColor: "bg-orange-500/10",
       };
@@ -71,8 +81,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
     if (isServerError) {
       return {
         icon: ServerCrash,
-        title: title || translate("errorServerTitle"),
-        message: translate("errorServer"),
+        title: title || ERROR_MESSAGES.errorServerTitle,
+        message: ERROR_MESSAGES.errorServer,
         color: "text-red-500",
         bgColor: "bg-red-500/10",
       };
@@ -80,8 +90,8 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
 
     return {
       icon: AlertCircle,
-      title: title || translate("errorTitle"),
-      message: translate("errorGeneric"),
+      title: title || ERROR_MESSAGES.errorTitle,
+      message: ERROR_MESSAGES.errorGeneric,
       color: "text-red-500",
       bgColor: "bg-red-500/10",
     };
@@ -90,7 +100,7 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
   const config = getErrorConfig();
   const Icon = config.icon;
 
-  const devErrorMessage = isUnauthorized ? translate("errorUnauthorized") : error?.message;
+  const devErrorMessage = isUnauthorized ? ERROR_MESSAGES.errorUnauthorized : error?.message;
 
   if (compact) {
     return (
@@ -127,7 +137,7 @@ export function QueryError({ error, onRetry, title, compact = false }: QueryErro
         {onRetry && (
           <Button onClick={onRetry} variant="outline">
             <RefreshCw className="mr-2 h-4 w-4" />
-            {translate("retry")}
+            {ERROR_MESSAGES.retry}
           </Button>
         )}
       </CardContent>

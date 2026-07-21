@@ -1,14 +1,8 @@
-import { type CountryCode, getCountryConfig } from "@/config/countries";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export function formatCurrencySimple(value: number, country: CountryCode = "ar"): string {
-  const config = getCountryConfig(country);
-  return `${config.currencySymbol} ${formatNumber(value, 2)}`;
 }
 
 export function formatNumber(value: number, decimals = 2): string {

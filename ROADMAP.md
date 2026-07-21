@@ -402,8 +402,25 @@ billones con variación mensual, "emisión cero" = baja es buena) + tasa de refe
 fijo minorista, cada una con fuente+fecha. **Hallazgo:** la variable BCRA "Tasa de política monetaria"
 (id 160) quedó **discontinuada en 2025-07** al cambiar el esquema monetario; la referencia viva hoy es
 TAMAR (id 44), que es la que se muestra. Verificado `tsc`/`biome`/`next build` + `compileall`/`ruff`
-verdes. **Pendiente 5.a:** Base monetaria clock (contador en vivo), Gasto público por segundo (falta
-ingerir el presupuesto anual).
+verdes.
+
+**Hecho (2026-07-21) — Base monetaria clock:** widget `BaseMonetariaClockCard` en la Home (junto al
+clock de inflación) que proyecta la base monetaria en vivo con `LiveCounter` desde el último dato oficial
+de `base_monetaria` (datos.gob.ar), al **ritmo promedio de emisión de los últimos 12 meses** (evita el
+salto estacional de diciembre que daría una proyección engañosa). Badge "Proyección", disclaimer de que
+no es una medición y fuente+fecha visibles. Verificado `tsc`/`biome`/`next build` verdes.
+
+**Hecho (2026-07-21) — Gasto público por segundo:** dos series nuevas en `series_datosgob`
+(`gasto_corriente` = `373.9_GTOS_CORR...` y `gasto_capital` = `373.9_GTOS_CAP...`, Esquema
+Ahorro-Inversión metodología 2017 de la Sec. de Hacienda vía datos.gob.ar, mensuales hasta 2026-05, ARS
+millones). Corrida verde. **Hallazgo:** el IMIG mensual no expone "Ingresos totales" ni "Gasto primario"
+como agregados; sí existe en el Esquema AIF (373.9) el desglose corriente + capital, y **gasto total =
+corrientes + capital**. Widget `GastoPublicoClockCard` en la Home: `LiveCounter` con el gasto acumulado
+del año (real hasta el último mes + proyección desde entonces al ritmo promedio de los últimos 12 meses /
+segundos del año), badge "Proyección", disclaimer y fuente+fecha. Helpers puros nuevos en
+`lib/liveCounter.ts` (`daysInYear`, `annualValueToPerSecond`, `startOfMonthAfter`). Verificado
+`tsc`/`biome`/`next build` + `compileall` verdes. **5.a COMPLETA.**
+
 Componente `LiveCounter` genérico: recibe valor base + fecha + tasa (diaria/horaria/por-segundo derivada del
 último informe) y anima con `requestAnimationFrame`, con rótulo de proyección y fuente. Aplicaciones:
 *Inflación clock* (proyecta el IPC del mes desde el último mensual/REM), *Deuda/Base monetaria clock*,
@@ -579,6 +596,141 @@ del Impuestómetro seedeado a mano).
 **Criterio de salida de la fase**: Home con al menos los contadores en vivo, un progress bar político
 y las calculadoras personales; el pipeline del Boletín Oficial corriendo aunque sea en beta. Todo con
 fuente+fecha, ningún dato dudoso escrito en silencio.
+
+## Pendientes heredados (verificado 2026-07-21)
+
+Estado actualizado tras cerrar Fase 3, Fase 4 (server) y la parte de datos existentes de la 5.a:
+
+- ✅ **Fase 4 (VPS)** — hecho en el server: cron del host para el scraper, alerta sobre `scrape_runs`,
+  DNS de `labrecha.ar` y carpeta de deploy. La DB `finarg` y sus defaults en `docker-compose.yml` se
+  dejan a propósito (base real en Postgres compartido).
+- ✅ **Fase 3 (limpieza menor)** — hecho (2026-07-21): borrados `web/src/config/countries.ts`,
+  `web/src/i18n/translations.ts`, `web/src/hooks/useTranslation.ts` y de paso el código muerto de FinArg
+  que colgaba de `CountryCode` (`web/src/lib/queryKeys.ts`, `web/src/types/index.ts`, `formatCurrencySimple`
+  en `utils.ts`, `selectedCountry` en el store). `QueryError` pasó a español fijo. `tsc`/`biome`/`next
+  build` verdes. El rename backend `com.finarg → com.labrecha` quedó **moot** (módulo Java borrado en Fase 4).
+- ✅ **5.a Base monetaria clock** — hecho (2026-07-21, ver detalle en la sub-fase 5.a).
+- ✅ **5.a Gasto público por segundo** — hecho (2026-07-21): connector a datos.gob.ar (`gasto_corriente` +
+  `gasto_capital`, Esquema AIF 2017) + clock del gasto acumulado del año. **5.a COMPLETA.**
+- 🔴 **5.f Changelog/feed del Impuestómetro** (altas/bajas de impuestos, seedeable a mano) — no existe;
+  el número agregado (155 tributos, IARAF) sí está. El timeline por-tributo necesita un dataset curado real.
+- **Fuentes frágiles pendientes** — *ICC* (confianza del consumidor, UTDT CIF; probablemente sale con el
+  mismo patrón de scraping de texto que el ICG), inflación de alta frecuencia (Alphacast requiere key;
+  consultoras sólo prensa) y Nowcast de pobreza UTDT (app Shiny sin datos legibles).
+
+## Fase 6 — Alcance, distribución y confianza — 🔜 PLANIFICADA (2026-07-21)
+
+La plataforma ya tiene profundidad de datos (scraper + FastAPI + BFF + ~14 widgets en la Home). El
+cuello de botella dejó de ser "más indicadores": es **explotar lo ya ingerido**, hacer el dato
+**alcanzable y compartible**, y **reforzar la confianza** (frescura visible, estado público). Esta fase
+no agrega casi scraping nuevo — es sobre todo frontend + un par de endpoints de lectura.
+
+**Principios que no cambian** (heredados del resto del roadmap):
+- Ningún número sin **fuente + fecha** visibles. Un dato viejo se muestra con su fecha y un aviso de
+  desactualización, nunca se oculta ni rompe la página.
+- Reusar lo que ya existe (`indicator_history`, `/indicators`, `AnnotatedSeriesChart`, `LiveCounter`,
+  `boletin_summaries`, hooks de TanStack Query) antes de crear nada nuevo.
+- Sin auth ni estado de usuario: la distribución (compartir, RSS, export) reemplaza lo que antes darían
+  las alertas/suscripción que se podaron en Fase 0.
+
+### Veredicto de factibilidad por feature
+
+| Feature | Dato nuevo | Reusa | Encaje | Veredicto |
+|---|---|---|---|---|
+| Índice `/indicadores` + búsqueda global (Cmd-K) | Ninguno | `/indicators` (catálogo) | Ruta + componente | 🟢 Quick win |
+| Más brechas entre mediciones (IPC vs REM, pobreza) | Ninguno (ya ingerido) | `/indicators/{code}/sources`, comparador | Frontend + cableado | 🟢 Fácil |
+| Índice de brecha (ranking de discrepancia) | Ninguno | series multi-fuente | Endpoint + widget | 🟡 Media |
+| UI de noticias y feriados (datos huérfanos) | Ninguno | `useNews`/`/news`, `useHolidays`/`/holidays` | Rutas + widgets | 🟢 Quick win |
+| Frescura del dato (badge "desactualizado") | Ninguno | fecha del último punto | Helper + core | 🟢 Fácil |
+| Página de estado `/estado` (salud del scraper) | Ninguno | `/scrape-runs` | Ruta + endpoint expuesto | 🟢 Fácil |
+| OG images por indicador | Ninguno | serie + último valor | `opengraph-image` (Next) | 🟡 Media |
+| Export CSV / copiar-con-fuente | Ninguno | serie ya cargada | Botón + util | 🟢 Fácil |
+| RSS/feed del Boletín en criollo | Ninguno | `boletin_summaries` | Route handler XML | 🟢 Fácil |
+| Base monetaria clock + Gasto público/segundo | Presupuesto anual vigente | `LiveCounter`, `base_monetaria` | 5.a pendiente | 🟡 Media |
+| Changelog del Impuestómetro | Altas/bajas (seed manual) | `taxes` semilla | 5.f pendiente | 🟡 Media |
+| Cron + alerta sobre `scrape_runs` | Ninguno | `scrape_runs` | Infra (requiere VPS) | 🟡 Media |
+
+### Sub-fases (de menor a mayor riesgo)
+
+**6.a — Navegabilidad: índice de indicadores + búsqueda global.** El hueco más grande de UX: hoy sólo
+existe `/indicador/[code]` (acceso directo por URL); un indicador que no está en la Home es inalcanzable.
+- Ruta **`/indicadores`**: grilla/tabla del catálogo completo sobre `/indicators` (ya devuelve código,
+  fuentes y rango de fechas por indicador), con `IndicatorTile` reusando el último valor y variación.
+  Agrupar por familia (precios, fiscal, monetario, empleo, congreso, vivienda) con una constante de
+  clasificación en `web/src/lib/indicators.ts` (junto a `FEATURED_INDICATOR_CODES`).
+- **Búsqueda global tipo Cmd-K**: paleta que indexa `/indicators` + rutas fijas (calculadoras, congreso,
+  vivienda). Cliente-side sobre el catálogo ya cacheado por TanStack Query; sin backend nuevo. Atajo de
+  teclado + botón en la `Navbar`. Marca de "observatorio" alta por poco código.
+- **Agrupar la Home en secciones nombradas con ancla** ("Precios", "Fiscal", "Monetario", "Congreso",
+  "Vivienda") en vez del scroll plano de ~14 cards actual.
+- Criterio de salida: `/indicadores` lista el 100% del catálogo, cada uno linkea a su `/indicador/[code]`;
+  Cmd-K encuentra cualquier indicador por nombre. `tsc`/`biome`/`next build` verdes.
+
+**6.b — La feature estrella, explotada: más brechas entre mediciones.** Es *el* nombre del producto y hoy
+el comparador (`/indicador/[code]` con ≥2 fuentes) se dispara en **un solo indicador** (reservas BCRA vs
+datos.gob.ar). Hay materia prima ya ingerida sin usar:
+- **IPC oficial vs REM** (`ipc_mensual`/`ipc_interanual` vs `expectativas_inflacion_rem`, mediana 12m):
+  inflación medida vs esperada. Gratis, ya está en la base — cablear como comparación destacada.
+- **Pobreza INDEC vs Nowcast UTDT vs UCA**: la comparación insignia que el roadmap prometió. Depende de
+  destrabar las fuentes frágiles (ver *pendientes heredados*); si UTDT/UCA no entran, dejar el andamiaje
+  listo con INDEC solo y un placeholder honesto ("Nowcast UTDT: fuente sin dato legible aún").
+- **Widget "índice de brecha"** en la Home: rankear los `indicator_code` con ≥2 `source` por magnitud de
+  discrepancia actual (último valor por fuente), reusando `/indicators/{code}/sources`. Endpoint nuevo
+  `/indicators/gaps` (o cálculo en front sobre el catálogo) que devuelva las brechas ordenadas. Es
+  contenido que ninguna otra fuente arma.
+- Criterio de salida: ≥3 indicadores muestran comparador multi-fuente real; la Home tiene el ranking de
+  brechas con fuente+fecha por cada medición.
+
+**6.c — Datos huérfanos: noticias y feriados.** Ya se scrapean y hay endpoint + hook, pero **cero UI**:
+- **Noticias** (`useNews`/`/news`, El Economista RSS): feed en una ruta `/noticias` o card lateral en la
+  Home, con título, fecha, fuente y link. Sumar feeds sigue siendo una entrada en `FEEDS` del connector.
+- **Feriados** (`useHolidays`/`/holidays`): mini-widget "próximo feriado" en footer/Home y, si se quiere,
+  una página de calendario anual. Trivial, alto valor percibido.
+- Criterio de salida: noticias y feriados visibles en la UI con su fuente; nada de dato ingerido queda sin
+  superficie.
+
+**6.d — Frescura y confianza (muy on-brand).** La regla dura es fuente+fecha siempre; el paso natural es
+hacer visible cuándo un dato quedó viejo, y publicar la salud del scraper.
+- **Badge "desactualizado"**: helper puro que, dado el `date` del último punto y la cadencia esperada del
+  indicador (diaria/mensual/trimestral, declarada en una constante), decide si está fresco/viejo y pinta
+  en ámbar. Integrarlo en `IndicatorTile`/`SourceChip` (componentes core). Sin backend nuevo.
+- **Página `/estado`**: tablero de salud sobre `/scrape-runs` (hoy el endpoint existe pero no se expone en
+  la UI): por connector, última corrida, estado, filas, error. Refuerza la credibilidad, que es todo el
+  punto del observatorio. Requiere sólo un hook `useScrapeRuns` + ruta.
+- Criterio de salida: los tiles con dato viejo se marcan solos; `/estado` refleja `scrape_runs` en vivo.
+
+**6.e — Distribución: compartir, exportar, sindicar.** Hoy compartir un indicador comparte sólo texto y no
+hay forma de llevarse el dato. Un observatorio vive de que reproduzcan sus gráficos.
+- **OG images por indicador**: `opengraph-image.tsx` (Next App Router, `ImageResponse`) por
+  `/indicador/[code]` con el sparkline + último valor + brecha + atribución. Cuidar el CSP self-contained
+  (fuentes embebidas, sin assets remotos). Es la palanca de crecimiento más barata.
+- **Export CSV / "copiar dato con fuente"** por serie: botón en `/indicador/[code]` que baja la serie
+  cargada como CSV y un "copiar" que incluye valor + fuente + fecha (respeta la regla de atribución).
+- **RSS/Atom del Boletín en criollo**: route handler que sirve `boletin_summaries` como feed XML. Recicla
+  el pipeline IA ya hecho y da recurrencia sin reponer la auth/alertas podadas. Marcar "resumen generado
+  por IA, verificá contra la fuente" también en el feed, con link a la norma.
+- Criterio de salida: cada `/indicador/[code]` tiene OG image y export; existe `/boletin.xml` (o similar)
+  válido. Sin romper el CSP.
+
+**6.f — Cierres del roadmap previo (contadores + infra).** Barrer lo que quedó abierto:
+- **Base monetaria clock** y **Gasto público por segundo** (5.a): el primero reusa `LiveCounter` +
+  `base_monetaria` (ya ingerida). El segundo bloquea en **ingerir el presupuesto anual vigente** (connector
+  nuevo sobre Presupuesto Abierto / Sec. Hacienda vía datos.gob.ar → constante anual) y luego
+  `presupuesto / segundos del año` como tasa del `LiveCounter`.
+- **Changelog del Impuestómetro** (5.f): tabla/serie semilla `taxes(code, name, jurisdiction, status,
+  effective_date)` curada a mano; timeline "Derogado X en provincia Y (hace N días)" bajo el número
+  gigante ya existente. El número base se audita contra la semilla, no se confía a la IA.
+- **Infra Fase 4 (requiere VPS)**: cron del host para las corridas del scraper (una entrada por cadencia),
+  y **alerta simple (mail/Telegram) cuando un job de `scrape_runs` falla N veces seguidas** — hoy no hay
+  ninguna. Registrar/apuntar `labrecha.ar` (DNS) y, si se decide, renombrar `/home/deploy/finarg`.
+- **Limpieza Fase 3**: borrar `config/countries.ts`, `i18n/translations.ts`, `useTranslation.ts` (muertos,
+  la app es solo-Argentina). Verificar con `tsc`/`biome`/`next build` que nada los referencia.
+- Criterio de salida: contadores nuevos en la Home con disclaimer de proyección; changelog de impuestos
+  poblado; `scrape_runs` con alerta activa; código muerto de i18n/countries eliminado.
+
+**Criterio de salida de la fase**: cualquier indicador del catálogo es alcanzable (índice + búsqueda), el
+comparador de mediciones se luce en ≥3 indicadores, todo dato ingerido tiene UI, la frescura es visible y
+la salud del scraper es pública, y un gráfico se puede compartir (OG) y exportar. Todo con fuente+fecha.
 
 ## Orden de ejecución y reversibilidad
 

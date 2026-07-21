@@ -1,6 +1,8 @@
+import { BaseMonetariaClockCard } from "@/components/home/BaseMonetariaClockCard";
 import { BoletinFeedCard } from "@/components/home/BoletinFeedCard";
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { CoparticipacionCard } from "@/components/home/CoparticipacionCard";
+import { GastoPublicoClockCard } from "@/components/home/GastoPublicoClockCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
@@ -66,6 +68,8 @@ export default function HomePage() {
         }}
       >
         <InflationClockCard />
+        <BaseMonetariaClockCard />
+        <GastoPublicoClockCard />
         <BrechaMedicionesCard />
       </section>
 
