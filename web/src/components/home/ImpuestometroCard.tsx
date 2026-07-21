@@ -1,11 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { Badge, Card, VariationBadge } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIndicatorSeries } from "@/hooks/useLabrecha";
+import { useIndicatorSeries, useTaxChanges } from "@/hooks/useLabrecha";
 import { formatDateAR, formatNumberAR } from "@/lib/indicators";
 
 const SOURCE = "iaraf";
+
+const CHANGE_TYPE_STYLES: Record<string, { label: string; color: string }> = {
+  alta: { label: "Nuevo", color: "var(--baja)" },
+  baja: { label: "Derogado", color: "var(--alza)" },
+  modificacion: { label: "Modificado", color: "var(--gap-accent)" },
+};
+
+const RECENT_CHANGES_LIMIT = 5;
 
 interface LevelBreakdown {
   label: string;
@@ -20,6 +29,7 @@ const LEVELS: LevelBreakdown[] = [
 ];
 
 export function ImpuestometroCard() {
+  const changes = useTaxChanges({ limit: RECENT_CHANGES_LIMIT });
   const total = useIndicatorSeries("tributos_total", { source: SOURCE, limit: 2, order: "desc" });
   const nacionales = useIndicatorSeries("tributos_nacionales", { source: SOURCE, limit: 1, order: "desc" });
   const provinciales = useIndicatorSeries("tributos_provinciales", { source: SOURCE, limit: 1, order: "desc" });
@@ -109,6 +119,46 @@ export function ImpuestometroCard() {
             );
           })}
         </div>
+
+        {changes.data && changes.data.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600 }}>
+              Cambios recientes
+            </div>
+            {changes.data.map((change) => {
+              const style = CHANGE_TYPE_STYLES[change.change_type] ?? {
+                label: change.change_type,
+                color: "var(--text-muted)",
+              };
+              return (
+                <Link
+                  key={change.norma_id}
+                  href={change.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: 8,
+                    fontSize: "0.8125rem",
+                    color: "var(--text-body)",
+                  }}
+                >
+                  <span style={{ color: style.color, fontWeight: 700, flexShrink: 0 }}>
+                    {style.label}
+                  </span>
+                  <span style={{ fontWeight: 600 }}>{change.tax_name}</span>
+                  <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+                    {change.jurisdiction} · {formatDateAR(change.date)}
+                  </span>
+                </Link>
+              );
+            })}
+            <div style={{ fontSize: "0.6875rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+              Detectado automáticamente por IA sobre el Boletín Oficial. Verificá contra la norma.
+            </div>
+          </div>
+        )}
 
         <div style={{ fontSize: "0.6875rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
           Solo 10 tributos concentran el 92% de la recaudación (el IVA, el 27%). Fuente: IARAF,

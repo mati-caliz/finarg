@@ -555,8 +555,22 @@ citable (no inventado). Comando CLI `seed-taxes` (`seed_taxes.py`) upserta a `in
 provinciales/municipales` para 2023 (148 = 45+25+78) y 2024 (155 = 46+25+84), verificadas contra la
 fuente y aritméticamente consistentes. Widget `ImpuestometroCard` en la Home: número gigante (155) con
 variación vs. año previo (+7, baja es buena), desglose Nación/provincias/municipios con barras, y la
-nota "10 tributos = 92% de la recaudación (IVA 27%)", con atribución IARAF + fecha. **Pendiente 5.f:** el
-**changelog/feed** de altas y bajas de impuestos (seedeable a mano) sigue pendiente.
+nota "10 tributos = 92% de la recaudación (IVA 27%)", con atribución IARAF + fecha.
+
+**Hecho (2026-07-21) — Changelog automático (sin cargar nada a mano):** en vez de un seed manual, se
+enganchó al pipeline del Boletín Oficial con IA que ya corre. El **mismo** prompt/llamada al LLM ahora
+también marca, por norma, si CREA (alta), DEROGA (baja) o MODIFICA (modificacion) un tributo concreto, con
+su nombre y jurisdicción — sin costo extra de LLM. Tabla propia nueva `tax_changes` (`norma_id` PK, tipo,
+tributo, jurisdicción, título, url); el connector `boletin_oficial` persiste en ambas tablas
+(`boletin_summaries` + `tax_changes`) en la misma corrida. Endpoint `/taxes/changes` (filtros
+tipo/jurisdicción) + modelo/schema/router registrados. Frontend: sección "Cambios recientes" en
+`ImpuestometroCard` (timeline coloreado — alta rojo / baja verde / modificación ámbar, con jurisdicción +
+fecha, link a la norma y **disclaimer de IA — verificar contra la fuente**), que sólo aparece cuando hay
+datos. Verificado: tabla creada (`init-db`), endpoint sirve, `tsc`/`biome`/`next build` +
+`ruff`/`compileall` verdes, y una corrida real del connector con los campos nuevos (no crashea, parsea el
+JSON del LLM). **Nota de deploy:** como el resto del pipeline del boletín, corre en el **host** con el
+`claude` autenticado, no en el contenedor; y la imagen `api-py` debe reconstruirse para exponer
+`/taxes/changes`. **5.f COMPLETA.**
 
 **Hecho (2026-07-20) — Traductor del Boletín Oficial con IA:** pipeline completo, **sin API key** — usa
 Claude headless con la **suscripción del server** (`claude -p`, el mismo auth que Claude Code en la
@@ -572,8 +586,8 @@ modelo/schema. Frontend: card "Boletín Oficial, en criollo" en la Home (feed co
 título, 3 viñetas, link a la norma y **disclaimer de IA — verificar contra la fuente**). **Notas de
 deploy:** el connector debe correr en el **host** (donde vive el `claude` autenticado), no en el
 contenedor del scraper; bounded por `MAX_AVISOS_PER_RUN` para respetar la suscripción. Verificado
-`tsc`/`biome`/`next build` + `ruff`/`compileall` verdes. **5.f COMPLETA** (queda opcional el changelog
-del Impuestómetro seedeado a mano).
+`tsc`/`biome`/`next build` + `ruff`/`compileall` verdes. **5.f COMPLETA** (el changelog del Impuestómetro
+se cerró después de forma automática, ver más arriba — sin seed manual).
 
 **5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
 - *Monitor de vivienda* — ✅ HECHO (2026-07-21). **Hallazgo del spike:** los precios por barrio del
@@ -625,8 +639,9 @@ Estado actualizado tras cerrar Fase 3, Fase 4 (server) y la parte de datos exist
 - ✅ **5.a Base monetaria clock** — hecho (2026-07-21, ver detalle en la sub-fase 5.a).
 - ✅ **5.a Gasto público por segundo** — hecho (2026-07-21): connector a datos.gob.ar (`gasto_corriente` +
   `gasto_capital`, Esquema AIF 2017) + clock del gasto acumulado del año. **5.a COMPLETA.**
-- 🔴 **5.f Changelog/feed del Impuestómetro** (altas/bajas de impuestos, seedeable a mano) — no existe;
-  el número agregado (155 tributos, IARAF) sí está. El timeline por-tributo necesita un dataset curado real.
+- ✅ **5.f Changelog/feed del Impuestómetro** — hecho (2026-07-21): automático vía el pipeline del Boletín
+  Oficial con IA (detecta altas/bajas/modificaciones de tributos → tabla `tax_changes` → timeline en la
+  card). Sin carga manual. **5.f COMPLETA.**
 - **Fuentes frágiles pendientes** — *ICC* (confianza del consumidor, UTDT CIF; probablemente sale con el
   mismo patrón de scraping de texto que el ICG), inflación de alta frecuencia (Alphacast requiere key;
   consultoras sólo prensa) y Nowcast de pobreza UTDT (app Shiny sin datos legibles).

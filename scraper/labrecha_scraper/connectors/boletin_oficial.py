@@ -12,7 +12,10 @@ from sqlalchemy.orm import Session
 from labrecha_scraper.base import Connector, upsert_rows
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.llm import run_claude_json_array
-from labrecha_scraper.models import BoletinSummary
+from labrecha_scraper.models import BoletinSummary, TaxChange
+
+TAX_CHANGE_TYPES = {"alta", "baja", "modificacion"}
+TAX_JURISDICTIONS = {"nacional", "provincial", "municipal"}
 
 BASE_URL = "https://www.boletinoficial.gob.ar"
 SECTION = "primera"
@@ -40,6 +43,7 @@ class Aviso:
 @dataclass
 class BoletinData:
     summaries: list[dict] = field(default_factory=list)
+    tax_changes: list[dict] = field(default_factory=list)
 
 
 def _clean(raw_html: str) -> str:
@@ -77,8 +81,14 @@ def _build_prompt(batch: list[Aviso]) -> str:
         "Devolvé SOLO un array JSON, sin texto adicional ni backticks, con un objeto por norma en el "
         "MISMO orden, con esta forma: {\"norma_id\": \"<id>\", \"relevante\": true|false, "
         "\"categoria\": \"impuesto|regulacion|monetario|laboral|subsidio|tarifa|otro\", "
-        "\"resumen\": [\"viñeta 1\", \"viñeta 2\", \"viñeta 3\"]}. El resumen debe tener 3 viñetas "
-        "claras y cortas en español. Normas:\n" + json.dumps(payload, ensure_ascii=False)
+        "\"resumen\": [\"viñeta 1\", \"viñeta 2\", \"viñeta 3\"], "
+        "\"cambio_impositivo\": true|false, \"tipo_cambio\": \"alta|baja|modificacion\", "
+        "\"tributo\": \"<nombre corto del impuesto/tasa/contribución afectado>\", "
+        "\"jurisdiccion\": \"nacional|provincial|municipal\"}. Marcá \"cambio_impositivo\" en true SOLO "
+        "si la norma CREA (alta), DEROGA/ELIMINA (baja) o MODIFICA una alícuota/base (modificacion) de un "
+        "tributo concreto; en ese caso completá tributo y jurisdiccion. Si no es un cambio de un tributo "
+        "puntual, poné \"cambio_impositivo\": false y dejá los otros campos vacíos. El resumen debe tener "
+        "3 viñetas claras y cortas en español. Normas:\n" + json.dumps(payload, ensure_ascii=False)
     )
 
 
@@ -93,14 +103,18 @@ class BoletinOficialConnector(Connector):
             pending = self._filter_pending(avisos)[:MAX_AVISOS_PER_RUN]
             for aviso in pending:
                 self._load_body(client, aviso)
-        summaries = self._summarize(pending)
-        return BoletinData(summaries=summaries)
+        summaries, tax_changes = self._summarize(pending)
+        return BoletinData(summaries=summaries, tax_changes=tax_changes)
 
     def persist(self, session: Session, data: object) -> int:
         assert isinstance(data, BoletinData)
-        return upsert_rows(
+        summaries = upsert_rows(
             session, BoletinSummary, data.summaries, ["norma_id"], update_on_conflict=False
         )
+        changes = upsert_rows(
+            session, TaxChange, data.tax_changes, ["norma_id"], update_on_conflict=False
+        )
+        return summaries + changes
 
     def _list_avisos(self, client, target_date: date) -> list[Aviso]:
         response = client.get(f"{BASE_URL}/seccion/{SECTION}")
@@ -140,8 +154,9 @@ class BoletinOficialConnector(Connector):
         aviso.title = _title(response.text)
         aviso.body = _body(_clean(response.text))
 
-    def _summarize(self, avisos: list[Aviso]) -> list[dict]:
-        rows: list[dict] = []
+    def _summarize(self, avisos: list[Aviso]) -> tuple[list[dict], list[dict]]:
+        summaries: list[dict] = []
+        tax_changes: list[dict] = []
         for start in range(0, len(avisos), BATCH_SIZE):
             batch = avisos[start : start + BATCH_SIZE]
             results = run_claude_json_array(_build_prompt(batch))
@@ -153,7 +168,7 @@ class BoletinOficialConnector(Connector):
                 bullets = [str(bullet).strip() for bullet in item.get("resumen", []) if str(bullet).strip()]
                 if not bullets:
                     continue
-                rows.append(
+                summaries.append(
                     {
                         "norma_id": aviso.norma_id,
                         "date": aviso.date,
@@ -164,4 +179,27 @@ class BoletinOficialConnector(Connector):
                         "url": aviso.url,
                     }
                 )
-        return rows
+                tax_change = self._build_tax_change(aviso, item)
+                if tax_change is not None:
+                    tax_changes.append(tax_change)
+        return summaries, tax_changes
+
+    def _build_tax_change(self, aviso: Aviso, item: dict) -> dict | None:
+        if not item.get("cambio_impositivo"):
+            return None
+        change_type = str(item.get("tipo_cambio") or "").strip().lower()
+        jurisdiction = str(item.get("jurisdiccion") or "").strip().lower()
+        tax_name = str(item.get("tributo") or "").strip()
+        if change_type not in TAX_CHANGE_TYPES or not tax_name:
+            return None
+        if jurisdiction not in TAX_JURISDICTIONS:
+            jurisdiction = "otro"
+        return {
+            "norma_id": aviso.norma_id,
+            "date": aviso.date,
+            "change_type": change_type,
+            "tax_name": tax_name,
+            "jurisdiction": jurisdiction,
+            "title": aviso.title,
+            "url": aviso.url,
+        }
