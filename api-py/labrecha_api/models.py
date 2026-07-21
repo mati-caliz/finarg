@@ -84,6 +84,18 @@ class SanctionedLaw(Base):
     summary: Mapped[str | None] = mapped_column(Text)
 
 
+class BoletinSummary(Base):
+    __tablename__ = "boletin_summaries"
+
+    norma_id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    date: Mapped[date] = mapped_column(Date)
+    section: Mapped[str] = mapped_column(String(40))
+    title: Mapped[str] = mapped_column(Text)
+    summary: Mapped[str] = mapped_column(Text)
+    category: Mapped[str] = mapped_column(String(40))
+    url: Mapped[str] = mapped_column(String(300))
+
+
 class Senator(Base):
     __tablename__ = "senators"
 

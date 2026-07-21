@@ -3,6 +3,7 @@ from __future__ import annotations
 from labrecha_scraper.base import Connector
 from labrecha_scraper.connectors.bcra_tasas import BcraTasasConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
+from labrecha_scraper.connectors.boletin_oficial import BoletinOficialConnector
 from labrecha_scraper.connectors.congreso import CongresoConnector
 from labrecha_scraper.connectors.credito_bcra import CreditoBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
@@ -22,6 +23,7 @@ CONNECTORS: dict[str, Connector] = {
     for connector in (
         BcraTasasConnector(),
         BigMacConnector(),
+        BoletinOficialConnector(),
         CongresoConnector(),
         CreditoBcraConnector(),
         CryptoConnector(),

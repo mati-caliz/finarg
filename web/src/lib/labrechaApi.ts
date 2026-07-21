@@ -104,6 +104,16 @@ export interface Holiday {
   types: string | null;
 }
 
+export interface BoletinSummary {
+  norma_id: string;
+  date: string;
+  section: string;
+  title: string;
+  summary: string[];
+  category: string;
+  url: string;
+}
+
 export interface NewsArticle {
   title: string;
   summary: string;
@@ -273,6 +283,11 @@ export const holidaysApi = {
 export const newsApi = {
   list: (params?: { source?: string; category?: string; limit?: number; offset?: number }) =>
     get<NewsArticle[]>("/news", params),
+};
+
+export const boletinApi = {
+  summaries: (params?: { category?: string; limit?: number; offset?: number }) =>
+    get<BoletinSummary[]>("/boletin/summaries", params),
 };
 
 export const calculatorsApi = {

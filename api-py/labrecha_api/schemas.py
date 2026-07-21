@@ -71,6 +71,16 @@ class CongressVoteDetailOut(BaseModel):
     vote: str | None
 
 
+class BoletinSummaryOut(BaseModel):
+    norma_id: str
+    date: date
+    section: str
+    title: str
+    summary: list[str]
+    category: str
+    url: str
+
+
 class SanctionedLawOut(BaseModel):
     law_number: str
     project_id: str | None
