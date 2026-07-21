@@ -79,6 +79,13 @@ export interface SanctionedLaw {
   summary: string | null;
 }
 
+export interface BlocAttendance {
+  bloc: string;
+  total_votes: number;
+  present_votes: number;
+  attendance_pct: string;
+}
+
 export interface Senator {
   senator_id: string;
   last_name: string | null;
@@ -273,6 +280,7 @@ export const congressApi = {
     limit?: number;
     offset?: number;
   }) => get<SanctionedLaw[]>("/congress/laws", params),
+  attendance: () => get<BlocAttendance[]>("/congress/attendance"),
 };
 
 export const senateApi = {

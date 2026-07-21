@@ -497,9 +497,14 @@ definitiva desc) + modelo/schema de lectura. Frontend: panel "Últimas leyes san
 2ª media sanción → sanción definitiva, con fechas y pasos alcanzados en verde) + expediente y fuente.
 **Hallazgos:** (1) `leyes-sumario` corta en feb-2020 → los títulos recientes salen de
 `proyectos-parlamentarios` (~53MB, 113k proyectos, se baja con timeout largo y se retienen sólo los
-títulos en memoria); (2) el JSON de HCDN trae un BOM dentro del nombre de la primera clave. Presentismo
-de legisladores queda como sub-ítem opcional pendiente. Verificado `tsc`/`biome`/`next build` +
-`ruff`/`compileall` verdes.
+títulos en memoria); (2) el JSON de HCDN trae un BOM dentro del nombre de la primera clave. Verificado
+`tsc`/`biome`/`next build` + `ruff`/`compileall` verdes.
+
+**Hecho (2026-07-21) — Presentismo:** sin fuente nueva — se computa desde los `congress_vote_details`
+que ya estaban ingeridos. Endpoint `/congress/attendance`: presentismo por bloque = votos no `AUSENTE`
+sobre el total, agregado en SQL (`case`/`sum`), bloques con ≥1.000 votos, ordenado desc. Widget
+`BlocAttendance` en `/congreso`: barras por bloque coloreadas (verde ≥85% / ámbar ≥75% / rojo <75%) con
+disclaimer de alcance (Diputados, votaciones nominales 2011-2020). Verificado verde.
 
 **5.f — Boletín Oficial con IA + Impuestómetro (el feature diferencial).** Pipeline nocturno: connector
 `boletin_oficial` baja las normas del día (boletinoficial.gob.ar / primera+segunda sección), un paso

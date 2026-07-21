@@ -20,6 +20,7 @@ export const labrechaKeys = {
   congressVotes: (params?: object) => ["labrecha", "congress", "votes", params ?? {}] as const,
   congressVote: (actaId: string) => ["labrecha", "congress", "votes", actaId] as const,
   congressLaws: (params?: object) => ["labrecha", "congress", "laws", params ?? {}] as const,
+  congressAttendance: ["labrecha", "congress", "attendance"] as const,
   congressVoteDetails: (actaId: string, params?: object) =>
     ["labrecha", "congress", "votes", actaId, "details", params ?? {}] as const,
   senateMembers: (params?: object) => ["labrecha", "senate", "members", params ?? {}] as const,
@@ -99,6 +100,13 @@ export function useCongressLaws(params?: {
   return useQuery({
     queryKey: labrechaKeys.congressLaws(params),
     queryFn: () => congressApi.laws(params),
+  });
+}
+
+export function useCongressAttendance() {
+  return useQuery({
+    queryKey: labrechaKeys.congressAttendance,
+    queryFn: () => congressApi.attendance(),
   });
 }
 
