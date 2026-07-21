@@ -545,9 +545,13 @@ del Impuestómetro seedeado a mano).
   están tras Cloudflare y su reuso es legalmente gris; evaluar Propiedades.com index, reportes del
   Colegio de Escribanos (compraventas CABA, API) o el índice de alquileres del BCRA/INDEC como proxies
   API-friendly antes de intentar scraping.
-- *Termómetro de subsidios* (costo real vs subsidiado en luz/gas/transporte): dato disperso
-  (ASAP, Sec. de Energía, cuadros tarifarios). Spike para ver si hay serie consolidada; si no, se
-  arma con supuestos declarados y disclaimer fuerte, o se difiere.
+- *Termómetro de subsidios* ✅ HECHO (2026-07-21). El split "costo real vs subsidiado del usuario"
+  no está como serie, pero sí el **gasto fiscal en subsidios económicos** (IMIG, base caja): dos series
+  nuevas en `series_datosgob` — `subsidios_energia` (`452.2_ENERGIA...`) y `subsidios_transporte`
+  (`452.2_TRANSPORTE...`), mensuales hasta 2026-05, en ARS millones. Widget `TermometroSubsidiosCard`
+  en la Home: total del mes en billones + por rubro (energía/transporte) con sparkline y variación
+  interanual nominal, con disclaimer de que es nominal y la caída real es mayor. Fuente Sec. de Hacienda
+  vía datos.gob.ar. Verificado `tsc`/`biome`/`next build`/`ruff` verdes.
 
 **Criterio de salida de la fase**: Home con al menos los contadores en vivo, un progress bar político
 y las calculadoras personales; el pipeline del Boletín Oficial corriendo aunque sea en beta. Todo con

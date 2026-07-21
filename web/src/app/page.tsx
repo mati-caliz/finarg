@@ -8,6 +8,7 @@ import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
 import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
 import { RadarCreditoCard } from "@/components/home/RadarCreditoCard";
 import { TermometroEmpleoCard } from "@/components/home/TermometroEmpleoCard";
+import { TermometroSubsidiosCard } from "@/components/home/TermometroSubsidiosCard";
 import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
 
 export default function HomePage() {
@@ -79,6 +80,7 @@ export default function HomePage() {
         <TermometroEmpleoCard />
         <RadarCreditoCard />
         <ImpuestometroCard />
+        <TermometroSubsidiosCard />
       </section>
 
       <section>
