@@ -546,8 +546,19 @@ contenedor del scraper; bounded por `MAX_AVISOS_PER_RUN` para respetar la suscri
 del Impuestómetro seedeado a mano).
 
 **5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
-- *Monitor de vivienda* — **spike resuelto (2026-07-21): hay fuente oficial limpia, no hace falta
-  scrapear Zonaprop/Argenprop.** El portal **Buenos Aires Data** (`data.buenosaires.gob.ar`, CKAN de la
+- *Monitor de vivienda* — ✅ HECHO (2026-07-21). **Hallazgo del spike:** los precios por barrio del
+  portal de CABA cortan en **2019** (el CSV "actividad venta" resultó ser DDJJ de funcionarios, mal
+  etiquetado). Se pivoteó a lo que sí es **actual y limpio**: el **ICL del BCRA** (variable 40, Índice
+  para Contratos de Locación, base 30/6/2020=1, diario, hasta hoy) como héroe en vivo, más el ranking
+  de alquiler por barrio de CABA como **foto histórica 2019** (claramente rotulada, "referencia relativa
+  entre barrios, no valor actual"). Connectors: `icl_bcra` → `indicator_history` code `icl`; `alquiler_caba`
+  → tabla propia `rent_by_barrio` (último dato no vacío por barrio, 2 ambientes). Endpoint
+  `/vivienda/rent-by-barrio` + modelo/schema. Widget `MonitorAlquileresCard` en la Home: ICL ×34,8 (dato
+  de hoy) con variación interanual + sparkline, y ranking por barrio (Palermo/Núñez/Belgrano…) con la foto
+  de ago-2019. Zonaprop/Argenprop descartados. Verificado `tsc`/`biome`/`next build` + `ruff`/`compileall`
+  verdes.
+
+  **Fuente original (contexto):** hay fuente oficial limpia, no hace falta scrapear Zonaprop/Argenprop. El portal **Buenos Aires Data** (`data.buenosaires.gob.ar`, CKAN de la
   Dirección Gral. de Estadísticas y Censos de CABA) publica el dataset **`mercado-inmobiliario`** con
   recursos **CSV** (además de XLSX): "Precio promedio alquiler", "Actividad inmobiliaria - venta" y
   "Monto de préstamos hipotecarios en UVA" (escrituras del Colegio de Escribanos). Complemento nacional:

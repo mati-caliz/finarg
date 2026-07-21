@@ -163,6 +163,16 @@ class SanctionedLaw(Base):
     __table_args__ = (Index("ix_sanctioned_laws_final", "final_sanction"),)
 
 
+class RentByBarrio(Base):
+    __tablename__ = "rent_by_barrio"
+
+    barrio: Mapped[str] = mapped_column(String(80), primary_key=True)
+    comuna: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    date: Mapped[date] = mapped_column(Date)
+    price: Mapped[Decimal] = mapped_column(Numeric(16, 2))
+    rooms: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+
 class CoparticipacionShare(Base):
     __tablename__ = "coparticipacion_shares"
 

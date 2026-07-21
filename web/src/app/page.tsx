@@ -4,6 +4,7 @@ import { CoparticipacionCard } from "@/components/home/CoparticipacionCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
+import { MonitorAlquileresCard } from "@/components/home/MonitorAlquileresCard";
 import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
 import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
 import { RadarCreditoCard } from "@/components/home/RadarCreditoCard";
@@ -81,6 +82,7 @@ export default function HomePage() {
         <RadarCreditoCard />
         <ImpuestometroCard />
         <TermometroSubsidiosCard />
+        <MonitorAlquileresCard />
       </section>
 
       <section>
