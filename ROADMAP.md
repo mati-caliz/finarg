@@ -39,11 +39,16 @@ controllers): incluía capa de monetización (Mobbex + subscription + usage trac
 
 ### Hallazgo sobre la base de datos
 
-El volumen `finarg_postgres_data` está **compartido con otras apps** de la máquina (había tablas
-de un restaurante y de una inmobiliaria). Las tablas de este proyecto son `users`, `alerts`,
-`quote_history` y `news_articles`, todas vacías (0 filas). Se dropearon `users` y `alerts`; se
-conservan `quote_history` (histórico valioso para cruzar con eventos políticos) y `news_articles`.
-Backup completo en el scratchpad (`finarg-backup-2026-07-17.sql`).
+El volumen `finarg_postgres_data` estuvo **compartido con otras apps** de la máquina (había tablas
+de un restaurante y de una inmobiliaria). Las tablas de este proyecto eran `users`, `alerts`,
+`quote_history` y `news_articles`, todas vacías (0 filas).
+
+**Actualización (2026-07-21) — rename a "La Brecha" en prod:** el stack se recreó bajo el proyecto
+compose `labrecha` (antes derivaba a `finarg` por el nombre de carpeta). La DB pasó a `labrecha_prod`
+sobre un volumen propio y nuevo `labrecha_postgres_data` (ya **no compartido**: el Postgres del stack
+es exclusivo de La Brecha). Las 8 tablas viejas de finarg se descartaron por completo y el schema
+nuevo lo crea el scraper (`init-db` + seeds + `run all`). Backup de seguridad del `finarg_prod` viejo
+en el scratchpad de la sesión (`finarg_prod-backup-2026-07-21.sql`).
 
 ## Arquitectura objetivo
 
@@ -326,11 +331,20 @@ filtros y summary actualizados. Verificado: compose dev/prod parsean, `ci.yml` e
 on-demand, hardening). CI de Python ampliado: corre `ruff` (lint) sobre `api-py` + `scraper` además
 del byte-compile (config en `ruff.toml`). README/CLAUDE.md/scripts ya actualizados (ver más arriba).
 
-**Pendiente Fase 4 — requiere el server (no hacer sin acceso al VPS):** cron del host para las
-corridas del scraper, registrar/apuntar `labrecha.ar` (DNS), monitoreo/alerta sobre `scrape_runs`, y
-renombrar la carpeta de deploy del VPS (`/home/deploy/finarg` en deploy.yml/force-rebuild.yml) si se
-decide. La carpeta root LOCAL sigue `finarg` (renombrar con `mv` desde afuera de la sesión); la DB
-`finarg` se deja (base real con datos en Postgres compartido).
+**Hecho (2026-07-21) — cron del scraper + Boletin con IA en prod:** cron del host (`crontab` del
+usuario `deploy`, TZ=UTC) vía `scripts/scrape-cron.sh`: cotizaciones (`dolar`/`crypto`/`riesgo_pais`)
+cada 15 min y `run all` diario 07:20. El conector `boletin_oficial` usa el **CLI `claude` headless**
+(no API key — la **suscripcion** del usuario `deploy`): el servicio `scraper` bind-montea el binario
+nativo (`~/.local/bin/claude`) + credenciales (`~/.claude`, `~/.claude.json`) dentro del contenedor.
+Gotcha: `cap_drop: ALL` rompe el login del CLI (queda "Not logged in") — se quito del servicio
+`scraper` (se conservan `no-new-privileges` + limite de RAM + tmpfs). El scraper necesita `app-network`
+ademas de `db-network` para tener salida a internet (sin eso, todos los jobs fallan con DNS).
+
+**Pendiente Fase 4 — requiere el server (no hacer sin acceso al VPS):** registrar/apuntar
+`labrecha.ar` (DNS), monitoreo/alerta sobre `scrape_runs`, y renombrar la carpeta de deploy del VPS
+(`/home/deploy/finarg` en deploy.yml/force-rebuild.yml) si se decide. La carpeta root (local y VPS) sigue `finarg` (renombrar con `mv` desde afuera de la sesión).
+La DB y el proyecto compose de prod **ya se renombraron a `labrecha`** (2026-07-21): proyecto
+`labrecha`, DB `labrecha_prod`, volumen `labrecha_postgres_data` propio.
 
 ### Fase 4 — Infra y lanzamiento (detalle original)
 
