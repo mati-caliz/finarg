@@ -1,5 +1,6 @@
 import {
   type IndicatorSeriesParams,
+  boletinApi,
   congressApi,
   holidaysApi,
   indicatorsApi,
@@ -24,6 +25,7 @@ export const labrechaKeys = {
   senateBlocs: ["labrecha", "senate", "blocs"] as const,
   holidays: (params?: object) => ["labrecha", "holidays", params ?? {}] as const,
   news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
+  boletin: (params?: object) => ["labrecha", "boletin", params ?? {}] as const,
 };
 
 export function useIndicators() {
@@ -139,4 +141,15 @@ export function useNews(params?: {
   offset?: number;
 }) {
   return useQuery({ queryKey: labrechaKeys.news(params), queryFn: () => newsApi.list(params) });
+}
+
+export function useBoletinSummaries(params?: {
+  category?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  return useQuery({
+    queryKey: labrechaKeys.boletin(params),
+    queryFn: () => boletinApi.summaries(params),
+  });
 }

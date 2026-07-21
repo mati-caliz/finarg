@@ -1,3 +1,4 @@
+import { BoletinFeedCard } from "@/components/home/BoletinFeedCard";
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
@@ -77,6 +78,10 @@ export default function HomePage() {
         <TermometroEmpleoCard />
         <RadarCreditoCard />
         <ImpuestometroCard />
+      </section>
+
+      <section>
+        <BoletinFeedCard />
       </section>
     </div>
   );

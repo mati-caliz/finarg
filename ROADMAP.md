@@ -506,9 +506,24 @@ provinciales/municipales` para 2023 (148 = 45+25+78) y 2024 (155 = 46+25+84), ve
 fuente y aritméticamente consistentes. Widget `ImpuestometroCard` en la Home: número gigante (155) con
 variación vs. año previo (+7, baja es buena), desglose Nación/provincias/municipios con barras, y la
 nota "10 tributos = 92% de la recaudación (IVA 27%)", con atribución IARAF + fecha. **Pendiente 5.f:** el
-**changelog/feed** de altas y bajas de impuestos y el **Traductor del Boletín Oficial con IA** (pipeline
-nocturno con la API de Anthropic) — implican costo recurrente de LLM, key configurada y scraping de
-boletinoficial.gob.ar; son una decisión de producto a definir antes de encararlos.
+**changelog/feed** de altas y bajas de impuestos (seedeable a mano) sigue pendiente.
+
+**Hecho (2026-07-20) — Traductor del Boletín Oficial con IA:** pipeline completo, **sin API key** — usa
+Claude headless con la **suscripción del server** (`claude -p`, el mismo auth que Claude Code en la
+máquina), decisión del usuario para no pagar tokens de API. Connector `boletin_oficial`: la SPA
+boletinoficial.gob.ar server-renderiza lo suficiente (`/seccion/primera` lista los avisos con URLs
+`/detalleAviso/...`; cada detalle trae título+texto sin browser headless). Flujo: lista los avisos de la
+primera sección del día, deduplica contra lo ya resumido (idempotente, no re-gasta LLM), baja el texto,
+y en batches llama a `claude -p` (helper `llm.py`, salida JSON estricta parseada) para **clasificar
+relevancia económica/regulatoria + resumir en 3 viñetas**; guarda sólo los relevantes en tabla propia
+`boletin_summaries`. Corrida real verde (2 normas relevantes del 20-jul: reforma laboral + Agencia de
+Transformación de Empresas Públicas, bien clasificadas y resumidas). Endpoint `/boletin/summaries` +
+modelo/schema. Frontend: card "Boletín Oficial, en criollo" en la Home (feed con badge de categoría,
+título, 3 viñetas, link a la norma y **disclaimer de IA — verificar contra la fuente**). **Notas de
+deploy:** el connector debe correr en el **host** (donde vive el `claude` autenticado), no en el
+contenedor del scraper; bounded por `MAX_AVISOS_PER_RUN` para respetar la suscripción. Verificado
+`tsc`/`biome`/`next build` + `ruff`/`compileall` verdes. **5.f COMPLETA** (queda opcional el changelog
+del Impuestómetro seedeado a mano).
 
 **5.g — Data-hard, sólo tras research spike (no prometer en UI antes):**
 - *Monitor de vivienda* (m2/alquileres CABA por barrio, ROI): las fuentes ricas (Zonaprop/Argenprop)
