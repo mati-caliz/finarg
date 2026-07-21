@@ -467,10 +467,17 @@ jurisdicciones en tabla propia `coparticipacion_shares` (suma 0,6111 = total pro
 contra la fuente). Endpoint `/coparticipacion` (calcula el % del reparto = coef/total) + modelo/schema.
 Widget `CoparticipacionCard` en la Home: **ranking de barras** de las 24 provincias por su tajada del
 reparto (Buenos Aires 20,4% · Santa Fe 8,3% · Córdoba 8,25% …), con atribución CFI + Ley 23.548 y
-aclaración de que es el reparto por ley, no las transferencias efectivas del mes. **Decisión:** se usó
-ranking de barras en vez de mapa SVG geográfico — sin paths precisos de las 24 provincias, un mapa
-dibujado a mano sería inexacto (choca con la regla de no-dato-dudoso). El **choropleth geográfico** queda
-como mejora opcional (requiere un asset SVG real de provincias). **5.d COMPLETA** (radar + coparticipación).
+aclaración de que es el reparto por ley, no las transferencias efectivas del mes.
+
+**Hecho (2026-07-21) — mapa:** se sumó el **mapa** que pedía el feature, como **mapa de burbujas con
+centroides reales** (de georef del Estado, embebidos en `lib/argentina.ts` con proyección equirectangular
+corregida por cos(lat); Tierra del Fuego ajustada a su centroide continental para no arrastrar la
+Antártida). Cada provincia es una burbuja posicionada por su coordenada real y dimensionada por su tajada
+del reparto, con tooltip y etiqueta en las grandes; al lado, el ranking de barras (accesible). Se eligió
+burbujas sobre un choropleth de polígonos porque no había paths precisos de las 24 provincias y dibujarlos
+a mano sería inexacto — las burbujas usan coordenadas verdaderas, sin geometría inventada. Helper de
+proyección puro con 4 tests (N arriba de S, O a la izquierda de E, dentro del viewport). **5.d COMPLETA**
+(radar + coparticipación con mapa).
 *Radar de crédito (versión original)*: connector `credito_bcra`
 (tasas activas promedio + irregularidad de cartera, BCRA API). *Coparticipación*: connector
 `coparticipacion` (Min. Economía) a tabla propia `coparticipacion(provincia, date, enviado, aportado,

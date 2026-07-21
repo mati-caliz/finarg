@@ -81,15 +81,11 @@ export default function HomePage() {
         <ImpuestometroCard />
       </section>
 
-      <section
-        style={{
-          display: "grid",
-          gap: "var(--sp-4)",
-          gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
-          alignItems: "start",
-        }}
-      >
+      <section>
         <BoletinFeedCard />
+      </section>
+
+      <section>
         <CoparticipacionCard />
       </section>
     </div>
