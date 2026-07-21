@@ -285,10 +285,9 @@ congreso). La app ahora expone SÓLO rutas del stack nuevo (FastAPI). `tsc`/`bio
 `next build` verdes; los 5 tests que fallan son pre-existentes (ErrorBoundary/Button/Card/QueryError/
 test-utils, componentes no tocados).
 
-**Pendiente:** único ítem grande restante = completar el rename backend `com.finarg`→`com.labrecha`
-(Python ya usa `labrecha_*`; falta el módulo Java, que se apaga al no quedar nada del frontend
-apuntándolo). Menores: `config/countries` quedó sólo por `store`/`queryKeys`/`types` (simplificable a
-Argentina fija), y limpiar traducciones/`i18n` muertas.
+**Hecho:** el backend Java (`com.finarg`) se retiró por completo — ya no queda módulo Java en el repo
+(stack nuevo Python `labrecha_*`). Menores pendientes: `config/countries` quedó sólo por
+`store`/`queryKeys`/`types` (simplificable a Argentina fija), y limpiar traducciones/`i18n` muertas.
 
 - Nueva arquitectura de información. Home = "estado del país" con:
   - Inflación: oficial mensual + curva diaria/semanal privada en el mismo gráfico.
@@ -522,7 +521,7 @@ disclaimer de alcance (Diputados, votaciones nominales 2011-2020). Verificado ve
 
 **5.f — Boletín Oficial con IA + Impuestómetro (el feature diferencial).** Pipeline nocturno: connector
 `boletin_oficial` baja las normas del día (boletinoficial.gob.ar / primera+segunda sección), un paso
-de IA (Claude vía la API de Anthropic) filtra las relevantes (impuestos, regulaciones, alícuotas) y las
+de IA (Claude headless, con la suscripción del server — sin API key) filtra las relevantes (impuestos, regulaciones, alícuotas) y las
 resume en 3 viñetas → tabla `boletin_summaries(date, norma_id, title, summary, category, impact_tags)`.
 Alimenta dos features: (1) **feed changelog** en el dashboard; (2) **Impuestómetro** = count curado de
 impuestos vigentes (dataset semilla `taxes(code, name, jurisdiction, status, effective_date)`) que el
