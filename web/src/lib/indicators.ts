@@ -293,6 +293,45 @@ export const INDICATOR_META: Record<string, IndicatorMeta> = {
   confianza_gobierno: { label: "Confianza en el gobierno", family: "social", unit: "pts", goodWhen: "up", format: num2 },
 };
 
+export type Cadence = "diaria" | "mensual" | "trimestral" | "semestral" | "anual";
+
+const CADENCE_DAILY_EXTRA = new Set([
+  "reservas_internacionales",
+  "tasa_tamar",
+  "tasa_plazo_fijo",
+  "tasa_prestamos_personales",
+  "tasa_adelantos_cuenta_corriente",
+  "prestamos_sector_privado",
+  "icl",
+]);
+const CADENCE_TRIMESTRAL = new Set(["desempleo", "empleo_no_registrado"]);
+const CADENCE_SEMESTRAL = new Set(["pobreza_personas"]);
+const CADENCE_ANUAL = new Set([
+  "big_mac_ars",
+  "big_mac_usd",
+  "big_mac_valuacion",
+  "tributos_total",
+  "tributos_nacionales",
+  "tributos_provinciales",
+  "tributos_municipales",
+]);
+
+export function cadenceForCode(code: string): Cadence {
+  if (CADENCE_ANUAL.has(code)) {
+    return "anual";
+  }
+  if (CADENCE_SEMESTRAL.has(code)) {
+    return "semestral";
+  }
+  if (CADENCE_TRIMESTRAL.has(code)) {
+    return "trimestral";
+  }
+  if (CADENCE_DAILY_EXTRA.has(code) || INDICATOR_META[code]?.family === "dolar") {
+    return "diaria";
+  }
+  return "mensual";
+}
+
 export function getIndicatorMeta(code: string): IndicatorMeta | undefined {
   return INDICATOR_META[code];
 }

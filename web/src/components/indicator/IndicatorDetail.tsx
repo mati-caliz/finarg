@@ -9,6 +9,7 @@ import {
   type DataTableRow,
   RangeSelector,
   SourceAttribution,
+  StaleChip,
   VariationBadge,
 } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +26,7 @@ import {
   sourceLabel,
 } from "@/lib/indicators";
 import { BRECHAS } from "@/lib/brechas";
+import { freshnessForCode } from "@/lib/freshness";
 import {
   alignSources,
   eventsToChartEvents,
@@ -174,10 +176,13 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
             </div>
           )}
           {primary && (
-            <SourceAttribution
-              source={sourceLabel(primary.source)}
-              date={formatDateAR(primary.last_date)}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <SourceAttribution
+                source={sourceLabel(primary.source)}
+                date={formatDateAR(primary.last_date)}
+              />
+              {freshnessForCode(code, primary.last_date).stale && <StaleChip />}
+            </div>
           )}
         </div>
         <RangeSelector options={RANGE_OPTIONS} active={range} onChange={setRange} />

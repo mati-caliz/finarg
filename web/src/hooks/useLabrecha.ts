@@ -8,6 +8,7 @@ import {
   indicatorsApi,
   newsApi,
   politicalEventsApi,
+  scrapeRunsApi,
   senateApi,
   taxesApi,
 } from "@/lib/labrechaApi";
@@ -33,6 +34,7 @@ export const labrechaKeys = {
   coparticipacion: ["labrecha", "coparticipacion"] as const,
   taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
   rentByBarrio: ["labrecha", "vivienda", "rent-by-barrio"] as const,
+  scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
 };
 
 export function useIndicators() {
@@ -197,6 +199,13 @@ export function useTaxChanges(params?: {
   return useQuery({
     queryKey: labrechaKeys.taxChanges(params),
     queryFn: () => taxesApi.changes(params),
+  });
+}
+
+export function useScrapeRuns(params?: { limit?: number }) {
+  return useQuery({
+    queryKey: labrechaKeys.scrapeRuns(params),
+    queryFn: () => scrapeRunsApi.list(params),
   });
 }
 

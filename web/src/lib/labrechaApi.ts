@@ -145,6 +145,15 @@ export interface TaxChange {
   url: string;
 }
 
+export interface ScrapeRun {
+  job_name: string;
+  status: string;
+  started_at: string | null;
+  finished_at: string | null;
+  rows_upserted: number | null;
+  error: string | null;
+}
+
 export interface NewsArticle {
   title: string;
   summary: string;
@@ -329,6 +338,10 @@ export const taxesApi = {
     limit?: number;
     offset?: number;
   }) => get<TaxChange[]>("/taxes/changes", params),
+};
+
+export const scrapeRunsApi = {
+  list: (params?: { limit?: number }) => get<ScrapeRun[]>("/scrape-runs", params),
 };
 
 export const coparticipacionApi = {

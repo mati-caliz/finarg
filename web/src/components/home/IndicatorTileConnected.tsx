@@ -3,6 +3,7 @@
 import { IndicatorTile } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicatorSeries } from "@/hooks/useLabrecha";
+import { freshnessForCode } from "@/lib/freshness";
 import { INDICATOR_BY_CODE, PERIOD_LABELS, formatDateAR, sourceLabel } from "@/lib/indicators";
 
 interface IndicatorTileConnectedProps {
@@ -59,6 +60,7 @@ export function IndicatorTileConnected({ code }: IndicatorTileConnectedProps) {
       data={sparkData}
       source={sourceLabel(latest.source)}
       date={formatDateAR(latest.date)}
+      stale={freshnessForCode(indicator.code, latest.date).stale}
       href={indicator.href}
     />
   );
