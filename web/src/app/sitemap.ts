@@ -1,4 +1,4 @@
-import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
+import { INDICATOR_META } from "@/lib/indicators";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -11,8 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: number;
   }[] = [
     { path: "", changeFrequency: "hourly", priority: 1 },
+    { path: "/indicadores", changeFrequency: "daily", priority: 0.9 },
     { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
-    ...FEATURED_INDICATOR_CODES.map((code) => ({
+    ...Object.keys(INDICATOR_META).map((code) => ({
       path: `/indicador/${code}`,
       changeFrequency: "daily" as const,
       priority: 0.85,

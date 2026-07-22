@@ -26,6 +26,10 @@ export function formatMoneyAR(value: number, fractionDigits = 0): string {
   return `$ ${formatNumberAR(value, fractionDigits)}`;
 }
 
+export function formatUsdAR(value: number, fractionDigits = 0): string {
+  return `US$ ${formatNumberAR(value, fractionDigits)}`;
+}
+
 const MILLONES_POR_BILLON = 1_000_000;
 
 export function formatBillonesAR(valueInMillones: number, fractionDigits = 2): string {
@@ -190,18 +194,129 @@ export const INDICATOR_BY_CODE: Record<string, IndicatorDisplay> = Object.fromEn
   FEATURED_INDICATORS.map((indicator) => [indicator.code, indicator]),
 );
 
+export type IndicatorFamily = "precios" | "dolar" | "monetario" | "fiscal" | "empleo" | "social";
+
+export const INDICATOR_FAMILY_LABELS: Record<IndicatorFamily, string> = {
+  precios: "Precios e inflación",
+  dolar: "Dólar y mercados",
+  monetario: "Monetario y crédito",
+  fiscal: "Fiscal e impuestos",
+  empleo: "Empleo y actividad",
+  social: "Social",
+};
+
+export const INDICATOR_FAMILY_ORDER: IndicatorFamily[] = [
+  "precios",
+  "dolar",
+  "monetario",
+  "fiscal",
+  "empleo",
+  "social",
+];
+
+export interface IndicatorMeta {
+  label: string;
+  family: IndicatorFamily;
+  unit?: string;
+  goodWhen?: GoodWhen;
+  format: (value: number) => string;
+}
+
+const num0 = (value: number) => formatNumberAR(value);
+const num1 = (value: number) => formatNumberAR(value, 1);
+const num2 = (value: number) => formatNumberAR(value, 2);
+const money = (value: number) => formatMoneyAR(value);
+const billones = (value: number) => formatBillonesAR(value);
+const usd = (value: number) => formatUsdAR(value, value < 100 ? 2 : 0);
+
+export const INDICATOR_META: Record<string, IndicatorMeta> = {
+  ipc_mensual: { label: "Inflación mensual", family: "precios", unit: "%", goodWhen: "down", format: num1 },
+  ipc_interanual: { label: "Inflación interanual", family: "precios", unit: "%", goodWhen: "down", format: num1 },
+  ipc_nivel_general: { label: "IPC nivel general", family: "precios", unit: "pts", format: num1 },
+  expectativas_inflacion_rem: { label: "Inflación esperada (REM)", family: "precios", unit: "%", goodWhen: "down", format: num1 },
+  cba_nacional: { label: "Canasta básica total", family: "precios", unit: "ARS", goodWhen: "down", format: money },
+  big_mac_ars: { label: "Big Mac (ARS)", family: "precios", unit: "ARS", format: money },
+  big_mac_usd: { label: "Big Mac (USD)", family: "precios", unit: "USD", format: (value) => formatUsdAR(value, 2) },
+  big_mac_valuacion: { label: "Big Mac sub/sobrevaluación", family: "precios", unit: "%", format: num1 },
+
+  dolar_oficial: { label: "Dólar oficial", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_blue: { label: "Dólar blue", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_bolsa: { label: "Dólar MEP (bolsa)", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_contadoconliqui: { label: "Dólar contado con liqui", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_cripto: { label: "Dólar cripto", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_mayorista: { label: "Dólar mayorista", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  dolar_tarjeta: { label: "Dólar tarjeta", family: "dolar", unit: "ARS", goodWhen: "down", format: money },
+  riesgo_pais: { label: "Riesgo país", family: "dolar", unit: "pb", goodWhen: "down", format: num0 },
+  cripto_btc: { label: "Bitcoin", family: "dolar", unit: "USD", format: usd },
+  cripto_eth: { label: "Ethereum", family: "dolar", unit: "USD", format: usd },
+  cripto_bnb: { label: "BNB", family: "dolar", unit: "USD", format: usd },
+  cripto_xrp: { label: "XRP", family: "dolar", unit: "USD", format: usd },
+  cripto_ada: { label: "Cardano", family: "dolar", unit: "USD", format: usd },
+  cripto_sol: { label: "Solana", family: "dolar", unit: "USD", format: usd },
+
+  reservas_internacionales: { label: "Reservas internacionales", family: "monetario", unit: "USD M", goodWhen: "up", format: num0 },
+  base_monetaria: { label: "Base monetaria", family: "monetario", unit: "ARS", goodWhen: "down", format: billones },
+  prestamos_sector_privado: { label: "Préstamos al sector privado", family: "monetario", unit: "ARS", goodWhen: "up", format: billones },
+  tasa_tamar: { label: "Tasa TAMAR", family: "monetario", unit: "% TNA", format: num1 },
+  tasa_plazo_fijo: { label: "Plazo fijo minorista", family: "monetario", unit: "% TNA", goodWhen: "up", format: num1 },
+  tasa_prestamos_personales: { label: "Tasa préstamos personales", family: "monetario", unit: "% TNA", goodWhen: "down", format: num1 },
+  tasa_adelantos_cuenta_corriente: { label: "Tasa adelantos cta. cte.", family: "monetario", unit: "% TNA", goodWhen: "down", format: num1 },
+  icl: { label: "ICL (alquileres)", family: "monetario", unit: "índice", format: num2 },
+
+  recaudacion_tributaria: { label: "Recaudación tributaria", family: "fiscal", unit: "ARS", goodWhen: "up", format: billones },
+  gasto_corriente: { label: "Gasto corriente", family: "fiscal", unit: "ARS", goodWhen: "down", format: billones },
+  gasto_capital: { label: "Gasto de capital", family: "fiscal", unit: "ARS", format: billones },
+  resultado_primario: { label: "Resultado primario", family: "fiscal", unit: "ARS", goodWhen: "up", format: billones },
+  resultado_financiero: { label: "Resultado financiero", family: "fiscal", unit: "ARS", goodWhen: "up", format: billones },
+  subsidios_energia: { label: "Subsidios a la energía", family: "fiscal", unit: "ARS", goodWhen: "down", format: billones },
+  subsidios_transporte: { label: "Subsidios al transporte", family: "fiscal", unit: "ARS", goodWhen: "down", format: billones },
+  tributos_total: { label: "Impuestos vigentes", family: "fiscal", unit: "tributos", goodWhen: "down", format: num0 },
+  tributos_nacionales: { label: "Impuestos nacionales", family: "fiscal", unit: "tributos", goodWhen: "down", format: num0 },
+  tributos_provinciales: { label: "Impuestos provinciales", family: "fiscal", unit: "tributos", goodWhen: "down", format: num0 },
+  tributos_municipales: { label: "Impuestos municipales", family: "fiscal", unit: "tributos", goodWhen: "down", format: num0 },
+
+  emae: { label: "Actividad económica (EMAE)", family: "empleo", unit: "pts", goodWhen: "up", format: num1 },
+  produccion_industrial: { label: "Producción industrial (IPI)", family: "empleo", unit: "pts", goodWhen: "up", format: num1 },
+  desempleo: { label: "Desempleo", family: "empleo", unit: "%", goodWhen: "down", format: num1 },
+  empleo_no_registrado: { label: "Empleo no registrado", family: "empleo", unit: "%", goodWhen: "down", format: num1 },
+  empleo_asalariado_privado: { label: "Empleo asalariado privado", family: "empleo", unit: "miles", goodWhen: "up", format: num0 },
+  empleo_asalariado_publico: { label: "Empleo asalariado público", family: "empleo", unit: "miles", format: num0 },
+  empleo_casas_particulares: { label: "Empleo en casas particulares", family: "empleo", unit: "miles", format: num0 },
+  empleo_independiente_autonomo: { label: "Trabajadores autónomos", family: "empleo", unit: "miles", format: num0 },
+  empleo_independiente_monotributo: { label: "Monotributistas", family: "empleo", unit: "miles", format: num0 },
+  empleo_independiente_monotributo_social: { label: "Monotributistas sociales", family: "empleo", unit: "miles", format: num0 },
+  ripte: { label: "Salario (RIPTE)", family: "empleo", unit: "ARS", goodWhen: "up", format: money },
+  indice_salarios: { label: "Índice de salarios", family: "empleo", unit: "pts", goodWhen: "up", format: num1 },
+  salario_minimo: { label: "Salario mínimo (SMVM)", family: "empleo", unit: "ARS", goodWhen: "up", format: money },
+
+  pobreza_personas: { label: "Pobreza", family: "social", unit: "%", goodWhen: "down", format: num1 },
+  confianza_gobierno: { label: "Confianza en el gobierno", family: "social", unit: "pts", goodWhen: "up", format: num2 },
+};
+
+export function getIndicatorMeta(code: string): IndicatorMeta | undefined {
+  return INDICATOR_META[code];
+}
+
+export function indicatorLabel(code: string): string {
+  return INDICATOR_META[code]?.label ?? INDICATOR_BY_CODE[code]?.label ?? code;
+}
+
 export function getIndicatorDisplay(code: string): IndicatorDisplay {
-  return (
-    INDICATOR_BY_CODE[code] ?? {
-      code,
-      label: code,
-      href: `/indicador/${code}`,
-      goodWhen: "down",
-      format: (value) => formatNumberAR(value, 2),
-      variation: "pct",
-      sparkPoints: 60,
-    }
-  );
+  const featured = INDICATOR_BY_CODE[code];
+  if (featured) {
+    return featured;
+  }
+  const meta = INDICATOR_META[code];
+  return {
+    code,
+    label: meta?.label ?? code,
+    unit: meta?.unit,
+    href: `/indicador/${code}`,
+    goodWhen: meta?.goodWhen ?? "down",
+    format: meta?.format ?? ((value) => formatNumberAR(value, 2)),
+    variation: "pct",
+    sparkPoints: 60,
+  };
 }
 
 export const SOURCE_METHODOLOGY: Record<string, string> = {

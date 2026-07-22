@@ -1,8 +1,55 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Coffee } from "lucide-react";
+import { useAppStore } from "@/store/useStore";
+import { Coffee, Search } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+function CommandTrigger() {
+  const setCommandOpen = useAppStore((state) => state.setCommandOpen);
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad/.test(navigator.platform));
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setCommandOpen(true)}
+      aria-label="Buscar"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "6px 10px",
+        borderRadius: "var(--radius-md)",
+        border: "1px solid var(--border-2)",
+        background: "var(--surface-card)",
+        color: "var(--text-muted)",
+        fontSize: "0.8125rem",
+        cursor: "pointer",
+      }}
+    >
+      <Search className="h-4 w-4" />
+      <span className="hidden sm:inline">Buscar</span>
+      <span
+        className="hidden sm:inline"
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "0.6875rem",
+          padding: "1px 5px",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--border-1)",
+          color: "var(--text-secondary)",
+        }}
+      >
+        {isMac ? "⌘K" : "Ctrl K"}
+      </span>
+    </button>
+  );
+}
 
 export function Navbar() {
   return (
@@ -43,6 +90,7 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
+          <CommandTrigger />
           <a
             href="https://cafecito.app/finlatam"
             target="_blank"

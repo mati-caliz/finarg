@@ -6,6 +6,7 @@ import "./globals.css";
 import { CafecitoModal } from "@/components/CafecitoModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
+import { CommandPalette } from "@/components/layout/CommandPalette";
 import { Navbar } from "@/components/layout/Navbar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { EarlyHints } from "./early-hints";
@@ -117,6 +118,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="p-4 lg:p-6">{children}</main>
             </div>
           </div>
+          <CommandPalette />
           <CafecitoModal />
         </Providers>
         <ServiceWorkerRegistration />
