@@ -754,7 +754,19 @@ Diseño original de la sub-fase, como referencia:
 - Criterio de salida: ≥3 indicadores muestran comparador multi-fuente real; la Home tiene el ranking de
   brechas con fuente+fecha por cada medición.
 
-**6.c — Datos huérfanos: noticias y feriados.** Ya se scrapean y hay endpoint + hook, pero **cero UI**:
+**6.c — Datos huérfanos: noticias y feriados.** ✅ HECHO (2026-07-22). Ambos ya se scrapeaban y tenían
+endpoint + hook pero cero UI; ahora tienen superficie:
+- **Noticias**: ruta `/noticias` (`components/news/NewsFeed.tsx`, feed completo con badge de categoría,
+  título enlazado a la nota original, resumen, fuente + fecha) + teaser `NewsTeaserCard` en la Home
+  (últimos 5 titulares). **Decisión CSP:** el `img-src` compartido (nginx + `next.config.js`) no incluye
+  `statics.eleconomista.com.ar` y no se toca el nginx compartido → el feed va **sin imágenes** (título +
+  resumen + link), con disclaimer de que no se reproduce el contenido completo.
+- **Feriados**: helpers puros nuevos en `lib/holidays.ts` (`daysUntil`/`upcomingHolidays`/`formatLongDate`/
+  `daysUntilLabel`, fechas en UTC para evitar corrimiento de TZ). Widget `ProximoFeriadoCard` en la Home
+  (próximo feriado + los siguientes, cruzando año actual y siguiente) y ruta `/feriados`
+  (`HolidaysList`) con selector de año (±1) y los pasados atenuados. Fuente Nager.Date visible.
+- Ambas sumadas a Sidebar, Cmd-K y sitemap; nueva sección "Agenda y noticias" en la Home. Verificado
+  `tsc`/`biome` (115 archivos)/`next build` verdes; `/noticias` y `/feriados` prerenderizan.
 - **Noticias** (`useNews`/`/news`, El Economista RSS): feed en una ruta `/noticias` o card lateral en la
   Home, con título, fecha, fuente y link. Sumar feeds sigue siendo una entrada en `FEEDS` del connector.
 - **Feriados** (`useHolidays`/`/holidays`): mini-widget "próximo feriado" en footer/Home y, si se quiere,

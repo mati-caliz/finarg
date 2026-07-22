@@ -3,7 +3,7 @@
 import { useIndicators } from "@/hooks/useLabrecha";
 import { indicatorLabel, sourceLabel } from "@/lib/indicators";
 import { useAppStore } from "@/store/useStore";
-import { Calculator, Landmark, LineChart, Scale, Search } from "lucide-react";
+import { CalendarDays, Calculator, Landmark, LineChart, Newspaper, Scale, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
@@ -21,6 +21,8 @@ const STATIC_COMMANDS: Command[] = [
   { id: "route:indicadores", title: "Indicadores", subtitle: "Catálogo completo", href: "/indicadores", keywords: "indicadores catalogo series", icon: <LineChart className="h-4 w-4" /> },
   { id: "route:brechas", title: "Brechas entre mediciones", subtitle: "Cambiaria, financiera, inflación esperada, reservas", href: "/brechas", keywords: "brecha cambiaria financiera dolar blue mep reservas inflacion esperada rem comparador", icon: <Scale className="h-4 w-4" /> },
   { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congreso", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
+  { id: "route:noticias", title: "Noticias económicas", subtitle: "Últimos titulares de economía", href: "/noticias", keywords: "noticias titulares prensa economia el economista", icon: <Newspaper className="h-4 w-4" /> },
+  { id: "route:feriados", title: "Feriados de Argentina", subtitle: "Calendario de feriados nacionales", href: "/feriados", keywords: "feriados calendario dias no laborables asueto", icon: <CalendarDays className="h-4 w-4" /> },
   { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculadora-sueldo-neto", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
   { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculadora-impacto-fiscal", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
   { id: "route:interes", title: "Calculadora de interés compuesto", href: "/calculadora-interes-compuesto", keywords: "calculadora interes compuesto inversion", icon: <Calculator className="h-4 w-4" /> },
