@@ -29,7 +29,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 20m
           script: |
-            cd /home/deploy/finarg
+            cd /home/deploy/labrecha
 
             echo "📥 Pulling latest changes..."
             git pull origin main
