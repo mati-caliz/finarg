@@ -17,6 +17,7 @@ interface IndicatorTileProps {
   source: string;
   date?: string;
   href?: string;
+  stale?: boolean;
   style?: CSSProperties;
 }
 
@@ -32,6 +33,7 @@ export function IndicatorTile({
   source,
   date,
   href,
+  stale,
   style,
 }: IndicatorTileProps) {
   return (
@@ -108,7 +110,32 @@ export function IndicatorTile({
         </div>
         {data && <Sparkline data={data} width={96} height={40} fill />}
       </div>
-      <SourceChip source={source} date={date} style={{ alignSelf: "flex-start" }} />
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+        <SourceChip source={source} date={date} />
+        {stale && <StaleChip />}
+      </div>
     </a>
+  );
+}
+
+export function StaleChip() {
+  return (
+    <span
+      title="El último dato disponible es más viejo que la cadencia habitual de esta fuente."
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 4,
+        padding: "2px 8px",
+        borderRadius: "var(--radius-pill)",
+        background: "var(--brecha-bg)",
+        color: "var(--brecha-strong)",
+        fontSize: "0.6875rem",
+        fontWeight: 600,
+        lineHeight: 1.7,
+      }}
+    >
+      Desactualizado
+    </span>
   );
 }

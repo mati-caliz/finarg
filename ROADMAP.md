@@ -774,8 +774,20 @@ endpoint + hook pero cero UI; ahora tienen superficie:
 - Criterio de salida: noticias y feriados visibles en la UI con su fuente; nada de dato ingerido queda sin
   superficie.
 
-**6.d — Frescura y confianza (muy on-brand).** La regla dura es fuente+fecha siempre; el paso natural es
-hacer visible cuándo un dato quedó viejo, y publicar la salud del scraper.
+**6.d — Frescura y confianza (muy on-brand).** ✅ HECHO (2026-07-22). Entregado:
+- **Badge "Desactualizado"**: `lib/freshness.ts` (helper puro) decide fresco/viejo con `daysSince` +
+  `MAX_AGE_DAYS` por cadencia (diaria 5 / mensual 55 / trimestral 135 / semestral 250 / anual 430 días).
+  La cadencia por indicador vive en `indicators.ts` (`cadenceForCode`: default por familia —`dolar` →
+  diaria— con sets de override, p. ej. `base_monetaria` es mensual aunque su familia sea monetario;
+  desempleo/empleo_no_registrado trimestral; pobreza semestral; big_mac y tributos anual). Componente core
+  `StaleChip` (ámbar) integrado en `IndicatorTile` (Home), las cards de `/indicadores` y el header de
+  `IndicatorDetail`. Sin backend nuevo.
+- **Página `/estado`** (`components/estado/ScrapeStatus.tsx` + hook `useScrapeRuns` sobre `/scrape-runs`,
+  antes sin exponer en la UI): tablero de salud del scraper — última corrida de cada conector con estado
+  (verde OK / rojo error / ámbar running), tiempo relativo, filas ingeridas, duración y el mensaje de error;
+  los conectores con error se ordenan arriba, con un resumen (N conectores / N con error). Linkeada desde el
+  footer del Sidebar, Cmd-K y sitemap. Refuerza la credibilidad, que es el punto del observatorio.
+- Verificado `tsc`/`biome` (118 archivos)/`next build` verdes; `/estado` prerenderiza.
 - **Badge "desactualizado"**: helper puro que, dado el `date` del último punto y la cadencia esperada del
   indicador (diaria/mensual/trimestral, declarada en una constante), decide si está fresco/viejo y pinta
   en ámbar. Integrarlo en `IndicatorTile`/`SourceChip` (componentes core). Sin backend nuevo.

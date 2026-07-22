@@ -3,7 +3,16 @@
 import { useIndicators } from "@/hooks/useLabrecha";
 import { indicatorLabel, sourceLabel } from "@/lib/indicators";
 import { useAppStore } from "@/store/useStore";
-import { CalendarDays, Calculator, Landmark, LineChart, Newspaper, Scale, Search } from "lucide-react";
+import {
+  Activity,
+  CalendarDays,
+  Calculator,
+  Landmark,
+  LineChart,
+  Newspaper,
+  Scale,
+  Search,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
@@ -23,6 +32,7 @@ const STATIC_COMMANDS: Command[] = [
   { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congreso", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
   { id: "route:noticias", title: "Noticias económicas", subtitle: "Últimos titulares de economía", href: "/noticias", keywords: "noticias titulares prensa economia el economista", icon: <Newspaper className="h-4 w-4" /> },
   { id: "route:feriados", title: "Feriados de Argentina", subtitle: "Calendario de feriados nacionales", href: "/feriados", keywords: "feriados calendario dias no laborables asueto", icon: <CalendarDays className="h-4 w-4" /> },
+  { id: "route:estado", title: "Estado del observatorio", subtitle: "Salud del scraper", href: "/estado", keywords: "estado salud scraper conectores corridas errores pipeline status", icon: <Activity className="h-4 w-4" /> },
   { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculadora-sueldo-neto", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
   { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculadora-impacto-fiscal", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
   { id: "route:interes", title: "Calculadora de interés compuesto", href: "/calculadora-interes-compuesto", keywords: "calculadora interes compuesto inversion", icon: <Calculator className="h-4 w-4" /> },

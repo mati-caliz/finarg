@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
+  Activity,
   Banknote,
   CalendarDays,
   Calculator,
@@ -312,7 +313,26 @@ export function Sidebar() {
             })}
           </nav>
 
-          <div className="p-4" style={{ borderTop: "1px solid var(--border-1)" }}>
+          <div
+            className="p-4"
+            style={{ borderTop: "1px solid var(--border-1)", display: "flex", flexDirection: "column", gap: 8 }}
+          >
+            <Link
+              href="/estado"
+              onClick={closeOnMobile}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: pathname === "/estado" ? "var(--accent-strong)" : "var(--text-secondary)",
+                textDecoration: "none",
+              }}
+            >
+              <Activity className="h-3.5 w-3.5" />
+              Estado del observatorio
+            </Link>
             <p
               style={{
                 display: "flex",

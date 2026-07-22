@@ -9,7 +9,7 @@ export { DataTable } from "./DataTable";
 export type { DataTableColumn, DataTableRow } from "./DataTable";
 export { EventDot } from "./EventDot";
 export type { EventCategory } from "./EventDot";
-export { IndicatorTile } from "./IndicatorTile";
+export { IndicatorTile, StaleChip } from "./IndicatorTile";
 export { LiveCounter } from "./LiveCounter";
 export { SourceChip, SourceAttribution } from "./SourceChip";
 export { Sparkline } from "./Sparkline";

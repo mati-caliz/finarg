@@ -1,8 +1,10 @@
 "use client";
 
+import { StaleChip } from "@/components/core";
 import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicators } from "@/hooks/useLabrecha";
+import { freshnessForCode } from "@/lib/freshness";
 import type { IndicatorSummary } from "@/lib/labrechaApi";
 import {
   INDICATOR_FAMILY_LABELS,
@@ -146,8 +148,11 @@ function IndicatorCatalogCard({ indicator }: { indicator: IndicatorSummary }) {
           </span>
         )}
       </div>
-      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-        {indicator.count.toLocaleString("es-AR")} datos · último {formatDateAR(indicator.last_date)}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+          {indicator.count.toLocaleString("es-AR")} datos · último {formatDateAR(indicator.last_date)}
+        </span>
+        {freshnessForCode(indicator.indicator_code, indicator.last_date).stale && <StaleChip />}
       </div>
     </a>
   );
