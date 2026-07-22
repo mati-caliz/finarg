@@ -11,6 +11,7 @@ import {
   Landmark,
   LineChart,
   Menu,
+  Scale,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -37,6 +38,7 @@ interface NavTop {
 const TOP_LINKS: NavTop[] = [
   { label: "Inicio", href: "/", icon: Home },
   { label: "Indicadores", href: "/indicadores", icon: LineChart },
+  { label: "Brechas", href: "/brechas", icon: Scale },
   { label: "Congreso", href: "/congreso", icon: Landmark },
 ];
 

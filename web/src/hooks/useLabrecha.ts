@@ -61,6 +61,19 @@ export function useIndicatorSeriesMulti(
   });
 }
 
+export function useLegLatest(legs: { code: string; source: string }[]) {
+  return useQueries({
+    queries: legs.map((leg) => ({
+      queryKey: labrechaKeys.indicatorSeries(leg.code, {
+        source: leg.source,
+        limit: 1,
+        order: "desc" as const,
+      }),
+      queryFn: () => indicatorsApi.series(leg.code, { source: leg.source, limit: 1, order: "desc" }),
+    })),
+  });
+}
+
 export function useIndicatorSources(code: string) {
   return useQuery({
     queryKey: labrechaKeys.indicatorSources(code),

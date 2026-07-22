@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }[] = [
     { path: "", changeFrequency: "hourly", priority: 1 },
     { path: "/indicadores", changeFrequency: "daily", priority: 0.9 },
+    { path: "/brechas", changeFrequency: "daily", priority: 0.9 },
     { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
     ...Object.keys(INDICATOR_META).map((code) => ({
       path: `/indicador/${code}`,

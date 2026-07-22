@@ -3,6 +3,7 @@ import { BoletinFeedCard } from "@/components/home/BoletinFeedCard";
 import { BrechaMedicionesCard } from "@/components/home/BrechaMedicionesCard";
 import { CoparticipacionCard } from "@/components/home/CoparticipacionCard";
 import { GastoPublicoClockCard } from "@/components/home/GastoPublicoClockCard";
+import { IndiceBrechaCard } from "@/components/home/IndiceBrechaCard";
 import { IndicatorTileConnected } from "@/components/home/IndicatorTileConnected";
 import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
@@ -91,6 +92,10 @@ export default function HomePage() {
             Ver el catálogo completo →
           </a>
         </p>
+      </HomeSection>
+
+      <HomeSection id="brechas" title="La brecha entre mediciones">
+        <IndiceBrechaCard />
       </HomeSection>
 
       <HomeSection id="contadores" title="Contadores y brecha en vivo">
