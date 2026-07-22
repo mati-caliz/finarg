@@ -340,8 +340,10 @@ Gotcha: `cap_drop: ALL` rompe el login del CLI (queda "Not logged in") — se qu
 ademas de `db-network` para tener salida a internet (sin eso, todos los jobs fallan con DNS).
 
 **Pendiente Fase 4 — requiere el server (no hacer sin acceso al VPS):** registrar/apuntar
-`labrecha.ar` (DNS), monitoreo/alerta sobre `scrape_runs`, y renombrar la carpeta de deploy del VPS
+`labrecha.ar` (DNS), y renombrar la carpeta de deploy del VPS
 (`/home/deploy/finarg` en deploy.yml/force-rebuild.yml) si se decide. La carpeta root (local y VPS) sigue `finarg` (renombrar con `mv` desde afuera de la sesión).
+La **alerta sobre `scrape_runs`** ya tiene script listo (`scripts/scrape-alert.sh`, ver Fase 6.f); sólo falta
+cablearla al crontab del host.
 La DB y el proyecto compose de prod **ya se renombraron a `labrecha`** (2026-07-21): proyecto
 `labrecha`, DB `labrecha_prod`, volumen `labrecha_postgres_data` propio.
 
@@ -825,7 +827,25 @@ endpoint + hook pero cero UI; ahora tienen superficie:
 - Criterio de salida: cada `/indicador/[code]` tiene OG image y export; existe `/boletin.xml` (o similar)
   válido. Sin romper el CSP.
 
-**6.f — Cierres del roadmap previo (contadores + infra).** Barrer lo que quedó abierto:
+**6.f — Cierres del roadmap previo (contadores + infra).** ✅ HECHO (2026-07-22). Barrido de lo que quedó
+abierto:
+- **Base monetaria clock** y **Gasto público por segundo** (5.a): ya estaban hechos (ver 5.a).
+- **Changelog del Impuestómetro** (5.f): ya estaba hecho, automático vía el pipeline del Boletín (ver 5.f).
+- **Limpieza Fase 3** (`config/countries.ts`, `i18n/translations.ts`, `useTranslation.ts`): ya borrados (ver
+  *pendientes heredados*).
+- **Alerta sobre `scrape_runs`**: script nuevo `scripts/scrape-alert.sh` — detecta por SQL los conectores
+  cuyas últimas N corridas (env `FAILURE_THRESHOLD`, default 3) fallaron todas, y notifica por **Telegram**
+  (env `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`) y/o sale ≠0 para que el `MAILTO` del cron lo capture. Consulta
+  la base del contenedor `postgres` (prod) vía `docker compose exec`. Verificado contra la base local: la
+  consulta corre limpia (todos OK → sin alerta) y detecta un fallo sintético (probado con `BEGIN`/`ROLLBACK`,
+  sin persistir). **Queda para el VPS** (lo hace el usuario): agregar una línea al crontab del host que llame
+  a `scrape-alert.sh` después de la corrida diaria, y cargar las credenciales de Telegram si se quiere ese
+  canal.
+- **Infra restante en el VPS** (la hace el usuario): registrar/apuntar `labrecha.ar` (DNS) y, si se decide,
+  renombrar `/home/deploy/finarg`. El cron de las corridas ya estaba (ver Fase 4).
+
+**Criterio de salida de la fase: cumplido** salvo el DNS y el wiring del cron de la alerta, que dependen del
+VPS. Detalle original de la sub-fase, como referencia:
 - **Base monetaria clock** y **Gasto público por segundo** (5.a): el primero reusa `LiveCounter` +
   `base_monetaria` (ya ingerida). El segundo bloquea en **ingerir el presupuesto anual vigente** (connector
   nuevo sobre Presupuesto Abierto / Sec. Hacienda vía datos.gob.ar → constante anual) y luego
