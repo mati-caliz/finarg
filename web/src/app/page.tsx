@@ -9,6 +9,8 @@ import { ImpuestometroCard } from "@/components/home/ImpuestometroCard";
 import { InflationClockCard } from "@/components/home/InflationClockCard";
 import { MonitorAlquileresCard } from "@/components/home/MonitorAlquileresCard";
 import { MonitorBcraCard } from "@/components/home/MonitorBcraCard";
+import { NewsTeaserCard } from "@/components/home/NewsTeaserCard";
+import { ProximoFeriadoCard } from "@/components/home/ProximoFeriadoCard";
 import { PromesometroFiscalCard } from "@/components/home/PromesometroFiscalCard";
 import { RadarCreditoCard } from "@/components/home/RadarCreditoCard";
 import { TermometroEmpleoCard } from "@/components/home/TermometroEmpleoCard";
@@ -128,6 +130,19 @@ export default function HomePage() {
           <ImpuestometroCard />
           <TermometroSubsidiosCard />
           <MonitorAlquileresCard />
+        </div>
+      </HomeSection>
+
+      <HomeSection id="agenda" title="Agenda y noticias">
+        <div
+          style={{
+            display: "grid",
+            gap: "var(--sp-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          }}
+        >
+          <NewsTeaserCard />
+          <ProximoFeriadoCard />
         </div>
       </HomeSection>
 

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/useStore";
 import {
   Banknote,
+  CalendarDays,
   Calculator,
   ChevronDown,
   ChevronRight,
@@ -11,6 +12,7 @@ import {
   Landmark,
   LineChart,
   Menu,
+  Newspaper,
   Scale,
   X,
 } from "lucide-react";
@@ -40,6 +42,8 @@ const TOP_LINKS: NavTop[] = [
   { label: "Indicadores", href: "/indicadores", icon: LineChart },
   { label: "Brechas", href: "/brechas", icon: Scale },
   { label: "Congreso", href: "/congreso", icon: Landmark },
+  { label: "Noticias", href: "/noticias", icon: Newspaper },
+  { label: "Feriados", href: "/feriados", icon: CalendarDays },
 ];
 
 const GROUPS: NavGroup[] = [
