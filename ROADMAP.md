@@ -680,8 +680,30 @@ no agrega casi scraping nuevo — es sobre todo frontend + un par de endpoints d
 
 ### Sub-fases (de menor a mayor riesgo)
 
-**6.a — Navegabilidad: índice de indicadores + búsqueda global.** El hueco más grande de UX: hoy sólo
-existe `/indicador/[code]` (acceso directo por URL); un indicador que no está en la Home es inalcanzable.
+**6.a — Navegabilidad: índice de indicadores + búsqueda global.** ✅ HECHO (2026-07-22). El hueco más
+grande de UX estaba en que sólo existía `/indicador/[code]` (acceso directo por URL); un indicador fuera
+de la Home era inalcanzable. Entregado:
+- **Metadata de catálogo** en `web/src/lib/indicators.ts`: `INDICATOR_META` clasifica los 56 códigos del
+  catálogo en 6 familias (`precios`/`dolar`/`monetario`/`fiscal`/`empleo`/`social`) con label, unidad,
+  `goodWhen` y formateador. `getIndicatorDisplay` ahora cae a esta metadata (label/unidad/formato) para los
+  indicadores **no** destacados —antes mostraban el código crudo en su página—, y helpers nuevos
+  `getIndicatorMeta`/`indicatorLabel`/`formatUsdAR`.
+- **Ruta `/indicadores`** (`app/indicadores/page.tsx` + `components/indicator/IndicatorCatalog.tsx`):
+  catálogo completo sobre `/indicators` (una sola llamada, sin N fetches por tile), agrupado por familia,
+  con card por indicador (label + código + chips de fuente + badge "comparador" si ≥2 fuentes + conteo y
+  fecha del último dato) que linkea a su `/indicador/[code]`, más un buscador cliente-side sobre el catálogo.
+- **Búsqueda global Cmd-K** (`components/layout/CommandPalette.tsx`, montado global en `layout.tsx`): paleta
+  que indexa el catálogo cacheado por TanStack Query + rutas fijas (inicio, indicadores, congreso, las 4
+  calculadoras); abre con ⌘K/Ctrl-K o el botón "Buscar" nuevo en la `Navbar`, con navegación por teclado
+  (↑/↓/Enter/Esc) y match sin acentos. Backdrop como `<button>` y panel como `<dialog>` nativo para pasar
+  a11y sin `biome-ignore`.
+- **Sidebar**: link top nuevo "Indicadores" → `/indicadores`; el grupo colapsable viejo homónimo se renombró
+  a "Destacados" (accesos rápidos). **Sitemap**: agrega `/indicadores` y expande las páginas de indicador a
+  **todo** `INDICATOR_META` (antes sólo los destacados). **Home**: las secciones ahora tienen título con
+  ancla ("Indicadores destacados" con link al catálogo, "Contadores y brecha en vivo", "Monitores…") en vez
+  del scroll plano. Verificado `tsc`/`biome` (104 archivos)/`next build` verdes.
+
+El diseño original de la sub-fase se mantiene como referencia:
 - Ruta **`/indicadores`**: grilla/tabla del catálogo completo sobre `/indicators` (ya devuelve código,
   fuentes y rango de fechas por indicador), con `IndicatorTile` reusando el último valor y variación.
   Agrupar por familia (precios, fiscal, monetario, empleo, congreso, vivienda) con una constante de

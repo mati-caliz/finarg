@@ -36,12 +36,13 @@ interface NavTop {
 
 const TOP_LINKS: NavTop[] = [
   { label: "Inicio", href: "/", icon: Home },
+  { label: "Indicadores", href: "/indicadores", icon: LineChart },
   { label: "Congreso", href: "/congreso", icon: Landmark },
 ];
 
 const GROUPS: NavGroup[] = [
   {
-    label: "Indicadores",
+    label: "Destacados",
     icon: LineChart,
     items: [
       { label: "Dólar", href: "/indicador/dolar_blue" },
@@ -122,7 +123,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { sidebarOpen, toggleSidebar, setSidebarOpen } = useAppStore();
   const activeGroup = GROUPS.find((group) => group.items.some((item) => item.href === pathname));
-  const [openGroup, setOpenGroup] = useState<string | null>(activeGroup?.label ?? "Indicadores");
+  const [openGroup, setOpenGroup] = useState<string | null>(activeGroup?.label ?? "Destacados");
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;

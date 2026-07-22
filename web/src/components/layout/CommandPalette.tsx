@@ -1,0 +1,246 @@
+"use client";
+
+import { useIndicators } from "@/hooks/useLabrecha";
+import { indicatorLabel, sourceLabel } from "@/lib/indicators";
+import { useAppStore } from "@/store/useStore";
+import { Calculator, Landmark, LineChart, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+
+interface Command {
+  id: string;
+  title: string;
+  subtitle?: string;
+  href: string;
+  keywords: string;
+  icon: ReactNode;
+}
+
+const STATIC_COMMANDS: Command[] = [
+  { id: "route:inicio", title: "Inicio", subtitle: "Estado del país", href: "/", keywords: "inicio home estado del pais", icon: <LineChart className="h-4 w-4" /> },
+  { id: "route:indicadores", title: "Indicadores", subtitle: "Catálogo completo", href: "/indicadores", keywords: "indicadores catalogo series", icon: <LineChart className="h-4 w-4" /> },
+  { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congreso", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
+  { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculadora-sueldo-neto", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculadora-impacto-fiscal", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:interes", title: "Calculadora de interés compuesto", href: "/calculadora-interes-compuesto", keywords: "calculadora interes compuesto inversion", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:ajuste", title: "Calculadora de ajuste por inflación", href: "/calculadora-ajuste-inflacion", keywords: "calculadora ajuste inflacion ipc actualizar", icon: <Calculator className="h-4 w-4" /> },
+];
+
+const DIACRITICS = /\p{Diacritic}/gu;
+
+function normalize(text: string): string {
+  return text.toLowerCase().normalize("NFD").replace(DIACRITICS, "");
+}
+
+export function CommandPalette() {
+  const router = useRouter();
+  const { commandOpen, setCommandOpen } = useAppStore();
+  const { data: indicators } = useIndicators();
+  const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setCommandOpen(!commandOpen);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [commandOpen, setCommandOpen]);
+
+  useEffect(() => {
+    if (commandOpen) {
+      setQuery("");
+      setActiveIndex(0);
+      const timeoutId = setTimeout(() => inputRef.current?.focus(), 0);
+      return () => clearTimeout(timeoutId);
+    }
+    return undefined;
+  }, [commandOpen]);
+
+  const commands = useMemo<Command[]>(() => {
+    const indicatorCommands: Command[] = (indicators ?? []).map((indicator) => ({
+      id: `indicator:${indicator.indicator_code}`,
+      title: indicatorLabel(indicator.indicator_code),
+      subtitle: indicator.sources.map(sourceLabel).join(" · "),
+      href: `/indicador/${indicator.indicator_code}`,
+      keywords: `${indicator.indicator_code} ${indicatorLabel(indicator.indicator_code)}`,
+      icon: <LineChart className="h-4 w-4" />,
+    }));
+    return [...STATIC_COMMANDS, ...indicatorCommands];
+  }, [indicators]);
+
+  const results = useMemo(() => {
+    const normalizedQuery = normalize(query.trim());
+    if (normalizedQuery.length === 0) {
+      return commands;
+    }
+    return commands.filter((command) =>
+      normalize(`${command.title} ${command.keywords}`).includes(normalizedQuery),
+    );
+  }, [commands, query]);
+
+  if (!commandOpen) {
+    return null;
+  }
+
+  const go = (command: Command) => {
+    setCommandOpen(false);
+    router.push(command.href);
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((index) => Math.min(index + 1, results.length - 1));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((index) => Math.max(index - 1, 0));
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      const command = results[activeIndex];
+      if (command) {
+        go(command);
+      }
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      setCommandOpen(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 60,
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        paddingTop: "12vh",
+        paddingInline: 16,
+      }}
+    >
+      <button
+        type="button"
+        aria-label="Cerrar buscador"
+        onClick={() => setCommandOpen(false)}
+        style={{
+          position: "absolute",
+          inset: 0,
+          border: "none",
+          cursor: "default",
+          background: "rgba(20,25,31,0.45)",
+          backdropFilter: "blur(2px)",
+        }}
+      />
+      <dialog
+        open
+        aria-label="Buscar en el observatorio"
+        onKeyDown={onKeyDown}
+        style={{
+          position: "relative",
+          margin: 0,
+          padding: 0,
+          width: "100%",
+          maxWidth: 560,
+          background: "var(--surface-card)",
+          color: "var(--text-body)",
+          border: "1px solid var(--border-2)",
+          borderRadius: "var(--radius-lg)",
+          boxShadow: "var(--shadow-raised)",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "12px 16px",
+            borderBottom: "1px solid var(--border-1)",
+          }}
+        >
+          <Search className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setActiveIndex(0);
+            }}
+            placeholder="Buscar indicador, calculadora, sección…"
+            aria-label="Buscar"
+            style={{
+              flex: 1,
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              color: "var(--text-body)",
+              fontSize: "0.9375rem",
+            }}
+          />
+        </div>
+
+        <div ref={listRef} style={{ maxHeight: "56vh", overflowY: "auto", padding: 6 }}>
+          {results.length === 0 && (
+            <p style={{ padding: "16px", color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>
+              Sin resultados para “{query}”.
+            </p>
+          )}
+          {results.map((command, index) => {
+            const active = index === activeIndex;
+            return (
+              <button
+                key={command.id}
+                type="button"
+                onClick={() => go(command)}
+                onMouseEnter={() => setActiveIndex(index)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  width: "100%",
+                  padding: "9px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "left",
+                  background: active ? "var(--accent-soft)" : "transparent",
+                  color: active ? "var(--accent-strong)" : "var(--text-body)",
+                }}
+              >
+                <span style={{ color: active ? "var(--accent-strong)" : "var(--text-muted)", flexShrink: 0 }}>
+                  {command.icon}
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: "block", fontSize: "0.875rem", fontWeight: 600 }}>
+                    {command.title}
+                  </span>
+                  {command.subtitle && (
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: "0.75rem",
+                        color: "var(--text-muted)",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {command.subtitle}
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </dialog>
+    </div>
+  );
+}

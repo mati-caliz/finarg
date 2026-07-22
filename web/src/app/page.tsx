@@ -13,6 +13,32 @@ import { RadarCreditoCard } from "@/components/home/RadarCreditoCard";
 import { TermometroEmpleoCard } from "@/components/home/TermometroEmpleoCard";
 import { TermometroSubsidiosCard } from "@/components/home/TermometroSubsidiosCard";
 import { FEATURED_INDICATOR_CODES } from "@/lib/indicators";
+import type { ReactNode } from "react";
+
+function HomeSection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return (
+    <section
+      id={id}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "var(--sp-4)",
+        scrollMarginTop: "var(--sp-8)",
+      }}
+    >
+      <h2
+        style={{
+          font: "var(--fw-bold) var(--fs-h3)/var(--lh-heading) var(--font-sans)",
+          color: "var(--text-body)",
+          margin: 0,
+        }}
+      >
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
 
 export default function HomePage() {
   const today = new Date().toLocaleDateString("es-AR", {
@@ -48,52 +74,63 @@ export default function HomePage() {
         </p>
       </header>
 
-      <section
-        style={{
-          display: "grid",
-          gap: "var(--sp-4)",
-          gridTemplateColumns: "repeat(auto-fill, minmax(var(--tile-min), 1fr))",
-        }}
-      >
-        {FEATURED_INDICATOR_CODES.map((code) => (
-          <IndicatorTileConnected key={code} code={code} />
-        ))}
-      </section>
+      <HomeSection id="destacados" title="Indicadores destacados">
+        <div
+          style={{
+            display: "grid",
+            gap: "var(--sp-4)",
+            gridTemplateColumns: "repeat(auto-fill, minmax(var(--tile-min), 1fr))",
+          }}
+        >
+          {FEATURED_INDICATOR_CODES.map((code) => (
+            <IndicatorTileConnected key={code} code={code} />
+          ))}
+        </div>
+        <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", margin: "var(--sp-2) 0 0" }}>
+          <a href="/indicadores" style={{ color: "var(--accent-strong)", fontWeight: 600 }}>
+            Ver el catálogo completo →
+          </a>
+        </p>
+      </HomeSection>
 
-      <section
-        style={{
-          display: "grid",
-          gap: "var(--sp-4)",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        }}
-      >
-        <InflationClockCard />
-        <BaseMonetariaClockCard />
-        <GastoPublicoClockCard />
-        <BrechaMedicionesCard />
-      </section>
+      <HomeSection id="contadores" title="Contadores y brecha en vivo">
+        <div
+          style={{
+            display: "grid",
+            gap: "var(--sp-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          }}
+        >
+          <InflationClockCard />
+          <BaseMonetariaClockCard />
+          <GastoPublicoClockCard />
+          <BrechaMedicionesCard />
+        </div>
+      </HomeSection>
 
-      <section
-        style={{
-          display: "grid",
-          gap: "var(--sp-4)",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        }}
-      >
-        <PromesometroFiscalCard />
-        <MonitorBcraCard />
-        <TermometroEmpleoCard />
-        <RadarCreditoCard />
-        <ImpuestometroCard />
-        <TermometroSubsidiosCard />
-        <MonitorAlquileresCard />
-      </section>
+      <HomeSection id="monitores" title="Monitores fiscal, monetario y social">
+        <div
+          style={{
+            display: "grid",
+            gap: "var(--sp-4)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          }}
+        >
+          <PromesometroFiscalCard />
+          <MonitorBcraCard />
+          <TermometroEmpleoCard />
+          <RadarCreditoCard />
+          <ImpuestometroCard />
+          <TermometroSubsidiosCard />
+          <MonitorAlquileresCard />
+        </div>
+      </HomeSection>
 
-      <section>
+      <section id="boletin" style={{ scrollMarginTop: "var(--sp-8)" }}>
         <BoletinFeedCard />
       </section>
 
-      <section>
+      <section id="coparticipacion" style={{ scrollMarginTop: "var(--sp-8)" }}>
         <CoparticipacionCard />
       </section>
     </div>
