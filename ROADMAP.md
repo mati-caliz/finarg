@@ -341,7 +341,7 @@ ademas de `db-network` para tener salida a internet (sin eso, todos los jobs fal
 
 **Pendiente Fase 4 — requiere el server (no hacer sin acceso al VPS):** registrar/apuntar
 `labrecha.ar` (DNS), y renombrar la carpeta de deploy del VPS
-(`/home/deploy/finarg` en deploy.yml/force-rebuild.yml) si se decide. La carpeta root (local y VPS) sigue `finarg` (renombrar con `mv` desde afuera de la sesión).
+(`/home/deploy/labrecha` en deploy.yml/force-rebuild.yml) si se decide. La carpeta root (local y VPS) sigue `finarg` (renombrar con `mv` desde afuera de la sesión).
 La **alerta sobre `scrape_runs`** ya tiene script listo (`scripts/scrape-alert.sh`, ver Fase 6.f); sólo falta
 cablearla al crontab del host.
 La DB y el proyecto compose de prod **ya se renombraron a `labrecha`** (2026-07-21): proyecto
@@ -842,7 +842,7 @@ abierto:
   a `scrape-alert.sh` después de la corrida diaria, y cargar las credenciales de Telegram si se quiere ese
   canal.
 - **Infra restante en el VPS** (la hace el usuario): registrar/apuntar `labrecha.ar` (DNS) y, si se decide,
-  renombrar `/home/deploy/finarg`. El cron de las corridas ya estaba (ver Fase 4).
+  renombrar `/home/deploy/labrecha`. El cron de las corridas ya estaba (ver Fase 4).
 
 **Criterio de salida de la fase: cumplido** salvo el DNS y el wiring del cron de la alerta, que dependen del
 VPS. Detalle original de la sub-fase, como referencia:
@@ -855,7 +855,7 @@ VPS. Detalle original de la sub-fase, como referencia:
   gigante ya existente. El número base se audita contra la semilla, no se confía a la IA.
 - **Infra Fase 4 (requiere VPS)**: cron del host para las corridas del scraper (una entrada por cadencia),
   y **alerta simple (mail/Telegram) cuando un job de `scrape_runs` falla N veces seguidas** — hoy no hay
-  ninguna. Registrar/apuntar `labrecha.ar` (DNS) y, si se decide, renombrar `/home/deploy/finarg`.
+  ninguna. Registrar/apuntar `labrecha.ar` (DNS) y, si se decide, renombrar `/home/deploy/labrecha`.
 - **Limpieza Fase 3**: borrar `config/countries.ts`, `i18n/translations.ts`, `useTranslation.ts` (muertos,
   la app es solo-Argentina). Verificar con `tsc`/`biome`/`next build` que nada los referencia.
 - Criterio de salida: contadores nuevos en la Home con disclaimer de proyección; changelog de impuestos
