@@ -25,6 +25,7 @@ import {
   getIndicatorDisplay,
   sourceLabel,
 } from "@/lib/indicators";
+import { SeriesExport } from "@/components/indicator/SeriesExport";
 import { BRECHAS } from "@/lib/brechas";
 import { freshnessForCode } from "@/lib/freshness";
 import {
@@ -185,7 +186,19 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
             </div>
           )}
         </div>
-        <RangeSelector options={RANGE_OPTIONS} active={range} onChange={setRange} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+          <RangeSelector options={RANGE_OPTIONS} active={range} onChange={setRange} />
+          <SeriesExport
+            code={code}
+            indicator={indicator}
+            sources={parsedSources}
+            latest={
+              primary && primaryValue !== undefined
+                ? { source: primary.source, value: primaryValue, date: primary.last_date }
+                : undefined
+            }
+          />
+        </div>
       </div>
 
       <Card

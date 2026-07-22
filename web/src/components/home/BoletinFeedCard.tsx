@@ -70,10 +70,18 @@ export function BoletinFeedCard() {
       subtitle="Las normas económicas y regulatorias del día, resumidas en 3 viñetas"
       actions={<Badge tone="evento">IA</Badge>}
       footer={
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-          Resúmenes generados por IA a partir del Boletín Oficial (primera sección). Verificá siempre
-          contra la norma original en el enlace.
-        </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+            Resúmenes generados por IA a partir del Boletín Oficial (primera sección). Verificá siempre
+            contra la norma original en el enlace.
+          </span>
+          <a
+            href="/boletin.xml"
+            style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--accent-strong)" }}
+          >
+            Suscribite por RSS →
+          </a>
+        </div>
       }
     >
       <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
