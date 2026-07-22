@@ -796,8 +796,24 @@ endpoint + hook pero cero UI; ahora tienen superficie:
   punto del observatorio. Requiere sólo un hook `useScrapeRuns` + ruta.
 - Criterio de salida: los tiles con dato viejo se marcan solos; `/estado` refleja `scrape_runs` en vivo.
 
-**6.e — Distribución: compartir, exportar, sindicar.** Hoy compartir un indicador comparte sólo texto y no
-hay forma de llevarse el dato. Un observatorio vive de que reproduzcan sus gráficos.
+**6.e — Distribución: compartir, exportar, sindicar.** ✅ HECHO (2026-07-22). Entregado:
+- **OG images por indicador**: `app/indicador/[code]/opengraph-image.tsx` (Next `ImageResponse`/satori,
+  1200×630) con marca, label, valor grande + unidad, fuente + fecha y **sparkline SVG** de la serie. Fetch
+  server-side vía helper nuevo `lib/serverApi.ts` (`serverGet`, habla directo con la API interna). **CSP
+  self-contained:** fuente por defecto de satori (sin fetch remoto), sin assets externos. Gotchas resueltos:
+  (1) satori renderiza `<title>` como texto visible → se usó `role="img"` + `aria-label` (que biome acepta en
+  lugar de `<title>`); (2) los indicadores con serie histórica (riesgo_pais, etc.) dibujan la línea; los que
+  hoy tienen 1 solo punto (dólar, que el cron puebla hacia adelante) muestran la card limpia sin línea.
+  Verificado renderizando el PNG real.
+- **Export CSV / copiar-con-fuente**: componente `SeriesExport` en `/indicador/[code]` (junto al
+  `RangeSelector`): "Descargar CSV" (fecha,fuente,valor del rango cargado, vía Blob) y "Copiar con fuente"
+  (texto con valor + unidad + fuente + fecha + link a labrecha.ar, respeta la regla de atribución).
+- **RSS del Boletín**: route handler `app/boletin.xml/route.ts` sirve `boletin_summaries` como RSS 2.0
+  válido (title/link/guid/category/pubDate/description con las 3 viñetas + **disclaimer de IA**), con XML
+  escapado y `Content-Type: application/rss+xml`. Verificado: XML válido con items reales. Link "Suscribite
+  por RSS" en la card del Boletín. Sumado a Cmd-K/sitemap donde corresponde.
+- Verificado `tsc`/`biome` (122 archivos)/`next build` verdes; `/boletin.xml` y la OG image probados end-to-end
+  contra un `npm start` real (RSS 200 + XML, OG PNG 1200×630).
 - **OG images por indicador**: `opengraph-image.tsx` (Next App Router, `ImageResponse`) por
   `/indicador/[code]` con el sparkline + último valor + brecha + atribución. Cuidar el CSP self-contained
   (fuentes embebidas, sin assets remotos). Es la palanca de crecimiento más barata.
