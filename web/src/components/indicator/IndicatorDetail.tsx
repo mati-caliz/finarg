@@ -24,6 +24,7 @@ import {
   getIndicatorDisplay,
   sourceLabel,
 } from "@/lib/indicators";
+import { BRECHAS } from "@/lib/brechas";
 import {
   alignSources,
   eventsToChartEvents,
@@ -31,6 +32,7 @@ import {
   rangeDateFrom,
   yearLabels,
 } from "@/lib/series";
+import Link from "next/link";
 import { useState } from "react";
 
 const RANGE_OPTIONS = ["6M", "1A", "5A", "Máx"];
@@ -92,6 +94,10 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   const xLabels = yearLabels(aligned.axis);
   const hasSeries = aligned.axis.length >= 2;
   const isComparator = ordered.length >= 2;
+
+  const relatedBrechas = BRECHAS.filter((brecha) =>
+    brecha.legs.some((leg) => leg.code === code),
+  );
 
   const primary = ordered[0];
   const primaryPoints = parsedSources.find((source) => source.source === primary?.source)?.points;
@@ -202,6 +208,35 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
           </p>
         )}
       </Card>
+
+      {relatedBrechas.length > 0 && (
+        <Card title="Este indicador forma parte de una brecha">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            {relatedBrechas.map((brecha) => (
+              <Link
+                key={brecha.id}
+                href={`/brechas#${brecha.id}`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 12px",
+                  borderRadius: "var(--radius-md)",
+                  border: "1px solid var(--border-1)",
+                  background: "var(--surface-inset)",
+                  textDecoration: "none",
+                  color: "var(--text-body)",
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                }}
+              >
+                <Badge tone="gap">Brecha</Badge>
+                {brecha.label} →
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {isComparator && (
         <Card

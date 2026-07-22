@@ -716,9 +716,32 @@ El diseño original de la sub-fase se mantiene como referencia:
 - Criterio de salida: `/indicadores` lista el 100% del catálogo, cada uno linkea a su `/indicador/[code]`;
   Cmd-K encuentra cualquier indicador por nombre. `tsc`/`biome`/`next build` verdes.
 
-**6.b — La feature estrella, explotada: más brechas entre mediciones.** Es *el* nombre del producto y hoy
-el comparador (`/indicador/[code]` con ≥2 fuentes) se dispara en **un solo indicador** (reservas BCRA vs
-datos.gob.ar). Hay materia prima ya ingerida sin usar:
+**6.b — La feature estrella, explotada: más brechas entre mediciones.** ✅ HECHO (2026-07-22). Antes el
+comparador (`/indicador/[code]` con ≥2 fuentes) se disparaba en **un solo indicador** (reservas BCRA vs
+datos.gob.ar). Ahora hay 4 brechas reales, superpuestas con relleno ámbar. **Hallazgo clave:** las brechas
+más valiosas (cambiaria, IPC vs REM) son entre **dos `indicator_code` distintos**, no dos `source` del mismo
+código — pero el helper `alignSources` de `lib/series.ts` es genérico (opera sobre series nombradas), así que
+se reusó tal cual para comparaciones cross-indicador. Entregado:
+- **`lib/brechas.ts`**: catálogo curado de 4 brechas (`BRECHAS` + `BRECHA_BY_ID` + `computeGap`): *cambiaria*
+  (dólar blue vs oficial), *financiera* (MEP/bolsa vs oficial), *inflación esperada vs medida* (REM 12m vs
+  IPC interanual, en pp) y *reservas* (BCRA vs datos.gob.ar, el caso mismo-código-dos-fuentes). Cada una con
+  formato, `gapMode` (pct/pp) y patas `{code, source, label}`.
+- **Widget "Índice de brecha"** (`home/IndiceBrechaCard`, sección propia en la Home): rankea las 4 brechas
+  por magnitud de discrepancia actual (`|gapPct|`), trayendo el último valor de cada pata con `useLegLatest`
+  (hook nuevo con `useQueries` sobre las patas aplanadas), mostrando ambas mediciones con **fuente + fecha**
+  y la brecha en ámbar. Contenido que ninguna otra fuente arma.
+- **Ruta `/brechas`** + **`BrechaComparison`**: cada brecha como comparación completa — dos series alineadas
+  y superpuestas (`AnnotatedSeriesChart` con `gapFill` + eventos políticos), `RangeSelector`, resumen de la
+  brecha actual y metodología por fuente. Satisface "≥3 indicadores con comparador multi-fuente real" (son 4).
+  Gotcha resuelto: la page es server (por `metadata`) y no puede pasar el `def` con su función `format` al
+  client component → `BrechaComparison` recibe `id` y resuelve el def desde `BRECHA_BY_ID`.
+- **Cross-links**: `IndicatorDetail` muestra un card "Este indicador forma parte de una brecha" cuando el
+  código aparece en alguna pata (linkea a `/brechas#<id>`). `/brechas` sumada a Sidebar, Cmd-K y sitemap.
+- Verificado `tsc`/`biome` (108 archivos)/`next build` verdes; las 6 patas devuelven dato contra la API.
+
+*Pobreza INDEC vs Nowcast UTDT vs UCA* queda pendiente (depende de destrabar las fuentes frágiles, ver
+*pendientes heredados*); el andamiaje de brechas ya está listo para sumarla cuando entren esas fuentes.
+Diseño original de la sub-fase, como referencia:
 - **IPC oficial vs REM** (`ipc_mensual`/`ipc_interanual` vs `expectativas_inflacion_rem`, mediana 12m):
   inflación medida vs esperada. Gratis, ya está en la base — cablear como comparación destacada.
 - **Pobreza INDEC vs Nowcast UTDT vs UCA**: la comparación insignia que el roadmap prometió. Depende de

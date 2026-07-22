@@ -3,7 +3,7 @@
 import { useIndicators } from "@/hooks/useLabrecha";
 import { indicatorLabel, sourceLabel } from "@/lib/indicators";
 import { useAppStore } from "@/store/useStore";
-import { Calculator, Landmark, LineChart, Search } from "lucide-react";
+import { Calculator, Landmark, LineChart, Scale, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
@@ -19,6 +19,7 @@ interface Command {
 const STATIC_COMMANDS: Command[] = [
   { id: "route:inicio", title: "Inicio", subtitle: "Estado del país", href: "/", keywords: "inicio home estado del pais", icon: <LineChart className="h-4 w-4" /> },
   { id: "route:indicadores", title: "Indicadores", subtitle: "Catálogo completo", href: "/indicadores", keywords: "indicadores catalogo series", icon: <LineChart className="h-4 w-4" /> },
+  { id: "route:brechas", title: "Brechas entre mediciones", subtitle: "Cambiaria, financiera, inflación esperada, reservas", href: "/brechas", keywords: "brecha cambiaria financiera dolar blue mep reservas inflacion esperada rem comparador", icon: <Scale className="h-4 w-4" /> },
   { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congreso", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
   { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculadora-sueldo-neto", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
   { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculadora-impacto-fiscal", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
