@@ -11,10 +11,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
 import { POST_CATEGORIES, type Post } from "@/lib/labrechaApi";
 import Link from "next/link";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 
 const SKELETON_KEYS = ["p1", "p2", "p3", "p4"];
 const ALL_FILTER = "Todas";
+const GRID_STYLE: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+  gap: "var(--sp-4)",
+  alignItems: "stretch",
+};
 
 function PostItem({ post }: { post: Post }) {
   return (
@@ -112,7 +118,7 @@ export function PostsFeed() {
       {isError && <QueryError error={error} onRetry={() => refetch()} />}
 
       {isLoading && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
+        <div style={GRID_STYLE}>
           {SKELETON_KEYS.map((key) => (
             <Skeleton key={key} className="h-[110px] rounded-[10px]" />
           ))}
@@ -127,9 +133,13 @@ export function PostsFeed() {
         </Card>
       )}
 
-      {(data ?? []).map((post) => (
-        <PostItem key={post.id} post={post} />
-      ))}
+      {(data ?? []).length > 0 && (
+        <div style={GRID_STYLE}>
+          {(data ?? []).map((post) => (
+            <PostItem key={post.id} post={post} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
