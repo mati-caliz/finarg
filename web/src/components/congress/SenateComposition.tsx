@@ -84,6 +84,7 @@ export function SenateComposition() {
           <HemicycleChart
             seats={seats}
             blocs={blocs}
+            majority={majority}
             ariaLabel={`Hemiciclo del Senado: ${total} bancas coloreadas por bloque`}
           />
         </div>

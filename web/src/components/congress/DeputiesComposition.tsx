@@ -76,6 +76,7 @@ export function DeputiesComposition() {
           <HemicycleChart
             seats={seats}
             blocs={blocs}
+            majority={majority}
             ariaLabel={`Hemiciclo de Diputados: ${total} bancas coloreadas por bloque`}
           />
         </div>
