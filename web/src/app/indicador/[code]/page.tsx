@@ -17,9 +17,5 @@ export async function generateMetadata({ params }: IndicatorPageProps): Promise<
 
 export default async function IndicatorPage({ params }: IndicatorPageProps) {
   const { code } = await params;
-  return (
-    <div style={{ maxWidth: "var(--container-max)", margin: "0 auto" }}>
-      <IndicatorDetail code={code} />
-    </div>
-  );
+  return <IndicatorDetail code={code} />;
 }

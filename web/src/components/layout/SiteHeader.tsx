@@ -1,0 +1,276 @@
+"use client";
+
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAppStore } from "@/store/useStore";
+import { Coffee, Menu, Search, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { type CSSProperties, useEffect, useState } from "react";
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "El país", href: "/" },
+  { label: "Indicadores", href: "/indicadores" },
+  { label: "Brechas", href: "/brechas" },
+  { label: "Ideas", href: "/ideas" },
+  { label: "Congreso", href: "/congreso" },
+  { label: "Noticias", href: "/noticias" },
+];
+
+const CAFECITO_URL = "https://cafecito.app/finlatam";
+
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/") {
+    return pathname === "/";
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+export function BrandMark({ fontSize = 21 }: { fontSize?: number }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8 }}>
+      <span
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize,
+          letterSpacing: "-0.02em",
+          color: "var(--ink)",
+        }}
+      >
+        La Brecha
+      </span>
+      <span
+        style={{
+          width: 7,
+          height: 7,
+          borderRadius: "50%",
+          background: "var(--brecha)",
+          transform: "translateY(-2px)",
+        }}
+      />
+    </span>
+  );
+}
+
+function CommandTrigger() {
+  const setCommandOpen = useAppStore((state) => state.setCommandOpen);
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    setIsMac(/Mac|iPhone|iPad/.test(navigator.platform));
+  }, []);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setCommandOpen(true)}
+      aria-label="Buscar"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "6px 11px",
+        borderRadius: "var(--radius-pill)",
+        border: "1px solid var(--line)",
+        background: "var(--surface)",
+        color: "var(--ink3)",
+        fontFamily: "var(--font-jb-mono)",
+        fontSize: "0.75rem",
+        cursor: "pointer",
+      }}
+    >
+      <Search size={14} aria-hidden />
+      <span className="hidden sm:inline">Buscar</span>
+      <span className="hidden md:inline">{isMac ? "⌘K" : "Ctrl K"}</span>
+    </button>
+  );
+}
+
+const NAV_LINK_BASE: CSSProperties = {
+  padding: "8px 12px",
+  borderRadius: "var(--radius-md)",
+  fontFamily: "var(--font-jb-mono)",
+  fontSize: "0.75rem",
+  letterSpacing: "0.02em",
+  textDecoration: "none",
+};
+
+export function SiteHeader() {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const today = new Date().toLocaleDateString("es-AR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  return (
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 50,
+        background: "color-mix(in oklch, var(--paper) 88%, transparent)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid var(--line)",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "var(--container-max)",
+          margin: "0 auto",
+          padding: "0 24px",
+          height: 60,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 24,
+        }}
+      >
+        <Link href="/" aria-label="Ir al inicio">
+          <BrandMark />
+        </Link>
+
+        <nav className="hidden lg:flex" style={{ alignItems: "center", gap: 2 }}>
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  ...NAV_LINK_BASE,
+                  color: active ? "var(--ink)" : "var(--ink2)",
+                  background: active ? "var(--surface)" : "transparent",
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span
+            className="hidden xl:inline"
+            style={{
+              fontFamily: "var(--font-jb-mono)",
+              fontSize: "0.7rem",
+              color: "var(--ink3)",
+            }}
+          >
+            {today}
+          </span>
+          <div className="hidden sm:block">
+            <CommandTrigger />
+          </div>
+          <a
+            href={CAFECITO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex"
+            style={{
+              alignItems: "center",
+              gap: 6,
+              padding: "6px 12px",
+              borderRadius: "var(--radius-pill)",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              color: "var(--brecha)",
+              fontFamily: "var(--font-jb-mono)",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            <Coffee size={14} aria-hidden />
+            <span className="hidden md:inline">Café</span>
+          </a>
+          <ThemeToggle />
+          <button
+            type="button"
+            className="lg:hidden"
+            aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+            onClick={() => setMobileOpen((open) => !open)}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 36,
+              height: 36,
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--line)",
+              background: "var(--surface)",
+              color: "var(--ink2)",
+              cursor: "pointer",
+            }}
+          >
+            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <nav
+          className="lg:hidden"
+          style={{
+            borderTop: "1px solid var(--line)",
+            background: "var(--paper)",
+            padding: "8px 16px 16px",
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}
+        >
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                style={{
+                  padding: "10px 12px",
+                  borderRadius: "var(--radius-md)",
+                  fontFamily: "var(--font-jb-mono)",
+                  fontSize: "0.8125rem",
+                  textDecoration: "none",
+                  color: active ? "var(--ink)" : "var(--ink2)",
+                  background: active ? "var(--surface)" : "transparent",
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+          <a
+            href={CAFECITO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginTop: 6,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 12px",
+              borderRadius: "var(--radius-md)",
+              fontFamily: "var(--font-jb-mono)",
+              fontSize: "0.8125rem",
+              color: "var(--brecha)",
+              textDecoration: "none",
+            }}
+          >
+            <Coffee size={14} aria-hidden />
+            Invitame un café
+          </a>
+        </nav>
+      )}
+    </header>
+  );
+}

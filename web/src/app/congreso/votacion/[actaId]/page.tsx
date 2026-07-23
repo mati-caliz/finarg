@@ -13,9 +13,5 @@ interface VotePageProps {
 
 export default async function VotePage({ params }: VotePageProps) {
   const { actaId } = await params;
-  return (
-    <div style={{ maxWidth: "var(--container-max)", margin: "0 auto" }}>
-      <VoteDetail actaId={actaId} />
-    </div>
-  );
+  return <VoteDetail actaId={actaId} />;
 }

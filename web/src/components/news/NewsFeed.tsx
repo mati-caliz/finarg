@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge, Card } from "@/components/core";
 import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNews } from "@/hooks/useLabrecha";
 import type { NewsArticle } from "@/lib/labrechaApi";
-import { ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 const NEWS_LIMIT = 40;
+const MONO = "var(--font-jb-mono)";
 
 const CATEGORY_LABELS: Record<string, string> = {
   ECONOMY_GENERAL: "Economía",
@@ -30,65 +30,50 @@ function formatPublished(value: string): string {
   }
   return date.toLocaleString("es-AR", {
     day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+    month: "short",
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
-function NewsItem({ article }: { article: NewsArticle }) {
+function LeadArticle({ article }: { article: NewsArticle }) {
   return (
     <a
       href={article.source_url}
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        padding: "14px 16px",
-        background: "var(--surface-card)",
-        border: "1px solid var(--border-1)",
-        borderRadius: "var(--radius-lg)",
-        boxShadow: "var(--shadow-card)",
-        textDecoration: "none",
-        color: "var(--text-body)",
-        transition: "border-color 120ms ease-out,box-shadow 120ms ease-out",
-      }}
-      onMouseEnter={(event) => {
-        event.currentTarget.style.borderColor = "var(--border-2)";
-        event.currentTarget.style.boxShadow = "var(--shadow-raised)";
-      }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.borderColor = "var(--border-1)";
-        event.currentTarget.style.boxShadow = "var(--shadow-card)";
-      }}
+      style={{ display: "block", paddingBottom: 28, borderBottom: "1px solid var(--line)", marginBottom: 24, textDecoration: "none" }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <Badge tone="accent">{categoryLabel(article.category)}</Badge>
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--brecha)", border: "1px solid var(--brecha)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
+          {categoryLabel(article.category)}
+        </span>
+        <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
           {article.source} · {formatPublished(article.published_date)}
         </span>
       </div>
-      <h3
-        style={{
-          font: "var(--fw-semibold) 1rem/var(--lh-heading) var(--font-sans)",
-          margin: 0,
-          color: "var(--text-body)",
-          display: "flex",
-          alignItems: "flex-start",
-          gap: 6,
-        }}
-      >
-        <span>{article.title}</span>
-        <ExternalLink className="h-3.5 w-3.5" style={{ flexShrink: 0, marginTop: 3, color: "var(--text-muted)" }} />
-      </h3>
-      {article.summary && (
-        <p style={{ fontSize: "0.8125rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
+      <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 12px", color: "var(--ink)", textWrap: "balance" }}>
+        {article.title}
+      </h2>
+      {article.summary ? (
+        <p style={{ fontFamily: "var(--font-serif)", fontSize: "1.0625rem", lineHeight: 1.5, color: "var(--ink2)", margin: 0 }}>
           {article.summary}
         </p>
-      )}
+      ) : null}
+    </a>
+  );
+}
+
+function ListArticle({ article }: { article: NewsArticle }) {
+  return (
+    <a href={article.source_url} target="_blank" rel="noopener noreferrer" style={{ display: "block", textDecoration: "none" }}>
+      <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)", marginBottom: 7 }}>
+        {article.source} · {formatPublished(article.published_date)} · <span style={{ color: "var(--ink2)" }}>{categoryLabel(article.category)}</span>
+      </div>
+      <h3 style={{ display: "flex", gap: 6, alignItems: "flex-start", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.3125rem", lineHeight: 1.12, letterSpacing: "-0.015em", margin: 0, color: "var(--ink)" }}>
+        <span>{article.title}</span>
+        <ArrowUpRight size={15} aria-hidden style={{ flexShrink: 0, marginTop: 4, color: "var(--ink3)" }} />
+      </h3>
     </a>
   );
 }
@@ -102,7 +87,7 @@ export function NewsFeed() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-[var(--sp-4)] md:grid-cols-2">
+      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
         {SKELETON_KEYS.map((key) => (
           <Skeleton key={key} className="h-[120px] rounded-[10px]" />
         ))}
@@ -113,24 +98,79 @@ export function NewsFeed() {
   const articles = data ?? [];
   if (articles.length === 0) {
     return (
-      <Card>
-        <p style={{ color: "var(--text-muted)", margin: 0 }}>
-          Todavía no hay noticias ingeridas. Volvé más tarde.
-        </p>
-      </Card>
+      <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)" }}>
+        Todavía no hay noticias ingeridas. Volvé más tarde.
+      </p>
     );
   }
 
+  const [lead, ...rest] = articles;
+  const mainList = rest.slice(0, 5);
+  const sidebarList = rest.slice(5, 9);
+  const sources = Array.from(new Set(articles.map((article) => article.source)));
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-      <div className="grid grid-cols-1 gap-[var(--sp-4)] md:grid-cols-2">
-        {articles.map((article) => (
-          <NewsItem key={article.source_url} article={article} />
-        ))}
+    <div>
+      <div className="lb-ideas-grid">
+        <div>
+          <LeadArticle article={lead} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+            {mainList.map((article) => (
+              <ListArticle key={article.source_url} article={article} />
+            ))}
+          </div>
+        </div>
+
+        <aside>
+          {sidebarList.length > 0 && (
+            <>
+              <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
+                Más titulares
+              </div>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {sidebarList.map((article, index) => (
+                  <a
+                    key={article.source_url}
+                    href={article.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: "flex",
+                      gap: 16,
+                      padding: "16px 0",
+                      borderBottom: index === sidebarList.length - 1 ? "none" : "1px solid var(--line)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.25rem", color: index === 0 ? "var(--brecha)" : "var(--ink3)" }}>
+                      {index + 1}
+                    </span>
+                    <div>
+                      <h4 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1rem", lineHeight: 1.15, margin: "0 0 5px", color: "var(--ink)" }}>
+                        {article.title}
+                      </h4>
+                      <span style={{ fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
+                        {article.source} · {formatPublished(article.published_date)}
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </>
+          )}
+          <div style={{ marginTop: 24, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 9, padding: "16px 18px" }}>
+            <div style={{ fontFamily: MONO, fontSize: "0.66rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 10 }}>
+              Fuentes agregadas
+            </div>
+            <p style={{ fontFamily: MONO, fontSize: "0.72rem", lineHeight: 1.8, color: "var(--ink2)", margin: 0 }}>
+              {sources.join(" · ")}
+            </p>
+          </div>
+        </aside>
       </div>
-      <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: 0 }}>
-        Titulares de El Economista, enlazados a la nota original. La Brecha no edita ni reproduce el
-        contenido completo.
+
+      <p style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)", margin: "32px 0 0" }}>
+        Titulares enlazados a la nota original. La Brecha no edita ni reproduce el contenido completo.
       </p>
     </div>
   );

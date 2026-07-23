@@ -8,31 +8,33 @@ export const metadata: Metadata = {
 
 export default function FeriadosPage() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--container-max)",
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--sp-6)",
-      }}
-    >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <div style={{ maxWidth: 1000, margin: "0 auto", padding: "48px 24px 72px" }}>
+      <header style={{ borderBottom: "2px solid var(--ink)", paddingBottom: 20, marginBottom: 30 }}>
+        <div
+          style={{
+            fontFamily: "var(--font-jb-mono)",
+            fontSize: "0.72rem",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--ink3)",
+            marginBottom: 10,
+          }}
+        >
+          /feriados
+        </div>
         <h1
           style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(2rem, 5vw, 2.75rem)",
+            letterSpacing: "-0.025em",
             margin: 0,
-            letterSpacing: "-0.01em",
+            color: "var(--ink)",
           }}
         >
           Feriados de Argentina
         </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Calendario anual de feriados nacionales, próximos feriados y fines de semana largos.
-        </p>
       </header>
-
       <HolidaysCalendar />
     </div>
   );

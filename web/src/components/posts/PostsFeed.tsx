@@ -1,164 +1,189 @@
 "use client";
 
-import { Badge, Card } from "@/components/core";
+import { QueryError } from "@/components/QueryError";
 import {
   POST_CATEGORY_LABELS,
-  POST_CATEGORY_TONES,
   formatPostDate,
 } from "@/components/posts/postCategories";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
-import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
-import { POST_CATEGORIES, type Post, type PostImpact } from "@/lib/labrechaApi";
-import { ArrowRight, Clock3 } from "lucide-react";
+import { POST_CATEGORIES, type Post } from "@/lib/labrechaApi";
 import Link from "next/link";
 import { type CSSProperties, useState } from "react";
 
-const SKELETON_KEYS = ["p1", "p2", "p3", "p4"];
+const SKELETON_KEYS = ["p1", "p2", "p3"];
 const ALL_FILTER = "Todas";
-const GRID_STYLE: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-  gap: "var(--sp-4)",
-  alignItems: "stretch",
-};
-const SUMMARY_CLAMP_STYLE: CSSProperties = {
-  fontSize: "0.8125rem",
-  color: "var(--text-secondary)",
-  margin: 0,
-  lineHeight: 1.55,
-  display: "-webkit-box",
-  WebkitBoxOrient: "vertical",
-  WebkitLineClamp: 3,
-  overflow: "hidden",
+const MONO = "var(--font-jb-mono)";
+
+const IMPACT_CHIP_STYLE: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 5,
+  fontFamily: MONO,
+  fontSize: "0.66rem",
+  color: "var(--ink2)",
+  border: "1px solid var(--line)",
+  borderRadius: 5,
+  padding: "4px 9px",
 };
 
-function ImpactChip({ impact }: { impact: PostImpact }) {
-  const meta = POST_IMPACT_META[impact.kind];
-  const Icon = meta.icon;
+function CategoryBadge({ category }: { category: Post["category"] }) {
   return (
     <span
-      title={`${meta.label}: ${impact.label}`}
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 5,
-        padding: "3px 9px",
-        borderRadius: "var(--radius-pill)",
-        background: meta.background,
-        border: `1px solid ${meta.border}`,
-        color: meta.color,
-        fontSize: "0.75rem",
+        fontFamily: MONO,
+        fontSize: "0.62rem",
         fontWeight: 600,
-        fontFamily: "var(--font-mono)",
-        whiteSpace: "nowrap",
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        color: "var(--evento)",
+        border: "1px solid var(--evento-ln)",
+        background: "var(--evento-bg)",
+        padding: "2px 9px",
+        borderRadius: "var(--radius-pill)",
       }}
     >
-      <Icon size={12} strokeWidth={2.2} aria-hidden />
-      {impact.value}
+      {POST_CATEGORY_LABELS[category]}
     </span>
   );
 }
 
-function PostItem({ post }: { post: Post }) {
-  const impacts = post.impacts ?? [];
+function ImpactChips({ post, limit = 2 }: { post: Post; limit?: number }) {
+  const impacts = (post.impacts ?? []).slice(0, limit);
+  if (impacts.length === 0) {
+    return null;
+  }
+  return (
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      {impacts.map((impact) => {
+        const meta = POST_IMPACT_META[impact.kind];
+        const Icon = meta.icon;
+        return (
+          <span key={`${impact.kind}-${impact.value}`} style={IMPACT_CHIP_STYLE}>
+            <Icon size={11} strokeWidth={2.2} aria-hidden />
+            {meta.label}: {impact.value}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function FeaturedIdea({ post }: { post: Post }) {
   return (
     <Link
       href={`/ideas/${post.slug}`}
-      className="group"
       style={{
+        display: "block",
+        paddingBottom: 38,
+        marginBottom: 38,
+        borderBottom: "1px solid var(--line)",
+        textDecoration: "none",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <CategoryBadge category={post.category} />
+        <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+          {formatPostDate(post.created_at)} · {readingTimeMinutes(post.content)} min
+        </span>
+      </div>
+      <h2
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: "clamp(1.875rem, 4.5vw, 2.625rem)",
+          lineHeight: 1.02,
+          letterSpacing: "-0.025em",
+          margin: "0 0 16px",
+          color: "var(--ink)",
+          textWrap: "balance",
+        }}
+      >
+        {post.title}
+      </h2>
+      {post.summary ? (
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(1rem, 2vw, 1.1875rem)",
+            lineHeight: 1.5,
+            color: "var(--ink2)",
+            margin: "0 0 20px",
+            maxWidth: 720,
+            textWrap: "pretty",
+          }}
+        >
+          {post.summary}
+        </p>
+      ) : null}
+      <ImpactChips post={post} limit={3} />
+    </Link>
+  );
+}
+
+function IdeaCard({ post }: { post: Post }) {
+  return (
+    <Link
+      href={`/ideas/${post.slug}`}
+      style={{
+        background: "var(--raise)",
+        padding: "26px 24px",
         display: "flex",
         flexDirection: "column",
-        gap: 10,
-        padding: "16px 18px",
-        background: "var(--surface-card)",
-        border: "1px solid var(--border-1)",
-        borderRadius: "var(--radius-lg)",
-        boxShadow: "var(--shadow-card)",
+        gap: 14,
         textDecoration: "none",
-        color: "var(--text-body)",
-        transition:
-          "border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out",
-      }}
-      onMouseEnter={(event) => {
-        event.currentTarget.style.borderColor = "var(--accent-border)";
-        event.currentTarget.style.boxShadow = "var(--shadow-raised)";
-        event.currentTarget.style.transform = "translateY(-2px)";
-      }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.borderColor = "var(--border-1)";
-        event.currentTarget.style.boxShadow = "var(--shadow-card)";
-        event.currentTarget.style.transform = "translateY(0)";
+        color: "var(--ink)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <Badge tone={POST_CATEGORY_TONES[post.category]}>
-          {POST_CATEGORY_LABELS[post.category]}
-        </Badge>
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-          {formatPostDate(post.created_at)}
-        </span>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 3,
-            fontSize: "0.6875rem",
-            color: "var(--text-muted)",
-            marginLeft: "auto",
-          }}
-        >
-          <Clock3 size={11} aria-hidden />
-          {readingTimeMinutes(post.content)} min
-        </span>
+        <CategoryBadge category={post.category} />
       </div>
-
       <h3
         style={{
-          font: "var(--fw-semibold) 1.0625rem/var(--lh-heading) var(--font-sans)",
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: "1.5rem",
+          lineHeight: 1.08,
+          letterSpacing: "-0.02em",
           margin: 0,
-          color: "var(--text-body)",
-          letterSpacing: "-0.01em",
+          flex: 1,
+          color: "var(--ink)",
         }}
       >
         {post.title}
       </h3>
-
-      {post.summary && <p style={SUMMARY_CLAMP_STYLE}>{post.summary}</p>}
-
+      {post.summary ? (
+        <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.97rem", lineHeight: 1.45, color: "var(--ink2)", margin: 0 }}>
+          {post.summary}
+        </p>
+      ) : null}
+      <ImpactChips post={post} />
       <div
         style={{
-          marginTop: "auto",
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          flexWrap: "wrap",
-          paddingTop: 10,
-          borderTop: "1px solid var(--border-1)",
+          fontFamily: MONO,
+          fontSize: "0.7rem",
+          color: "var(--ink3)",
+          paddingTop: 6,
+          borderTop: "1px solid var(--line2)",
         }}
       >
-        {impacts.length > 0 ? (
-          impacts.map((impact) => (
-            <ImpactChip key={`${impact.kind}-${impact.value}`} impact={impact} />
-          ))
-        ) : (
-          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Leer la propuesta</span>
-        )}
-        <span
-          style={{
-            marginLeft: "auto",
-            display: "inline-flex",
-            alignItems: "center",
-            color: "var(--text-link)",
-          }}
-        >
-          <ArrowRight size={14} aria-hidden />
-        </span>
+        {formatPostDate(post.created_at)}
       </div>
     </Link>
   );
 }
+
+const FILTER_STYLE = (active: boolean): CSSProperties => ({
+  fontFamily: MONO,
+  fontSize: "0.75rem",
+  padding: "8px 14px",
+  borderRadius: "var(--radius-pill)",
+  cursor: "pointer",
+  border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
+  background: active ? "var(--ink)" : "transparent",
+  color: active ? "var(--paper)" : "var(--ink2)",
+});
 
 export function PostsFeed() {
   const [activeFilter, setActiveFilter] = useState<string>(ALL_FILTER);
@@ -170,57 +195,56 @@ export function PostsFeed() {
   );
 
   const filterItems = [ALL_FILTER, ...POST_CATEGORIES.map((category) => POST_CATEGORY_LABELS[category])];
+  const posts = data ?? [];
+  const [featured, ...rest] = posts;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        {filterItems.map((item) => {
-          const active = item === activeFilter;
-          return (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setActiveFilter(item)}
-              style={{
-                padding: "5px 12px",
-                borderRadius: "var(--radius-pill)",
-                border: `1px solid ${active ? "var(--accent-border)" : "var(--border-1)"}`,
-                background: active ? "var(--accent-soft)" : "var(--surface-card)",
-                color: active ? "var(--accent-strong)" : "var(--text-secondary)",
-                fontSize: "0.8125rem",
-                fontWeight: active ? 600 : 500,
-                fontFamily: "var(--font-sans)",
-                cursor: "pointer",
-              }}
-            >
-              {item}
-            </button>
-          );
-        })}
+    <div>
+      <div style={{ display: "flex", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
+        {filterItems.map((item) => (
+          <button
+            key={item}
+            type="button"
+            onClick={() => setActiveFilter(item)}
+            style={FILTER_STYLE(item === activeFilter)}
+          >
+            {item}
+          </button>
+        ))}
       </div>
 
       {isError && <QueryError error={error} onRetry={() => refetch()} />}
 
       {isLoading && (
-        <div style={GRID_STYLE}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 1 }}>
           {SKELETON_KEYS.map((key) => (
-            <Skeleton key={key} className="h-[170px] rounded-[10px]" />
+            <Skeleton key={key} className="h-[220px] rounded-[10px]" />
           ))}
         </div>
       )}
 
-      {!isLoading && !isError && (data ?? []).length === 0 && (
-        <Card>
-          <p style={{ color: "var(--text-muted)", margin: 0 }}>
-            Todavía no hay publicaciones en esta categoría.
-          </p>
-        </Card>
+      {!isLoading && !isError && posts.length === 0 && (
+        <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)", margin: 0 }}>
+          Todavía no hay publicaciones en esta categoría.
+        </p>
       )}
 
-      {(data ?? []).length > 0 && (
-        <div style={GRID_STYLE}>
-          {(data ?? []).map((post) => (
-            <PostItem key={post.id} post={post} />
+      {featured ? <FeaturedIdea post={featured} /> : null}
+
+      {rest.length > 0 && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+            gap: 1,
+            background: "var(--line)",
+            border: "1px solid var(--line)",
+            borderRadius: 10,
+            overflow: "hidden",
+          }}
+        >
+          {rest.map((post) => (
+            <IdeaCard key={post.id} post={post} />
           ))}
         </div>
       )}

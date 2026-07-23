@@ -338,18 +338,73 @@
   --chart-grid: #262b31;
 }
 
+/* ── Design system v2 — dirección "Editorial" ───────────────────────────────
+   Rediseño de Claude Design (proyecto "Design system home página 1c"). Convive
+   con los tokens de arriba durante la migración; ver ROADMAP-REDISENO.md. */
+:root {
+  --font-display: var(--font-bricolage), "Archivo", sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-jb-mono: var(--font-jetbrains), "SFMono-Regular", monospace;
+
+  --paper: oklch(0.988 0.006 85);
+  --surface: oklch(0.966 0.008 85);
+  --raise: oklch(0.999 0.002 85);
+  --ink: oklch(0.22 0.01 70);
+  --ink2: oklch(0.48 0.012 70);
+  --ink3: oklch(0.62 0.01 70);
+  --line: oklch(0.9 0.008 80);
+  --line2: oklch(0.94 0.006 80);
+  --brecha: oklch(0.6 0.19 42);
+  --brecha-bg: oklch(0.965 0.03 55);
+  --brecha-ln: oklch(0.6 0.19 42 / 0.32);
+  --evento: oklch(0.52 0.16 300);
+  --evento-bg: oklch(0.96 0.03 300);
+  --evento-ln: oklch(0.52 0.16 300 / 0.4);
+  --pos: oklch(0.5 0.13 150);
+  --pos-bg: oklch(0.95 0.04 150);
+  --neg: oklch(0.55 0.2 25);
+  --neg-bg: oklch(0.95 0.04 25);
+  --chart: oklch(0.45 0.03 250);
+  --chart-fill: oklch(0.45 0.03 250 / 0.1);
+}
+
+[data-theme="dark"] {
+  --paper: oklch(0.185 0.012 265);
+  --surface: oklch(0.225 0.014 265);
+  --raise: oklch(0.255 0.015 265);
+  --ink: oklch(0.95 0.006 85);
+  --ink2: oklch(0.72 0.012 265);
+  --ink3: oklch(0.58 0.014 265);
+  --line: oklch(0.32 0.016 265);
+  --line2: oklch(0.28 0.015 265);
+  --brecha: oklch(0.74 0.16 55);
+  --brecha-bg: oklch(0.28 0.055 50);
+  --brecha-ln: oklch(0.74 0.16 55 / 0.4);
+  --evento: oklch(0.74 0.13 300);
+  --evento-bg: oklch(0.29 0.05 300);
+  --evento-ln: oklch(0.74 0.13 300 / 0.45);
+  --pos: oklch(0.74 0.13 150);
+  --pos-bg: oklch(0.3 0.05 150);
+  --neg: oklch(0.7 0.16 25);
+  --neg-bg: oklch(0.32 0.06 25);
+  --chart: oklch(0.72 0.06 250);
+  --chart-fill: oklch(0.72 0.06 250 / 0.13);
+}
+
 .num {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
 .post-markdown h2 {
-  font: var(--fw-semibold) 1.25rem/var(--lh-heading) var(--font-sans);
+  font: 700 1.5rem/1.15 var(--font-display);
+  letter-spacing: -0.02em;
   margin: 1.5em 0 0.5em;
 }
 
 .post-markdown h3 {
-  font: var(--fw-semibold) 1.0625rem/var(--lh-heading) var(--font-sans);
+  font: 700 1.1875rem/1.2 var(--font-display);
+  letter-spacing: -0.015em;
   margin: 1.25em 0 0.5em;
 }
 
@@ -439,4 +494,116 @@
   border: none;
   border-top: 1px solid var(--border-1);
   margin: 1.5em 0;
+}
+
+/* ── Home editorial (design system v2) ──────────────────────────────────── */
+.lb-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.lb-hero-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 56px;
+  align-items: end;
+}
+
+.lb-estado-grid {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.lb-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.lb-brechas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--brecha-ln);
+  border: 1px solid var(--brecha-ln);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lb-ideas-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.lb-indicador-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.lb-brecha-row {
+  display: grid;
+  grid-template-columns: 34px 1fr 300px 130px;
+}
+
+.lb-congreso-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  align-items: start;
+}
+
+.lb-feriado-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.lb-feriado-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+}
+
+@media (max-width: 620px) {
+  .lb-feriado-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .lb-feriado-row {
+    grid-template-columns: 90px 1fr;
+  }
+  .lb-feriado-row > div:last-child {
+    grid-column: 1 / -1;
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .lb-brecha-row {
+    grid-template-columns: 34px 1fr;
+    row-gap: 16px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .lb-hero-grid,
+  .lb-estado-grid,
+  .lb-ideas-grid,
+  .lb-indicador-grid,
+  .lb-congreso-grid,
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .lb-hero-aside {
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+  .lb-brechas-grid {
+    grid-template-columns: 1fr;
+  }
 }

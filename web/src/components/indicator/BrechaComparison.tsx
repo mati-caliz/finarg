@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  AnnotatedSeriesChart,
-  Badge,
-  Card,
-  type ChartSeries,
-  RangeSelector,
-  SourceAttribution,
-} from "@/components/core";
+import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicatorSeries, usePoliticalEvents } from "@/hooks/useLabrecha";
 import { BRECHA_BY_ID, computeGap } from "@/lib/brechas";
@@ -20,14 +13,26 @@ import {
   rangeDateFrom,
   yearLabels,
 } from "@/lib/series";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 
 const RANGE_OPTIONS = ["6M", "1A", "5A", "Máx"];
-const SERIE_COLORS = ["var(--serie-1)", "var(--serie-2)"];
+const SERIE_COLORS = ["var(--chart)", "var(--brecha)"];
+const MONO = "var(--font-jb-mono)";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
+
+const rangeStyle = (active: boolean): CSSProperties => ({
+  fontFamily: MONO,
+  fontSize: "0.7rem",
+  padding: "5px 12px",
+  borderRadius: "var(--radius-pill)",
+  cursor: "pointer",
+  border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
+  background: active ? "var(--ink)" : "transparent",
+  color: active ? "var(--paper)" : "var(--ink2)",
+});
 
 export function BrechaComparison({ id }: { id: string }) {
   const [range, setRange] = useState("1A");
@@ -82,97 +87,96 @@ export function BrechaComparison({ id }: { id: string }) {
 
   const latestA = pointsA[pointsA.length - 1];
   const latestB = pointsB[pointsB.length - 1];
-  const gap =
-    latestA && latestB ? computeGap(def, latestA.value, latestB.value) : undefined;
+  const gap = latestA && latestB ? computeGap(def, latestA.value, latestB.value) : undefined;
 
   return (
-    <Card
-      title={def.label}
-      subtitle={def.subtitle}
-      actions={
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Badge tone="gap">Comparador</Badge>
-          <RangeSelector options={RANGE_OPTIONS} active={range} onChange={setRange} />
-        </div>
-      }
-    >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {gap && latestA && latestB && (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: 20,
-              padding: "12px 14px",
-              border: "1px solid var(--border-1)",
-              borderRadius: "var(--radius-md)",
-              background: "var(--surface-inset)",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-secondary)", fontWeight: 600 }}>
-                {legA.label}
-              </span>
-              <span className="num" style={{ fontSize: "1.375rem", fontWeight: 600, lineHeight: 1 }}>
-                {def.format(latestA.value)}
-              </span>
-              <span style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
-                {sourceLabel(legA.source)} · {formatDateAR(latestA.date)}
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-secondary)", fontWeight: 600 }}>
-                {legB.label}
-              </span>
-              <span className="num" style={{ fontSize: "1.375rem", fontWeight: 600, lineHeight: 1 }}>
-                {def.format(latestB.value)}
-              </span>
-              <span style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
-                {sourceLabel(legB.source)} · {formatDateAR(latestB.date)}
-              </span>
-            </div>
-            <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-              <span
-                className="num"
-                style={{ fontSize: "1.75rem", fontWeight: 700, lineHeight: 1, color: "var(--brecha-strong)" }}
-              >
-                {gap.formattedGap}
-              </span>
-              <span style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>brecha actual</span>
-            </div>
-          </div>
-        )}
-
-        {hasSeries ? (
-          <AnnotatedSeriesChart
-            series={chartSeries}
-            events={chartEvents}
-            gapFill
-            yFormat={(value) => def.format(value)}
-            xLabels={xLabels}
-            height={320}
-          />
-        ) : (
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>
-            No hay suficiente serie en el rango seleccionado para graficar esta brecha.
+    <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 10, padding: "26px 28px 22px" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
+        <div>
+          <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.375rem", letterSpacing: "-0.015em", margin: "0 0 4px" }}>
+            {def.label}
+          </h2>
+          <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9375rem", color: "var(--ink2)", margin: 0 }}>
+            {def.subtitle}
           </p>
-        )}
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {[legA, legB].map((leg) => (
-            <SourceAttribution
-              key={`${leg.code}-${leg.source}`}
-              source={
-                leg.historySource
-                  ? `${leg.label} — ${sourceLabel(leg.source)} (actual) + ${sourceLabel(leg.historySource)} (histórico)`
-                  : `${leg.label} — ${sourceLabel(leg.source)}`
-              }
-              note={SOURCE_METHODOLOGY[leg.source] ?? "Fuente oficial; ver publicación original."}
-            />
+        </div>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {RANGE_OPTIONS.map((option) => (
+            <button key={option} type="button" onClick={() => setRange(option)} style={rangeStyle(option === range)}>
+              {option}
+            </button>
           ))}
         </div>
       </div>
-    </Card>
+
+      {gap && latestA && latestB && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 24,
+            padding: "16px 18px",
+            border: "1px solid var(--brecha-ln)",
+            borderRadius: 8,
+            background: "var(--brecha-bg)",
+            marginBottom: 18,
+          }}
+        >
+          {[
+            { leg: legA, latest: latestA, color: SERIE_COLORS[0] },
+            { leg: legB, latest: latestB, color: SERIE_COLORS[1] },
+          ].map(({ leg, latest, color }) => (
+            <div key={`${leg.code}-${leg.source}`} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink2)", fontWeight: 600 }}>
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
+                {leg.label}
+              </span>
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.375rem", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+                {def.format(latest.value)}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>
+                {sourceLabel(leg.source)} · {formatDateAR(latest.date)}
+              </span>
+            </div>
+          ))}
+          <div style={{ marginLeft: "auto", textAlign: "right" }}>
+            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.875rem", lineHeight: 1, color: "var(--brecha)", fontVariantNumeric: "tabular-nums" }}>
+              {gap.formattedGap}
+            </div>
+            <span style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>brecha actual</span>
+          </div>
+        </div>
+      )}
+
+      {hasSeries ? (
+        <AnnotatedSeriesChart
+          series={chartSeries}
+          events={chartEvents}
+          gapFill
+          yFormat={(value) => def.format(value)}
+          xLabels={xLabels}
+          height={320}
+        />
+      ) : (
+        <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)", margin: 0 }}>
+          No hay suficiente serie en el rango seleccionado para graficar esta brecha.
+        </p>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+        {[legA, legB].map((leg) => (
+          <div key={`${leg.code}-${leg.source}`} style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink3)", lineHeight: 1.5 }}>
+            <b style={{ color: "var(--ink2)" }}>
+              {leg.historySource
+                ? `${leg.label} — ${sourceLabel(leg.source)} + ${sourceLabel(leg.historySource)}`
+                : `${leg.label} — ${sourceLabel(leg.source)}`}
+            </b>
+            {" · "}
+            {SOURCE_METHODOLOGY[leg.source] ?? "Fuente oficial; ver publicación original."}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

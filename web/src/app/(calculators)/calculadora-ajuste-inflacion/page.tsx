@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculatorHeader } from "@/components/calculators/CalculatorHeader";
 import { Button, Card } from "@/components/core";
 import { formatMoneyAR, formatNumberAR } from "@/lib/indicators";
 import { calculatorsApi } from "@/lib/labrechaApi";
@@ -47,26 +48,18 @@ export default function InflationAdjustmentPage() {
   return (
     <div
       style={{
-        maxWidth: "var(--container-max)",
+        maxWidth: 1000,
         margin: "0 auto",
+        padding: "48px 24px 72px",
         display: "flex",
         flexDirection: "column",
         gap: "var(--sp-6)",
       }}
     >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <h1
-          style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            margin: 0,
-          }}
-        >
-          Ajuste por inflación
-        </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Cuánto vale hoy un monto de otra fecha, según el IPC del INDEC.
-        </p>
-      </header>
+      <CalculatorHeader
+        title="Ajuste por inflación"
+        subtitle="Cuánto vale hoy un monto de otra fecha, según el IPC del INDEC."
+      />
 
       <div
         style={{

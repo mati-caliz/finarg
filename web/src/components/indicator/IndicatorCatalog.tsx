@@ -1,11 +1,9 @@
 "use client";
 
-import { StaleChip } from "@/components/core";
 import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicators } from "@/hooks/useLabrecha";
 import { freshnessForCode } from "@/lib/freshness";
-import type { IndicatorSummary } from "@/lib/labrechaApi";
 import {
   INDICATOR_FAMILY_LABELS,
   INDICATOR_FAMILY_ORDER,
@@ -15,11 +13,14 @@ import {
   indicatorLabel,
   sourceLabel,
 } from "@/lib/indicators";
-import { useMemo, useState } from "react";
+import type { IndicatorSummary } from "@/lib/labrechaApi";
+import { type CSSProperties, useMemo, useState } from "react";
 
 const OTHER_FAMILY_LABEL = "Otros";
-
-const SKELETON_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9"];
+const ALL_FILTER = "Todos";
+const MONO = "var(--font-jb-mono)";
+const SKELETON_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"];
+const DIACRITICS = /\p{Diacritic}/gu;
 
 interface FamilyGroup {
   key: string;
@@ -27,16 +28,15 @@ interface FamilyGroup {
   items: IndicatorSummary[];
 }
 
-const DIACRITICS = /\p{Diacritic}/gu;
-
 function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(DIACRITICS, "");
+  return text.toLowerCase().normalize("NFD").replace(DIACRITICS, "");
 }
 
-function groupByFamily(indicators: IndicatorSummary[], query: string): FamilyGroup[] {
+function groupByFamily(
+  indicators: IndicatorSummary[],
+  query: string,
+  family: IndicatorFamily | null,
+): FamilyGroup[] {
   const normalizedQuery = normalize(query.trim());
   const matches = indicators.filter((indicator) => {
     if (normalizedQuery.length === 0) {
@@ -48,18 +48,21 @@ function groupByFamily(indicators: IndicatorSummary[], query: string): FamilyGro
 
   const byFamily = new Map<string, IndicatorSummary[]>();
   for (const indicator of matches) {
-    const family: IndicatorFamily | undefined = getIndicatorMeta(indicator.indicator_code)?.family;
-    const key = family ?? OTHER_FAMILY_LABEL;
+    const itemFamily = getIndicatorMeta(indicator.indicator_code)?.family;
+    if (family && itemFamily !== family) {
+      continue;
+    }
+    const key = itemFamily ?? OTHER_FAMILY_LABEL;
     const bucket = byFamily.get(key) ?? [];
     bucket.push(indicator);
     byFamily.set(key, bucket);
   }
 
   const groups: FamilyGroup[] = [];
-  for (const family of INDICATOR_FAMILY_ORDER) {
-    const items = byFamily.get(family);
+  for (const familyKey of INDICATOR_FAMILY_ORDER) {
+    const items = byFamily.get(familyKey);
     if (items && items.length > 0) {
-      groups.push({ key: family, label: INDICATOR_FAMILY_LABELS[family], items });
+      groups.push({ key: familyKey, label: INDICATOR_FAMILY_LABELS[familyKey], items });
     }
   }
   const others = byFamily.get(OTHER_FAMILY_LABEL);
@@ -74,42 +77,30 @@ function groupByFamily(indicators: IndicatorSummary[], query: string): FamilyGro
   return groups;
 }
 
-function IndicatorCatalogCard({ indicator }: { indicator: IndicatorSummary }) {
+const CARD_STYLE: CSSProperties = {
+  background: "var(--raise)",
+  border: "1px solid var(--line)",
+  borderRadius: 9,
+  padding: "18px 18px 16px",
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  textDecoration: "none",
+  color: "var(--ink)",
+};
+
+function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
+  const isComparator = indicator.sources.length >= 2;
+  const stale = freshnessForCode(indicator.indicator_code, indicator.last_date).stale;
   return (
     <a
       href={`/indicador/${indicator.indicator_code}`}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        padding: "14px 16px",
-        background: "var(--surface-card)",
-        border: "1px solid var(--border-1)",
-        borderRadius: "var(--radius-lg)",
-        boxShadow: "var(--shadow-card)",
-        textDecoration: "none",
-        color: "var(--text-body)",
-        transition: "border-color 120ms ease-out,box-shadow 120ms ease-out",
-      }}
-      onMouseEnter={(event) => {
-        event.currentTarget.style.borderColor = "var(--border-2)";
-        event.currentTarget.style.boxShadow = "var(--shadow-raised)";
-      }}
-      onMouseLeave={(event) => {
-        event.currentTarget.style.borderColor = "var(--border-1)";
-        event.currentTarget.style.boxShadow = "var(--shadow-card)";
-      }}
+      style={{ ...CARD_STYLE, borderColor: isComparator ? "var(--brecha-ln)" : "var(--line)" }}
     >
-      <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--text-body)" }}>
+      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.15, letterSpacing: "-0.015em" }}>
         {indicatorLabel(indicator.indicator_code)}
       </div>
-      <div
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "0.6875rem",
-          color: "var(--text-muted)",
-        }}
-      >
+      <div style={{ fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
         {indicator.indicator_code}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}>
@@ -117,52 +108,68 @@ function IndicatorCatalogCard({ indicator }: { indicator: IndicatorSummary }) {
           <span
             key={source}
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "2px 8px",
-              borderRadius: "var(--radius-sm)",
-              border: "1px solid var(--border-1)",
-              background: "var(--bg-page)",
-              fontSize: "0.6875rem",
+              fontFamily: MONO,
+              fontSize: "0.62rem",
               fontWeight: 600,
-              color: "var(--text-secondary)",
+              color: "var(--ink2)",
+              border: "1px solid var(--line)",
+              borderRadius: 5,
+              padding: "2px 8px",
             }}
           >
             {sourceLabel(source)}
           </span>
         ))}
-        {indicator.sources.length >= 2 && (
+        {isComparator && (
           <span
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "2px 8px",
-              borderRadius: "var(--radius-sm)",
-              background: "var(--brecha-bg)",
-              fontSize: "0.6875rem",
+              fontFamily: MONO,
+              fontSize: "0.62rem",
               fontWeight: 600,
-              color: "var(--brecha-strong)",
+              color: "var(--brecha)",
+              background: "var(--brecha-bg)",
+              border: "1px solid var(--brecha-ln)",
+              borderRadius: 5,
+              padding: "2px 8px",
             }}
           >
-            comparador
+            ◆ comparador
           </span>
         )}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-          {indicator.count.toLocaleString("es-AR")} datos · último {formatDateAR(indicator.last_date)}
-        </span>
-        {freshnessForCode(indicator.indicator_code, indicator.last_date).stale && <StaleChip />}
+      <div
+        style={{
+          fontFamily: MONO,
+          fontSize: "0.66rem",
+          color: stale ? "var(--brecha)" : "var(--ink3)",
+          paddingTop: 6,
+          borderTop: "1px solid var(--line2)",
+        }}
+      >
+        {indicator.count.toLocaleString("es-AR")} datos · {formatDateAR(indicator.last_date)}
+        {stale ? " · ⚠" : ""}
       </div>
     </a>
   );
 }
 
+const filterStyle = (active: boolean): CSSProperties => ({
+  fontFamily: MONO,
+  fontSize: "0.72rem",
+  padding: "9px 14px",
+  borderRadius: "var(--radius-pill)",
+  cursor: "pointer",
+  border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
+  background: active ? "var(--ink)" : "transparent",
+  color: active ? "var(--paper)" : "var(--ink2)",
+});
+
 export function IndicatorCatalog() {
   const { data, isLoading, isError, error, refetch } = useIndicators();
   const [query, setQuery] = useState("");
+  const [family, setFamily] = useState<IndicatorFamily | null>(null);
 
-  const groups = useMemo(() => groupByFamily(data ?? [], query), [data, query]);
+  const groups = useMemo(() => groupByFamily(data ?? [], query, family), [data, query, family]);
   const total = data?.length ?? 0;
   const shown = groups.reduce((sum, group) => sum + group.items.length, 0);
 
@@ -172,76 +179,81 @@ export function IndicatorCatalog() {
 
   if (isLoading) {
     return (
-      <div
-        style={{
-          display: "grid",
-          gap: "var(--sp-4)",
-          gridTemplateColumns: "repeat(auto-fill, minmax(var(--tile-min), 1fr))",
-        }}
-      >
+      <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))" }}>
         {SKELETON_KEYS.map((key) => (
-          <Skeleton key={key} className="h-[112px] rounded-[10px]" />
+          <Skeleton key={key} className="h-[130px] rounded-[9px]" />
         ))}
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-6)" }}>
-      <input
-        type="search"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        placeholder="Buscar indicador…"
-        aria-label="Buscar indicador"
-        style={{
-          width: "100%",
-          maxWidth: 420,
-          padding: "10px 14px",
-          borderRadius: "var(--radius-md)",
-          border: "1px solid var(--border-2)",
-          background: "var(--surface-card)",
-          color: "var(--text-body)",
-          fontSize: "0.9375rem",
-        }}
-      />
-      <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", margin: 0 }}>
-        {query.trim().length > 0
-          ? `${shown} de ${total} indicadores`
-          : `${total} indicadores en ${groups.length} familias`}
+    <div>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 32, flexWrap: "wrap" }}>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Buscar indicador…"
+          aria-label="Buscar indicador"
+          style={{
+            flex: 1,
+            minWidth: 240,
+            fontFamily: MONO,
+            fontSize: "0.8125rem",
+            padding: "11px 16px",
+            borderRadius: 8,
+            border: "1px solid var(--line)",
+            background: "var(--raise)",
+            color: "var(--ink)",
+          }}
+        />
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          <button type="button" onClick={() => setFamily(null)} style={filterStyle(family === null)}>
+            {ALL_FILTER}
+          </button>
+          {INDICATOR_FAMILY_ORDER.map((familyKey) => (
+            <button
+              key={familyKey}
+              type="button"
+              onClick={() => setFamily(familyKey)}
+              style={filterStyle(family === familyKey)}
+            >
+              {INDICATOR_FAMILY_LABELS[familyKey]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <p style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", margin: "0 0 26px" }}>
+        {query.trim().length > 0 || family ? `${shown} de ${total} indicadores` : `${total} indicadores`}
       </p>
 
       {groups.length === 0 && (
-        <p style={{ color: "var(--text-muted)" }}>No hay indicadores que coincidan con la búsqueda.</p>
+        <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)" }}>
+          No hay indicadores que coincidan con la búsqueda.
+        </p>
       )}
 
-      {groups.map((group) => (
-        <section key={group.key} style={{ display: "flex", flexDirection: "column", gap: "var(--sp-3)" }}>
-          <h2
-            style={{
-              font: "var(--fw-bold) var(--fs-h3)/var(--lh-heading) var(--font-sans)",
-              color: "var(--text-body)",
-              margin: 0,
-            }}
-          >
-            {group.label}
-            <span style={{ marginLeft: 8, fontSize: "0.8125rem", fontWeight: 500, color: "var(--text-muted)" }}>
-              {group.items.length}
-            </span>
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gap: "var(--sp-4)",
-              gridTemplateColumns: "repeat(auto-fill, minmax(var(--tile-min), 1fr))",
-            }}
-          >
-            {group.items.map((indicator) => (
-              <IndicatorCatalogCard key={indicator.indicator_code} indicator={indicator} />
-            ))}
-          </div>
-        </section>
-      ))}
+      <div style={{ display: "flex", flexDirection: "column", gap: 44 }}>
+        {groups.map((group) => (
+          <section key={group.key}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 18 }}>
+              <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.375rem", letterSpacing: "-0.015em", margin: 0 }}>
+                {group.label}
+              </h2>
+              <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+                {group.items.length} indicadores
+              </span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 14 }}>
+              {group.items.map((indicator) => (
+                <CatalogCard key={indicator.indicator_code} indicator={indicator} />
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }

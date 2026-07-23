@@ -9,32 +9,49 @@ export const metadata: Metadata = {
 
 export default function NoticiasPage() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--container-max)",
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--sp-6)",
-      }}
-    >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <h1
-          style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
-            margin: 0,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Noticias económicas
-        </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Los últimos titulares de economía, con su fuente y fecha. Cada nota enlaza al medio
-          original.
-        </p>
+    <div style={{ maxWidth: 1120, margin: "0 auto", padding: "48px 24px 72px" }}>
+      <header
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          borderBottom: "2px solid var(--ink)",
+          paddingBottom: 20,
+          marginBottom: 32,
+          flexWrap: "wrap",
+          gap: 12,
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: "var(--font-jb-mono)",
+              fontSize: "0.72rem",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--ink3)",
+              marginBottom: 10,
+            }}
+          >
+            /noticias
+          </div>
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: "clamp(2rem, 5vw, 2.875rem)",
+              letterSpacing: "-0.025em",
+              margin: 0,
+              color: "var(--ink)",
+            }}
+          >
+            Titulares del día
+          </h1>
+        </div>
+        <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.72rem", color: "var(--ink3)" }}>
+          Agregado de medios · con enlace a la fuente
+        </span>
       </header>
-
       <NewsFeed />
     </div>
   );
