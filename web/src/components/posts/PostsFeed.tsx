@@ -5,6 +5,7 @@ import {
   POST_CATEGORY_LABELS,
   formatPostDate,
 } from "@/components/posts/postCategories";
+import { PostCover } from "@/components/posts/PostCover";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
@@ -82,6 +83,12 @@ function FeaturedIdea({ post }: { post: Post }) {
         textDecoration: "none",
       }}
     >
+      <PostCover
+        slug={post.slug}
+        category={post.category}
+        ratio="21 / 9"
+        style={{ marginBottom: 22 }}
+      />
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
         <CategoryBadge category={post.category} />
         <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
@@ -136,6 +143,11 @@ function IdeaCard({ post }: { post: Post }) {
         color: "var(--ink)",
       }}
     >
+      <PostCover
+        slug={post.slug}
+        category={post.category}
+        style={{ margin: "-26px -24px 4px", width: "calc(100% + 48px)", borderWidth: "0 0 1px" }}
+      />
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <CategoryBadge category={post.category} />
       </div>

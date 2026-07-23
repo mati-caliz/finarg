@@ -2,6 +2,7 @@
 
 import { ActionLink, SectionHead } from "@/components/home/homeShared";
 import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
+import { PostCover } from "@/components/posts/PostCover";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
@@ -33,6 +34,9 @@ function LeadIdea({ post }: { post: Post }) {
   const impacts = post.impacts ?? [];
   return (
     <article>
+      <Link href={`/ideas/${post.slug}`} style={{ display: "block", marginBottom: 20 }}>
+        <PostCover slug={post.slug} category={post.category} ratio="21 / 9" />
+      </Link>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
         <CategoryBadge post={post} />
         <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.7rem", color: "var(--ink3)" }}>

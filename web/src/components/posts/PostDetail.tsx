@@ -2,6 +2,7 @@
 
 import { QueryError } from "@/components/QueryError";
 import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
+import { PostCover } from "@/components/posts/PostCover";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePost, usePosts } from "@/hooks/useLabrecha";
@@ -179,6 +180,10 @@ export function PostDetail({ slug }: { slug: string }) {
           <span>·</span>
           <span>{readingTimeMinutes(post.content)} min de lectura</span>
         </div>
+      </div>
+
+      <div style={{ maxWidth: 940, margin: "0 auto", padding: "28px 24px 0" }}>
+        <PostCover slug={post.slug} category={post.category} ratio="21 / 9" />
       </div>
 
       {impacts.length > 0 && (

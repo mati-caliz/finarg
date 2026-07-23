@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNews } from "@/hooks/useLabrecha";
 import type { NewsArticle } from "@/lib/labrechaApi";
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 
 const NEWS_LIMIT = 40;
 const MONO = "var(--font-jb-mono)";
@@ -36,6 +37,41 @@ function formatPublished(value: string): string {
   });
 }
 
+function NewsImage({
+  article,
+  ratio,
+  width,
+}: {
+  article: NewsArticle;
+  ratio: string;
+  width?: number;
+}) {
+  const [failed, setFailed] = useState(false);
+  if (!article.image_url || failed) {
+    return null;
+  }
+  return (
+    // biome-ignore lint/performance/noImgElement: dominio externo de cada medio, sin optimizador
+    <img
+      src={article.image_url}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      referrerPolicy="no-referrer"
+      onError={() => setFailed(true)}
+      style={{
+        display: "block",
+        width: width ? width : "100%",
+        flexShrink: 0,
+        aspectRatio: ratio,
+        objectFit: "cover",
+        background: "var(--paper-2)",
+        border: "1px solid var(--line)",
+      }}
+    />
+  );
+}
+
 function LeadArticle({ article }: { article: NewsArticle }) {
   return (
     <a
@@ -44,6 +80,11 @@ function LeadArticle({ article }: { article: NewsArticle }) {
       rel="noopener noreferrer"
       style={{ display: "block", paddingBottom: 28, borderBottom: "1px solid var(--line)", marginBottom: 24, textDecoration: "none" }}
     >
+      {article.image_url ? (
+        <div style={{ marginBottom: 18 }}>
+          <NewsImage article={article} ratio="16 / 9" />
+        </div>
+      ) : null}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
         <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--brecha)", border: "1px solid var(--brecha)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
           {categoryLabel(article.category)}
@@ -66,14 +107,17 @@ function LeadArticle({ article }: { article: NewsArticle }) {
 
 function ListArticle({ article }: { article: NewsArticle }) {
   return (
-    <a href={article.source_url} target="_blank" rel="noopener noreferrer" style={{ display: "block", textDecoration: "none" }}>
-      <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)", marginBottom: 7 }}>
-        {article.source} · {formatPublished(article.published_date)} · <span style={{ color: "var(--ink2)" }}>{categoryLabel(article.category)}</span>
+    <a href={article.source_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 16, textDecoration: "none" }}>
+      <NewsImage article={article} ratio="4 / 3" width={132} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)", marginBottom: 7 }}>
+          {article.source} · {formatPublished(article.published_date)} · <span style={{ color: "var(--ink2)" }}>{categoryLabel(article.category)}</span>
+        </div>
+        <h3 style={{ display: "flex", gap: 6, alignItems: "flex-start", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.3125rem", lineHeight: 1.12, letterSpacing: "-0.015em", margin: 0, color: "var(--ink)" }}>
+          <span>{article.title}</span>
+          <ArrowUpRight size={15} aria-hidden style={{ flexShrink: 0, marginTop: 4, color: "var(--ink3)" }} />
+        </h3>
       </div>
-      <h3 style={{ display: "flex", gap: 6, alignItems: "flex-start", fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.3125rem", lineHeight: 1.12, letterSpacing: "-0.015em", margin: 0, color: "var(--ink)" }}>
-        <span>{article.title}</span>
-        <ArrowUpRight size={15} aria-hidden style={{ flexShrink: 0, marginTop: 4, color: "var(--ink3)" }} />
-      </h3>
     </a>
   );
 }
