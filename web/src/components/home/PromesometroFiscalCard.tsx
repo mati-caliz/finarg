@@ -3,10 +3,39 @@
 import { Badge, Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicatorSeries } from "@/hooks/useLabrecha";
-import { formatBillonesAR, formatDateAR } from "@/lib/indicators";
+import {
+  MILLONES_POR_BILLON,
+  formatBillonesAR,
+  formatDateAR,
+  formatNumberAR,
+} from "@/lib/indicators";
 
 const SOURCE = "datosgobar";
 const MONTHS_WINDOW = 12;
+const MONTH_ABBREVIATIONS = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sep",
+  "oct",
+  "nov",
+  "dic",
+];
+
+function monthAbbreviation(isoDate: string): string {
+  const monthNumber = Number.parseInt(isoDate.slice(5, 7), 10);
+  return MONTH_ABBREVIATIONS[monthNumber - 1] ?? isoDate;
+}
+
+function signedBillonesCompact(valueInMillones: number): string {
+  const magnitude = formatNumberAR(Math.abs(valueInMillones) / MILLONES_POR_BILLON, 1);
+  return valueInMillones >= 0 ? `+${magnitude}` : `−${magnitude}`;
+}
 
 function countLeadingSurplus(valuesDesc: number[]): number {
   let streak = 0;
@@ -86,25 +115,53 @@ export function PromesometroFiscalCard() {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-          {monthsAscending.map((point) => {
-            const value = Number.parseFloat(point.value);
-            const positive = value > 0;
-            return (
-              <div
-                key={point.date}
-                title={`${formatDateAR(point.date)}: ${signedBillones(value)}`}
-                style={{
-                  flex: "1 1 0",
-                  minWidth: 14,
-                  height: 28,
-                  borderRadius: "var(--radius-sm)",
-                  background: positive ? "var(--pos-bg)" : "var(--neg-bg)",
-                  borderBottom: `3px solid ${positive ? "var(--pos)" : "var(--neg)"}`,
-                }}
-              />
-            );
-          })}
+        <div>
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            {monthsAscending.map((point) => {
+              const value = Number.parseFloat(point.value);
+              const positive = value > 0;
+              return (
+                <div
+                  key={point.date}
+                  title={`${formatDateAR(point.date)}: ${signedBillones(value)}`}
+                  style={{
+                    flex: "1 1 0",
+                    minWidth: 34,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 3,
+                  }}
+                >
+                  <span
+                    className="num"
+                    style={{
+                      fontSize: "0.625rem",
+                      fontWeight: 600,
+                      color: positive ? "var(--pos)" : "var(--neg)",
+                    }}
+                  >
+                    {signedBillonesCompact(value)}
+                  </span>
+                  <div
+                    style={{
+                      alignSelf: "stretch",
+                      height: 28,
+                      borderRadius: "var(--radius-sm)",
+                      background: positive ? "var(--pos-bg)" : "var(--neg-bg)",
+                      borderBottom: `3px solid ${positive ? "var(--pos)" : "var(--neg)"}`,
+                    }}
+                  />
+                  <span style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
+                    {monthAbbreviation(point.date)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ fontSize: "0.625rem", color: "var(--text-muted)", marginTop: 6 }}>
+            Resultado financiero por mes, en billones de pesos
+          </div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>

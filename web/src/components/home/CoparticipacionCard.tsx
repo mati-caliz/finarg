@@ -3,7 +3,7 @@
 import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCoparticipacion } from "@/hooks/useLabrecha";
-import { PROVINCE_CENTROIDS, projectCentroid } from "@/lib/argentina";
+import { PROVINCE_CENTROIDS, argentinaOutlinePaths, projectCentroid } from "@/lib/argentina";
 import { formatNumberAR } from "@/lib/indicators";
 
 const MAP_WIDTH = 190;
@@ -61,6 +61,16 @@ export function CoparticipacionCard() {
           aria-label="Mapa de Argentina: tamaño de cada burbuja según la tajada de coparticipación de la provincia"
           style={{ flexShrink: 0, maxWidth: "100%" }}
         >
+          {argentinaOutlinePaths(MAP_WIDTH, MAP_HEIGHT).map((path) => (
+            <path
+              key={path}
+              d={path}
+              fill="var(--surface-inset)"
+              stroke="var(--border-2)"
+              strokeWidth={1}
+              strokeLinejoin="round"
+            />
+          ))}
           {bubbles.map((bubble) => (
             <g key={bubble.province}>
               <circle

@@ -1,4 +1,5 @@
 import { BlocAttendance } from "@/components/congress/BlocAttendance";
+import { DeputiesComposition } from "@/components/congress/DeputiesComposition";
 import { LatestVotes } from "@/components/congress/LatestVotes";
 import { RecentLaws } from "@/components/congress/RecentLaws";
 import { SenateComposition } from "@/components/congress/SenateComposition";
@@ -37,6 +38,8 @@ export default function CongresoPage() {
       </header>
 
       <SenateComposition />
+
+      <DeputiesComposition />
 
       <section style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
         <h2

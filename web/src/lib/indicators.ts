@@ -30,7 +30,7 @@ export function formatUsdAR(value: number, fractionDigits = 0): string {
   return `US$ ${formatNumberAR(value, fractionDigits)}`;
 }
 
-const MILLONES_POR_BILLON = 1_000_000;
+export const MILLONES_POR_BILLON = 1_000_000;
 
 export function formatBillonesAR(valueInMillones: number, fractionDigits = 2): string {
   return `$ ${formatNumberAR(valueInMillones / MILLONES_POR_BILLON, fractionDigits)} billones`;

@@ -41,6 +41,37 @@ export function daysUntilLabel(days: number): string {
   return `en ${days} días`;
 }
 
+export function addDaysISO(isoDate: string, days: number): string {
+  return new Date(toUtcMidnight(isoDate) + days * MS_PER_DAY).toISOString().slice(0, 10);
+}
+
+export function weekdayMondayFirst(isoDate: string): number {
+  return (new Date(toUtcMidnight(isoDate)).getUTCDay() + 6) % 7;
+}
+
+export function isWeekend(isoDate: string): boolean {
+  return weekdayMondayFirst(isoDate) >= 5;
+}
+
+export interface FreeRun {
+  start: string;
+  end: string;
+  length: number;
+}
+
+export function freeRunAround(isoDate: string, holidayDates: Set<string>): FreeRun {
+  const isDayOff = (candidate: string) => isWeekend(candidate) || holidayDates.has(candidate);
+  let start = isoDate;
+  while (isDayOff(addDaysISO(start, -1))) {
+    start = addDaysISO(start, -1);
+  }
+  let end = isoDate;
+  while (isDayOff(addDaysISO(end, 1))) {
+    end = addDaysISO(end, 1);
+  }
+  return { start, end, length: daysUntil(end, start) + 1 };
+}
+
 export function upcomingHolidays(
   holidays: Holiday[],
   fromISO: string = todayISO(),

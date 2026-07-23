@@ -55,3 +55,85 @@ export function projectCentroid(
   const y = ((LAT_MAX - centroid.lat) / latSpan) * height;
   return { x, y };
 }
+
+const MAINLAND_OUTLINE: ProvinceCentroid[] = [
+  { lon: -66.9, lat: -21.8 },
+  { lon: -64.3, lat: -22.0 },
+  { lon: -62.6, lat: -22.2 },
+  { lon: -61.0, lat: -23.6 },
+  { lon: -59.4, lat: -24.4 },
+  { lon: -57.6, lat: -25.4 },
+  { lon: -57.9, lat: -27.3 },
+  { lon: -56.4, lat: -27.4 },
+  { lon: -55.6, lat: -26.9 },
+  { lon: -54.6, lat: -25.9 },
+  { lon: -53.7, lat: -25.6 },
+  { lon: -53.8, lat: -26.7 },
+  { lon: -54.8, lat: -27.5 },
+  { lon: -55.7, lat: -28.3 },
+  { lon: -57.1, lat: -29.7 },
+  { lon: -58.0, lat: -31.4 },
+  { lon: -58.4, lat: -33.0 },
+  { lon: -58.4, lat: -34.0 },
+  { lon: -58.35, lat: -34.6 },
+  { lon: -57.2, lat: -35.3 },
+  { lon: -57.1, lat: -35.9 },
+  { lon: -57.5, lat: -38.1 },
+  { lon: -58.7, lat: -38.6 },
+  { lon: -60.9, lat: -38.95 },
+  { lon: -62.3, lat: -38.8 },
+  { lon: -62.3, lat: -40.8 },
+  { lon: -63.7, lat: -41.15 },
+  { lon: -63.6, lat: -42.4 },
+  { lon: -65.1, lat: -43.3 },
+  { lon: -65.6, lat: -44.8 },
+  { lon: -67.5, lat: -45.9 },
+  { lon: -67.3, lat: -46.9 },
+  { lon: -65.9, lat: -47.75 },
+  { lon: -67.7, lat: -49.8 },
+  { lon: -69.2, lat: -51.6 },
+  { lon: -68.4, lat: -52.3 },
+  { lon: -69.8, lat: -52.15 },
+  { lon: -72.3, lat: -51.5 },
+  { lon: -72.5, lat: -50.0 },
+  { lon: -73.5, lat: -49.3 },
+  { lon: -72.6, lat: -48.0 },
+  { lon: -72.0, lat: -46.5 },
+  { lon: -71.7, lat: -45.0 },
+  { lon: -71.3, lat: -43.5 },
+  { lon: -71.7, lat: -42.0 },
+  { lon: -71.9, lat: -40.5 },
+  { lon: -70.8, lat: -39.0 },
+  { lon: -71.2, lat: -37.5 },
+  { lon: -70.4, lat: -36.0 },
+  { lon: -69.8, lat: -34.5 },
+  { lon: -70.0, lat: -33.0 },
+  { lon: -69.8, lat: -31.5 },
+  { lon: -70.2, lat: -30.0 },
+  { lon: -69.9, lat: -28.5 },
+  { lon: -68.6, lat: -27.0 },
+  { lon: -68.4, lat: -25.5 },
+  { lon: -67.3, lat: -24.0 },
+  { lon: -67.0, lat: -22.7 },
+];
+
+const TIERRA_DEL_FUEGO_OUTLINE: ProvinceCentroid[] = [
+  { lon: -68.6, lat: -52.9 },
+  { lon: -67.2, lat: -53.3 },
+  { lon: -65.2, lat: -54.4 },
+  { lon: -66.5, lat: -55.05 },
+  { lon: -68.6, lat: -54.95 },
+];
+
+const ARGENTINA_OUTLINES = [MAINLAND_OUTLINE, TIERRA_DEL_FUEGO_OUTLINE];
+
+export function argentinaOutlinePaths(width: number, height: number): string[] {
+  return ARGENTINA_OUTLINES.map((outline) => {
+    const commands = outline.map((vertex, index) => {
+      const point = projectCentroid(vertex, width, height);
+      const command = index === 0 ? "M" : "L";
+      return `${command}${point.x.toFixed(1)} ${point.y.toFixed(1)}`;
+    });
+    return `${commands.join(" ")} Z`;
+  });
+}

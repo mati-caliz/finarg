@@ -76,8 +76,7 @@ export function Navbar() {
             }}
           >
             <span
-              className="lg:hidden"
-              style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+              className="inline-flex items-center gap-1 lg:hidden"
             >
               La
               <span
@@ -85,7 +84,7 @@ export function Navbar() {
               />
               Brecha
             </span>
-            <span className="hidden lg:inline">Observatorio político-económico</span>
+            <span className="hidden lg:inline lg:pl-2">Observatorio político-económico</span>
           </Link>
         </div>
 

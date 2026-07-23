@@ -102,7 +102,7 @@ export function NewsFeed() {
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
+      <div className="grid grid-cols-1 gap-[var(--sp-4)] md:grid-cols-2">
         {SKELETON_KEYS.map((key) => (
           <Skeleton key={key} className="h-[120px] rounded-[10px]" />
         ))}
@@ -123,9 +123,11 @@ export function NewsFeed() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-      {articles.map((article) => (
-        <NewsItem key={article.source_url} article={article} />
-      ))}
+      <div className="grid grid-cols-1 gap-[var(--sp-4)] md:grid-cols-2">
+        {articles.map((article) => (
+          <NewsItem key={article.source_url} article={article} />
+        ))}
+      </div>
       <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: 0 }}>
         Titulares de El Economista, enlazados a la nota original. La Brecha no edita ni reproduce el
         contenido completo.
