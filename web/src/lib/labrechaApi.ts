@@ -164,6 +164,22 @@ export interface NewsArticle {
   image_url: string | null;
 }
 
+export const POST_CATEGORIES = ["idea", "ley", "analisis", "nota"] as const;
+
+export type PostCategory = (typeof POST_CATEGORIES)[number];
+
+export interface Post {
+  id: number;
+  slug: string;
+  title: string;
+  category: PostCategory;
+  summary: string | null;
+  content: string;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface IndicatorSeriesParams {
   source?: string;
   date_from?: string;
@@ -324,6 +340,12 @@ export const holidaysApi = {
 export const newsApi = {
   list: (params?: { source?: string; category?: string; limit?: number; offset?: number }) =>
     get<NewsArticle[]>("/news", params),
+};
+
+export const postsApi = {
+  list: (params?: { category?: PostCategory; limit?: number; offset?: number }) =>
+    get<Post[]>("/posts", params),
+  bySlug: (slug: string) => get<Post>(`/posts/${slug}`),
 };
 
 export const boletinApi = {

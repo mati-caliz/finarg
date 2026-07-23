@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Home,
   Landmark,
+  Lightbulb,
   LineChart,
   Menu,
   Newspaper,
@@ -44,6 +45,7 @@ const TOP_LINKS: NavTop[] = [
   { label: "Brechas", href: "/brechas", icon: Scale },
   { label: "Congreso", href: "/congreso", icon: Landmark },
   { label: "Noticias", href: "/noticias", icon: Newspaper },
+  { label: "Ideas", href: "/ideas", icon: Lightbulb },
   { label: "Feriados", href: "/feriados", icon: CalendarDays },
 ];
 
@@ -181,13 +183,10 @@ export function Sidebar() {
     <>
       <button
         type="button"
-        className="fixed top-3 left-3 z-50 lg:hidden"
+        className="fixed top-3 left-3 z-50 inline-flex items-center justify-center lg:hidden"
         onClick={toggleSidebar}
         aria-label={sidebarOpen ? "Cerrar menú" : "Abrir menú"}
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
           width: 40,
           height: 40,
           borderRadius: "var(--radius-md)",
