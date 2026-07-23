@@ -23,6 +23,17 @@ export function parsePoints(points: IndicatorPoint[]): ParsedPoint[] {
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
 }
 
+export function mergePoints(history: ParsedPoint[], live: ParsedPoint[]): ParsedPoint[] {
+  const byDate = new Map<string, ParsedPoint>();
+  for (const point of history) {
+    byDate.set(point.date, point);
+  }
+  for (const point of live) {
+    byDate.set(point.date, point);
+  }
+  return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+}
+
 function downsample(dates: string[], maxPoints: number): string[] {
   if (dates.length <= maxPoints) {
     return dates;
