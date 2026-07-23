@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from labrecha_api.config import settings
 from labrecha_api.db import get_session
 from labrecha_api.models import Post
-from labrecha_api.schemas import PostCategory, PostCreate, PostOut, PostUpdate
+from labrecha_api.schemas import PostCategory, PostCreate, PostImpact, PostOut, PostUpdate
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
@@ -28,6 +28,9 @@ def to_post_out(post: Post) -> PostOut:
         category=PostCategory(post.category),
         summary=post.summary,
         content=post.content,
+        impacts=[PostImpact.model_validate(impact) for impact in post.impacts]
+        if post.impacts is not None
+        else None,
         published=post.published,
         created_at=post.created_at,
         updated_at=post.updated_at,
@@ -78,6 +81,9 @@ def create_post(payload: PostCreate, session: Session = Depends(get_session)) ->
         category=payload.category.value,
         summary=payload.summary,
         content=payload.content,
+        impacts=[impact.model_dump(mode="json") for impact in payload.impacts]
+        if payload.impacts is not None
+        else None,
         published=payload.published,
         created_at=now,
         updated_at=now,
@@ -95,7 +101,7 @@ def update_post(
     post = session.get(Post, post_id)
     if post is None:
         raise HTTPException(status_code=404, detail="Post no encontrado")
-    changes = payload.model_dump(exclude_unset=True)
+    changes = payload.model_dump(exclude_unset=True, mode="json")
     if "slug" in changes and changes["slug"] != post.slug:
         duplicate = session.scalars(select(Post).where(Post.slug == changes["slug"])).first()
         if duplicate is not None:

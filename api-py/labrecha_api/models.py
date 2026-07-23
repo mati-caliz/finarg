@@ -174,6 +174,7 @@ class Post(Base):
     category: Mapped[str] = mapped_column(String(40))
     summary: Mapped[str | None] = mapped_column(Text)
     content: Mapped[str] = mapped_column(Text)
+    impacts: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     published: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

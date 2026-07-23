@@ -304,6 +304,21 @@ class PostCategory(str, Enum):
     NOTA = "nota"
 
 
+class PostImpactKind(str, Enum):
+    TIEMPO = "tiempo"
+    DINERO = "dinero"
+    AMBIENTE = "ambiente"
+    VIDAS = "vidas"
+    ESTADO = "estado"
+    TRANSPARENCIA = "transparencia"
+
+
+class PostImpact(BaseModel):
+    kind: PostImpactKind
+    value: str = Field(min_length=1, max_length=40)
+    label: str = Field(min_length=1, max_length=200)
+
+
 class PostOut(BaseModel):
     id: int
     slug: str
@@ -311,6 +326,7 @@ class PostOut(BaseModel):
     category: PostCategory
     summary: str | None
     content: str
+    impacts: list[PostImpact] | None
     published: bool
     created_at: datetime
     updated_at: datetime
@@ -322,6 +338,7 @@ class PostCreate(BaseModel):
     category: PostCategory
     summary: str | None = None
     content: str = Field(min_length=1)
+    impacts: list[PostImpact] | None = None
     published: bool = False
 
 
@@ -331,4 +348,5 @@ class PostUpdate(BaseModel):
     category: PostCategory | None = None
     summary: str | None = None
     content: str | None = Field(default=None, min_length=1)
+    impacts: list[PostImpact] | None = None
     published: bool | None = None

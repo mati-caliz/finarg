@@ -168,6 +168,23 @@ export const POST_CATEGORIES = ["idea", "ley", "analisis", "nota"] as const;
 
 export type PostCategory = (typeof POST_CATEGORIES)[number];
 
+export const POST_IMPACT_KINDS = [
+  "tiempo",
+  "dinero",
+  "ambiente",
+  "vidas",
+  "estado",
+  "transparencia",
+] as const;
+
+export type PostImpactKind = (typeof POST_IMPACT_KINDS)[number];
+
+export interface PostImpact {
+  kind: PostImpactKind;
+  value: string;
+  label: string;
+}
+
 export interface Post {
   id: number;
   slug: string;
@@ -175,6 +192,7 @@ export interface Post {
   category: PostCategory;
   summary: string | null;
   content: string;
+  impacts: PostImpact[] | null;
   published: boolean;
   created_at: string;
   updated_at: string;

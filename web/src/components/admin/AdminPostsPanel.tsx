@@ -2,6 +2,7 @@
 
 import { Badge, Button, Card } from "@/components/core";
 import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
+import { POST_IMPACT_META } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AdminApiError,
@@ -9,8 +10,15 @@ import {
   adminPostsApi,
   adminSessionApi,
 } from "@/lib/adminPostsApi";
-import { POST_CATEGORIES, type Post, type PostCategory } from "@/lib/labrechaApi";
-import { LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  POST_CATEGORIES,
+  POST_IMPACT_KINDS,
+  type Post,
+  type PostCategory,
+  type PostImpact,
+  type PostImpactKind,
+} from "@/lib/labrechaApi";
+import { LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 const EMPTY_DRAFT: PostDraft = {
@@ -19,8 +27,11 @@ const EMPTY_DRAFT: PostDraft = {
   category: "idea",
   summary: null,
   content: "",
+  impacts: null,
   published: false,
 };
+
+const EMPTY_IMPACT: PostImpact = { kind: "tiempo", value: "", label: "" };
 
 function slugify(title: string): string {
   return title
@@ -39,6 +50,7 @@ function toDraft(post: Post): PostDraft {
     category: post.category,
     summary: post.summary,
     content: post.content,
+    impacts: post.impacts,
     published: post.published,
   };
 }
@@ -148,7 +160,10 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
         onSubmit={(event) => {
           event.preventDefault();
           if (canSave) {
-            onSave(draft);
+            const completeImpacts = (draft.impacts ?? []).filter(
+              (impact) => impact.value.trim().length > 0 && impact.label.trim().length > 0,
+            );
+            onSave({ ...draft, impacts: completeImpacts.length > 0 ? completeImpacts : null });
           }
         }}
         style={{ display: "flex", flexDirection: "column", gap: 14 }}
@@ -230,6 +245,98 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
             }
             style={fieldStyle}
           />
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <span style={labelStyle}>Impactos estimados</span>
+          {(draft.impacts ?? []).map((impact, index) => (
+            <div
+              key={`impact-${index}-${impact.kind}`}
+              style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}
+            >
+              <select
+                value={impact.kind}
+                onChange={(event) => {
+                  const kind = event.target.value as PostImpactKind;
+                  setDraft((current) => ({
+                    ...current,
+                    impacts: (current.impacts ?? []).map((item, itemIndex) =>
+                      itemIndex === index ? { ...item, kind } : item,
+                    ),
+                  }));
+                }}
+                style={{ ...fieldStyle, width: 150, flex: "0 0 auto" }}
+              >
+                {POST_IMPACT_KINDS.map((kind) => (
+                  <option key={kind} value={kind}>
+                    {POST_IMPACT_META[kind].label}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={impact.value}
+                placeholder="Valor (ej: -30 min)"
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setDraft((current) => ({
+                    ...current,
+                    impacts: (current.impacts ?? []).map((item, itemIndex) =>
+                      itemIndex === index ? { ...item, value } : item,
+                    ),
+                  }));
+                }}
+                style={{ ...fieldStyle, width: 160, flex: "0 1 auto", fontFamily: "var(--font-mono)" }}
+              />
+              <input
+                value={impact.label}
+                placeholder="Descripción corta"
+                onChange={(event) => {
+                  const label = event.target.value;
+                  setDraft((current) => ({
+                    ...current,
+                    impacts: (current.impacts ?? []).map((item, itemIndex) =>
+                      itemIndex === index ? { ...item, label } : item,
+                    ),
+                  }));
+                }}
+                style={{ ...fieldStyle, flex: "1 1 200px" }}
+              />
+              <button
+                type="button"
+                aria-label="Quitar impacto"
+                onClick={() =>
+                  setDraft((current) => ({
+                    ...current,
+                    impacts: (current.impacts ?? []).filter((_, itemIndex) => itemIndex !== index),
+                  }))
+                }
+                style={{
+                  border: "1px solid var(--border-1)",
+                  background: "var(--surface-card)",
+                  color: "var(--text-muted)",
+                  borderRadius: "var(--radius-md)",
+                  padding: 6,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                }}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+          <Button
+            variant="secondary"
+            size="sm"
+            icon={<Plus className="h-3.5 w-3.5" />}
+            onClick={() =>
+              setDraft((current) => ({
+                ...current,
+                impacts: [...(current.impacts ?? []), { ...EMPTY_IMPACT }],
+              }))
+            }
+          >
+            Agregar impacto
+          </Button>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
