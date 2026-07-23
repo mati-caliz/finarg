@@ -5,8 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressAttendance } from "@/hooks/useLabrecha";
 import { formatNumberAR } from "@/lib/indicators";
 
-const MIN_ATTENDANCE_SCALE = 60;
-
 export function BlocAttendance() {
   const { data, isLoading } = useCongressAttendance();
 
@@ -33,7 +31,7 @@ export function BlocAttendance() {
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {rows.map((row) => {
           const pct = Number.parseFloat(row.attendance_pct);
-          const fill = Math.max(0, (pct - MIN_ATTENDANCE_SCALE) / (100 - MIN_ATTENDANCE_SCALE)) * 100;
+          const fill = Math.min(100, Math.max(0, pct));
           return (
             <div key={row.bloc} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span

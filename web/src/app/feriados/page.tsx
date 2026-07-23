@@ -1,4 +1,4 @@
-import { HolidaysList } from "@/components/holidays/HolidaysList";
+import { HolidaysCalendar } from "@/components/holidays/HolidaysCalendar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -29,11 +29,11 @@ export default function FeriadosPage() {
           Feriados de Argentina
         </h1>
         <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Calendario de feriados nacionales, con su fecha y fuente. Los ya pasados quedan atenuados.
+          Calendario anual de feriados nacionales, próximos feriados y fines de semana largos.
         </p>
       </header>
 
-      <HolidaysList />
+      <HolidaysCalendar />
     </div>
   );
 }

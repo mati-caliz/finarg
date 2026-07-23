@@ -8,40 +8,29 @@ import {
   type HemicycleSeat,
 } from "@/components/congress/HemicycleChart";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSenateMembers } from "@/hooks/useLabrecha";
+import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
 import { blocColor } from "@/lib/congress";
-import type { Senator } from "@/lib/labrechaApi";
+import { formatDateAR } from "@/lib/indicators";
 
 const UNKNOWN_BLOC = "Sin bloque";
 
-function senatorFullName(senator: Senator): string {
-  return [senator.first_name, senator.last_name].filter(Boolean).join(" ") || senator.senator_id;
-}
+export function DeputiesComposition() {
+  const latestVoteQuery = useCongressVotes({ limit: 1 });
+  const latestVote = latestVoteQuery.data?.[0];
+  const detailsQuery = useCongressVoteDetails(latestVote?.acta_id ?? "");
 
-function mandateYears(senator: Senator): string | null {
-  const start = senator.mandate_start?.slice(0, 4);
-  const end = senator.mandate_end?.slice(0, 4);
-  if (!start && !end) {
-    return null;
-  }
-  return `Mandato ${start ?? "?"}–${end ?? "?"}`;
-}
-
-export function SenateComposition() {
-  const { data, isLoading } = useSenateMembers();
-
-  if (isLoading) {
+  if (latestVoteQuery.isLoading || (latestVote && detailsQuery.isLoading)) {
     return <Skeleton className="h-80 w-full rounded-[10px]" />;
   }
 
-  const senators = data ?? [];
-  if (senators.length === 0) {
+  const details = detailsQuery.data ?? [];
+  if (!latestVote || details.length === 0) {
     return null;
   }
 
   const countByBloc = new Map<string, number>();
-  for (const senator of senators) {
-    const bloc = senator.bloc ?? UNKNOWN_BLOC;
+  for (const detail of details) {
+    const bloc = detail.bloc ?? UNKNOWN_BLOC;
     countByBloc.set(bloc, (countByBloc.get(bloc) ?? 0) + 1);
   }
   const blocs: HemicycleBloc[] = [...countByBloc.entries()]
@@ -49,21 +38,22 @@ export function SenateComposition() {
     .map(([name, count], index) => ({ name, count, color: blocColor(index) }));
 
   const blocOrder = new Map(blocs.map((bloc, index) => [bloc.name, index]));
-  const seats: HemicycleSeat[] = [...senators]
+  const seats: HemicycleSeat[] = [...details]
     .sort((first, second) => {
       const firstBloc = blocOrder.get(first.bloc ?? UNKNOWN_BLOC) ?? Number.MAX_SAFE_INTEGER;
       const secondBloc = blocOrder.get(second.bloc ?? UNKNOWN_BLOC) ?? Number.MAX_SAFE_INTEGER;
-      return firstBloc - secondBloc;
+      if (firstBloc !== secondBloc) {
+        return firstBloc - secondBloc;
+      }
+      return (first.deputy_name ?? "").localeCompare(second.deputy_name ?? "");
     })
-    .map((senator) => ({
-      id: senator.senator_id,
-      occupantName: senatorFullName(senator),
-      bloc: senator.bloc ?? UNKNOWN_BLOC,
-      detailLines: [
-        senator.province,
-        senator.party && senator.party !== senator.bloc ? senator.party : null,
-        mandateYears(senator),
-      ].filter((line): line is string => line !== null && line !== ""),
+    .map((detail, index) => ({
+      id: `${detail.deputy_name ?? "banca"}-${index}`,
+      occupantName: detail.deputy_name ?? "Banca sin datos",
+      bloc: detail.bloc ?? UNKNOWN_BLOC,
+      detailLines: [detail.district].filter(
+        (line): line is string => line !== null && line !== "",
+      ),
     }));
 
   const total = seats.length;
@@ -71,11 +61,13 @@ export function SenateComposition() {
 
   return (
     <Card
-      title="Composición del Senado"
+      title="Composición de Diputados"
       subtitle={`${total} bancas · mayoría en ${majority} · pasá el mouse por cada banca`}
       footer={
         <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-          Fuente: Senado de la Nación (datos abiertos)
+          Bancas y bloques según la última votación nominal registrada
+          {latestVote.date ? ` (${formatDateAR(latestVote.date)})` : ""}. Fuente: Cámara de
+          Diputados (datos abiertos).
         </span>
       }
     >
@@ -84,7 +76,7 @@ export function SenateComposition() {
           <HemicycleChart
             seats={seats}
             blocs={blocs}
-            ariaLabel={`Hemiciclo del Senado: ${total} bancas coloreadas por bloque`}
+            ariaLabel={`Hemiciclo de Diputados: ${total} bancas coloreadas por bloque`}
           />
         </div>
         <BlocLegend blocs={blocs} />

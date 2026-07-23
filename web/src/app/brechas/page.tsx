@@ -37,11 +37,13 @@ export default function BrechasPage() {
         </p>
       </header>
 
-      {BRECHAS.map((def) => (
-        <section key={def.id} id={def.id} style={{ scrollMarginTop: "var(--sp-8)" }}>
-          <BrechaComparison id={def.id} />
-        </section>
-      ))}
+      <div className="grid grid-cols-1 gap-[var(--sp-6)] xl:grid-cols-2">
+        {BRECHAS.map((def) => (
+          <section key={def.id} id={def.id} style={{ scrollMarginTop: "var(--sp-8)" }}>
+            <BrechaComparison id={def.id} />
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
