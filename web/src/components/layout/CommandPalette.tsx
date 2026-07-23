@@ -163,9 +163,9 @@ export function CommandPalette() {
           padding: 0,
           width: "100%",
           maxWidth: 560,
-          background: "var(--surface-card)",
-          color: "var(--text-body)",
-          border: "1px solid var(--border-2)",
+          background: "var(--raise)",
+          color: "var(--ink)",
+          border: "1px solid var(--line2)",
           borderRadius: "var(--radius-lg)",
           boxShadow: "var(--shadow-raised)",
           overflow: "hidden",
@@ -177,10 +177,10 @@ export function CommandPalette() {
             alignItems: "center",
             gap: 10,
             padding: "12px 16px",
-            borderBottom: "1px solid var(--border-1)",
+            borderBottom: "1px solid var(--line)",
           }}
         >
-          <Search className="h-4 w-4" style={{ color: "var(--text-muted)" }} />
+          <Search className="h-4 w-4" style={{ color: "var(--ink3)" }} />
           <input
             ref={inputRef}
             value={query}
@@ -195,7 +195,7 @@ export function CommandPalette() {
               border: "none",
               outline: "none",
               background: "transparent",
-              color: "var(--text-body)",
+              color: "var(--ink)",
               fontSize: "0.9375rem",
             }}
           />
@@ -203,7 +203,7 @@ export function CommandPalette() {
 
         <div ref={listRef} style={{ maxHeight: "56vh", overflowY: "auto", padding: 6 }}>
           {results.length === 0 && (
-            <p style={{ padding: "16px", color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>
+            <p style={{ padding: "16px", color: "var(--ink3)", fontSize: "0.875rem", margin: 0 }}>
               Sin resultados para “{query}”.
             </p>
           )}
@@ -225,11 +225,11 @@ export function CommandPalette() {
                   border: "none",
                   cursor: "pointer",
                   textAlign: "left",
-                  background: active ? "var(--accent-soft)" : "transparent",
-                  color: active ? "var(--accent-strong)" : "var(--text-body)",
+                  background: active ? "var(--brecha-bg)" : "transparent",
+                  color: active ? "var(--brecha)" : "var(--ink)",
                 }}
               >
-                <span style={{ color: active ? "var(--accent-strong)" : "var(--text-muted)", flexShrink: 0 }}>
+                <span style={{ color: active ? "var(--brecha)" : "var(--ink3)", flexShrink: 0 }}>
                   {command.icon}
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
@@ -241,7 +241,7 @@ export function CommandPalette() {
                       style={{
                         display: "block",
                         fontSize: "0.75rem",
-                        color: "var(--text-muted)",
+                        color: "var(--ink3)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",

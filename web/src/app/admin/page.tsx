@@ -21,14 +21,14 @@ export default function AdminPage() {
         <h1
           style={{
             font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
+            color: "var(--ink)",
             margin: 0,
             letterSpacing: "-0.01em",
           }}
         >
           Administración
         </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
+        <p style={{ fontSize: "0.9375rem", color: "var(--ink3)", margin: 0 }}>
           Alta, edición y baja de publicaciones de la sección Ideas.
         </p>
       </header>

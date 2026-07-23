@@ -12,7 +12,7 @@ export function blocColor(index: number): string {
   if (index < 6) {
     return `var(--serie-${index + 1})`;
   }
-  return "var(--text-faint)";
+  return "var(--ink3)";
 }
 
 export interface BlocVoteTally {

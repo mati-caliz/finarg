@@ -8,7 +8,7 @@ const SECTION_LINKS = [
   { label: "Congreso", href: "/congreso" },
   { label: "Noticias", href: "/noticias" },
   { label: "Feriados", href: "/feriados" },
-  { label: "Calculadoras", href: "/calculadora-sueldo-neto" },
+  { label: "Calculadoras", href: "/calculadoras" },
 ];
 
 const SOURCES = "INDEC · BCRA · datos.gob.ar · Congreso de la Nación · consultoras (REM) · UTDT";

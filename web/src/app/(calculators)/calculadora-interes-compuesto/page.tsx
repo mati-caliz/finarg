@@ -23,17 +23,17 @@ const fieldStyle = {
 const inputStyle = {
   padding: "8px 10px",
   borderRadius: "var(--radius-md)",
-  border: "1px solid var(--border-2)",
-  background: "var(--surface-card)",
-  color: "var(--text-body)",
-  fontFamily: "var(--font-mono)",
+  border: "1px solid var(--line2)",
+  background: "var(--raise)",
+  color: "var(--ink)",
+  fontFamily: "var(--font-jb-mono)",
   fontSize: "0.9375rem",
 };
 
 const labelStyle = {
   fontSize: "0.75rem",
   fontWeight: 600,
-  color: "var(--text-secondary)",
+  color: "var(--ink2)",
 };
 
 export default function CompoundInterestCalculatorPage() {
@@ -158,7 +158,7 @@ export default function CompoundInterestCalculatorPage() {
           <Card title="Resultado">
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Monto final</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Monto final</div>
                 <div
                   className="num"
                   style={{ fontSize: "var(--fs-num-xl)", fontWeight: 600, lineHeight: 1.1 }}
@@ -168,13 +168,13 @@ export default function CompoundInterestCalculatorPage() {
               </div>
               <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Aportado</div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Aportado</div>
                   <div className="num" style={{ fontWeight: 600 }}>
                     {formatMoneyAR(Number.parseFloat(result.total_contributions))}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
                     Interés ganado
                   </div>
                   <div className="num" style={{ fontWeight: 600, color: "var(--pos)" }}>
@@ -205,7 +205,7 @@ export default function CompoundInterestCalculatorPage() {
           <Card>
             <p
               style={{
-                color: "var(--text-muted)",
+                color: "var(--ink3)",
                 fontSize: "0.875rem",
                 margin: 0,
                 textAlign: "center",

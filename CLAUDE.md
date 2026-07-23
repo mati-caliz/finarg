@@ -54,9 +54,10 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
   para eventos políticos, `--pos`/`--neg`, `--chart`. Tres tipografías: **Bricolage Grotesque**
   (`--font-display`, titulares), **Newsreader** (`--font-serif`, prosa), **JetBrains Mono**
   (`--font-jb-mono`, números/labels/eyebrows). Regla: ningún número va en serif/sans, siempre mono
-  tabular. El plan y estado de la migración están en `ROADMAP-REDISENO.md`. Quedan tokens viejos
-  (`--paper-N`, `--azul-N`, etc.) que aún consumen algunos componentes core y secciones secundarias
-  transicionales; se borran cuando ninguna pantalla los use.
+  tabular. El plan y estado de la migración están en `ROADMAP-REDISENO.md`. Los tokens legacy
+  ("Observatorio claro") ya se eliminaron; conviven sólo el bloque v2, un bloque de primitivos
+  genéricos (fonts, `--serie-N`, spacing, radios, sombras) y el sistema HSL de shadcn (`--background`,
+  `--foreground`, `--border`… que usan los componentes `ui/`).
 - Layout: **top-nav sticky sin sidebar** (`SiteHeader`/`SiteFooter`); ancho máximo 1200px centrado;
   headers de sección con eyebrow mono + regla 2px. Los componentes core (`src/components/core/`:
   AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.

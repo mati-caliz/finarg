@@ -196,81 +196,26 @@
   animation: slide-up 0.5s ease-out;
 }
 
-/* ── La Brecha design system tokens ─────────────────────────────────────────
-   Fuente: "La Brecha Design System" (Claude Design). Dirección "Observatorio
-   claro". Conviven con las variables HSL de Tailwind de arriba durante Fase 3. */
+/* ── Primitivos compartidos (fonts, escala categórica, spacing, radios) ──────
+   Tokens genéricos que consumen tanto los componentes v2 como los core shadcn.
+   La paleta de superficie/tinta/semántica vive en el bloque "Design system v2". */
 :root {
   --font-sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
   --font-mono: var(--font-plex-mono), "SFMono-Regular", Consolas, monospace;
 
-  --paper-0: #fdfdfb;
-  --paper-1: #f6f5f1;
-  --paper-2: #edece6;
-  --paper-3: #e2e0d8;
-  --ink-1: #1a1d21;
-  --ink-2: #454a51;
-  --ink-3: #6d737b;
-  --ink-4: #9aa0a8;
-  --azul-900: #0d2b45;
-  --azul-700: #14477a;
-  --azul-600: #1a5da3;
-  --azul-500: #2374c9;
-  --azul-100: #dbe9f7;
-  --azul-50: #eef4fb;
-  --alza: #177245;
-  --alza-strong: #0e5a35;
-  --alza-bg: #e3f2e9;
-  --baja: #b3382c;
-  --baja-strong: #93291f;
-  --baja-bg: #f9e6e3;
-  --brecha: #c77b1e;
-  --brecha-strong: #a15f0d;
-  --brecha-bg: #faf0df;
-  --serie-1: #1a5da3;
-  --serie-2: #c77b1e;
-  --serie-3: #177245;
-  --serie-4: #7b4fa6;
-  --serie-5: #b3382c;
-  --serie-6: #3b8ea5;
-  --evento: #7b4fa6;
-  --evento-bg: #f0e9f7;
-  --bg-page: var(--paper-1);
-  --surface-card: var(--paper-0);
-  --surface-inset: var(--paper-2);
-  --surface-raised: #ffffff;
-  --text-body: var(--ink-1);
-  --text-secondary: var(--ink-2);
-  --text-muted: var(--ink-3);
-  --text-faint: var(--ink-4);
-  --text-link: var(--azul-600);
-  --text-link-hover: var(--azul-700);
-  --ds-accent: var(--azul-600);
-  --accent-strong: var(--azul-700);
-  --accent-soft: var(--azul-50);
-  --accent-border: var(--azul-100);
-  --border-1: #dcdad2;
-  --border-2: #c9c7bd;
-  --focus-ring: var(--azul-500);
-  --pos: var(--alza);
-  --pos-bg: var(--alza-bg);
-  --neg: var(--baja);
-  --neg-bg: var(--baja-bg);
-  --gap-accent: var(--brecha);
-  --gap-bg: var(--brecha-bg);
-  --chart-grid: #e6e4dc;
-  --chart-axis: var(--ink-4);
+  --serie-1: oklch(0.45 0.03 250);
+  --serie-2: oklch(0.6 0.19 42);
+  --serie-3: oklch(0.5 0.13 150);
+  --serie-4: oklch(0.52 0.16 300);
+  --serie-5: oklch(0.55 0.2 25);
+  --serie-6: oklch(0.55 0.08 210);
 
-  --sp-1: 4px;
   --sp-2: 8px;
   --sp-3: 12px;
   --sp-4: 16px;
   --sp-5: 20px;
   --sp-6: 24px;
   --sp-8: 32px;
-  --sp-10: 40px;
-  --sp-12: 48px;
-  --sp-16: 64px;
-  --radius-sm: 3px;
   --radius-md: 6px;
   --radius-lg: 10px;
   --radius-pill: 999px;
@@ -278,64 +223,22 @@
   --shadow-raised: 0 2px 8px rgba(20, 25, 31, 0.1), 0 1px 2px rgba(20, 25, 31, 0.06);
   --shadow-overlay: 0 8px 32px rgba(20, 25, 31, 0.18);
   --container-max: 1200px;
-  --tile-min: 240px;
 
-  --fs-display: clamp(2rem, 4vw, 2.75rem);
   --fs-h1: 1.75rem;
-  --fs-h2: 1.375rem;
   --fs-h3: 1.125rem;
-  --fs-body: 0.9375rem;
-  --fs-small: 0.8125rem;
-  --fs-micro: 0.6875rem;
   --fs-num-xl: 2.25rem;
-  --fs-num-lg: 1.625rem;
-  --fs-num-md: 1.125rem;
-  --lh-tight: 1.15;
   --lh-heading: 1.25;
-  --lh-body: 1.55;
-  --fw-regular: 400;
-  --fw-medium: 500;
   --fw-semibold: 600;
   --fw-bold: 700;
-  --ls-caps: 0.06em;
-  --text-h3-def: var(--fw-semibold) var(--fs-h3) / var(--lh-heading) var(--font-sans);
 }
 
 [data-theme="dark"] {
-  --paper-0: #16191d;
-  --paper-1: #101215;
-  --paper-2: #1e2227;
-  --paper-3: #2a2f36;
-  --ink-1: #e8e6e1;
-  --ink-2: #bdbab2;
-  --ink-3: #8f8d86;
-  --ink-4: #66655f;
-  --azul-600: #5b9bd9;
-  --azul-700: #7fb2e3;
-  --azul-100: #1c3a58;
-  --azul-50: #16283b;
-  --alza: #4cae7d;
-  --alza-strong: #6cc397;
-  --alza-bg: #15291f;
-  --baja: #e0685b;
-  --baja-strong: #ea8579;
-  --baja-bg: #331b18;
-  --brecha: #e0a04a;
-  --brecha-strong: #eab36a;
-  --brecha-bg: #2e2314;
-  --serie-1: #5b9bd9;
-  --serie-2: #e0a04a;
-  --serie-3: #4cae7d;
-  --serie-4: #a985cf;
-  --serie-5: #e0685b;
-  --serie-6: #5fb3c9;
-  --evento: #a985cf;
-  --evento-bg: #251c30;
-  --surface-raised: #1b1f24;
-  --border-1: #2c3138;
-  --border-2: #3a4048;
-  --focus-ring: var(--azul-600);
-  --chart-grid: #262b31;
+  --serie-1: oklch(0.72 0.06 250);
+  --serie-2: oklch(0.74 0.16 55);
+  --serie-3: oklch(0.74 0.13 150);
+  --serie-4: oklch(0.74 0.13 300);
+  --serie-5: oklch(0.7 0.16 25);
+  --serie-6: oklch(0.7 0.09 210);
 }
 
 /* ── Design system v2 — dirección "Editorial" ───────────────────────────────
@@ -437,7 +340,7 @@
 }
 
 .post-markdown a {
-  color: var(--text-link);
+  color: var(--brecha);
   text-decoration: underline;
 }
 
@@ -445,22 +348,22 @@
   margin: 1em 0;
   padding: 0.5em 1em;
   border-left: 3px solid var(--brecha);
-  background: var(--surface-inset);
-  color: var(--text-secondary);
+  background: var(--surface);
+  color: var(--ink2);
   border-radius: var(--radius-md);
 }
 
 .post-markdown code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  background: var(--surface-inset);
+  background: var(--surface);
   padding: 0.15em 0.4em;
   border-radius: 4px;
 }
 
 .post-markdown pre {
   overflow-x: auto;
-  background: var(--surface-inset);
+  background: var(--surface);
   padding: 12px 14px;
   border-radius: var(--radius-md);
   margin: 1em 0;
@@ -480,19 +383,19 @@
 
 .post-markdown th,
 .post-markdown td {
-  border: 1px solid var(--border-1);
+  border: 1px solid var(--line);
   padding: 6px 10px;
   text-align: left;
 }
 
 .post-markdown th {
-  background: var(--surface-inset);
+  background: var(--surface);
   font-weight: 600;
 }
 
 .post-markdown hr {
   border: none;
-  border-top: 1px solid var(--border-1);
+  border-top: 1px solid var(--line);
   margin: 1.5em 0;
 }
 

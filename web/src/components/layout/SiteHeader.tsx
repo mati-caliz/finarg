@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Ideas", href: "/ideas" },
   { label: "Congreso", href: "/congreso" },
   { label: "Noticias", href: "/noticias" },
+  { label: "Calculadoras", href: "/calculadoras" },
 ];
 
 const CAFECITO_URL = "https://cafecito.app/finlatam";
@@ -26,6 +27,9 @@ const CAFECITO_URL = "https://cafecito.app/finlatam";
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") {
     return pathname === "/";
+  }
+  if (href === "/calculadoras") {
+    return pathname.startsWith("/calculadora");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

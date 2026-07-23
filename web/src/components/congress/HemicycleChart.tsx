@@ -110,7 +110,7 @@ export function BlocLegend({ blocs }: { blocs: HemicycleBloc[] }) {
           />
           <span
             style={{
-              color: "var(--text-secondary)",
+              color: "var(--ink2)",
               flex: 1,
               minWidth: 0,
               overflow: "hidden",
@@ -155,7 +155,7 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
               y1={CENTER_Y - OUTER_RADIUS - 2}
               x2={CENTER_X}
               y2={CENTER_Y - INNER_RADIUS + 8}
-              stroke="var(--text-muted)"
+              stroke="var(--ink3)"
               strokeWidth={0.7}
               strokeDasharray="2 2"
             />
@@ -166,7 +166,7 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
               style={{
                 fontSize: 5.5,
                 fontWeight: 600,
-                fill: "var(--text-muted)",
+                fill: "var(--ink3)",
                 fontFamily: "var(--font-sans)",
               }}
             >
@@ -186,8 +186,8 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
               cx={position.x}
               cy={position.y}
               r={hovered ? position.seatRadius * 1.35 : position.seatRadius}
-              fill={colorByBloc.get(seat.bloc) ?? "var(--text-faint)"}
-              stroke={hovered ? "var(--text-body)" : "var(--surface-card)"}
+              fill={colorByBloc.get(seat.bloc) ?? "var(--ink3)"}
+              stroke={hovered ? "var(--ink)" : "var(--raise)"}
               strokeWidth={hovered ? 0.8 : 0.5}
               style={{ cursor: "default", transition: "r 80ms ease-out" }}
               onMouseEnter={() => setHoveredIndex(index)}
@@ -204,8 +204,8 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
             transform: tooltipOnLeftHalf ? "translate(-100%, -110%)" : "translate(0, -110%)",
             pointerEvents: "none",
             zIndex: 10,
-            background: "var(--surface-card)",
-            border: "1px solid var(--border-2)",
+            background: "var(--raise)",
+            border: "1px solid var(--line2)",
             borderRadius: "var(--radius-md)",
             boxShadow: "var(--shadow-overlay)",
             padding: "8px 10px",
@@ -213,7 +213,7 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
             maxWidth: 220,
           }}
         >
-          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-body)" }}>
+          <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--ink)" }}>
             {hoveredSeat.occupantName}
           </div>
           <div
@@ -222,7 +222,7 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
               alignItems: "center",
               gap: 6,
               fontSize: "0.6875rem",
-              color: "var(--text-secondary)",
+              color: "var(--ink2)",
               marginTop: 2,
             }}
           >
@@ -231,14 +231,14 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
                 width: 8,
                 height: 8,
                 borderRadius: 2,
-                background: colorByBloc.get(hoveredSeat.bloc) ?? "var(--text-faint)",
+                background: colorByBloc.get(hoveredSeat.bloc) ?? "var(--ink3)",
                 flexShrink: 0,
               }}
             />
             {hoveredSeat.bloc}
           </div>
           {hoveredSeat.detailLines.map((line) => (
-            <div key={line} style={{ fontSize: "0.6875rem", color: "var(--text-muted)", marginTop: 2 }}>
+            <div key={line} style={{ fontSize: "0.6875rem", color: "var(--ink3)", marginTop: 2 }}>
               {line}
             </div>
           ))}

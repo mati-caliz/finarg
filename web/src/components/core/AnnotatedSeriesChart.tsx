@@ -100,7 +100,7 @@ export function AnnotatedSeriesChart({
               x2={W - padR}
               y1={Y(t)}
               y2={Y(t)}
-              stroke="var(--chart-grid)"
+              stroke="var(--line2)"
               strokeWidth="1"
             />
             <text
@@ -108,8 +108,8 @@ export function AnnotatedSeriesChart({
               y={Y(t) + 3}
               textAnchor="end"
               fontSize="10"
-              fill="var(--chart-axis)"
-              fontFamily="var(--font-mono)"
+              fill="var(--ink3)"
+              fontFamily="var(--font-jb-mono)"
             >
               {fmt(t)}
             </text>
@@ -123,14 +123,14 @@ export function AnnotatedSeriesChart({
               y={H - 8}
               textAnchor="middle"
               fontSize="10"
-              fill="var(--chart-axis)"
-              fontFamily="var(--font-mono)"
+              fill="var(--ink3)"
+              fontFamily="var(--font-jb-mono)"
             >
               {label}
             </text>
           ) : null,
         )}
-        {gapArea && <path d={gapArea} fill="var(--gap-accent)" opacity="0.12" />}
+        {gapArea && <path d={gapArea} fill="var(--brecha)" opacity="0.12" />}
         {events.map((event) => (
           <g key={`ev-${event.index}-${event.label}`}>
             <line
@@ -173,7 +173,7 @@ export function AnnotatedSeriesChart({
               x2={X(hover)}
               y1={padT}
               y2={H - padB}
-              stroke="var(--text-faint)"
+              stroke="var(--ink3)"
               strokeWidth="1"
             />
             {series.map((s, si) =>
@@ -184,7 +184,7 @@ export function AnnotatedSeriesChart({
                   cy={Y(s.data[hover].v)}
                   r="3.5"
                   fill={s.color || `var(--serie-${si + 1})`}
-                  stroke="var(--surface-card)"
+                  stroke="var(--raise)"
                   strokeWidth="1.5"
                 />
               ) : null,
@@ -199,8 +199,8 @@ export function AnnotatedSeriesChart({
             top: 8,
             left: hover > n / 2 ? 12 : "auto",
             right: hover > n / 2 ? "auto" : 12,
-            background: "var(--surface-raised)",
-            border: "1px solid var(--border-1)",
+            background: "var(--raise)",
+            border: "1px solid var(--line)",
             borderRadius: "var(--radius-md)",
             boxShadow: "var(--shadow-raised)",
             padding: "8px 10px",
@@ -210,7 +210,7 @@ export function AnnotatedSeriesChart({
           }}
         >
           <div
-            style={{ color: "var(--text-muted)", marginBottom: 4, fontFamily: "var(--font-mono)" }}
+            style={{ color: "var(--ink3)", marginBottom: 4, fontFamily: "var(--font-jb-mono)" }}
           >
             {series[0].data[hover]?.t}
           </div>
@@ -230,7 +230,7 @@ export function AnnotatedSeriesChart({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 5,
-                    color: "var(--text-secondary)",
+                    color: "var(--ink2)",
                   }}
                 >
                   <span
@@ -249,7 +249,7 @@ export function AnnotatedSeriesChart({
                 style={{
                   marginTop: 5,
                   paddingTop: 5,
-                  borderTop: "1px solid var(--border-1)",
+                  borderTop: "1px solid var(--line)",
                   color: "var(--evento)",
                   fontWeight: 600,
                 }}
@@ -267,7 +267,7 @@ export function AnnotatedSeriesChart({
           gap: "4px 16px",
           marginTop: 8,
           fontSize: "0.75rem",
-          color: "var(--text-secondary)",
+          color: "var(--ink2)",
         }}
       >
         {series.map((s, si) => (
@@ -306,7 +306,7 @@ export function AnnotatedSeriesChart({
               style={{
                 width: 12,
                 height: 10,
-                background: "var(--gap-accent)",
+                background: "var(--brecha)",
                 opacity: 0.25,
                 borderRadius: 2,
               }}

@@ -12,13 +12,13 @@ const fieldStyle = { display: "flex", flexDirection: "column" as const, gap: 4 }
 const inputStyle = {
   padding: "8px 10px",
   borderRadius: "var(--radius-md)",
-  border: "1px solid var(--border-2)",
-  background: "var(--surface-card)",
-  color: "var(--text-body)",
-  fontFamily: "var(--font-mono)",
+  border: "1px solid var(--line2)",
+  background: "var(--raise)",
+  color: "var(--ink)",
+  fontFamily: "var(--font-jb-mono)",
   fontSize: "0.9375rem",
 };
-const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--text-secondary)" };
+const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--ink2)" };
 
 function monthLabel(month: string): string {
   const [year, monthNumber] = month.split("-");
@@ -113,14 +113,14 @@ export default function InflationAdjustmentPage() {
           <Card
             title="Resultado"
             footer={
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+              <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
                 Fuente: IPC nivel general (INDEC) · {result.months_elapsed} meses
               </span>
             }
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
                   Valor equivalente en {monthLabel(toMonth)}
                 </div>
                 <div
@@ -130,13 +130,13 @@ export default function InflationAdjustmentPage() {
                   {formatMoneyAR(Number.parseFloat(result.adjusted_amount))}
                 </div>
               </div>
-              <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", margin: 0 }}>
+              <p style={{ fontSize: "0.875rem", color: "var(--ink2)", margin: 0 }}>
                 {formatMoneyAR(Number.parseFloat(result.original_amount))} de{" "}
                 {monthLabel(fromMonth)} equivalen a{" "}
                 {formatMoneyAR(Number.parseFloat(result.adjusted_amount))} de {monthLabel(toMonth)}.
               </p>
               <div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
                   Inflación acumulada del período
                 </div>
                 <div className="num" style={{ fontWeight: 600, color: "var(--neg)" }}>
@@ -149,7 +149,7 @@ export default function InflationAdjustmentPage() {
           <Card>
             <p
               style={{
-                color: "var(--text-muted)",
+                color: "var(--ink3)",
                 fontSize: "0.875rem",
                 margin: 0,
                 textAlign: "center",

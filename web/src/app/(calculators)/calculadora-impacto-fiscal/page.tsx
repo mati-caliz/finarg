@@ -12,19 +12,19 @@ const fieldStyle = { display: "flex", flexDirection: "column" as const, gap: 4 }
 const inputStyle = {
   padding: "8px 10px",
   borderRadius: "var(--radius-md)",
-  border: "1px solid var(--border-2)",
-  background: "var(--surface-card)",
-  color: "var(--text-body)",
-  fontFamily: "var(--font-mono)",
+  border: "1px solid var(--line2)",
+  background: "var(--raise)",
+  color: "var(--ink)",
+  fontFamily: "var(--font-jb-mono)",
   fontSize: "0.9375rem",
 };
-const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--text-secondary)" };
+const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--ink2)" };
 const checkboxRow = {
   display: "flex",
   alignItems: "center",
   gap: 8,
   fontSize: "0.875rem",
-  color: "var(--text-body)",
+  color: "var(--ink)",
 };
 
 function formatFreedomDate(isoDate: string): string {
@@ -122,7 +122,7 @@ export default function TaxImpactPage() {
           <Card
             title="Cuánto le dejás al Estado"
             footer={
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+              <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
                 Estimación. El IVA se calcula al 21% embebido en tus gastos y los Ingresos Brutos a una
                 alícuota provincial representativa del 4%; los aportes de la seguridad social financian
                 tu jubilación y obra social. No incluye impuestos internos ni tasas municipales.
@@ -137,8 +137,8 @@ export default function TaxImpactPage() {
                   gap: 16,
                   padding: "12px 14px",
                   borderRadius: "var(--radius-md)",
-                  background: "var(--gap-bg)",
-                  color: "var(--gap-accent)",
+                  background: "var(--brecha-bg)",
+                  color: "var(--brecha)",
                 }}
               >
                 <div>
@@ -185,7 +185,7 @@ export default function TaxImpactPage() {
           <Card>
             <p
               style={{
-                color: "var(--text-muted)",
+                color: "var(--ink3)",
                 fontSize: "0.875rem",
                 margin: 0,
                 textAlign: "center",

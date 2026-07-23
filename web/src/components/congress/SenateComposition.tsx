@@ -74,7 +74,7 @@ export function SenateComposition() {
       title="Composición del Senado"
       subtitle={`${total} bancas · mayoría en ${majority} · pasá el mouse por cada banca`}
       footer={
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+        <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
           Fuente: Senado de la Nación (datos abiertos)
         </span>
       }

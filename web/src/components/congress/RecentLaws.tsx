@@ -31,8 +31,8 @@ function LawCard({ law }: { law: SanctionedLaw }) {
         flexDirection: "column",
         gap: 12,
         padding: "16px 18px",
-        background: "var(--surface-card)",
-        border: "1px solid var(--border-1)",
+        background: "var(--raise)",
+        border: "1px solid var(--line)",
         borderRadius: "var(--radius-lg)",
         boxShadow: "var(--shadow-card)",
       }}
@@ -40,13 +40,13 @@ function LawCard({ law }: { law: SanctionedLaw }) {
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <Badge tone="accent">Ley {law.law_number}</Badge>
         {law.sanctioning_chamber && (
-          <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+          <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
             Sancionada en {law.sanctioning_chamber}
           </span>
         )}
       </div>
 
-      <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--text-body)", lineHeight: 1.35 }}>
+      <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--ink)", lineHeight: 1.35 }}>
         {law.title ?? `Ley ${law.law_number}`}
       </div>
 
@@ -60,7 +60,7 @@ function LawCard({ law }: { law: SanctionedLaw }) {
                   style={{
                     width: 22,
                     height: 2,
-                    background: reached ? "var(--pos)" : "var(--border-2)",
+                    background: reached ? "var(--pos)" : "var(--line2)",
                     margin: "0 6px",
                   }}
                 />
@@ -72,14 +72,14 @@ function LawCard({ law }: { law: SanctionedLaw }) {
                       width: 9,
                       height: 9,
                       borderRadius: 999,
-                      background: reached ? "var(--pos)" : "var(--border-2)",
+                      background: reached ? "var(--pos)" : "var(--line2)",
                     }}
                   />
-                  <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--text-secondary)" }}>
+                  <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--ink2)" }}>
                     {step.label}
                   </span>
                 </span>
-                <span className="num" style={{ fontSize: "0.6875rem", color: "var(--text-muted)", marginLeft: 15 }}>
+                <span className="num" style={{ fontSize: "0.6875rem", color: "var(--ink3)", marginLeft: 15 }}>
                   {step.date ? formatDateAR(step.date) : "—"}
                 </span>
               </div>
@@ -88,7 +88,7 @@ function LawCard({ law }: { law: SanctionedLaw }) {
         })}
       </div>
 
-      <div style={{ fontSize: "0.625rem", color: "var(--text-muted)" }}>
+      <div style={{ fontSize: "0.625rem", color: "var(--ink3)" }}>
         Expediente {law.initial_file ?? "s/d"} · Fuente: HCDN (datos abiertos)
       </div>
     </div>
@@ -117,7 +117,7 @@ export function RecentLaws() {
   const laws = data ?? [];
   if (laws.length === 0) {
     return (
-      <p style={{ color: "var(--text-muted)", fontSize: "0.875rem" }}>No hay leyes para mostrar.</p>
+      <p style={{ color: "var(--ink3)", fontSize: "0.875rem" }}>No hay leyes para mostrar.</p>
     );
   }
 
