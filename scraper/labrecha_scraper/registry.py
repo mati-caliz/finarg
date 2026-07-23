@@ -8,7 +8,9 @@ from labrecha_scraper.connectors.boletin_oficial import BoletinOficialConnector
 from labrecha_scraper.connectors.congreso import CongresoConnector
 from labrecha_scraper.connectors.credito_bcra import CreditoBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
+from labrecha_scraper.connectors.crypto_historico import CryptoHistoricoConnector
 from labrecha_scraper.connectors.dolar import DolarConnector
+from labrecha_scraper.connectors.dolar_historico import DolarHistoricoConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.icg import IcgConnector
 from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
@@ -30,7 +32,9 @@ CONNECTORS: dict[str, Connector] = {
         CongresoConnector(),
         CreditoBcraConnector(),
         CryptoConnector(),
+        CryptoHistoricoConnector(),
         DolarConnector(),
+        DolarHistoricoConnector(),
         HolidaysConnector(),
         IclBcraConnector(),
         IcgConnector(),
