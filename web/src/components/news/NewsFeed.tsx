@@ -51,7 +51,6 @@ function NewsImage({
     return null;
   }
   return (
-    // biome-ignore lint/performance/noImgElement: dominio externo de cada medio, sin optimizador
     <img
       src={article.image_url}
       alt=""
@@ -65,7 +64,7 @@ function NewsImage({
         flexShrink: 0,
         aspectRatio: ratio,
         objectFit: "cover",
-        background: "var(--paper-2)",
+        background: "var(--surface)",
         border: "1px solid var(--line)",
       }}
     />

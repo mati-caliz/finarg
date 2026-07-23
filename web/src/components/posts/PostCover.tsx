@@ -18,8 +18,8 @@ const INK2 = "var(--ink2)";
 const INK3 = "var(--ink3)";
 const LINE = "var(--line)";
 const ACC = "var(--brecha)";
-const SURFACE = "var(--paper-2)";
-const SURFACE_2 = "var(--paper-3)";
+const SURFACE = "var(--line2)";
+const SURFACE_2 = "var(--line)";
 
 function Car({
   x,
