@@ -1,4 +1,4 @@
-import type { Post, PostCategory } from "@/lib/labrechaApi";
+import type { Post, PostCategory, PostImpact } from "@/lib/labrechaApi";
 
 export interface PostDraft {
   slug: string;
@@ -6,6 +6,7 @@ export interface PostDraft {
   category: PostCategory;
   summary: string | null;
   content: string;
+  impacts: PostImpact[] | null;
   published: boolean;
 }
 
