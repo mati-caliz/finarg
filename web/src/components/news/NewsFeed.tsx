@@ -79,27 +79,31 @@ function LeadArticle({ article }: { article: NewsArticle }) {
       rel="noopener noreferrer"
       style={{ display: "block", paddingBottom: 28, borderBottom: "1px solid var(--line)", marginBottom: 24, textDecoration: "none" }}
     >
-      {article.image_url ? (
-        <div style={{ marginBottom: 18 }}>
-          <NewsImage article={article} ratio="16 / 9" />
+      <div className="lb-media-row">
+        <div className="lb-media-body">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--brecha)", border: "1px solid var(--brecha)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
+              {categoryLabel(article.category)}
+            </span>
+            <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+              {article.source} · {formatPublished(article.published_date)}
+            </span>
+          </div>
+          <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 12px", color: "var(--ink)", textWrap: "balance" }}>
+            {article.title}
+          </h2>
+          {article.summary ? (
+            <p style={{ fontFamily: "var(--font-serif)", fontSize: "1.0625rem", lineHeight: 1.5, color: "var(--ink2)", margin: 0 }}>
+              {article.summary}
+            </p>
+          ) : null}
         </div>
-      ) : null}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--brecha)", border: "1px solid var(--brecha)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
-          {categoryLabel(article.category)}
-        </span>
-        <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
-          {article.source} · {formatPublished(article.published_date)}
-        </span>
+        {article.image_url ? (
+          <div className="lb-media-side">
+            <NewsImage article={article} ratio="4 / 3" />
+          </div>
+        ) : null}
       </div>
-      <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 12px", color: "var(--ink)", textWrap: "balance" }}>
-        {article.title}
-      </h2>
-      {article.summary ? (
-        <p style={{ fontFamily: "var(--font-serif)", fontSize: "1.0625rem", lineHeight: 1.5, color: "var(--ink2)", margin: 0 }}>
-          {article.summary}
-        </p>
-      ) : null}
     </a>
   );
 }
@@ -107,7 +111,7 @@ function LeadArticle({ article }: { article: NewsArticle }) {
 function ListArticle({ article }: { article: NewsArticle }) {
   return (
     <a href={article.source_url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 16, textDecoration: "none" }}>
-      <NewsImage article={article} ratio="4 / 3" width={132} />
+      <NewsImage article={article} ratio="4 / 3" width={104} />
       <div style={{ minWidth: 0 }}>
         <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)", marginBottom: 7 }}>
           {article.source} · {formatPublished(article.published_date)} · <span style={{ color: "var(--ink2)" }}>{categoryLabel(article.category)}</span>

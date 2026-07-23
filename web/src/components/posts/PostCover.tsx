@@ -4,12 +4,6 @@ import type { PostCategory } from "@/lib/labrechaApi";
 import type { CSSProperties, ReactNode } from "react";
 import { useId } from "react";
 
-/**
- * Portadas de las ideas: ilustraciones vectoriales dibujadas a medida, una por
- * artículo. Usan los tokens del tema (var(--ink*), var(--brecha)) así que
- * acompañan light/dark sin assets externos ni imágenes de stock.
- */
-
 const W = 640;
 const H = 360;
 
@@ -81,8 +75,6 @@ function Bolt({ x, y, scale = 1, fill = ACC }: { x: number; y: number; scale?: n
     />
   );
 }
-
-// ── Motivos, uno por slug ────────────────────────────────────────────────────
 
 function TransitoMotif() {
   return (
@@ -264,7 +256,6 @@ function AutoTramiteMotif() {
 }
 
 function FacturacionMotif() {
-  // celdas "encendidas" del falso QR, como pares [columna, fila]
   const qrCells: Array<[number, number]> = [
     [0, 0], [1, 0], [2, 0], [4, 0],
     [0, 1], [2, 1], [5, 1],
@@ -390,8 +381,6 @@ function EnchufarMotif() {
     </g>
   );
 }
-
-// ── Fallbacks por categoría ──────────────────────────────────────────────────
 
 function hashSlug(slug: string): number {
   let hash = 0;
@@ -526,15 +515,13 @@ export function PostCover({
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label={`Ilustración de portada de la idea "${slug.replace(/-/g, " ")}"`}
       style={{
         display: "block",
         width: "100%",
         aspectRatio: ratio,
-        background: SURFACE,
-        border: `1px solid ${LINE}`,
         ...style,
       }}
     >
@@ -544,8 +531,7 @@ export function PostCover({
           <circle cx={1.5} cy={1.5} r={1.5} fill={LINE} />
         </pattern>
       </defs>
-      <rect x={0} y={0} width={W} height={H} fill={SURFACE} />
-      <rect x={0} y={0} width={W} height={H} fill={`url(#${patternId})`} />
+      <rect x={0} y={0} width={W} height={H} fill={`url(#${patternId})`} opacity={0.7} />
       {motifFor(slug, category, seed)}
     </svg>
   );

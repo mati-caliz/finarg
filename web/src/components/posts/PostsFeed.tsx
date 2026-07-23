@@ -83,48 +83,49 @@ function FeaturedIdea({ post }: { post: Post }) {
         textDecoration: "none",
       }}
     >
-      <PostCover
-        slug={post.slug}
-        category={post.category}
-        ratio="21 / 9"
-        style={{ marginBottom: 22 }}
-      />
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
-        <CategoryBadge category={post.category} />
-        <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
-          {formatPostDate(post.created_at)} · {readingTimeMinutes(post.content)} min
-        </span>
+      <div className="lb-media-row">
+        <div className="lb-media-body">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+            <CategoryBadge category={post.category} />
+            <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+              {formatPostDate(post.created_at)} · {readingTimeMinutes(post.content)} min
+            </span>
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: "clamp(1.875rem, 4.5vw, 2.625rem)",
+              lineHeight: 1.02,
+              letterSpacing: "-0.025em",
+              margin: "0 0 16px",
+              color: "var(--ink)",
+              textWrap: "balance",
+            }}
+          >
+            {post.title}
+          </h2>
+          {post.summary ? (
+            <p
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(1rem, 2vw, 1.1875rem)",
+                lineHeight: 1.5,
+                color: "var(--ink2)",
+                margin: "0 0 20px",
+                maxWidth: 720,
+                textWrap: "pretty",
+              }}
+            >
+              {post.summary}
+            </p>
+          ) : null}
+          <ImpactChips post={post} limit={3} />
+        </div>
+        <div className="lb-media-side">
+          <PostCover slug={post.slug} category={post.category} />
+        </div>
       </div>
-      <h2
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 800,
-          fontSize: "clamp(1.875rem, 4.5vw, 2.625rem)",
-          lineHeight: 1.02,
-          letterSpacing: "-0.025em",
-          margin: "0 0 16px",
-          color: "var(--ink)",
-          textWrap: "balance",
-        }}
-      >
-        {post.title}
-      </h2>
-      {post.summary ? (
-        <p
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontSize: "clamp(1rem, 2vw, 1.1875rem)",
-            lineHeight: 1.5,
-            color: "var(--ink2)",
-            margin: "0 0 20px",
-            maxWidth: 720,
-            textWrap: "pretty",
-          }}
-        >
-          {post.summary}
-        </p>
-      ) : null}
-      <ImpactChips post={post} limit={3} />
     </Link>
   );
 }
@@ -143,11 +144,6 @@ function IdeaCard({ post }: { post: Post }) {
         color: "var(--ink)",
       }}
     >
-      <PostCover
-        slug={post.slug}
-        category={post.category}
-        style={{ margin: "-26px -24px 4px", width: "calc(100% + 48px)", borderWidth: "0 0 1px" }}
-      />
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <CategoryBadge category={post.category} />
       </div>
