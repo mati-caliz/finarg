@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const STATIC_CACHE = `labrecha-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `labrecha-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `labrecha-api-${CACHE_VERSION}`;
