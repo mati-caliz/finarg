@@ -15,6 +15,7 @@ import { RANGE_MONTHS, SOURCE_METHODOLOGY, formatDateAR, sourceLabel } from "@/l
 import {
   alignSources,
   eventsToChartEvents,
+  mergePoints,
   parsePoints,
   rangeDateFrom,
   yearLabels,
@@ -37,18 +38,34 @@ export function BrechaComparison({ id }: { id: string }) {
   const legB = def?.legs[1] ?? { code: "", source: "", label: "" };
   const queryA = useIndicatorSeries(legA.code, { source: legA.source, order: "asc", date_from: dateFrom });
   const queryB = useIndicatorSeries(legB.code, { source: legB.source, order: "asc", date_from: dateFrom });
+  const historyQueryA = useIndicatorSeries(legA.code, {
+    source: legA.historySource ?? legA.source,
+    order: "asc",
+    date_from: dateFrom,
+  });
+  const historyQueryB = useIndicatorSeries(legB.code, {
+    source: legB.historySource ?? legB.source,
+    order: "asc",
+    date_from: dateFrom,
+  });
   const { data: eventsData } = usePoliticalEvents({ date_from: dateFrom, date_to: todayISO() });
 
   if (!def) {
     return null;
   }
 
-  if (queryA.isLoading || queryB.isLoading) {
+  if (queryA.isLoading || queryB.isLoading || historyQueryA.isLoading || historyQueryB.isLoading) {
     return <Skeleton className="h-[360px] rounded-[10px]" />;
   }
 
-  const pointsA = parsePoints(queryA.data?.points ?? []);
-  const pointsB = parsePoints(queryB.data?.points ?? []);
+  const pointsA = mergePoints(
+    legA.historySource ? parsePoints(historyQueryA.data?.points ?? []) : [],
+    parsePoints(queryA.data?.points ?? []),
+  );
+  const pointsB = mergePoints(
+    legB.historySource ? parsePoints(historyQueryB.data?.points ?? []) : [],
+    parsePoints(queryB.data?.points ?? []),
+  );
 
   const aligned = alignSources([
     { source: legA.label, points: pointsA },
@@ -146,7 +163,11 @@ export function BrechaComparison({ id }: { id: string }) {
           {[legA, legB].map((leg) => (
             <SourceAttribution
               key={`${leg.code}-${leg.source}`}
-              source={`${leg.label} — ${sourceLabel(leg.source)}`}
+              source={
+                leg.historySource
+                  ? `${leg.label} — ${sourceLabel(leg.source)} (actual) + ${sourceLabel(leg.historySource)} (histórico)`
+                  : `${leg.label} — ${sourceLabel(leg.source)}`
+              }
               note={SOURCE_METHODOLOGY[leg.source] ?? "Fuente oficial; ver publicación original."}
             />
           ))}

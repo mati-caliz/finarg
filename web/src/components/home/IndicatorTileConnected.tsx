@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicatorSeries } from "@/hooks/useLabrecha";
 import { freshnessForCode } from "@/lib/freshness";
 import { INDICATOR_BY_CODE, PERIOD_LABELS, formatDateAR, sourceLabel } from "@/lib/indicators";
+import type { IndicatorPoint } from "@/lib/labrechaApi";
 
 interface IndicatorTileConnectedProps {
   code: string;
@@ -17,16 +18,32 @@ export function IndicatorTileConnected({ code }: IndicatorTileConnectedProps) {
     limit: indicator?.sparkPoints,
     order: "desc",
   });
+  const historyQuery = useIndicatorSeries(indicator?.code ?? "", {
+    source: indicator?.historySource ?? indicator?.preferredSource,
+    limit: indicator?.sparkPoints,
+    order: "desc",
+  });
 
   if (!indicator) {
     return null;
   }
 
-  if (isLoading) {
+  if (isLoading || historyQuery.isLoading) {
     return <Skeleton className="h-[132px] rounded-[10px]" />;
   }
 
-  const points = data?.points ?? [];
+  const livePoints = data?.points ?? [];
+  const historyPoints = indicator.historySource ? (historyQuery.data?.points ?? []) : [];
+  const pointsByDate = new Map<string, IndicatorPoint>();
+  for (const point of historyPoints) {
+    pointsByDate.set(point.date, point);
+  }
+  for (const point of livePoints) {
+    pointsByDate.set(point.date, point);
+  }
+  const points = Array.from(pointsByDate.values())
+    .sort((a, b) => (a.date > b.date ? -1 : a.date < b.date ? 1 : 0))
+    .slice(0, indicator.sparkPoints);
   if (points.length === 0) {
     return null;
   }

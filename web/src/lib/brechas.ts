@@ -5,6 +5,7 @@ export type GapMode = "pct" | "pp";
 export interface BrechaLeg {
   code: string;
   source: string;
+  historySource?: string;
   label: string;
 }
 
@@ -29,8 +30,8 @@ export const BRECHAS: BrechaDef[] = [
     gapMode: "pct",
     narrowIsGood: true,
     legs: [
-      { code: "dolar_blue", source: "dolarapi", label: "Blue" },
-      { code: "dolar_oficial", source: "dolarapi", label: "Oficial" },
+      { code: "dolar_blue", source: "dolarapi", historySource: "argentinadatos", label: "Blue" },
+      { code: "dolar_oficial", source: "dolarapi", historySource: "argentinadatos", label: "Oficial" },
     ],
   },
   {
@@ -42,8 +43,8 @@ export const BRECHAS: BrechaDef[] = [
     gapMode: "pct",
     narrowIsGood: true,
     legs: [
-      { code: "dolar_bolsa", source: "dolarapi", label: "MEP" },
-      { code: "dolar_oficial", source: "dolarapi", label: "Oficial" },
+      { code: "dolar_bolsa", source: "dolarapi", historySource: "argentinadatos", label: "MEP" },
+      { code: "dolar_oficial", source: "dolarapi", historySource: "argentinadatos", label: "Oficial" },
     ],
   },
   {
