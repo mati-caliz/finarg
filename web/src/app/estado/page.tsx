@@ -22,14 +22,14 @@ export default function EstadoPage() {
         <h1
           style={{
             font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
+            color: "var(--ink)",
             margin: 0,
             letterSpacing: "-0.01em",
           }}
         >
           Estado del observatorio
         </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
+        <p style={{ fontSize: "0.9375rem", color: "var(--ink3)", margin: 0 }}>
           La salud del pipeline de datos, a la vista. Cada conector reporta su última corrida: cuándo
           fue, cuántas filas ingirió y si falló. Un dato viejo se muestra con su fecha; nunca se
           oculta.

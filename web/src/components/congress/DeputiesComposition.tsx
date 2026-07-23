@@ -64,7 +64,7 @@ export function DeputiesComposition() {
       title="Composición de Diputados"
       subtitle={`${total} bancas · mayoría en ${majority} · pasá el mouse por cada banca`}
       footer={
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+        <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
           Bancas y bloques según la última votación nominal registrada
           {latestVote.date ? ` (${formatDateAR(latestVote.date)})` : ""}. Fuente: Cámara de
           Diputados (datos abiertos).

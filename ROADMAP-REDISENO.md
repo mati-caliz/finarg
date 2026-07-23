@@ -120,27 +120,28 @@ Orden sugerido (mayor impacto primero):
    (internos aún con estilo viejo, transicional). `LatestVotes.tsx` quedó sin uso (borrar Fase 4).
 8. **Noticias** (`/noticias`) ✅ (hecho) — `NewsFeed` reescrito: lead editorial + lista + sidebar
    ("Más titulares" + "Fuentes agregadas" derivadas de los datos), todo con enlace a la fuente.
-9. **Calculadoras** (4) ✅ (parcial) — header editorial compartido (`CalculatorHeader`) + contenedor
-   con padding en las 4. **Los formularios/resultados internos siguen con Card viejo** (transicional,
-   pulir en Fase 4). Sin índice de calculadoras: se accede por el link del footer + ⌘K.
+9. **Calculadoras** (4 + índice) ✅ (hecho) — header editorial compartido (`CalculatorHeader`),
+   formularios/resultados migrados a tokens v2, e **índice `/calculadoras`** con entrada de nav.
 10. **Feriados** (`/feriados`) ✅ (hecho) — `HolidaysCalendar` reescrito: hero con **countdown en
     vivo** al próximo feriado + lista editorial con badge Inamovible/Trasladable (de `is_fixed`) y
     finde largo. Se reemplazó la grilla de 12 meses por la lista (más fiel al diseño nuevo).
 
-### Fase 4 — Limpieza ✅ (parcial)
+### Fase 4 — Limpieza ✅ (hecho)
 
-- ✅ Re-skin de los primitivos core `Card` / `Button` / `Badge` / `DataTable` a tokens+tipografías
-  v2 (lifta calculadoras y secciones secundarias de Congreso que los usan).
-- ✅ Header editorial compartido en las 4 calculadoras.
-- ✅ Borrados componentes muertos: `Navbar`, `Sidebar`, `LatestVotes` y los ~16 cards viejos de la
-  home (relojes/termómetros/impuestómetros/`IndicatorTileConnected`).
+- ✅ Re-skin de los primitivos core `Card` / `Button` / `Badge` / `DataTable` a tokens+tipografías v2.
+- ✅ Formularios internos de las 4 calculadoras y secciones secundarias de Congreso
+  (Senado/Diputados/leyes/asistencia) migrados a tokens v2. Índice `/calculadoras` + entrada de nav.
+- ✅ Borrados componentes muertos: `Navbar`, `Sidebar`, `LatestVotes`, los ~16 cards viejos de la
+  home y 8 core sin uso (`IndicatorTile`, `Sparkline`, `SourceChip`, `Tabs`, `VariationBadge`,
+  `LiveCounter`, `VoteBar`, `EventDot`).
+- ✅ **Tokens legacy eliminados** de `globals.css`: se borró todo el bloque "Observatorio claro"
+  (paper-N/ink-N/azul-N/alza/baja/surface-*/text-*/border-*/accent-*/gap-*/ds-accent/chart-grid…).
+  Quedan sólo: el bloque v2, un bloque de primitivos genéricos (fonts, escala `--serie-N`, spacing,
+  radios, sombras, `--container-max`, un puñado de `--fs`/`--fw`/`--lh`) y el sistema HSL de shadcn
+  (`--background`/`--foreground`/`--border`/… que consumen los componentes `ui/`).
 - ✅ Sección "Sistema de diseño" de `CLAUDE.md` actualizada a la dirección editorial.
-- **Pendiente:** revisar todo corriendo el stack (nada verificado visualmente); re-skin fino de los
-  **formularios internos** de las 4 calculadoras y de las secciones secundarias de Congreso
-  (Senado/Diputados/leyes/asistencia) que aún usan estilos viejos; eliminar los **tokens viejos** de
-  `globals.css` cuando ninguna pantalla los use y renombrar el bloque v2 al set definitivo; evaluar
-  un **índice de calculadoras** o entrada de nav. Core sin uso tras la limpieza (`IndicatorTile`,
-  `Sparkline`, `VoteBar`/`VoteCard`, `LiveCounter`): borrar cuando se confirme.
+- **Único pendiente:** revisar todo **corriendo el stack** (nada se verificó visualmente); es
+  esperable algún ajuste fino de spacing/tamaños.
 
 ## Notas
 

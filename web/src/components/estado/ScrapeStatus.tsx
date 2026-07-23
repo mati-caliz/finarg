@@ -69,8 +69,8 @@ function StatusRow({ run }: { run: ScrapeRun }) {
         gap: 12,
         padding: "12px 14px",
         borderRadius: "var(--radius-md)",
-        border: "1px solid var(--border-1)",
-        background: ok ? "var(--surface-inset)" : "var(--brecha-bg)",
+        border: "1px solid var(--line)",
+        background: ok ? "var(--surface)" : "var(--brecha-bg)",
       }}
     >
       <span
@@ -85,21 +85,21 @@ function StatusRow({ run }: { run: ScrapeRun }) {
       />
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <span className="num" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-body)" }}>
+          <span className="num" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--ink)" }}>
             {run.job_name}
           </span>
-          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+          <span style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
             {relativeTime(run.finished_at ?? run.started_at)}
           </span>
         </div>
-        <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+        <div style={{ fontSize: "0.75rem", color: "var(--ink2)" }}>
           {ok ? "OK" : run.status} · {(run.rows_upserted ?? 0).toLocaleString("es-AR")} filas ·{" "}
           {durationLabel(run)}
         </div>
         {run.error && (
           <div
             style={{
-              fontFamily: "var(--font-mono)",
+              fontFamily: "var(--font-jb-mono)",
               fontSize: "0.6875rem",
               color: "var(--neg)",
               whiteSpace: "pre-wrap",
@@ -135,7 +135,7 @@ export function ScrapeStatus() {
   if (runs.length === 0) {
     return (
       <Card>
-        <p style={{ color: "var(--text-muted)", margin: 0 }}>No hay corridas registradas todavía.</p>
+        <p style={{ color: "var(--ink3)", margin: 0 }}>No hay corridas registradas todavía.</p>
       </Card>
     );
   }
@@ -165,7 +165,7 @@ export function ScrapeStatus() {
             <span className="num" style={{ fontSize: "1.5rem", fontWeight: 700 }}>
               {total}
             </span>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginLeft: 6 }}>
+            <span style={{ fontSize: "0.75rem", color: "var(--ink3)", marginLeft: 6 }}>
               conectores
             </span>
           </div>
@@ -176,7 +176,7 @@ export function ScrapeStatus() {
             >
               {errors}
             </span>
-            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginLeft: 6 }}>
+            <span style={{ fontSize: "0.75rem", color: "var(--ink3)", marginLeft: 6 }}>
               con error
             </span>
           </div>

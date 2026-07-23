@@ -1,4 +1,4 @@
-import type { GoodWhen } from "@/components/core";
+export type GoodWhen = "up" | "down" | "neutral";
 
 export type VariationMode = "pct" | "delta" | "none";
 

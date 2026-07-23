@@ -59,9 +59,9 @@ const fieldStyle = {
   width: "100%",
   padding: "8px 10px",
   borderRadius: "var(--radius-md)",
-  border: "1px solid var(--border-2)",
-  background: "var(--surface-card)",
-  color: "var(--text-body)",
+  border: "1px solid var(--line2)",
+  background: "var(--raise)",
+  color: "var(--ink)",
   fontSize: "0.875rem",
   fontFamily: "var(--font-sans)",
 } as const;
@@ -69,7 +69,7 @@ const fieldStyle = {
 const labelStyle = {
   fontSize: "0.75rem",
   fontWeight: 600,
-  color: "var(--text-secondary)",
+  color: "var(--ink2)",
 } as const;
 
 interface LoginFormProps {
@@ -122,8 +122,8 @@ function LoginForm({ onAuthenticated }: LoginFormProps) {
           style={{
             padding: "8px 16px",
             borderRadius: "var(--radius-md)",
-            border: "1px solid var(--ds-accent)",
-            background: "var(--ds-accent)",
+            border: "1px solid var(--brecha)",
+            background: "var(--brecha)",
             color: "#fff",
             fontSize: "0.875rem",
             fontWeight: 600,
@@ -203,7 +203,7 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
                 setSlugTouched(true);
                 setDraft((current) => ({ ...current, slug: slugify(event.target.value) }));
               }}
-              style={{ ...fieldStyle, fontFamily: "var(--font-mono)" }}
+              style={{ ...fieldStyle, fontFamily: "var(--font-jb-mono)" }}
             />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: "0 1 180px" }}>
@@ -285,7 +285,7 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
                     ),
                   }));
                 }}
-                style={{ ...fieldStyle, width: 160, flex: "0 1 auto", fontFamily: "var(--font-mono)" }}
+                style={{ ...fieldStyle, width: 160, flex: "0 1 auto", fontFamily: "var(--font-jb-mono)" }}
               />
               <input
                 value={impact.label}
@@ -311,9 +311,9 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
                   }))
                 }
                 style={{
-                  border: "1px solid var(--border-1)",
-                  background: "var(--surface-card)",
-                  color: "var(--text-muted)",
+                  border: "1px solid var(--line)",
+                  background: "var(--raise)",
+                  color: "var(--ink3)",
                   borderRadius: "var(--radius-md)",
                   padding: 6,
                   cursor: "pointer",
@@ -348,7 +348,7 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
             value={draft.content}
             onChange={(event) => setDraft((current) => ({ ...current, content: event.target.value }))}
             rows={14}
-            style={{ ...fieldStyle, fontFamily: "var(--font-mono)", resize: "vertical" }}
+            style={{ ...fieldStyle, fontFamily: "var(--font-jb-mono)", resize: "vertical" }}
           />
         </div>
 
@@ -374,8 +374,8 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
             style={{
               padding: "8px 16px",
               borderRadius: "var(--radius-md)",
-              border: "1px solid var(--ds-accent)",
-              background: "var(--ds-accent)",
+              border: "1px solid var(--brecha)",
+              background: "var(--brecha)",
               color: "#fff",
               fontSize: "0.875rem",
               fontWeight: 600,
@@ -531,7 +531,7 @@ export function AdminPostsPanel() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {posts.length === 0 && (
             <Card>
-              <p style={{ color: "var(--text-muted)", margin: 0 }}>
+              <p style={{ color: "var(--ink3)", margin: 0 }}>
                 Todavía no hay publicaciones. Creá la primera.
               </p>
             </Card>
@@ -544,8 +544,8 @@ export function AdminPostsPanel() {
                 alignItems: "center",
                 gap: 12,
                 padding: "12px 16px",
-                background: "var(--surface-card)",
-                border: "1px solid var(--border-1)",
+                background: "var(--raise)",
+                border: "1px solid var(--line)",
                 borderRadius: "var(--radius-lg)",
               }}
             >
@@ -555,18 +555,18 @@ export function AdminPostsPanel() {
                     {post.published ? "Publicado" : "Borrador"}
                   </Badge>
                   <Badge tone="accent">{POST_CATEGORY_LABELS[post.category]}</Badge>
-                  <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+                  <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
                     {formatPostDate(post.created_at)}
                   </span>
                 </div>
-                <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--text-body)" }}>
+                <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--ink)" }}>
                   {post.title}
                 </span>
                 <span
                   style={{
                     fontSize: "0.6875rem",
-                    fontFamily: "var(--font-mono)",
-                    color: "var(--text-muted)",
+                    fontFamily: "var(--font-jb-mono)",
+                    color: "var(--ink3)",
                   }}
                 >
                   /ideas/{post.slug}

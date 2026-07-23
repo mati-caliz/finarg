@@ -22,7 +22,7 @@ export function BlocAttendance() {
       title="Presentismo por bloque"
       subtitle="Cuántas veces estuvieron presentes en las votaciones nominales de Diputados"
       footer={
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+        <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
           Presentismo = votos no ausentes sobre el total, por bloque, en votaciones nominales de
           Diputados (2011–2020). Bloques con al menos 1.000 votos registrados. Fuente: HCDN.
         </span>
@@ -39,7 +39,7 @@ export function BlocAttendance() {
                 style={{
                   width: 160,
                   fontSize: "0.6875rem",
-                  color: "var(--text-secondary)",
+                  color: "var(--ink2)",
                   fontWeight: 600,
                   textAlign: "right",
                   whiteSpace: "nowrap",
@@ -50,7 +50,7 @@ export function BlocAttendance() {
               >
                 {row.bloc}
               </span>
-              <div style={{ flex: 1, height: 13, background: "var(--surface-inset)", borderRadius: 3 }}>
+              <div style={{ flex: 1, height: 13, background: "var(--surface)", borderRadius: 3 }}>
                 <div
                   style={{
                     width: `${fill}%`,

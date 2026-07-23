@@ -12,19 +12,19 @@ const fieldStyle = { display: "flex", flexDirection: "column" as const, gap: 4 }
 const inputStyle = {
   padding: "8px 10px",
   borderRadius: "var(--radius-md)",
-  border: "1px solid var(--border-2)",
-  background: "var(--surface-card)",
-  color: "var(--text-body)",
-  fontFamily: "var(--font-mono)",
+  border: "1px solid var(--line2)",
+  background: "var(--raise)",
+  color: "var(--ink)",
+  fontFamily: "var(--font-jb-mono)",
   fontSize: "0.9375rem",
 };
-const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--text-secondary)" };
+const labelStyle = { fontSize: "0.75rem", fontWeight: 600, color: "var(--ink2)" };
 const checkboxRow = {
   display: "flex",
   alignItems: "center",
   gap: 8,
   fontSize: "0.875rem",
-  color: "var(--text-body)",
+  color: "var(--ink)",
 };
 
 const DEDUCTION_LABELS: { key: string; label: string }[] = [
@@ -144,14 +144,14 @@ export default function IncomeTaxPage() {
           <Card
             title="Tu sueldo de bolsillo"
             footer={
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
+              <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
                 Cálculo estimativo según deducciones legales y escala vigente de Ganancias.
               </span>
             }
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Neto mensual</div>
+                <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Neto mensual</div>
                 <div
                   className="num"
                   style={{ fontSize: "var(--fs-num-xl)", fontWeight: 600, lineHeight: 1.1 }}
@@ -161,7 +161,7 @@ export default function IncomeTaxPage() {
               </div>
               <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
                     Ganancias mensual
                   </div>
                   <div className="num" style={{ fontWeight: 600, color: "var(--neg)" }}>
@@ -169,7 +169,7 @@ export default function IncomeTaxPage() {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
                     Alícuota efectiva
                   </div>
                   <div className="num" style={{ fontWeight: 600 }}>
@@ -198,7 +198,7 @@ export default function IncomeTaxPage() {
           <Card>
             <p
               style={{
-                color: "var(--text-muted)",
+                color: "var(--ink3)",
                 fontSize: "0.875rem",
                 margin: 0,
                 textAlign: "center",
