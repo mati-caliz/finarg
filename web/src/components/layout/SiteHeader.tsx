@@ -36,7 +36,15 @@ function isActive(pathname: string, href: string): boolean {
 
 export function BrandMark({ fontSize = 21 }: { fontSize?: number }) {
   return (
-    <span style={{ display: "inline-flex", alignItems: "baseline", gap: 8 }}>
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "baseline",
+        gap: 8,
+        flexShrink: 0,
+        whiteSpace: "nowrap",
+      }}
+    >
       <span
         style={{
           fontFamily: "var(--font-display)",
@@ -52,6 +60,7 @@ export function BrandMark({ fontSize = 21 }: { fontSize?: number }) {
         style={{
           width: 7,
           height: 7,
+          flexShrink: 0,
           borderRadius: "50%",
           background: "var(--brecha)",
           transform: "translateY(-2px)",
@@ -137,7 +146,7 @@ export function SiteHeader() {
           gap: 24,
         }}
       >
-        <Link href="/" aria-label="Ir al inicio">
+        <Link href="/" aria-label="Ir al inicio" style={{ flexShrink: 0 }}>
           <BrandMark />
         </Link>
 
