@@ -33,78 +33,80 @@ function CategoryBadge({ post }: { post: Post }) {
 function LeadIdea({ post }: { post: Post }) {
   const impacts = post.impacts ?? [];
   return (
-    <article>
-      <Link href={`/ideas/${post.slug}`} style={{ display: "block", marginBottom: 20 }}>
-        <PostCover slug={post.slug} category={post.category} ratio="21 / 9" />
-      </Link>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
-        <CategoryBadge post={post} />
-        <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.7rem", color: "var(--ink3)" }}>
-          {readingTimeMinutes(post.content)} min de lectura
-        </span>
-      </div>
-      <Link
-        href={`/ideas/${post.slug}`}
-        style={{
-          display: "block",
-          fontFamily: "var(--font-display)",
-          fontWeight: 800,
-          fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
-          lineHeight: 1.02,
-          letterSpacing: "-0.025em",
-          margin: "0 0 16px",
-          color: "var(--ink)",
-          textDecoration: "none",
-          textWrap: "balance",
-        }}
-      >
-        {post.title}
-      </Link>
-      {post.summary ? (
-        <p
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontSize: "clamp(1rem, 2vw, 1.1875rem)",
-            lineHeight: 1.5,
-            color: "var(--ink2)",
-            margin: "0 0 22px",
-            textWrap: "pretty",
-          }}
-        >
-          {post.summary}
-        </p>
-      ) : null}
-      {impacts.length > 0 ? (
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
-          {impacts.map((impact) => {
-            const meta = POST_IMPACT_META[impact.kind];
-            const Icon = meta.icon;
-            return (
-              <span
-                key={`${impact.kind}-${impact.value}`}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontFamily: "var(--font-jb-mono)",
-                  fontSize: "0.7rem",
-                  color: meta.color,
-                  background: meta.background,
-                  border: `1px solid ${meta.border}`,
-                  borderRadius: 6,
-                  padding: "6px 11px",
-                }}
-              >
-                <Icon size={12} strokeWidth={2.2} aria-hidden />
-                {meta.label}: {impact.value}
-              </span>
-            );
-          })}
+    <article className="lb-media-row">
+      <div className="lb-media-body">
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18 }}>
+            <CategoryBadge post={post} />
+            <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.7rem", color: "var(--ink3)" }}>
+              {readingTimeMinutes(post.content)} min de lectura
+            </span>
+          </div>
+          <Link
+            href={`/ideas/${post.slug}`}
+            style={{
+              display: "block",
+              fontFamily: "var(--font-display)",
+              fontWeight: 800,
+              fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+              lineHeight: 1.02,
+              letterSpacing: "-0.025em",
+              margin: "0 0 16px",
+              color: "var(--ink)",
+              textDecoration: "none",
+              textWrap: "balance",
+            }}
+          >
+            {post.title}
+          </Link>
+          {post.summary ? (
+            <p
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "clamp(1rem, 2vw, 1.1875rem)",
+                lineHeight: 1.5,
+                color: "var(--ink2)",
+                margin: "0 0 22px",
+                textWrap: "pretty",
+              }}
+            >
+              {post.summary}
+            </p>
+          ) : null}
+          {impacts.length > 0 ? (
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 20 }}>
+              {impacts.map((impact) => {
+                const meta = POST_IMPACT_META[impact.kind];
+                const Icon = meta.icon;
+                return (
+                  <span
+                    key={`${impact.kind}-${impact.value}`}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      fontFamily: "var(--font-jb-mono)",
+                      fontSize: "0.7rem",
+                      color: meta.color,
+                      background: meta.background,
+                      border: `1px solid ${meta.border}`,
+                      borderRadius: 6,
+                      padding: "6px 11px",
+                    }}
+                  >
+                    <Icon size={12} strokeWidth={2.2} aria-hidden />
+                    {meta.label}: {impact.value}
+                  </span>
+                );
+              })}
+            </div>
+          ) : null}
+          <div style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.72rem", color: "var(--ink3)" }}>
+            Publicado {formatPostDate(post.created_at)}
+          </div>
         </div>
-      ) : null}
-      <div style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.72rem", color: "var(--ink3)" }}>
-        Publicado {formatPostDate(post.created_at)}
-      </div>
+        <Link href={`/ideas/${post.slug}`} className="lb-media-side">
+        <PostCover slug={post.slug} category={post.category} />
+      </Link>
     </article>
   );
 }
