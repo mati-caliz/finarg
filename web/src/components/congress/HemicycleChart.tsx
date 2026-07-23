@@ -19,6 +19,7 @@ interface HemicycleChartProps {
   seats: HemicycleSeat[];
   blocs: HemicycleBloc[];
   ariaLabel: string;
+  majority?: number;
 }
 
 const VIEW_WIDTH = 200;
@@ -128,7 +129,7 @@ export function BlocLegend({ blocs }: { blocs: HemicycleBloc[] }) {
   );
 }
 
-export function HemicycleChart({ seats, blocs, ariaLabel }: HemicycleChartProps) {
+export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const positions = computeSeatPositions(seats.length);
@@ -147,6 +148,32 @@ export function HemicycleChart({ seats, blocs, ariaLabel }: HemicycleChartProps)
         style={{ width: "100%", height: "auto", display: "block" }}
         onMouseLeave={() => setHoveredIndex(null)}
       >
+        {majority !== undefined && (
+          <g>
+            <line
+              x1={CENTER_X}
+              y1={CENTER_Y - OUTER_RADIUS - 2}
+              x2={CENTER_X}
+              y2={CENTER_Y - INNER_RADIUS + 8}
+              stroke="var(--text-muted)"
+              strokeWidth={0.7}
+              strokeDasharray="2 2"
+            />
+            <text
+              x={CENTER_X}
+              y={CENTER_Y - OUTER_RADIUS - 5}
+              textAnchor="middle"
+              style={{
+                fontSize: 5.5,
+                fontWeight: 600,
+                fill: "var(--text-muted)",
+                fontFamily: "var(--font-sans)",
+              }}
+            >
+              {`Mayoría: ${majority} bancas`}
+            </text>
+          </g>
+        )}
         {positions.map((position, index) => {
           const seat = seats[index];
           if (!seat) {
