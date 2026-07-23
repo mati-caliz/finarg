@@ -182,8 +182,8 @@ export function PostDetail({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <div style={{ maxWidth: 940, margin: "0 auto", padding: "28px 24px 0" }}>
-        <PostCover slug={post.slug} category={post.category} ratio="21 / 9" />
+      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "26px 24px 0" }}>
+        <PostCover slug={post.slug} category={post.category} style={{ width: 232 }} />
       </div>
 
       {impacts.length > 0 && (
