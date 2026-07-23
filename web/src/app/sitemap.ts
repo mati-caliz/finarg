@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/brechas", changeFrequency: "daily", priority: 0.9 },
     { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
     { path: "/noticias", changeFrequency: "hourly", priority: 0.6 },
+    { path: "/ideas", changeFrequency: "weekly", priority: 0.7 },
     { path: "/feriados", changeFrequency: "monthly", priority: 0.5 },
     { path: "/estado", changeFrequency: "daily", priority: 0.4 },
     ...Object.keys(INDICATOR_META).map((code) => ({

@@ -6,6 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg2://finarg:finarg123@localhost:5432/finarg"
     cors_allowed_origins: str = "http://localhost:3000,http://localhost:3001"
+    admin_token: str = ""
 
     @property
     def cors_origins(self) -> list[str]:

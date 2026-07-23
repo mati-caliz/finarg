@@ -1,6 +1,8 @@
 import {
   type IndicatorSeriesParams,
+  type PostCategory,
   boletinApi,
+  postsApi,
   congressApi,
   coparticipacionApi,
   viviendaApi,
@@ -30,6 +32,8 @@ export const labrechaKeys = {
   senateBlocs: ["labrecha", "senate", "blocs"] as const,
   holidays: (params?: object) => ["labrecha", "holidays", params ?? {}] as const,
   news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
+  posts: (params?: object) => ["labrecha", "posts", params ?? {}] as const,
+  post: (slug: string) => ["labrecha", "posts", slug] as const,
   boletin: (params?: object) => ["labrecha", "boletin", params ?? {}] as const,
   coparticipacion: ["labrecha", "coparticipacion"] as const,
   taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
@@ -170,6 +174,18 @@ export function useNews(params?: {
   offset?: number;
 }) {
   return useQuery({ queryKey: labrechaKeys.news(params), queryFn: () => newsApi.list(params) });
+}
+
+export function usePosts(params?: { category?: PostCategory; limit?: number; offset?: number }) {
+  return useQuery({ queryKey: labrechaKeys.posts(params), queryFn: () => postsApi.list(params) });
+}
+
+export function usePost(slug: string) {
+  return useQuery({
+    queryKey: labrechaKeys.post(slug),
+    queryFn: () => postsApi.bySlug(slug),
+    enabled: slug.length > 0,
+  });
 }
 
 export function useBoletinSummaries(params?: {

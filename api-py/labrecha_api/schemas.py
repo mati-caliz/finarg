@@ -295,3 +295,40 @@ class IncomeTaxResponse(BaseModel):
     calculation_details: IncomeTaxCalculationDetails
     deduction_breakdown: IncomeTaxDeductionBreakdown
     tax_brackets: list[TaxBracketOut]
+
+
+class PostCategory(str, Enum):
+    IDEA = "idea"
+    LEY = "ley"
+    ANALISIS = "analisis"
+    NOTA = "nota"
+
+
+class PostOut(BaseModel):
+    id: int
+    slug: str
+    title: str
+    category: PostCategory
+    summary: str | None
+    content: str
+    published: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class PostCreate(BaseModel):
+    slug: str = Field(min_length=1, max_length=160, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    title: str = Field(min_length=1, max_length=200)
+    category: PostCategory
+    summary: str | None = None
+    content: str = Field(min_length=1)
+    published: bool = False
+
+
+class PostUpdate(BaseModel):
+    slug: str | None = Field(default=None, min_length=1, max_length=160, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    category: PostCategory | None = None
+    summary: str | None = None
+    content: str | None = Field(default=None, min_length=1)
+    published: bool | None = None
