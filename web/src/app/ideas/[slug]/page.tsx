@@ -8,9 +8,5 @@ export const metadata: Metadata = {
 
 export default async function IdeaDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return (
-    <div style={{ maxWidth: 760, margin: "0 auto" }}>
-      <PostDetail slug={slug} />
-    </div>
-  );
+  return <PostDetail slug={slug} />;
 }

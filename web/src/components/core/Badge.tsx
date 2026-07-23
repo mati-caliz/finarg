@@ -10,22 +10,22 @@ interface BadgeProps {
 
 const tones: Record<BadgeTone, CSSProperties> = {
   neutral: {
-    background: "var(--surface-inset)",
-    color: "var(--text-secondary)",
-    border: "1px solid var(--border-1)",
+    background: "var(--surface)",
+    color: "var(--ink2)",
+    border: "1px solid var(--line)",
   },
   accent: {
-    background: "var(--accent-soft)",
-    color: "var(--accent-strong)",
-    border: "1px solid var(--accent-border)",
+    background: "var(--evento-bg)",
+    color: "var(--evento)",
+    border: "1px solid var(--evento-ln)",
   },
   pos: { background: "var(--pos-bg)", color: "var(--pos)", border: "1px solid transparent" },
   neg: { background: "var(--neg-bg)", color: "var(--neg)", border: "1px solid transparent" },
-  gap: { background: "var(--gap-bg)", color: "var(--gap-accent)", border: "1px solid transparent" },
+  gap: { background: "var(--brecha-bg)", color: "var(--brecha)", border: "1px solid var(--brecha-ln)" },
   evento: {
     background: "var(--evento-bg)",
     color: "var(--evento)",
-    border: "1px solid transparent",
+    border: "1px solid var(--evento-ln)",
   },
 };
 
@@ -36,12 +36,14 @@ export function Badge({ tone = "neutral", children, style }: BadgeProps) {
         display: "inline-flex",
         alignItems: "center",
         gap: 4,
-        padding: "2px 8px",
-        borderRadius: "var(--radius-sm)",
-        fontSize: "0.6875rem",
+        padding: "3px 9px",
+        borderRadius: "var(--radius-pill)",
+        fontFamily: "var(--font-jb-mono)",
+        fontSize: "0.62rem",
         fontWeight: 600,
-        letterSpacing: "0.02em",
-        lineHeight: 1.6,
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        lineHeight: 1.5,
         ...tones[tone],
         ...style,
       }}

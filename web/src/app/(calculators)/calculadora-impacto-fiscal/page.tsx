@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculatorHeader } from "@/components/calculators/CalculatorHeader";
 import { Button, Card, DataTable } from "@/components/core";
 import { formatMoneyAR, formatNumberAR } from "@/lib/indicators";
 import { calculatorsApi } from "@/lib/labrechaApi";
@@ -60,27 +61,18 @@ export default function TaxImpactPage() {
   return (
     <div
       style={{
-        maxWidth: "var(--container-max)",
+        maxWidth: 1000,
         margin: "0 auto",
+        padding: "48px 24px 72px",
         display: "flex",
         flexDirection: "column",
         gap: "var(--sp-6)",
       }}
     >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <h1
-          style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            margin: 0,
-          }}
-        >
-          Tu impacto fiscal
-        </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Cuánto de tu ingreso se va en impuestos y aportes, y hasta qué día del año trabajás para el
-          Estado antes de empezar a ganar para vos.
-        </p>
-      </header>
+      <CalculatorHeader
+        title="Tu impacto fiscal"
+        subtitle="Cuánto de tu ingreso se va en impuestos y aportes, y hasta qué día del año trabajás para el Estado antes de empezar a ganar para vos."
+      />
 
       <div
         style={{

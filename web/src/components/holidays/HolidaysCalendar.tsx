@@ -1,280 +1,100 @@
 "use client";
 
-import { Badge, Card, RangeSelector } from "@/components/core";
 import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHolidays } from "@/hooks/useLabrecha";
-import {
-  daysUntil,
-  daysUntilLabel,
-  formatLongDate,
-  freeRunAround,
-  holidayLabel,
-  isWeekend,
-  todayISO,
-  weekdayMondayFirst,
-} from "@/lib/holidays";
+import { daysUntil, formatLongDate, freeRunAround, holidayLabel, todayISO } from "@/lib/holidays";
 import type { Holiday } from "@/lib/labrechaApi";
-import { CalendarDays, PartyPopper, Sun } from "lucide-react";
-import { useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 
-const WEEKDAY_HEADERS = ["L", "M", "X", "J", "V", "S", "D"];
-const MONTH_COUNT = 12;
+const MONO = "var(--font-jb-mono)";
 const LONG_WEEKEND_MIN_DAYS = 3;
-const WORKWEEK_DAYS = 5;
 
-function monthName(year: number, monthIndex: number): string {
-  return new Date(Date.UTC(year, monthIndex, 1)).toLocaleDateString("es-AR", {
-    month: "long",
-    timeZone: "UTC",
-  });
+function weekdayName(isoDate: string): string {
+  return new Date(`${isoDate}T00:00:00`).toLocaleDateString("es-AR", { weekday: "long" });
 }
 
-function isoDate(year: number, monthIndex: number, day: number): string {
-  return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+function dayMonth(isoDate: string): string {
+  return new Date(`${isoDate}T00:00:00`).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
 }
 
-function formatDayMonth(iso: string): string {
-  const [, month, day] = iso.split("-");
-  return `${day}/${month}`;
+function useCountdown(targetISO: string | undefined) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+  if (!targetISO) {
+    return undefined;
+  }
+  const target = new Date(`${targetISO}T00:00:00`).getTime();
+  const diff = Math.max(0, target - now);
+  const days = Math.floor(diff / 86_400_000);
+  const hours = Math.floor((diff % 86_400_000) / 3_600_000);
+  const minutes = Math.floor((diff % 3_600_000) / 60_000);
+  const seconds = Math.floor((diff % 60_000) / 1000);
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return { days, hms: `${pad(hours)}:${pad(minutes)}:${pad(seconds)}` };
 }
 
-interface MonthCalendarProps {
-  year: number;
-  monthIndex: number;
-  holidaysByDate: Map<string, Holiday[]>;
-  today: string;
-}
-
-function MonthCalendar({ year, monthIndex, holidaysByDate, today }: MonthCalendarProps) {
-  const [hoveredDate, setHoveredDate] = useState<string | null>(null);
-
-  const daysInMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
-  const leadingBlanks = weekdayMondayFirst(isoDate(year, monthIndex, 1));
-  const containsToday = today.startsWith(`${year}-${String(monthIndex + 1).padStart(2, "0")}`);
-
-  const cells: { key: string; day: number | null }[] = [
-    ...Array.from({ length: leadingBlanks }, (_, blankOffset) => ({
-      key: `void-${monthIndex}-${blankOffset}`,
-      day: null,
-    })),
-    ...Array.from({ length: daysInMonth }, (_, dayOffset) => ({
-      key: isoDate(year, monthIndex, dayOffset + 1),
-      day: dayOffset + 1,
-    })),
-  ];
-
+function TypeBadge({ holiday }: { holiday: Holiday }) {
+  const fixed = holiday.is_fixed === true;
+  const color = fixed ? "var(--evento)" : "var(--brecha)";
   return (
-    <div
-      style={{
-        background: "var(--surface-inset)",
-        border: `1px solid ${containsToday ? "var(--accent-border)" : "var(--border-1)"}`,
-        borderRadius: "var(--radius-md)",
-        padding: "10px 12px 12px",
-      }}
-    >
-      <div
-        style={{
-          fontSize: "0.75rem",
-          fontWeight: 700,
-          color: containsToday ? "var(--accent-strong)" : "var(--text-body)",
-          textTransform: "capitalize",
-          marginBottom: 8,
-        }}
-      >
-        {monthName(year, monthIndex)}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", rowGap: 2 }}>
-        {WEEKDAY_HEADERS.map((header, headerIndex) => (
-          <span
-            key={header}
-            style={{
-              fontSize: "0.5625rem",
-              fontWeight: 600,
-              color: headerIndex >= WORKWEEK_DAYS ? "var(--text-faint)" : "var(--text-muted)",
-              textAlign: "center",
-              paddingBottom: 2,
-            }}
-          >
-            {header}
-          </span>
-        ))}
-        {cells.map(({ key, day }) => {
-          if (day === null) {
-            return <span key={key} />;
-          }
-          const date = key;
-          const dayHolidays = holidaysByDate.get(date);
-          const isHoliday = dayHolidays !== undefined;
-          const isToday = date === today;
-          const isPastHoliday = isHoliday && date < today;
-          const hovered = hoveredDate === date;
-          return (
-            <span
-              key={date}
-              onMouseEnter={isHoliday ? () => setHoveredDate(date) : undefined}
-              onMouseLeave={isHoliday ? () => setHoveredDate(null) : undefined}
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: 24,
-              }}
-            >
-              <span
-                className="num"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 22,
-                  height: 22,
-                  borderRadius: 999,
-                  fontSize: "0.625rem",
-                  fontWeight: isHoliday || isToday ? 700 : 500,
-                  color: isHoliday
-                    ? "#ffffff"
-                    : isWeekend(date)
-                      ? "var(--text-faint)"
-                      : "var(--text-secondary)",
-                  background: isHoliday ? "var(--ds-accent)" : "transparent",
-                  opacity: isPastHoliday ? 0.45 : 1,
-                  boxShadow: isToday ? "0 0 0 1.5px var(--accent-strong)" : "none",
-                  cursor: isHoliday ? "default" : undefined,
-                }}
-              >
-                {day}
-              </span>
-              {hovered && dayHolidays && (
-                <span
-                  style={{
-                    position: "absolute",
-                    bottom: "calc(100% + 4px)",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    zIndex: 10,
-                    background: "var(--surface-card)",
-                    border: "1px solid var(--border-2)",
-                    borderRadius: "var(--radius-md)",
-                    boxShadow: "var(--shadow-overlay)",
-                    padding: "6px 9px",
-                    whiteSpace: "nowrap",
-                    pointerEvents: "none",
-                  }}
-                >
-                  {dayHolidays.map((holiday) => (
-                    <span
-                      key={holiday.name}
-                      style={{
-                        display: "block",
-                        fontSize: "0.6875rem",
-                        fontWeight: 600,
-                        color: "var(--text-body)",
-                      }}
-                    >
-                      {holidayLabel(holiday)}
-                    </span>
-                  ))}
-                </span>
-              )}
-            </span>
-          );
-        })}
-      </div>
-    </div>
+    <span style={{ fontFamily: MONO, fontSize: "0.68rem", color, border: `1px solid ${color}`, borderRadius: "var(--radius-pill)", padding: "4px 12px", whiteSpace: "nowrap" }}>
+      {fixed ? "Inamovible" : "Trasladable"}
+    </span>
   );
 }
 
-interface StatTileProps {
-  icon: React.ElementType;
-  value: string;
-  label: string;
-}
-
-function StatTile({ icon: Icon, value, label }: StatTileProps) {
+function CountdownHero({ holiday, targetISO }: { holiday: Holiday; targetISO: string }) {
+  const countdown = useCountdown(targetISO);
   return (
     <div
+      className="lb-feriado-hero"
       style={{
-        flex: "1 1 150px",
-        display: "flex",
+        background: "var(--brecha-bg)",
+        border: "1px solid var(--brecha)",
+        borderRadius: 14,
+        padding: "36px 40px",
+        marginBottom: 40,
+        gap: 32,
         alignItems: "center",
-        gap: 12,
-        border: "1px solid var(--border-1)",
-        borderRadius: "var(--radius-md)",
-        padding: "12px 14px",
-        background: "var(--surface-inset)",
       }}
     >
-      <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--ds-accent)" }} />
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <span className="num" style={{ fontSize: "1.25rem", fontWeight: 700, lineHeight: 1.1 }}>
-          {value}
-        </span>
-        <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>{label}</span>
-      </div>
-    </div>
-  );
-}
-
-function NextHolidayHero({ holiday, holidayDates }: { holiday: Holiday; holidayDates: Set<string> }) {
-  const days = daysUntil(holiday.date);
-  const freeRun = freeRunAround(holiday.date, holidayDates);
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: 20,
-        border: "1px solid var(--accent-border)",
-        borderRadius: "var(--radius-lg)",
-        background: "var(--accent-soft)",
-        padding: "18px 20px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          minWidth: 84,
-        }}
-      >
-        <span
-          className="num"
-          style={{
-            fontSize: "2.5rem",
-            fontWeight: 700,
-            lineHeight: 1,
-            color: "var(--accent-strong)",
-          }}
-        >
-          {days}
-        </span>
-        <span style={{ fontSize: "0.6875rem", fontWeight: 600, color: "var(--text-secondary)" }}>
-          {days === 1 ? "día" : "días"}
-        </span>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1 }}>
-        <span style={{ fontSize: "0.6875rem", fontWeight: 700, color: "var(--accent-strong)" }}>
-          PRÓXIMO FERIADO
-        </span>
-        <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--text-body)" }}>
+      <div>
+        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brecha)", marginBottom: 14 }}>
+          Próximo feriado
+        </div>
+        <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 10px", color: "var(--ink)" }}>
           {holidayLabel(holiday)}
-        </span>
-        <span style={{ fontSize: "0.8125rem", color: "var(--text-secondary)", textTransform: "capitalize" }}>
+        </h2>
+        <div style={{ fontFamily: MONO, fontSize: "0.82rem", color: "var(--ink2)", textTransform: "capitalize" }}>
           {formatLongDate(holiday.date)}
-        </span>
+        </div>
       </div>
-      {freeRun.length >= LONG_WEEKEND_MIN_DAYS && (
-        <Badge tone="evento">
-          {`Finde largo de ${freeRun.length} días · ${formatDayMonth(freeRun.start)} al ${formatDayMonth(freeRun.end)}`}
-        </Badge>
-      )}
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "clamp(3rem, 9vw, 4.5rem)", lineHeight: 0.85, letterSpacing: "-0.04em", color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
+          {countdown?.days ?? "—"}
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink2)", marginTop: 8 }}>
+          días · {countdown?.hms ?? "00:00:00"}
+        </div>
+      </div>
     </div>
   );
 }
+
+const yearPillStyle = (active: boolean): CSSProperties => ({
+  fontFamily: MONO,
+  fontSize: "0.75rem",
+  padding: "7px 15px",
+  borderRadius: "var(--radius-pill)",
+  cursor: "pointer",
+  border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
+  background: active ? "var(--ink)" : "transparent",
+  color: active ? "var(--paper)" : "var(--ink2)",
+});
 
 export function HolidaysCalendar() {
   const currentYear = new Date().getUTCFullYear();
@@ -282,166 +102,88 @@ export function HolidaysCalendar() {
   const [year, setYear] = useState(currentYear);
   const { data, isLoading, isError, error, refetch } = useHolidays({ year });
 
+  if (isError) {
+    return <QueryError error={error} onRetry={() => refetch()} />;
+  }
+
   const holidays = [...(data ?? [])].sort((first, second) =>
     first.date < second.date ? -1 : first.date > second.date ? 1 : 0,
   );
   const today = todayISO();
   const holidayDates = new Set(holidays.map((holiday) => holiday.date));
-  const holidaysByDate = new Map<string, Holiday[]>();
-  for (const holiday of holidays) {
-    const existing = holidaysByDate.get(holiday.date) ?? [];
-    holidaysByDate.set(holiday.date, [...existing, holiday]);
-  }
-
   const nextHoliday = holidays.find((holiday) => holiday.date >= today);
-  const weekdayHolidayCount = [...holidayDates].filter((date) => !isWeekend(date)).length;
-  const longWeekendStarts = new Set(
-    [...holidayDates]
-      .map((date) => freeRunAround(date, holidayDates))
-      .filter((run) => run.length >= LONG_WEEKEND_MIN_DAYS)
-      .map((run) => run.start),
-  );
-
-  if (isError) {
-    return <QueryError error={error} onRetry={() => refetch()} />;
-  }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-5)" }}>
+    <div>
+      <div style={{ display: "flex", gap: 6, marginBottom: 30, flexWrap: "wrap" }}>
+        {years.map((option) => (
+          <button key={option} type="button" onClick={() => setYear(option)} style={yearPillStyle(option === year)}>
+            {option}
+          </button>
+        ))}
+      </div>
+
       {isLoading ? (
         <>
-          <Skeleton className="h-[110px] rounded-[10px]" />
-          <Skeleton className="h-[520px] rounded-[10px]" />
+          <Skeleton className="h-[150px] rounded-[14px]" />
+          <div style={{ height: 24 }} />
+          <Skeleton className="h-[360px] rounded-[10px]" />
         </>
+      ) : holidays.length === 0 ? (
+        <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)" }}>
+          No hay feriados cargados para {year}.
+        </p>
       ) : (
         <>
           {year === currentYear && nextHoliday && (
-            <NextHolidayHero holiday={nextHoliday} holidayDates={holidayDates} />
+            <CountdownHero holiday={nextHoliday} targetISO={nextHoliday.date} />
           )}
 
-          <Card
-            title={`Calendario ${year}`}
-            subtitle="Los feriados en azul; el día de hoy, resaltado. Pasá el mouse por un feriado para ver cuál es."
-            actions={
-              <RangeSelector
-                options={years.map(String)}
-                active={String(year)}
-                onChange={(value) => setYear(Number(value))}
-              />
-            }
-            footer={
-              <span style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>
-                Feriados nacionales de Argentina. Fuente: Nager.Date.
-              </span>
-            }
-          >
-            {holidays.length === 0 ? (
-              <p style={{ color: "var(--text-muted)", margin: 0 }}>
-                No hay feriados cargados para {year}.
-              </p>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                  <StatTile
-                    icon={PartyPopper}
-                    value={String(holidays.length)}
-                    label={`feriados en ${year}`}
-                  />
-                  <StatTile
-                    icon={CalendarDays}
-                    value={String(weekdayHolidayCount)}
-                    label="caen en día hábil"
-                  />
-                  <StatTile
-                    icon={Sun}
-                    value={String(longWeekendStarts.size)}
-                    label="findes largos (3+ días)"
-                  />
-                </div>
-
+          <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
+            {year === currentYear ? "Los feriados del año" : `Feriados ${year}`}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {holidays.map((holiday, index) => {
+              const isPast = daysUntil(holiday.date) < 0;
+              const freeRun = freeRunAround(holiday.date, holidayDates);
+              return (
                 <div
+                  key={`${holiday.date}-${holiday.name}`}
+                  className="lb-feriado-row"
                   style={{
-                    display: "grid",
-                    gap: 12,
-                    gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                    alignItems: "center",
+                    gap: 20,
+                    padding: "18px 4px",
+                    borderBottom: index === holidays.length - 1 ? "none" : "1px solid var(--line)",
+                    opacity: isPast ? 0.5 : 1,
                   }}
                 >
-                  {Array.from({ length: MONTH_COUNT }, (_, monthIndex) => (
-                    <MonthCalendar
-                      key={isoDate(year, monthIndex, 1)}
-                      year={year}
-                      monthIndex={monthIndex}
-                      holidaysByDate={holidaysByDate}
-                      today={today}
-                    />
-                  ))}
+                  <div style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.9375rem", fontVariantNumeric: "tabular-nums" }}>
+                    {dayMonth(holiday.date)}
+                    <br />
+                    <span style={{ fontSize: "0.7rem", color: "var(--ink3)", fontWeight: 400, textTransform: "capitalize" }}>
+                      {weekdayName(holiday.date)}
+                    </span>
+                  </div>
+                  <div style={{ fontFamily: "var(--font-serif)", fontSize: "1.1875rem", color: "var(--ink)" }}>
+                    {holidayLabel(holiday)}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                    {freeRun.length >= LONG_WEEKEND_MIN_DAYS && (
+                      <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink2)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "var(--radius-pill)", padding: "4px 10px" }}>
+                        Finde de {freeRun.length} días
+                      </span>
+                    )}
+                    <TypeBadge holiday={holiday} />
+                  </div>
                 </div>
+              );
+            })}
+          </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {holidays.map((holiday) => {
-                    const days = daysUntil(holiday.date);
-                    const isPast = days < 0;
-                    const freeRun = freeRunAround(holiday.date, holidayDates);
-                    return (
-                      <div
-                        key={`${holiday.date}-${holiday.name}`}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 12,
-                          padding: "10px 14px",
-                          borderRadius: "var(--radius-md)",
-                          border: "1px solid var(--border-1)",
-                          background: "var(--surface-inset)",
-                          opacity: isPast ? 0.55 : 1,
-                        }}
-                      >
-                        <span
-                          className="num"
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: 44,
-                            height: 44,
-                            borderRadius: "var(--radius-md)",
-                            background: "var(--ds-accent)",
-                            color: "#ffffff",
-                            flexShrink: 0,
-                            lineHeight: 1.1,
-                          }}
-                        >
-                          <span style={{ fontSize: "1rem", fontWeight: 700 }}>
-                            {Number(holiday.date.slice(8, 10))}
-                          </span>
-                          <span style={{ fontSize: "0.5625rem", fontWeight: 600, textTransform: "uppercase" }}>
-                            {monthName(year, Number(holiday.date.slice(5, 7)) - 1).slice(0, 3)}
-                          </span>
-                        </span>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
-                          <span style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--text-body)" }}>
-                            {holidayLabel(holiday)}
-                          </span>
-                          <span
-                            style={{ fontSize: "0.75rem", color: "var(--text-muted)", textTransform: "capitalize" }}
-                          >
-                            {formatLongDate(holiday.date)}
-                          </span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-                          {freeRun.length >= LONG_WEEKEND_MIN_DAYS && (
-                            <Badge tone="evento">{`Finde de ${freeRun.length} días`}</Badge>
-                          )}
-                          {!isPast && days <= 45 && <Badge tone="accent">{daysUntilLabel(days)}</Badge>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </Card>
+          <div style={{ marginTop: 24, fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)" }}>
+            Fuente: calendario oficial de feriados nacionales · Nager.Date.
+          </div>
         </>
       )}
     </div>

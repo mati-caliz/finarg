@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
+import { Archivo, Bricolage_Grotesque, IBM_Plex_Mono, JetBrains_Mono, Newsreader } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
@@ -7,8 +7,8 @@ import { CafecitoModal } from "@/components/CafecitoModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { CommandPalette } from "@/components/layout/CommandPalette";
-import { Navbar } from "@/components/layout/Navbar";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { EarlyHints } from "./early-hints";
 import { Providers } from "./providers";
 
@@ -28,6 +28,31 @@ const plexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
   variable: "--font-plex-mono",
   adjustFontFallback: true,
+});
+
+const bricolageGrotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-bricolage",
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -72,7 +97,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const adsenseId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID;
 
   return (
-    <html lang="es" className={`${archivo.variable} ${plexMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="es"
+      className={`${archivo.variable} ${plexMono.variable} ${bricolageGrotesque.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <EarlyHints />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
@@ -110,13 +139,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <div
             className="min-h-screen"
-            style={{ background: "var(--bg-page)", color: "var(--text-body)" }}
+            style={{
+              background: "var(--paper)",
+              color: "var(--ink)",
+              fontFamily: "var(--font-serif)",
+              display: "flex",
+              flexDirection: "column",
+            }}
           >
-            <Sidebar />
-            <div className="lg:pl-64">
-              <Navbar />
-              <main className="p-4 lg:p-6">{children}</main>
-            </div>
+            <SiteHeader />
+            <main style={{ flex: 1 }}>{children}</main>
+            <SiteFooter />
           </div>
           <CommandPalette />
           <CafecitoModal />

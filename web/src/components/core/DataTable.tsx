@@ -22,7 +22,14 @@ interface DataTableProps {
 export function DataTable({ columns, rows, footer, style }: DataTableProps) {
   return (
     <div style={{ overflowX: "auto", ...style }}>
-      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8125rem" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontFamily: "var(--font-jb-mono)",
+          fontSize: "0.8125rem",
+        }}
+      >
         <thead>
           <tr>
             {columns.map((column) => (
@@ -30,13 +37,13 @@ export function DataTable({ columns, rows, footer, style }: DataTableProps) {
                 key={column.key}
                 style={{
                   textAlign: column.align || "left",
-                  padding: "8px 12px",
-                  borderBottom: "1px solid var(--border-2)",
-                  color: "var(--text-muted)",
-                  fontWeight: 600,
-                  fontSize: "0.6875rem",
+                  padding: "10px 12px",
+                  borderBottom: "1px solid var(--line)",
+                  color: "var(--ink3)",
+                  fontWeight: 500,
+                  fontSize: "0.66rem",
                   textTransform: "uppercase",
-                  letterSpacing: "var(--ls-caps)",
+                  letterSpacing: "0.08em",
                   whiteSpace: "nowrap",
                 }}
               >
@@ -47,19 +54,17 @@ export function DataTable({ columns, rows, footer, style }: DataTableProps) {
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.id} style={{ borderBottom: "1px solid var(--border-1)" }}>
+            <tr key={row.id} style={{ borderTop: "1px solid var(--line2)" }}>
               {row.cells.map((cell, cellIndex) => {
                 const column = columns[cellIndex];
                 return (
                   <td
                     key={column.key}
-                    className={column.numeric ? "num" : undefined}
                     style={{
                       textAlign: column.align || "left",
-                      padding: "9px 12px",
-                      color: "var(--text-body)",
+                      padding: "10px 12px",
+                      color: "var(--ink)",
                       fontVariantNumeric: column.numeric ? "tabular-nums" : undefined,
-                      fontFamily: column.numeric ? "var(--font-mono)" : undefined,
                       whiteSpace: "nowrap",
                     }}
                   >
@@ -71,7 +76,7 @@ export function DataTable({ columns, rows, footer, style }: DataTableProps) {
           ))}
         </tbody>
       </table>
-      {footer && <div style={{ padding: "8px 12px" }}>{footer}</div>}
+      {footer && <div style={{ padding: "10px 12px" }}>{footer}</div>}
     </div>
   );
 }

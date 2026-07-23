@@ -1,20 +1,17 @@
 "use client";
 
-import { Badge } from "@/components/core";
-import {
-  POST_CATEGORY_LABELS,
-  POST_CATEGORY_TONES,
-  formatPostDate,
-} from "@/components/posts/postCategories";
-import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { QueryError } from "@/components/QueryError";
+import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
+import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { usePost } from "@/hooks/useLabrecha";
-import type { PostImpact } from "@/lib/labrechaApi";
-import { ArrowLeft, Clock3 } from "lucide-react";
+import { usePost, usePosts } from "@/hooks/useLabrecha";
+import type { Post, PostImpact } from "@/lib/labrechaApi";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+const MONO = "var(--font-jb-mono)";
+const NARROW = 720;
 
 function ImpactTile({ impact }: { impact: PostImpact }) {
   const meta = POST_IMPACT_META[impact.kind];
@@ -22,166 +19,238 @@ function ImpactTile({ impact }: { impact: PostImpact }) {
   return (
     <div
       style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-        padding: "12px 14px",
-        borderRadius: "var(--radius-lg)",
-        background: meta.background,
-        border: `1px solid ${meta.border}`,
+        background: "var(--raise)",
+        border: "1px solid var(--line)",
+        borderRadius: 9,
+        padding: 16,
       }}
     >
-      <span
+      <Icon size={20} strokeWidth={2} aria-hidden style={{ color: meta.color, marginBottom: 8 }} />
+      <div
         style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 5,
-          fontSize: "0.6875rem",
-          fontWeight: 600,
+          fontFamily: MONO,
+          fontSize: "0.62rem",
           textTransform: "uppercase",
-          letterSpacing: "0.05em",
-          color: meta.color,
+          letterSpacing: "0.06em",
+          color: "var(--ink3)",
+          marginBottom: 4,
         }}
       >
-        <Icon size={13} strokeWidth={2.2} aria-hidden />
         {meta.label}
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "1.25rem",
-          fontWeight: 700,
-          color: meta.color,
-          lineHeight: 1.1,
-        }}
-      >
+      </div>
+      <div style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.9375rem", color: "var(--ink)" }}>
         {impact.value}
-      </span>
-      <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)", lineHeight: 1.45 }}>
-        {impact.label}
-      </span>
+      </div>
     </div>
   );
 }
 
-function ImpactGrid({ impacts }: { impacts: PostImpact[] }) {
+function RelatedItem({ post }: { post: Post }) {
   return (
-    <section style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <h2
-        style={{
-          fontSize: "0.75rem",
-          fontWeight: 600,
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          color: "var(--text-muted)",
-          margin: 0,
-        }}
-      >
-        Impacto estimado
-      </h2>
+    <Link href={`/ideas/${post.slug}`} style={{ textDecoration: "none" }}>
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "var(--sp-3)",
+          fontFamily: MONO,
+          fontSize: "0.66rem",
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          color: "var(--ink3)",
+          marginBottom: 8,
         }}
       >
-        {impacts.map((impact) => (
-          <ImpactTile key={`${impact.kind}-${impact.value}`} impact={impact} />
-        ))}
+        {POST_CATEGORY_LABELS[post.category]}
       </div>
-    </section>
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: "1.25rem",
+          lineHeight: 1.1,
+          letterSpacing: "-0.015em",
+          color: "var(--ink)",
+        }}
+      >
+        {post.title}
+      </div>
+    </Link>
   );
 }
 
 export function PostDetail({ slug }: { slug: string }) {
   const { data: post, isLoading, isError, error, refetch } = usePost(slug);
+  const { data: allPosts } = usePosts({ limit: 6 });
 
   if (isError) {
-    return <QueryError error={error} onRetry={() => refetch()} />;
-  }
-
-  if (isLoading || !post) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-        <Skeleton className="h-[40px] w-2/3 rounded-[10px]" />
-        <Skeleton className="h-[300px] rounded-[10px]" />
+      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "52px 24px" }}>
+        <QueryError error={error} onRetry={() => refetch()} />
       </div>
     );
   }
 
-  return (
-    <article style={{ display: "flex", flexDirection: "column", gap: "var(--sp-5)" }}>
-      <Link
-        href="/ideas"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          fontSize: "0.8125rem",
-          fontWeight: 600,
-          color: "var(--text-link)",
-          textDecoration: "none",
-        }}
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Volver a Ideas
-      </Link>
+  if (isLoading || !post) {
+    return (
+      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "52px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+        <Skeleton className="h-[48px] w-2/3 rounded-[10px]" />
+        <Skeleton className="h-[320px] rounded-[10px]" />
+      </div>
+    );
+  }
 
-      <header style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <Badge tone={POST_CATEGORY_TONES[post.category]}>
-            {POST_CATEGORY_LABELS[post.category]}
-          </Badge>
-          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-            {formatPostDate(post.created_at)}
-          </span>
+  const impacts = post.impacts ?? [];
+  const related = (allPosts ?? []).filter((item) => item.slug !== post.slug).slice(0, 2);
+
+  return (
+    <article style={{ fontFamily: "var(--font-serif)" }}>
+      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "52px 24px 0" }}>
+        <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}>
+          <Link href="/ideas" style={{ color: "var(--ink3)", textDecoration: "none" }}>
+            Ideas
+          </Link>{" "}
+          / <span style={{ color: "var(--ink2)" }}>{POST_CATEGORY_LABELS[post.category]}</span>
+        </div>
+
+        <div style={{ marginBottom: 22 }}>
           <span
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 4,
-              fontSize: "0.75rem",
-              color: "var(--text-muted)",
+              fontFamily: MONO,
+              fontSize: "0.68rem",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--evento)",
+              border: "1px solid var(--evento-ln)",
+              background: "var(--evento-bg)",
+              padding: "3px 11px",
+              borderRadius: "var(--radius-pill)",
             }}
           >
-            <Clock3 size={12} aria-hidden />
-            {readingTimeMinutes(post.content)} min de lectura
+            {POST_CATEGORY_LABELS[post.category]}
           </span>
         </div>
+
         <h1
           style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
-            margin: 0,
-            letterSpacing: "-0.01em",
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(2rem, 5.5vw, 3.25rem)",
+            lineHeight: 1.02,
+            letterSpacing: "-0.03em",
+            margin: "0 0 22px",
+            color: "var(--ink)",
+            textWrap: "balance",
           }}
         >
           {post.title}
         </h1>
-        {post.summary && (
-          <p style={{ fontSize: "1rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.6 }}>
+
+        {post.summary ? (
+          <p
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "clamp(1.125rem, 3vw, 1.4375rem)",
+              lineHeight: 1.45,
+              color: "var(--ink2)",
+              margin: "0 0 28px",
+              textWrap: "pretty",
+            }}
+          >
             {post.summary}
           </p>
-        )}
-      </header>
+        ) : null}
 
-      {(post.impacts ?? []).length > 0 && <ImpactGrid impacts={post.impacts ?? []} />}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            flexWrap: "wrap",
+            padding: "16px 0",
+            borderTop: "1px solid var(--line)",
+            borderBottom: "1px solid var(--line)",
+            fontFamily: MONO,
+            fontSize: "0.75rem",
+            color: "var(--ink3)",
+          }}
+        >
+          <span style={{ color: "var(--ink2)" }}>Por la redacción de La Brecha</span>
+          <span>·</span>
+          <span>{formatPostDate(post.created_at)}</span>
+          <span>·</span>
+          <span>{readingTimeMinutes(post.content)} min de lectura</span>
+        </div>
+      </div>
+
+      {impacts.length > 0 && (
+        <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "28px 24px 0" }}>
+          <div
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.68rem",
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: "var(--ink3)",
+              marginBottom: 14,
+            }}
+          >
+            Impacto estimado
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
+            {impacts.map((impact) => (
+              <ImpactTile key={`${impact.kind}-${impact.value}`} impact={impact} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div
         className="post-markdown"
         style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border-1)",
-          borderRadius: "var(--radius-lg)",
-          boxShadow: "var(--shadow-card)",
-          padding: "var(--sp-6)",
-          fontSize: "0.9375rem",
-          lineHeight: 1.7,
-          color: "var(--text-body)",
+          maxWidth: NARROW,
+          margin: "0 auto",
+          padding: "40px 24px 20px",
+          fontFamily: "var(--font-serif)",
+          fontSize: "1.1875rem",
+          lineHeight: 1.65,
+          color: "var(--ink)",
         }}
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+      </div>
+
+      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "0 24px 60px" }}>
+        <div
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            borderRadius: 10,
+            padding: "20px 24px",
+            fontFamily: MONO,
+            fontSize: "0.75rem",
+            color: "var(--ink2)",
+            lineHeight: 1.7,
+          }}
+        >
+          <span style={{ color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.66rem" }}>
+            Atribución
+          </span>
+          <br />
+          Publicado por La Brecha el {formatPostDate(post.created_at)}. Todo dato citado en el texto
+          lleva su fuente.
+        </div>
+
+        {related.length > 0 && (
+          <div style={{ marginTop: 40, borderTop: "2px solid var(--ink)", paddingTop: 22 }}>
+            <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.25rem", margin: "0 0 18px" }}>
+              Seguir leyendo
+            </h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+              {related.map((item) => (
+                <RelatedItem key={item.id} post={item} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </article>
   );

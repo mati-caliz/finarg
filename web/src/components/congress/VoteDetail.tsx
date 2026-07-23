@@ -1,11 +1,13 @@
 "use client";
 
-import { Badge, Card, VoteBar } from "@/components/core";
+import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congress/VoteBars";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVote, useCongressVoteDetails } from "@/hooks/useLabrecha";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
 import { formatDateAR } from "@/lib/indicators";
 import Link from "next/link";
+
+const MONO = "var(--font-jb-mono)";
 
 interface VoteDetailProps {
   actaId: string;
@@ -16,97 +18,102 @@ export function VoteDetail({ actaId }: VoteDetailProps) {
   const { data: details, isLoading: loadingDetails } = useCongressVoteDetails(actaId);
 
   if (loadingVote) {
-    return <Skeleton className="h-64 w-full rounded-[10px]" />;
+    return (
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "44px 24px" }}>
+        <Skeleton className="h-64 w-full rounded-[10px]" />
+      </div>
+    );
   }
   if (!vote) {
-    return <p style={{ color: "var(--text-muted)" }}>No se encontró la votación solicitada.</p>;
+    return (
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "44px 24px" }}>
+        <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)" }}>
+          No se encontró la votación solicitada.
+        </p>
+      </div>
+    );
   }
 
   const result = normalizeResult(vote.result);
+  const chip = result.won
+    ? { label: "Aprobado", color: "var(--pos)", background: "var(--pos-bg)" }
+    : { label: "Rechazado", color: "var(--neg)", background: "var(--neg-bg)" };
+  const tally = {
+    afirmativos: vote.affirmative_votes ?? 0,
+    negativos: vote.negative_votes ?? 0,
+    abstenciones: vote.abstentions ?? 0,
+    ausentes: vote.absents ?? 0,
+  };
   const blocs = tallyByBloc(details ?? []);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-6)" }}>
-      <Link href="/congreso" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
-        ← Volver a Congreso
-      </Link>
+    <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 24px 72px" }}>
+      <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}>
+        <Link href="/congreso" style={{ color: "var(--ink3)", textDecoration: "none" }}>
+          Congreso
+        </Link>{" "}
+        / <span style={{ color: "var(--ink2)" }}>Votación</span>
+      </div>
 
-      <Card>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <div
+      <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 12, padding: "28px 30px", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+          <span
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: 12,
-              flexWrap: "wrap",
+              fontFamily: MONO,
+              fontSize: "0.68rem",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: chip.color,
+              background: chip.background,
+              border: `1px solid ${chip.color}`,
+              padding: "4px 11px",
+              borderRadius: "var(--radius-pill)",
             }}
           >
-            <div>
-              <h1
-                style={{
-                  font: "var(--fw-bold) var(--fs-h2)/var(--lh-heading) var(--font-sans)",
-                  margin: 0,
-                }}
-              >
-                {vote.title ?? "Votación"}
-              </h1>
-              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>
-                Diputados · {vote.date ? formatDateAR(vote.date) : "s/f"}
-                {vote.session_type ? ` · sesión ${vote.session_type.toLowerCase()}` : ""}
-                {vote.president_name ? ` · preside ${vote.president_name}` : ""}
-              </div>
-            </div>
-            <Badge tone={result.won ? "pos" : "neg"}>{result.label}</Badge>
-          </div>
-          <VoteBar
-            height={12}
-            afirmativos={vote.affirmative_votes ?? 0}
-            negativos={vote.negative_votes ?? 0}
-            abstenciones={vote.abstentions ?? 0}
-            ausentes={vote.absents ?? 0}
-          />
+            {chip.label}
+          </span>
+          <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+            Diputados · {vote.date ? formatDateAR(vote.date) : "s/f"}
+            {vote.session_type ? ` · sesión ${vote.session_type.toLowerCase()}` : ""}
+            {vote.president_name ? ` · preside ${vote.president_name}` : ""}
+          </span>
         </div>
-      </Card>
+        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.375rem)", lineHeight: 1.05, letterSpacing: "-0.025em", margin: "0 0 22px", color: "var(--ink)" }}>
+          {vote.title ?? "Votación"}
+        </h1>
+        <div style={{ marginBottom: 8 }}>
+          <TallyBar tally={tally} />
+        </div>
+        <TallyCounts tally={tally} />
+      </div>
 
-      <Card title="Voto por bloque" subtitle="Cómo votó cada bloque de la cámara">
+      <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 12, padding: "28px 30px" }}>
+        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 4 }}>
+          Voto por bloque
+        </div>
+        <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", color: "var(--ink2)", margin: "0 0 20px" }}>
+          Cómo votó cada bloque de la cámara.
+        </p>
         {loadingDetails ? (
           <Skeleton className="h-40 w-full rounded-[6px]" />
         ) : blocs.length === 0 ? (
-          <p style={{ color: "var(--text-muted)", fontSize: "0.875rem", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", color: "var(--ink2)", margin: 0 }}>
             No hay detalle de voto por diputado para esta votación.
           </p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {blocs.map((bloc) => (
-              <div key={bloc.bloc} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    fontSize: "0.8125rem",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, color: "var(--text-secondary)" }}>
-                    {bloc.bloc}
-                  </span>
-                  <span className="num" style={{ color: "var(--text-muted)" }}>
-                    {bloc.total}
-                  </span>
-                </div>
-                <VoteBar
-                  height={8}
-                  afirmativos={bloc.afirmativos}
-                  negativos={bloc.negativos}
-                  abstenciones={bloc.abstenciones}
-                  ausentes={bloc.ausentes}
-                />
-              </div>
-            ))}
-          </div>
+          <>
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {blocs.map((bloc) => (
+                <BlocRow key={bloc.bloc} tally={bloc} />
+              ))}
+            </div>
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+              <VoteLegend />
+            </div>
+          </>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

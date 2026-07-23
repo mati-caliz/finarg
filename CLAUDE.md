@@ -47,12 +47,19 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
   (`LABRECHA_API_INTERNAL_URL`, default `api-py:8000`) con caché ISR por ruta (GET) y reenvío de POST
   (calculadoras). El cliente axios está en `src/lib/labrechaApi.ts`; los hooks TanStack Query en
   `src/hooks/useLabrecha.ts`.
-- **Sistema de diseño:** el frontend implementa el **"La Brecha Design System"** de Claude Design
-  (dirección "Observatorio claro"). Los tokens viven en `src/app/globals.css` (paleta papel/tinta,
-  azul institucional, **brecha ámbar** para discrepancias, evento violeta; Archivo + IBM Plex Mono).
-  Los componentes core porteados 1:1 están en `src/components/core/` (IndicatorTile, Sparkline,
-  VariationBadge, SourceChip, AnnotatedSeriesChart, VoteBar, DataTable, etc.). Es la fuente de verdad
-  del look; al cambiar algo allá, se re-porta acá (no hay sync automático).
+- **Sistema de diseño:** dirección **"Editorial"** (periodística de datos) de Claude Design. Los
+  tokens `oklch` (light + dark) viven en `src/app/globals.css`, bloque "Design system v2":
+  superficies `--paper`/`--surface`/`--raise`, tinta `--ink`/`--ink2`/`--ink3`, líneas
+  `--line`/`--line2`, **`--brecha` ámbar** para discrepancias entre fuentes, **`--evento` violeta**
+  para eventos políticos, `--pos`/`--neg`, `--chart`. Tres tipografías: **Bricolage Grotesque**
+  (`--font-display`, titulares), **Newsreader** (`--font-serif`, prosa), **JetBrains Mono**
+  (`--font-jb-mono`, números/labels/eyebrows). Regla: ningún número va en serif/sans, siempre mono
+  tabular. El plan y estado de la migración están en `ROADMAP-REDISENO.md`. Quedan tokens viejos
+  (`--paper-N`, `--azul-N`, etc.) que aún consumen algunos componentes core y secciones secundarias
+  transicionales; se borran cuando ninguna pantalla los use.
+- Layout: **top-nav sticky sin sidebar** (`SiteHeader`/`SiteFooter`); ancho máximo 1200px centrado;
+  headers de sección con eyebrow mono + regla 2px. Los componentes core (`src/components/core/`:
+  AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.
 - Rutas: `/` (Estado del país), `/indicador/[code]` (serie anotada + comparador de fuentes),
   `/congreso` (+ `/congreso/votacion/[actaId]`), calculadoras.
 - Estilos: los componentes core usan estilos inline con variables del design system; el resto,

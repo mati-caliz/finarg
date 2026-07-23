@@ -1,71 +1,85 @@
 import { BlocAttendance } from "@/components/congress/BlocAttendance";
 import { DeputiesComposition } from "@/components/congress/DeputiesComposition";
-import { LatestVotes } from "@/components/congress/LatestVotes";
 import { RecentLaws } from "@/components/congress/RecentLaws";
 import { SenateComposition } from "@/components/congress/SenateComposition";
+import { VotesBoard } from "@/components/congress/VotesBoard";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Congreso - La Brecha",
   description:
-    "Composición del Senado por bloque y últimas votaciones nominales de la Cámara de Diputados de Argentina.",
+    "Votaciones nominales de la Cámara de Diputados y composición del Congreso de Argentina, con su fuente.",
 };
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h2
+      style={{
+        fontFamily: "var(--font-display)",
+        fontWeight: 700,
+        fontSize: "clamp(1.375rem, 3vw, 1.75rem)",
+        letterSpacing: "-0.02em",
+        margin: 0,
+      }}
+    >
+      {children}
+    </h2>
+  );
+}
 
 export default function CongresoPage() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--container-max)",
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--sp-8)",
-      }}
-    >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <h1
+    <div style={{ maxWidth: 1120, margin: "0 auto", padding: "48px 24px 72px" }}>
+      <header style={{ borderBottom: "2px solid var(--ink)", paddingBottom: 22, marginBottom: 32 }}>
+        <div
           style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            color: "var(--text-body)",
-            margin: 0,
+            fontFamily: "var(--font-jb-mono)",
+            fontSize: "0.72rem",
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "var(--ink3)",
+            marginBottom: 10,
           }}
         >
-          Congreso
+          /congreso · Cámara de Diputados
+        </div>
+        <h1
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(2rem, 5vw, 2.875rem)",
+            letterSpacing: "-0.025em",
+            margin: "0 0 8px",
+            color: "var(--ink)",
+          }}
+        >
+          Votaciones nominales
         </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Composición del Senado y votaciones nominales de Diputados.
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(1rem, 2vw, 1.125rem)",
+            color: "var(--ink2)",
+            margin: 0,
+            maxWidth: 560,
+          }}
+        >
+          Cómo votó cada bloque en las últimas sesiones, voto por voto.
         </p>
       </header>
 
-      <SenateComposition />
+      <VotesBoard />
 
-      <DeputiesComposition />
-
-      <section style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-        <h2
-          style={{
-            font: "var(--fw-semibold) var(--fs-h3)/var(--lh-heading) var(--font-sans)",
-            margin: 0,
-          }}
-        >
-          Últimas leyes sancionadas
-        </h2>
-        <RecentLaws />
-      </section>
-
-      <section style={{ display: "flex", flexDirection: "column", gap: "var(--sp-4)" }}>
-        <h2
-          style={{
-            font: "var(--fw-semibold) var(--fs-h3)/var(--lh-heading) var(--font-sans)",
-            margin: 0,
-          }}
-        >
-          Últimas votaciones de Diputados
-        </h2>
-        <LatestVotes />
-      </section>
-
-      <BlocAttendance />
+      <div style={{ marginTop: 56, borderTop: "2px solid var(--ink)", paddingTop: 32, display: "flex", flexDirection: "column", gap: 40 }}>
+        <SenateComposition />
+        <DeputiesComposition />
+        <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <SectionHeading>Últimas leyes sancionadas</SectionHeading>
+          <RecentLaws />
+        </section>
+        <BlocAttendance />
+      </div>
     </div>
   );
 }

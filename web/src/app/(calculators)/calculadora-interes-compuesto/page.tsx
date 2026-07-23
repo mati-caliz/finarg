@@ -1,5 +1,6 @@
 "use client";
 
+import { CalculatorHeader } from "@/components/calculators/CalculatorHeader";
 import { Button, Card, DataTable } from "@/components/core";
 import { formatMoneyAR } from "@/lib/indicators";
 import { calculatorsApi } from "@/lib/labrechaApi";
@@ -63,26 +64,18 @@ export default function CompoundInterestCalculatorPage() {
   return (
     <div
       style={{
-        maxWidth: "var(--container-max)",
+        maxWidth: 1000,
         margin: "0 auto",
+        padding: "48px 24px 72px",
         display: "flex",
         flexDirection: "column",
         gap: "var(--sp-6)",
       }}
     >
-      <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <h1
-          style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
-            margin: 0,
-          }}
-        >
-          Calculadora de interés compuesto
-        </h1>
-        <p style={{ fontSize: "0.9375rem", color: "var(--text-muted)", margin: 0 }}>
-          Proyectá cómo crece un capital con capitalización periódica y aportes.
-        </p>
-      </header>
+      <CalculatorHeader
+        title="Calculadora de interés compuesto"
+        subtitle="Proyectá cómo crece un capital con capitalización periódica y aportes."
+      />
 
       <div
         style={{
