@@ -450,6 +450,28 @@
   align-items: start;
 }
 
+.lb-media-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.lb-media-side {
+  flex: 0 0 208px;
+  max-width: 208px;
+}
+
+.lb-media-body {
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 620px) {
+  .lb-media-side {
+    display: none;
+  }
+}
+
 .lb-brecha-row {
   display: grid;
   grid-template-columns: 34px 1fr 300px 130px;
