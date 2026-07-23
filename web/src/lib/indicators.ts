@@ -9,6 +9,7 @@ export interface IndicatorDisplay {
   href: string;
   goodWhen: GoodWhen;
   preferredSource?: string;
+  historySource?: string;
   format: (value: number) => string;
   variation: VariationMode;
   variationSuffix?: string;
@@ -91,6 +92,7 @@ export const FEATURED_INDICATORS: IndicatorDisplay[] = [
     href: "/indicador/dolar_oficial",
     goodWhen: "down",
     preferredSource: "dolarapi",
+    historySource: "argentinadatos",
     format: (value) => formatMoneyAR(value),
     variation: "pct",
     sparkPoints: 30,
@@ -102,6 +104,7 @@ export const FEATURED_INDICATORS: IndicatorDisplay[] = [
     href: "/indicador/dolar_blue",
     goodWhen: "down",
     preferredSource: "dolarapi",
+    historySource: "argentinadatos",
     format: (value) => formatMoneyAR(value),
     variation: "pct",
     sparkPoints: 30,
