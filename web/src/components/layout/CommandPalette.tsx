@@ -28,17 +28,17 @@ interface Command {
 
 const STATIC_COMMANDS: Command[] = [
   { id: "route:inicio", title: "Inicio", subtitle: "Estado del país", href: "/", keywords: "inicio home estado del pais", icon: <LineChart className="h-4 w-4" /> },
-  { id: "route:indicadores", title: "Indicadores", subtitle: "Catálogo completo", href: "/indicators", keywords: "indicadores catalogo series", icon: <LineChart className="h-4 w-4" /> },
-  { id: "route:brechas", title: "Brechas entre mediciones", subtitle: "Cambiaria, financiera, inflación esperada, reservas", href: "/gaps", keywords: "brecha cambiaria financiera dolar blue mep reservas inflacion esperada rem comparador", icon: <Scale className="h-4 w-4" /> },
-  { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congress", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
-  { id: "route:noticias", title: "Noticias económicas", subtitle: "Últimos titulares de economía", href: "/news", keywords: "noticias titulares prensa economia el economista", icon: <Newspaper className="h-4 w-4" /> },
+  { id: "route:indicadores", title: "Indicadores", subtitle: "Catálogo completo", href: "/indicadores", keywords: "indicadores catalogo series", icon: <LineChart className="h-4 w-4" /> },
+  { id: "route:brechas", title: "Brechas entre mediciones", subtitle: "Cambiaria, financiera, inflación esperada, reservas", href: "/brechas", keywords: "brecha cambiaria financiera dolar blue mep reservas inflacion esperada rem comparador", icon: <Scale className="h-4 w-4" /> },
+  { id: "route:congreso", title: "Congreso", subtitle: "Votaciones, leyes y composición", href: "/congreso", keywords: "congreso diputados senado votaciones leyes", icon: <Landmark className="h-4 w-4" /> },
+  { id: "route:noticias", title: "Noticias económicas", subtitle: "Últimos titulares de economía", href: "/noticias", keywords: "noticias titulares prensa economia el economista", icon: <Newspaper className="h-4 w-4" /> },
   { id: "route:ideas", title: "Ideas", subtitle: "Ideas, leyes y análisis para Argentina", href: "/ideas", keywords: "ideas propuestas leyes analisis blog publicaciones", icon: <Lightbulb className="h-4 w-4" /> },
-  { id: "route:feriados", title: "Feriados de Argentina", subtitle: "Calendario de feriados nacionales", href: "/holidays", keywords: "feriados calendario dias no laborables asueto", icon: <CalendarDays className="h-4 w-4" /> },
-  { id: "route:estado", title: "Estado del observatorio", subtitle: "Salud del scraper", href: "/status", keywords: "estado salud scraper conectores corridas errores pipeline status", icon: <Activity className="h-4 w-4" /> },
-  { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculator-net-salary", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
-  { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculator-fiscal-impact", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
-  { id: "route:interes", title: "Calculadora de interés compuesto", href: "/calculator-compound-interest", keywords: "calculadora interes compuesto inversion", icon: <Calculator className="h-4 w-4" /> },
-  { id: "route:ajuste", title: "Calculadora de ajuste por inflación", href: "/calculator-inflation-adjustment", keywords: "calculadora ajuste inflacion ipc actualizar", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:feriados", title: "Feriados de Argentina", subtitle: "Calendario de feriados nacionales", href: "/feriados", keywords: "feriados calendario dias no laborables asueto", icon: <CalendarDays className="h-4 w-4" /> },
+  { id: "route:estado", title: "Estado del observatorio", subtitle: "Salud del scraper", href: "/estado", keywords: "estado salud scraper conectores corridas errores pipeline status", icon: <Activity className="h-4 w-4" /> },
+  { id: "route:sueldo", title: "Calculadora de sueldo neto", href: "/calculadora-sueldo-neto", keywords: "calculadora sueldo neto ganancias impuesto", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:impacto", title: "Calculadora de impacto fiscal", href: "/calculadora-impacto-fiscal", keywords: "calculadora impacto fiscal tax freedom day impuestos", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:interes", title: "Calculadora de interés compuesto", href: "/calculadora-interes-compuesto", keywords: "calculadora interes compuesto inversion", icon: <Calculator className="h-4 w-4" /> },
+  { id: "route:ajuste", title: "Calculadora de ajuste por inflación", href: "/calculadora-ajuste-inflacion", keywords: "calculadora ajuste inflacion ipc actualizar", icon: <Calculator className="h-4 w-4" /> },
 ];
 
 const DIACRITICS = /\p{Diacritic}/gu;
@@ -82,7 +82,7 @@ export function CommandPalette() {
       id: `indicator:${indicator.indicator_code}`,
       title: indicatorLabel(indicator.indicator_code),
       subtitle: indicator.sources.map(sourceLabel).join(" · "),
-      href: `/indicator/${indicator.indicator_code}`,
+      href: `/indicador/${indicator.indicator_code}`,
       keywords: `${indicator.indicator_code} ${indicatorLabel(indicator.indicator_code)}`,
       icon: <LineChart className="h-4 w-4" />,
     }));

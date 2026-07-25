@@ -9,22 +9,22 @@ export const metadata: Metadata = {
 
 const CALCULATORS = [
   {
-    href: "/calculator-net-salary",
+    href: "/calculadora-sueldo-neto",
     title: "Sueldo neto",
     description: "Estimá tu sueldo de bolsillo con las deducciones de ley y Ganancias.",
   },
   {
-    href: "/calculator-inflation-adjustment",
+    href: "/calculadora-ajuste-inflacion",
     title: "Ajuste por inflación",
     description: "Cuánto vale hoy un monto de otra fecha, según el IPC del INDEC.",
   },
   {
-    href: "/calculator-compound-interest",
+    href: "/calculadora-interes-compuesto",
     title: "Interés compuesto",
     description: "Proyectá cómo crece un capital con capitalización periódica y aportes.",
   },
   {
-    href: "/calculator-fiscal-impact",
+    href: "/calculadora-impacto-fiscal",
     title: "Impacto fiscal",
     description: "Cuánto de tu ingreso se va en impuestos y hasta qué día trabajás para el Estado.",
   },
@@ -44,7 +44,7 @@ export default function CalculatorsPage() {
             marginBottom: 10,
           }}
         >
-          /calculators
+          /calculadoras
         </div>
         <h1
           style={{

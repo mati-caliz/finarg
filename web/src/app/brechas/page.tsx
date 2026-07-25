@@ -24,7 +24,7 @@ export default function GapsPage() {
               marginBottom: 16,
             }}
           >
-            ◆ /gaps
+            ◆ /brechas
           </div>
           <h1
             style={{

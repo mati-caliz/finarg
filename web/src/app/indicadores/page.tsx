@@ -21,7 +21,7 @@ export default function IndicatorsPage() {
             marginBottom: 10,
           }}
         >
-          /indicators
+          /indicadores
         </div>
         <h1
           style={{

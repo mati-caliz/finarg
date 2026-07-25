@@ -20,7 +20,7 @@ export default function HolidaysPage() {
             marginBottom: 10,
           }}
         >
-          /holidays
+          /feriados
         </div>
         <h1
           style={{

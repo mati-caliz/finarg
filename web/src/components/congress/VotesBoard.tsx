@@ -98,7 +98,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
 function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties }) {
   const chip = resultChip(vote);
   return (
-    <Link href={`/congress/vote/${vote.vote_record_id}`} style={{ display: "block", background: "var(--raise)", border: "1px solid var(--line)", padding: "16px 18px", textDecoration: "none", ...style }}>
+    <Link href={`/congreso/votacion/${vote.vote_record_id}`} style={{ display: "block", background: "var(--raise)", border: "1px solid var(--line)", padding: "16px 18px", textDecoration: "none", ...style }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
         <span style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", color: chip.color, background: chip.background, padding: "2px 8px", borderRadius: "var(--radius-pill)" }}>
           {chip.label}

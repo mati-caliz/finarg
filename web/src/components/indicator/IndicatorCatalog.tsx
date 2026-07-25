@@ -94,7 +94,7 @@ function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
   const stale = freshnessForCode(indicator.indicator_code, indicator.last_date).stale;
   return (
     <a
-      href={`/indicator/${indicator.indicator_code}`}
+      href={`/indicador/${indicator.indicator_code}`}
       style={{ ...CARD_STYLE, borderColor: isComparator ? "var(--gap-ln)" : "var(--line)" }}
     >
       <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.15, letterSpacing: "-0.015em" }}>

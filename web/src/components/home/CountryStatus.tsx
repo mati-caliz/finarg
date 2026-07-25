@@ -270,7 +270,7 @@ export function CountryStatus() {
       <SectionHead
         index="01"
         title="El estado del país"
-        action={<ActionLink href="/indicators">Ver todos los indicadores →</ActionLink>}
+        action={<ActionLink href="/indicadores">Ver todos los indicadores →</ActionLink>}
       />
       <div className="lb-status-grid">
         <HeroIndicator />

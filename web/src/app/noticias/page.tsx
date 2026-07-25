@@ -33,7 +33,7 @@ export default function NewsPage() {
               marginBottom: 10,
             }}
           >
-            /news
+            /noticias
           </div>
           <h1
             style={{

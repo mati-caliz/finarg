@@ -14,12 +14,12 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "El país", href: "/" },
-  { label: "Indicadores", href: "/indicators" },
-  { label: "Brechas", href: "/gaps" },
+  { label: "Indicadores", href: "/indicadores" },
+  { label: "Brechas", href: "/brechas" },
   { label: "Ideas", href: "/ideas" },
-  { label: "Congreso", href: "/congress" },
-  { label: "Noticias", href: "/news" },
-  { label: "Calculadoras", href: "/calculators" },
+  { label: "Congreso", href: "/congreso" },
+  { label: "Noticias", href: "/noticias" },
+  { label: "Calculadoras", href: "/calculadoras" },
 ];
 
 const CAFECITO_URL = "https://cafecito.app/finlatam";
@@ -28,7 +28,7 @@ function isActive(pathname: string, href: string): boolean {
   if (href === "/") {
     return pathname === "/";
   }
-  if (href === "/calculators") {
+  if (href === "/calculadoras") {
     return pathname.startsWith("/calculadora");
   }
   return pathname === href || pathname.startsWith(`${href}/`);

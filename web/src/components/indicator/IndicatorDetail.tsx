@@ -278,7 +278,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   return (
     <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "28px 24px 72px" }}>
       <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 20 }}>
-        <Link href="/indicators" style={{ color: "var(--ink3)", textDecoration: "none" }}>
+        <Link href="/indicadores" style={{ color: "var(--ink3)", textDecoration: "none" }}>
           Indicadores
         </Link>{" "}
         / {familyLabel} / <span style={{ color: "var(--ink2)" }}>{indicator.label}</span>
@@ -307,7 +307,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
               marginBottom: 12,
             }}
           >
-            {familyLabel} · /indicator/{code}
+            {familyLabel} · /indicador/{code}
           </div>
           <h1
             style={{
@@ -516,7 +516,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
           {relatedGaps.map((gap) => (
             <Link
               key={gap.id}
-              href={`/gaps#${gap.id}`}
+              href={`/brechas#${gap.id}`}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
