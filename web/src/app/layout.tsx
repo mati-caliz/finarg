@@ -1,40 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import {
-  Archivo,
-  Bricolage_Grotesque,
-  IBM_Plex_Mono,
-  JetBrains_Mono,
-  Newsreader,
-} from "next/font/google";
+import { Bricolage_Grotesque, JetBrains_Mono, Newsreader } from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 import { CafecitoModal } from "@/components/CafecitoModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { JsonLd } from "@/components/JsonLd";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { EarlyHints } from "./early-hints";
+import { layoutQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
+import { SITE_URL } from "@/lib/site";
+import { websiteStructuredData } from "@/lib/structuredData";
 import { Providers } from "./providers";
-
-const archivo = Archivo({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-archivo",
-  adjustFontFallback: true,
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-mono",
-  adjustFontFallback: true,
-});
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -62,6 +42,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "La Brecha - Indicadores económicos de Argentina",
   description:
     "Inflación, reservas del BCRA, riesgo país, cotizaciones y calculadoras financieras de Argentina",
@@ -103,31 +84,22 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const gaMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const adsenseId = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_ID;
 
   return (
     <html
       lang="es"
-      className={`${archivo.variable} ${plexMono.variable} ${bricolageGrotesque.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
+      className={`${bricolageGrotesque.variable} ${newsreader.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>
-        <EarlyHints />
         <link rel="icon" href="/icon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" sizes="180x180" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        {adsenseId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
+        <JsonLd data={websiteStructuredData()} />
       </head>
-      <body className={archivo.className}>
+      <body className={newsreader.className}>
         {gaMeasurementId && (
           <>
             <Script
@@ -147,21 +119,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
         <Providers>
-          <div
-            className="min-h-screen"
-            style={{
-              background: "var(--paper)",
-              color: "var(--ink)",
-              fontFamily: "var(--font-serif)",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <SiteHeader />
-            <main style={{ flex: 1 }}>{children}</main>
-            <SiteFooter />
-          </div>
-          <CommandPalette />
+          <PrefetchedQueries queries={layoutQueries()}>
+            <div
+              className="min-h-screen"
+              style={{
+                background: "var(--paper)",
+                color: "var(--ink)",
+                fontFamily: "var(--font-serif)",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <SiteHeader />
+              <main style={{ flex: 1 }}>{children}</main>
+              <SiteFooter />
+            </div>
+            <CommandPalette />
+          </PrefetchedQueries>
           <CafecitoModal />
         </Providers>
         <ServiceWorkerRegistration />

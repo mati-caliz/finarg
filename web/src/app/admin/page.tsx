@@ -20,7 +20,7 @@ export default function AdminPage() {
       <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <h1
           style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
+            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-display)",
             color: "var(--ink)",
             margin: 0,
             letterSpacing: "-0.01em",

@@ -169,7 +169,7 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
                 fontSize: 5.5,
                 fontWeight: 600,
                 fill: "var(--ink3)",
-                fontFamily: "var(--font-sans)",
+                fontFamily: "var(--font-display)",
               }}
             >
               {`Mayoría: ${majority} bancas`}

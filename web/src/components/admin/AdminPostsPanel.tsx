@@ -58,7 +58,7 @@ const fieldStyle = {
   background: "var(--raise)",
   color: "var(--ink)",
   fontSize: "0.875rem",
-  fontFamily: "var(--font-sans)",
+  fontFamily: "var(--font-display)",
 } as const;
 
 const labelStyle = {
@@ -122,7 +122,7 @@ function LoginForm({ onAuthenticated }: LoginFormProps) {
             color: "#fff",
             fontSize: "0.875rem",
             fontWeight: 600,
-            fontFamily: "var(--font-sans)",
+            fontFamily: "var(--font-display)",
             cursor: submitting ? "wait" : "pointer",
             opacity: submitting || password.length === 0 ? 0.6 : 1,
           }}
@@ -166,7 +166,7 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
       >
         <h2
           style={{
-            font: "var(--fw-semibold) 1.125rem/var(--lh-heading) var(--font-sans)",
+            font: "var(--fw-semibold) 1.125rem/var(--lh-heading) var(--font-display)",
             margin: 0,
           }}
         >
@@ -395,7 +395,7 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
               color: "#fff",
               fontSize: "0.875rem",
               fontWeight: 600,
-              fontFamily: "var(--font-sans)",
+              fontFamily: "var(--font-display)",
               cursor: saving ? "wait" : "pointer",
               opacity: !canSave || saving ? 0.6 : 1,
             }}

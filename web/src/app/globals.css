@@ -200,9 +200,6 @@
    Tokens genéricos que consumen tanto los componentes v2 como los core shadcn.
    La paleta de superficie/tinta/semántica vive en el bloque "Design system v2". */
 :root {
-  --font-sans: var(--font-archivo), "Helvetica Neue", Arial, sans-serif;
-  --font-mono: var(--font-plex-mono), "SFMono-Regular", Consolas, monospace;
-
   --serie-1: oklch(0.45 0.03 250);
   --serie-2: oklch(0.6 0.19 42);
   --serie-3: oklch(0.5 0.13 150);
@@ -245,7 +242,7 @@
    Rediseño de Claude Design (proyecto "Design system home página 1c"). Convive
    con los tokens de arriba durante la migración; ver ROADMAP-REDISENO.md. */
 :root {
-  --font-display: var(--font-bricolage), "Archivo", sans-serif;
+  --font-display: var(--font-bricolage), "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-newsreader), Georgia, serif;
   --font-jb-mono: var(--font-jetbrains), "SFMono-Regular", monospace;
 
@@ -295,7 +292,7 @@
 }
 
 .num {
-  font-family: var(--font-mono);
+  font-family: var(--font-jb-mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -354,7 +351,7 @@
 }
 
 .post-markdown code {
-  font-family: var(--font-mono);
+  font-family: var(--font-jb-mono);
   font-size: 0.85em;
   background: var(--surface);
   padding: 0.15em 0.4em;
