@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
+from labrecha_db import ScrapeRun
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import ScrapeRun
 from labrecha_api.schemas import ScrapeRunOut
 
 router = APIRouter(tags=["status"])

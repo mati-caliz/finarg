@@ -6,10 +6,10 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import httpx
+from labrecha_db import SanctionedLaw
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import SanctionedLaw
 
 CKAN_PACKAGE_URL = "https://datos.hcdn.gob.ar/api/3/action/package_show"
 SANCTIONED_DATASET = "leyes-sancionadas"

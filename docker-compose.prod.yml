@@ -35,8 +35,8 @@ services:
 
   api-py:
     build:
-      context: ./api-py
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: api-py/Dockerfile
     image: labrecha-api
     container_name: labrecha-api-prod
     depends_on:
@@ -86,14 +86,12 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
         NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID}
     container_name: web-prod
     depends_on:
       api-py:
         condition: service_healthy
     environment:
-      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       NEXT_PUBLIC_GA_MEASUREMENT_ID: ${NEXT_PUBLIC_GA_MEASUREMENT_ID}
       LABRECHA_API_INTERNAL_URL: http://api-py:8000
       LABRECHA_ADMIN_TOKEN: ${ADMIN_TOKEN}
@@ -123,8 +121,8 @@ services:
 
   scraper:
     build:
-      context: ./scraper
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: scraper/Dockerfile
     image: labrecha-scraper
     profiles:
       - scraper
@@ -135,11 +133,14 @@ services:
       DATABASE_URL: postgresql+psycopg2://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
       HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
+      LOG_DIR: ${SCRAPER_LOG_DIR:-/var/log/labrecha}
     networks:
       - db-network
       - app-network
     restart: "no"
     volumes:
+      # Log rotado de corridas y fallos: sobrevive al contenedor efimero.
+      - scraper_logs:/var/log/labrecha
       # Boletin Oficial: traductor IA via CLI claude headless (suscripcion del
       # host, sin API key). Binario nativo + credenciales OAuth del usuario deploy.
       - /home/deploy/.local/bin/claude:/usr/local/bin/claude:ro
@@ -202,6 +203,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  scraper_logs:
     driver: local
 
 networks:

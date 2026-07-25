@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
+from labrecha_db import NewsArticle
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import NewsArticle
 from labrecha_api.schemas import NewsArticleOut
 
 router = APIRouter(prefix="/news", tags=["news"])

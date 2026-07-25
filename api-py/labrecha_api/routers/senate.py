@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
+from labrecha_db import Senator
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import Senator
 from labrecha_api.schemas import BlocSummary, SenatorOut
 
 router = APIRouter(prefix="/senate", tags=["senate"])

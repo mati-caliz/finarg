@@ -4,10 +4,10 @@ from datetime import UTC, date
 from datetime import datetime as datetime_type
 
 import httpx
+from labrecha_db import Holiday
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import Holiday
 
 HOLIDAYS_URL = "https://date.nager.at/api/v3/PublicHolidays/{year}/AR"
 BACKFILL_START_YEAR = 2010

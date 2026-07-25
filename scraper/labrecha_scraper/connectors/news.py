@@ -8,10 +8,10 @@ from email.utils import parsedate_to_datetime
 
 import httpx
 from defusedxml import ElementTree
+from labrecha_db import NewsArticle
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import NewsArticle
 
 COUNTRY = "ARGENTINA"
 MAX_ITEMS_PER_FEED = 40

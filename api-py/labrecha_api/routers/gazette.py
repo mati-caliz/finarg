@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
+from labrecha_db import GazetteSummary
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import GazetteSummary
 from labrecha_api.schemas import GazetteSummaryOut
 
 router = APIRouter(prefix="/gazette", tags=["gazette"])

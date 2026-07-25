@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+from labrecha_db import IndicatorHistory
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, IndicatorPoint, upsert_rows
 from labrecha_scraper.connectors.dollar import dollar_code
-from labrecha_scraper.models import IndicatorHistory
 
 HISTORICAL_DOLLARS_URL = "https://api.argentinadatos.com/v1/cotizaciones/dolares"
 

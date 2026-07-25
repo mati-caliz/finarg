@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import date
 
+from labrecha_db import Senator
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import Senator
 
 SENATORS_URL = "https://www.senado.gob.ar/micrositios/DatosAbiertos/ExportarListadoSenadores/json"
 

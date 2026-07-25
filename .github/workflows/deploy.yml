@@ -55,6 +55,10 @@ jobs:
               echo "⏭️ Skipping frontend build (no changes)"
             fi
 
+            echo "🗄️ Applying database migrations..."
+            docker compose -f docker-compose.prod.yml build scraper
+            docker compose -f docker-compose.prod.yml --profile scraper run --rm -T scraper db upgrade
+
             echo "🚀 Starting services..."
             docker compose -f docker-compose.prod.yml up -d
 

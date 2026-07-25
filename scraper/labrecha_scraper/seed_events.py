@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from datetime import date
 
+from labrecha_db import PoliticalEvent
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
-
-from labrecha_scraper.models import PoliticalEvent
 
 EVENTS: list[dict] = [
     {

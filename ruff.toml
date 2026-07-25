@@ -58,6 +58,7 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
+"shared/labrecha_db/migrations/versions/*.py" = ["INP001"]
 "scraper/labrecha_scraper/cli.py" = ["T201"]
 "scraper/labrecha_scraper/base.py" = ["BLE001"]
 "scraper/labrecha_scraper/llm.py" = ["S603"]

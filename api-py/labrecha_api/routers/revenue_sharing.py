@@ -3,11 +3,11 @@ from __future__ import annotations
 from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import APIRouter, Depends
+from labrecha_db import RevenueSharingShare
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import RevenueSharingShare
 from labrecha_api.schemas import RevenueSharingShareOut
 
 router = APIRouter(prefix="/revenue-sharing", tags=["revenue-sharing"])

@@ -4,11 +4,11 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from labrecha_db import CongressVote, CongressVoteDetail, SanctionedLaw
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import CongressVote, CongressVoteDetail, SanctionedLaw
 from labrecha_api.schemas import (
     BlocAttendanceOut,
     CongressVoteDetailOut,

@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import httpx
+from labrecha_db import GazetteSummary, TaxChange
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -14,7 +15,6 @@ from labrecha_scraper.base import Connector, upsert_rows
 from labrecha_scraper.clock import today_in_argentina
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.llm import run_claude_json_array
-from labrecha_scraper.models import GazetteSummary, TaxChange
 
 TAX_CHANGE_TYPES = {"alta", "baja", "modificacion"}
 TAX_JURISDICTIONS = {"nacional", "provincial", "municipal"}

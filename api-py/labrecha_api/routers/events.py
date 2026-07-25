@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query
+from labrecha_db import PoliticalEvent
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import PoliticalEvent
 from labrecha_api.schemas import PoliticalEventOut
 
 router = APIRouter(prefix="/political-events", tags=["political-events"])

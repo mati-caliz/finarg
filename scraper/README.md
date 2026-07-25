@@ -69,12 +69,13 @@ tracking de `scrape_runs` lo maneja `run_job`. Para un indicador que encaje en `
 ## Uso
 
 ```bash
-python -m labrecha_scraper init-db      # crear tablas
+python -m labrecha_scraper db upgrade   # aplicar migraciones (crea/actualiza el esquema)
 python -m labrecha_scraper list         # jobs disponibles
 python -m labrecha_scraper run dollar   # un job
 python -m labrecha_scraper run all      # todos
 python -m labrecha_scraper seed-events  # sembrar hitos políticos curados
 python -m labrecha_scraper status       # última corrida de cada job
+python -m labrecha_scraper db check     # comparar el esquema real con los modelos
 ```
 
 Configuración por entorno (ver `.env.example`): `DATABASE_URL`, `HTTP_TIMEOUT_SECONDS`,
