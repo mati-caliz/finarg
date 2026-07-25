@@ -29,6 +29,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           command_timeout: 20m
           script: |
+            set -euo pipefail
+
             cd /home/deploy/labrecha
 
             echo "📥 Pulling latest changes..."
@@ -57,7 +59,11 @@ jobs:
 
             echo "🗄️ Applying database migrations..."
             docker compose -f docker-compose.prod.yml build scraper
-            docker compose -f docker-compose.prod.yml --profile scraper run --rm -T scraper db upgrade
+            if ! docker compose -f docker-compose.prod.yml --profile scraper run --rm -T scraper db upgrade; then
+              echo "❌ Migrations failed: aborting before restarting services."
+              echo "   The running containers keep the previous code, so production stays as it was."
+              exit 1
+            fi
 
             echo "🚀 Starting services..."
             docker compose -f docker-compose.prod.yml up -d
@@ -69,8 +75,8 @@ jobs:
             docker compose -f docker-compose.prod.yml ps
 
             echo "🧹 Cleaning up..."
-            docker image prune -f --filter "dangling=true"
-            docker builder prune -f --filter "unused-for=24h"
+            docker image prune -f --filter "dangling=true" || true
+            docker builder prune -f --filter "unused-for=24h" || true
 
             echo "✅ Deployment complete!"
             echo "🌐 Site: http://178.156.210.71"
