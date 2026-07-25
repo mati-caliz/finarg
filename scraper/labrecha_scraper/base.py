@@ -44,7 +44,7 @@ class Connector(ABC):
         raise NotImplementedError
 
     def persist(self, session: Session, data: object) -> int:
-        return _upsert(session, data)
+        return upsert_indicator_points(session, data)
 
 
 UPSERT_BATCH_SIZE = 5000
@@ -78,7 +78,7 @@ def upsert_rows(
     return total
 
 
-def _upsert(session: Session, points: list[IndicatorPoint]) -> int:
+def upsert_indicator_points(session: Session, points: list[IndicatorPoint]) -> int:
     if not points:
         return 0
     rows = [

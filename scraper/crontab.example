@@ -21,10 +21,15 @@ LOGS=/var/log/labrecha
 45 7 * * *    $SCRAPE reserves_bcra      >> $LOGS/reserves_bcra.log 2>&1
 50 7 * * *    $SCRAPE icl_bcra           >> $LOGS/icl_bcra.log 2>&1
 55 7 * * *    $SCRAPE bcra_rates         >> $LOGS/bcra_rates.log 2>&1
+58 7 * * *    $SCRAPE monetary_base_bcra >> $LOGS/monetary_base_bcra.log 2>&1
 0 8 * * *     $SCRAPE crypto             >> $LOGS/crypto.log 2>&1
 5 8 * * *     $SCRAPE news               >> $LOGS/news.log 2>&1
 # Boletín Oficial: se publica de lunes a viernes por la mañana.
 30 9 * * 1-5  $SCRAPE official_gazette   >> $LOGS/official_gazette.log 2>&1
+
+# Series derivadas (salario y jubilacion a precios constantes, dolar de
+# convertibilidad): se recalculan de la base, despues de los jobs que las alimentan.
+30 8 * * *    $SCRAPE derived            >> $LOGS/derived.log 2>&1
 
 # ── Semanales (lunes) ─────────────────────────────────────────────────────────
 0 6 * * 1     $SCRAPE congress           >> $LOGS/congress.log 2>&1

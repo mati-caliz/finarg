@@ -120,6 +120,20 @@ export default function MethodologyPage() {
           esa medición, no una corrección nuestra. Mostrar la discrepancia entre mediciones, en vez
           de elegir una, es justamente el punto del sitio.
         </Rule>
+        <Rule title="Hay series que calculamos nosotros">
+          Algunas series no las publica nadie: las derivamos de otras dos que sí son oficiales y las
+          marcamos con la fuente <b>La Brecha (calculado)</b>. El salario mínimo y la jubilación
+          mínima a precios constantes se deflactan por el IPC nivel general, tomando como base el
+          último mes disponible; el dólar de convertibilidad es la base monetaria dividida por las
+          reservas, ambas del BCRA y del mismo día. Cada dato guarda en su metadata de qué series
+          salió y con qué método.
+        </Rule>
+        <Rule title="Las reservas netas no están porque nadie las publica">
+          El BCRA publica reservas brutas. Las netas —descontando el swap con China, los encajes en
+          dólares y los repos— son una estimación de analistas, no una serie oficial, y cada
+          consultora usa un criterio distinto. Preferimos no inventar un número antes que publicar
+          una estimación propia disfrazada de dato.
+        </Rule>
         <Rule title="El pipeline se puede auditar">
           Cada corrida de cada conector queda registrada con su estado, las filas que ingirió y el
           error si falló. Está publicado en <b>/estado</b>: si una serie se congeló, se ve ahí.
