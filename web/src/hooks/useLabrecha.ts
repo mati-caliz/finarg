@@ -9,6 +9,7 @@ import {
   holidaysQuery,
   indicatorSeriesQuery,
   indicatorSourcesQuery,
+  indicatorTermsQuery,
   indicatorsQuery,
   newsQuery,
   politicalEventsQuery,
@@ -19,6 +20,7 @@ import {
   scrapeRunsQuery,
   senateBlocsQuery,
   senateMembersQuery,
+  sourceGapsQuery,
   taxChangesQuery,
 } from "@/lib/queries";
 import { useQueries, useQuery } from "@tanstack/react-query";
@@ -157,4 +159,12 @@ export function useScrapeRuns(params?: { limit?: number }) {
 
 export function useRentByNeighborhood() {
   return useQuery(rentByNeighborhoodQuery());
+}
+
+export function useSourceGaps(params?: { limit?: number; min_sources?: number }) {
+  return useQuery(sourceGapsQuery(params));
+}
+
+export function useIndicatorTerms(code: string, params?: { source?: string }) {
+  return useQuery({ ...indicatorTermsQuery(code, params), enabled: Boolean(code) });
 }

@@ -352,3 +352,47 @@ class PostUpdate(BaseModel):
     content: str | None = Field(default=None, min_length=1)
     impacts: list[PostImpact] | None = None
     published: bool | None = None
+
+
+class GapMeasurement(BaseModel):
+    source: str
+    value: Decimal
+
+
+class GapOut(BaseModel):
+    indicator_code: str
+    date: date
+    higher_source: str
+    higher_value: Decimal
+    lower_source: str
+    lower_value: Decimal
+    spread: Decimal
+    gap_pct: float
+    measurements: list[GapMeasurement]
+
+
+class TermMethod(StrEnum):
+    COMPOUNDED = "COMPOUNDED"
+    ENDPOINTS = "ENDPOINTS"
+
+
+class IndicatorTermStat(BaseModel):
+    term_id: str
+    president: str
+    start: date
+    end: date | None
+    first_date: date
+    last_date: date
+    first_value: Decimal
+    last_value: Decimal
+    average: Decimal
+    points: int
+    change_pct: Decimal
+    annualized_pct: Decimal | None
+
+
+class IndicatorTermsOut(BaseModel):
+    indicator_code: str
+    source: str
+    method: TermMethod
+    terms: list[IndicatorTermStat]

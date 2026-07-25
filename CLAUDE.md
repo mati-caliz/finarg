@@ -6,8 +6,15 @@ sola fuente. Dos features definitorias que el producto hace brillar:
 
 1. **La brecha entre mediciones** — un mismo indicador medido por fuentes distintas (reservas BCRA
    vs datos.gob.ar; inflación oficial vs esperada). Mostrar la discrepancia ES la feature.
+   Conviven dos tipos: las **curadas** en `web/src/lib/gaps.ts`, que enfrentan indicadores
+   *distintos* (blue vs oficial, esperada vs medida), y las **automáticas** de `GET /gaps`, que
+   salen solas de los datos: todo `indicator_code` con ≥2 `source`, comparado en la última fecha
+   en que ambas midieron y rankeado por discrepancia.
 2. **Series anotadas con eventos políticos** — elecciones, cambios de gobierno, DNUs cruzados con lo
-   económico sobre la misma línea de tiempo.
+   económico sobre la misma línea de tiempo. Además `GET /terms/{code}` corta cualquier serie por
+   mandato presidencial (`api-py/labrecha_api/government_terms.py`): las series de tasa se acumulan
+   **componiendo** (`MONTHLY_RATE_INDICATORS`) y las de nivel comparan extremos; la respuesta
+   informa qué método usó y la UI lo explicita.
 
 El nombre juega con el doble sentido: brecha cambiaria + brecha entre mediciones. Dominio objetivo
 `labrecha.ar`. El plan del pivot (desde el proyecto original "FinArg") y su historial están en
@@ -87,7 +94,7 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
   AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.
 - Rutas (URLs en español, igual que el copy; los identificadores de código siguen en inglés):
   `/` (Estado del país), `/estado`, `/indicador/[code]` (serie anotada + comparador de fuentes),
-  `/brechas`, `/indicadores`, `/congreso` (+ `/congreso/votacion/[voteRecordId]`), `/noticias`,
+  `/brechas` (curadas + automáticas), `/metodologia`, `/indicadores`, `/congreso` (+ `/congreso/votacion/[voteRecordId]`), `/noticias`,
   `/feriados`, `/calculadoras` (+ `/calculadora-sueldo-neto`, `/calculadora-impacto-fiscal`,
   `/calculadora-interes-compuesto`, `/calculadora-ajuste-inflacion`), `/boletin.xml` (RSS). Los
   endpoints del backend (FastAPI, vía el proxy `/api/data`) **sí** siguen en inglés

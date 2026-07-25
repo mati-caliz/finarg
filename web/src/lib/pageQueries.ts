@@ -15,6 +15,7 @@ import {
   holidaysQuery,
   indicatorSeriesQuery,
   indicatorSourcesQuery,
+  indicatorTermsQuery,
   indicatorsQuery,
   newsQuery,
   politicalEventsQuery,
@@ -22,6 +23,7 @@ import {
   postsQuery,
   scrapeRunsQuery,
   senateMembersQuery,
+  sourceGapsQuery,
 } from "@/lib/queries";
 import {
   HERO_CODE,
@@ -78,6 +80,10 @@ export function indicatorCatalogQueries(): PageQuery[] {
   return [indicatorsQuery()];
 }
 
+export function methodologyQueries(): PageQuery[] {
+  return [indicatorsQuery()];
+}
+
 export async function indicatorDetailData(
   code: string,
 ): Promise<{ queries: PageQuery[]; sources: IndicatorSourceSummary[] }> {
@@ -98,13 +104,20 @@ export async function indicatorDetailData(
     );
   }
   queries.push(politicalEventsQuery({ date_from: dateFrom, date_to: latestDate }));
+  const primary = ordered[0];
+  if (primary !== undefined) {
+    queries.push(indicatorTermsQuery(code, { source: primary.source }));
+  }
   return { queries, sources: ordered };
 }
 
 export function gapsQueries(): PageQuery[] {
   const today = todayISO();
   const dateFrom = rangeDateFrom(today, DEFAULT_RANGE_MONTHS);
-  const queries: PageQuery[] = [politicalEventsQuery({ date_from: dateFrom, date_to: today })];
+  const queries: PageQuery[] = [
+    politicalEventsQuery({ date_from: dateFrom, date_to: today }),
+    sourceGapsQuery(),
+  ];
 
   for (const gap of GAPS) {
     for (const leg of gap.legs) {

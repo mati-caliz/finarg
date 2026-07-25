@@ -2,6 +2,7 @@
 
 import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
 import { SeriesExport } from "@/components/indicator/SeriesExport";
+import { TermBreakdown } from "@/components/indicator/TermBreakdown";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useIndicatorSeriesMulti,
@@ -859,6 +860,8 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
           {latestDate ? ` · última actualización ${formatDateAR(latestDate)}` : ""}
         </div>
       </div>
+
+      <TermBreakdown code={code} source={primary?.source} />
     </div>
   );
 }
