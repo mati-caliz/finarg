@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryError } from "@/components/QueryError";
-import { PostCover } from "@/components/posts/PostCover";
 import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -193,10 +192,6 @@ export function PostDetail({ slug }: { slug: string }) {
           <span>·</span>
           <span>{readingTimeMinutes(post.content)} min de lectura</span>
         </div>
-      </div>
-
-      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "26px 24px 0" }}>
-        <PostCover slug={post.slug} category={post.category} style={{ width: 232 }} />
       </div>
 
       {impacts.length > 0 && (
