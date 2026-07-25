@@ -6,11 +6,11 @@ usuarios, monetización por suscripción, módulo de inversiones) no vuelve a es
 
 ## Datos e indicadores
 
-- [ ] **Evolución del salario mínimo**: histórico ajustado por inflación.
-- [ ] **Evolución de las jubilaciones**: haberes y poder adquisitivo en el tiempo.
-- [ ] **Salarios promedio por sector**: estadísticas por rama de actividad.
-- [ ] **Reservas netas sin overrides**: hoy el valor mezcla fuentes; separar la serie neta propia.
-- [ ] **Tablero de reservas vs. base monetaria**: relación entre reservas del BCRA y emisión.
+- [ ] **Salarios promedio por sector**: hoy están RIPTE y el índice de salarios, falta la
+      apertura por rama de actividad.
+- [ ] **Reservas netas**: ni el BCRA ni datos.gob.ar las publican (es una estimación de
+      analistas: brutas menos swap, encajes en dólares, repos y BIS). Requiere elegir y
+      documentar una metodología propia, o citar una consultora como fuente.
 - [ ] **Tablero de riesgo país y bonos**: spreads, rendimientos y ratings.
 - [ ] **Calendario económico**: fechas de publicación (IPC, PBI, tasas, EMAE).
 - [ ] **Índice de paridad de poder adquisitivo regional**: costo de vida comparado entre provincias.

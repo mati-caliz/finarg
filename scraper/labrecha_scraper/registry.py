@@ -8,6 +8,7 @@ from labrecha_scraper.connectors.country_risk import CountryRiskConnector
 from labrecha_scraper.connectors.credit_bcra import CreditBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
 from labrecha_scraper.connectors.crypto_historical import CryptoHistoricalConnector
+from labrecha_scraper.connectors.derived import DerivedIndicatorsConnector
 from labrecha_scraper.connectors.dollar import DollarConnector
 from labrecha_scraper.connectors.dollar_historical import DollarHistoricalConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
@@ -15,6 +16,7 @@ from labrecha_scraper.connectors.icg import IcgConnector
 from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
 from labrecha_scraper.connectors.inflation import InflationConnector
 from labrecha_scraper.connectors.laws import LawsConnector
+from labrecha_scraper.connectors.monetary_base_bcra import MonetaryBaseBcraConnector
 from labrecha_scraper.connectors.news import NewsConnector
 from labrecha_scraper.connectors.official_gazette import OfficialGazetteConnector
 from labrecha_scraper.connectors.rent_caba import RentCabaConnector
@@ -39,12 +41,14 @@ CONNECTORS: dict[str, Connector] = {
         IclBcraConnector(),
         IcgConnector(),
         InflationConnector(),
+        MonetaryBaseBcraConnector(),
         LawsConnector(),
         NewsConnector(),
         ReservesBcraConnector(),
         CountryRiskConnector(),
         SenateConnector(),
         SeriesDatosGobConnector(),
+        DerivedIndicatorsConnector(),
     )
 }
 

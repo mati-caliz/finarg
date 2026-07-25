@@ -52,6 +52,7 @@ export const SOURCE_LABELS: Record<string, string> = {
   dolarapi: "DolarAPI",
   coingecko: "CoinGecko",
   utdt: "UTDT",
+  labrecha: "La Brecha (calculado)",
   iaraf: "IARAF",
   hcdn: "HCDN",
 };
@@ -535,6 +536,46 @@ export const INDICATOR_META: Record<string, IndicatorMeta> = {
     goodWhen: "up",
     format: money,
   },
+  minimum_wage_real: {
+    label: "Salario mínimo a precios constantes",
+    family: "empleo",
+    unit: "ARS",
+    goodWhen: "up",
+    format: money,
+  },
+  pension_minimum: {
+    label: "Jubilación mínima",
+    family: "social",
+    unit: "ARS",
+    goodWhen: "up",
+    format: money,
+  },
+  pension_minimum_real: {
+    label: "Jubilación mínima a precios constantes",
+    family: "social",
+    unit: "ARS",
+    goodWhen: "up",
+    format: money,
+  },
+  pension_beneficiaries: {
+    label: "Jubilaciones y pensiones pagadas",
+    family: "social",
+    unit: "prestaciones",
+    format: num0,
+  },
+  universal_child_allowance: {
+    label: "Asignación Universal por Hijo",
+    family: "social",
+    unit: "ARS",
+    goodWhen: "up",
+    format: money,
+  },
+  implicit_fx_rate: {
+    label: "Dólar de convertibilidad",
+    family: "monetario",
+    unit: "ARS",
+    format: money,
+  },
 
   poverty_persons: {
     label: "Pobreza",
@@ -556,6 +597,8 @@ export type Cadence = "diaria" | "mensual" | "trimestral" | "semestral" | "anual
 
 const CADENCE_DAILY_EXTRA = new Set([
   "international_reserves",
+  "implicit_fx_rate",
+  "monetary_base",
   "rate_tamar",
   "rate_time_deposit",
   "rate_personal_loans",
@@ -626,6 +669,8 @@ export const SOURCE_METHODOLOGY: Record<string, string> = {
   dolarapi: "Cotización de referencia publicada por DolarAPI.",
   coingecko: "Precio de mercado informado por CoinGecko.",
   utdt: "Índice de Confianza en el Gobierno (ICG) de la Escuela de Gobierno de la UTDT, escala 0 a 5.",
+  labrecha:
+    "Serie calculada por nosotros a partir de otras dos que sí son de fuente oficial; el detalle del cálculo está en la metadata de cada dato y en /metodologia.",
 };
 
 export const DEFAULT_RANGE = "1A";

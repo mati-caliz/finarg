@@ -134,10 +134,10 @@ export function FreshnessBoard() {
     return null;
   }
 
-  const counts = rows.reduce<Record<Health, number>>(
-    (totals, row) => ({ ...totals, [row.health]: totals[row.health] + 1 }),
-    { ok: 0, late: 0, stale: 0 },
-  );
+  const counts: Record<Health, number> = { ok: 0, late: 0, stale: 0 };
+  for (const row of rows) {
+    counts[row.health] += 1;
+  }
 
   return (
     <section>

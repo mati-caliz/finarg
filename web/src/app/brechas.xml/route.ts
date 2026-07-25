@@ -30,9 +30,7 @@ export async function GET(request: Request) {
       title: "La Brecha — discrepancias entre fuentes",
       link: `${SITE_URL}/brechas`,
       selfUrl: `${SITE_URL}/brechas.xml?min=${threshold}`,
-      description:
-        `Aviso cuando dos fuentes que miden el mismo indicador difieren en ${formatNumberAR(threshold, 2)}% o más. ` +
-        "Cambiá el umbral con ?min=5.",
+      description: `Aviso cuando dos fuentes que miden el mismo indicador difieren en ${formatNumberAR(threshold, 2)}% o más. Cambiá el umbral con ?min=5.`,
       items: alerted.map((gap) => {
         const indicator = getIndicatorDisplay(gap.indicator_code);
         const higher = Number.parseFloat(gap.higher_value);
@@ -44,10 +42,7 @@ export async function GET(request: Request) {
           guid: `${gap.indicator_code}-${gap.date}-${pct}`,
           pubDate: toRfc822(gap.date),
           category: indicator.label,
-          description:
-            `Al ${formatDateAR(gap.date)}, ${sourceLabel(gap.higher_source)} midió ${indicator.format(higher)} y ` +
-            `${sourceLabel(gap.lower_source)} midió ${indicator.format(lower)}: ${pct}% de discrepancia ` +
-            "sobre la misma fecha.",
+          description: `Al ${formatDateAR(gap.date)}, ${sourceLabel(gap.higher_source)} midió ${indicator.format(higher)} y ${sourceLabel(gap.lower_source)} midió ${indicator.format(lower)}: ${pct}% de discrepancia sobre la misma fecha.`,
         };
       }),
     },
