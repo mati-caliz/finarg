@@ -175,5 +175,5 @@ export function holidaysQueries(): PageQuery[] {
 }
 
 export function scrapeStatusQueries(): PageQuery[] {
-  return [scrapeRunsQuery(SCRAPE_RUNS_PARAMS)];
+  return [scrapeRunsQuery(SCRAPE_RUNS_PARAMS), indicatorsQuery()];
 }

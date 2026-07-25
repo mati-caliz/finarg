@@ -29,7 +29,9 @@ shared/    Paquete `labrecha_db`: los modelos SQLAlchemy (única definición del
            y las migraciones Alembic. Lo instalan tanto el scraper como la API.
 scraper/   Python (SQLAlchemy + httpx + pydantic). Un conector = un módulo en
            labrecha_scraper/connectors/. Corridos por cron, escriben a Postgres.
-api-py/    FastAPI de solo lectura sobre Postgres + calculadoras. Sin estado, sin auth.
+api-py/    FastAPI de solo lectura sobre Postgres + calculadoras. Sin estado, sin auth. Es
+           producto además de backend: gzip, rate limiting por IP (`rate_limit.py`, exento para
+           la red interna así el SSR no se auto-limita), CSV por serie y docs en /docs.
 web/       Next.js 16 (App Router) + React 18 + TS + Tailwind + Recharts.
 ```
 
@@ -94,9 +96,9 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
   AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.
 - Rutas (URLs en español, igual que el copy; los identificadores de código siguen en inglés):
   `/` (Estado del país), `/estado`, `/indicador/[code]` (serie anotada + comparador de fuentes),
-  `/brechas` (curadas + automáticas), `/metodologia`, `/indicadores`, `/congreso` (+ `/congreso/votacion/[voteRecordId]`), `/noticias`,
+  `/brechas` (curadas + automáticas), `/metodologia`, `/api-publica`, `/indicadores`, `/congreso` (+ `/congreso/votacion/[voteRecordId]`), `/noticias`,
   `/feriados`, `/calculadoras` (+ `/calculadora-sueldo-neto`, `/calculadora-impacto-fiscal`,
-  `/calculadora-interes-compuesto`, `/calculadora-ajuste-inflacion`), `/boletin.xml` (RSS). Los
+  `/calculadora-interes-compuesto`, `/calculadora-ajuste-inflacion`), `/boletin.xml`, `/brechas.xml` (con `?min=`) y `/indicador/[code]/feed.xml` (RSS). Los
   endpoints del backend (FastAPI, vía el proxy `/api/data`) **sí** siguen en inglés
   (`/indicators`, `/congress/votes`, `/holidays`, `/news`, `/calculators/...`, `/gazette/...`).
   Las URLs viejas en inglés redirigen (301) a las nuevas en `next.config.js`.

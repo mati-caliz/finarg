@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/feriados", changeFrequency: "monthly", priority: 0.5 },
     { path: "/estado", changeFrequency: "daily", priority: 0.4 },
     { path: "/metodologia", changeFrequency: "monthly", priority: 0.6 },
+    { path: "/api-publica", changeFrequency: "monthly", priority: 0.5 },
     { path: "/calculadoras", changeFrequency: "monthly", priority: 0.6 },
     ...Object.keys(INDICATOR_META).map((code) => ({
       path: `/indicador/${code}`,

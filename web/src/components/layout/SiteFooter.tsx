@@ -10,6 +10,7 @@ const SECTION_LINKS = [
   { label: "Feriados", href: "/feriados" },
   { label: "Calculadoras", href: "/calculadoras" },
   { label: "Metodología", href: "/metodologia" },
+  { label: "API pública", href: "/api-publica" },
 ];
 
 const SOURCES = "INDEC · BCRA · datos.gob.ar · Congreso de la Nación · consultoras (REM) · UTDT";
