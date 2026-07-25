@@ -84,7 +84,7 @@ export function GapsTeaser() {
             </p>
           </div>
           <a
-            href="/gaps"
+            href="/brechas"
             style={{
               fontFamily: "var(--font-jb-mono)",
               fontSize: "0.78rem",

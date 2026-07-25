@@ -42,7 +42,7 @@ export default function CongressPage() {
             marginBottom: 10,
           }}
         >
-          /congress · Cámara de Diputados
+          /congreso · Cámara de Diputados
         </div>
         <h1
           style={{

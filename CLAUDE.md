@@ -61,9 +61,14 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 - Layout: **top-nav sticky sin sidebar** (`SiteHeader`/`SiteFooter`); ancho máximo 1200px centrado;
   headers de sección con eyebrow mono + regla 2px. Los componentes core (`src/components/core/`:
   AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.
-- Rutas (URLs en inglés; el copy sigue en español): `/` (Estado del país), `/status`,
-  `/indicator/[code]` (serie anotada + comparador de fuentes), `/gaps`, `/indicators`,
-  `/congress` (+ `/congress/vote/[voteRecordId]`), `/news`, `/holidays`, `/calculators`.
+- Rutas (URLs en español, igual que el copy; los identificadores de código siguen en inglés):
+  `/` (Estado del país), `/estado`, `/indicador/[code]` (serie anotada + comparador de fuentes),
+  `/brechas`, `/indicadores`, `/congreso` (+ `/congreso/votacion/[voteRecordId]`), `/noticias`,
+  `/feriados`, `/calculadoras` (+ `/calculadora-sueldo-neto`, `/calculadora-impacto-fiscal`,
+  `/calculadora-interes-compuesto`, `/calculadora-ajuste-inflacion`), `/boletin.xml` (RSS). Los
+  endpoints del backend (FastAPI, vía el proxy `/api/data`) **sí** siguen en inglés
+  (`/indicators`, `/congress/votes`, `/holidays`, `/news`, `/calculators/...`, `/gazette/...`).
+  Las URLs viejas en inglés redirigen (301) a las nuevas en `next.config.js`.
 - Estilos: los componentes core usan estilos inline con variables del design system; el resto,
   utilidades de Tailwind. Números en formato argentino (punto de miles, coma decimal) y mono tabular.
 

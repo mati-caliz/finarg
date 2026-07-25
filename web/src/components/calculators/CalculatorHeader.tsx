@@ -11,7 +11,7 @@ export function CalculatorHeader({ title, subtitle }: { title: string; subtitle:
           marginBottom: 10,
         }}
       >
-        /calculators
+        /calculadoras
       </div>
       <h1
         style={{
