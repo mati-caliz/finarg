@@ -8,7 +8,7 @@ web/API es el esquema de la base.
 
 Todos los indicadores nuevos van a una tabla genérica `indicator_history`:
 
-- `indicator_code` — qué es (ej. `dolar_blue`, `ipc_mensual`, `riesgo_pais`, `cba_nacional`).
+- `indicator_code` — qué es (ej. `dollar_blue`, `cpi_monthly`, `country_risk`, `basic_basket_national`).
 - `source` — de dónde salió (ej. `dolarapi`, `argentinadatos`, `datosgobar`). Un mismo indicador
   puede tener varias fuentes (ej. pobreza INDEC vs UTDT vs UCA); mostrar la discrepancia es una
   feature, no un bug.
@@ -28,23 +28,23 @@ Algunos indicadores no encajan en la tabla genérica y usan tablas propias: `con
 
 | job | source | indicadores | cadencia sugerida |
 |-----|--------|-------------|-------------------|
-| `dolar` | dolarapi.com | `dolar_{oficial,blue,mep,ccl,tarjeta,...}` | 15 min |
-| `inflacion` | argentinadatos | `ipc_mensual`, `ipc_interanual` | diaria |
-| `riesgo_pais` | argentinadatos | `riesgo_pais` (histórico completo) | diaria |
-| `series_datosgob` | datos.gob.ar | `cba_nacional`, `ipc_nivel_general`, `reservas_internacionales`, `ripte`, `indice_salarios`, `pobreza_personas`, `base_monetaria`, `recaudacion_tributaria`, `emae`, `desempleo`, `expectativas_inflacion_rem` | diaria |
-| `reservas_bcra` | BCRA (API v4.0) | `reservas_internacionales` diaria desde 1996 (`source=bcra`) | diaria |
-| `congreso` | datos.hcdn.gob.ar | votaciones nominales de Diputados (tablas `congress_votes` / `congress_vote_details`) | semanal |
-| `crypto` | CoinGecko | `cripto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
+| `dollar` | dolarapi.com | `dollar_{official,blue,mep,ccl,card,...}` | 15 min |
+| `inflation` | argentinadatos | `cpi_monthly`, `cpi_yoy` | diaria |
+| `country_risk` | argentinadatos | `country_risk` (histórico completo) | diaria |
+| `series_datosgob` | datos.gob.ar | `basic_basket_national`, `cpi_level_general`, `international_reserves`, `ripte`, `wage_index`, `poverty_persons`, `monetary_base`, `tax_revenue`, `emae`, `unemployment`, `inflation_expectations_rem` | diaria |
+| `reserves_bcra` | BCRA (API v4.0) | `international_reserves` diaria desde 1996 (`source=bcra`) | diaria |
+| `congress` | datos.hcdn.gob.ar | votaciones nominales de Diputados (tablas `congress_votes` / `congress_vote_details`) | semanal |
+| `crypto` | CoinGecko | `crypto_{btc,eth,bnb,xrp,ada,sol}` (snapshot diario en USD) | diaria |
 | `holidays` | Nager.Date | feriados de Argentina (tabla `holidays`, PK `(date, name)`) | mensual |
 | `news` | El Economista (RSS) | artículos a la tabla `news_articles` (ingesta cruda, sin resumen AI) | diaria |
-| `senado` | Senado (datos abiertos) | composición actual del Senado (tabla `senators`: bloque, provincia, partido, mandato) | semanal |
+| `senate` | Senado (datos abiertos) | composición actual del Senado (tabla `senators`: bloque, provincia, partido, mandato) | semanal |
 
 `political_events` se puebla con un set curado de hitos (elecciones, cambios de gobierno, DNUs,
 medidas económicas) vía `seed-events` — datos curados, no scrapeados. Habilitan anotar las series
 en la UI (Fase 3).
 
-`pobreza_personas` es semestral (EPH, total nacional) y se guarda en % (la fuente da fracción).
-`reservas_internacionales` tiene dos fuentes bajo el mismo `indicator_code`: la mensual de
+`poverty_persons` es semestral (EPH, total nacional) y se guarda en % (la fuente da fracción).
+`international_reserves` tiene dos fuentes bajo el mismo `indicator_code`: la mensual de
 datos.gob.ar (`source=datosgobar`) y la diaria del BCRA (`source=bcra`, desde 1996). Es el primer
 caso real del comparador de mediciones.
 
@@ -71,7 +71,7 @@ tracking de `scrape_runs` lo maneja `run_job`. Para un indicador que encaje en `
 ```bash
 python -m labrecha_scraper init-db      # crear tablas
 python -m labrecha_scraper list         # jobs disponibles
-python -m labrecha_scraper run dolar    # un job
+python -m labrecha_scraper run dollar   # un job
 python -m labrecha_scraper run all      # todos
 python -m labrecha_scraper seed-events  # sembrar hitos políticos curados
 python -m labrecha_scraper status       # última corrida de cada job

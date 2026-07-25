@@ -11,22 +11,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: number;
   }[] = [
     { path: "", changeFrequency: "hourly", priority: 1 },
-    { path: "/indicadores", changeFrequency: "daily", priority: 0.9 },
-    { path: "/brechas", changeFrequency: "daily", priority: 0.9 },
-    { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
-    { path: "/noticias", changeFrequency: "hourly", priority: 0.6 },
+    { path: "/indicators", changeFrequency: "daily", priority: 0.9 },
+    { path: "/gaps", changeFrequency: "daily", priority: 0.9 },
+    { path: "/congress", changeFrequency: "weekly", priority: 0.8 },
+    { path: "/news", changeFrequency: "hourly", priority: 0.6 },
     { path: "/ideas", changeFrequency: "weekly", priority: 0.7 },
-    { path: "/feriados", changeFrequency: "monthly", priority: 0.5 },
-    { path: "/estado", changeFrequency: "daily", priority: 0.4 },
+    { path: "/holidays", changeFrequency: "monthly", priority: 0.5 },
+    { path: "/status", changeFrequency: "daily", priority: 0.4 },
     ...Object.keys(INDICATOR_META).map((code) => ({
-      path: `/indicador/${code}`,
+      path: `/indicator/${code}`,
       changeFrequency: "daily" as const,
       priority: 0.85,
     })),
-    { path: "/calculadora-sueldo-neto", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/calculadora-impacto-fiscal", changeFrequency: "monthly", priority: 0.7 },
-    { path: "/calculadora-interes-compuesto", changeFrequency: "monthly", priority: 0.6 },
-    { path: "/calculadora-ajuste-inflacion", changeFrequency: "monthly", priority: 0.6 },
+    { path: "/calculator-net-salary", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/calculator-fiscal-impact", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/calculator-compound-interest", changeFrequency: "monthly", priority: 0.6 },
+    { path: "/calculator-inflation-adjustment", changeFrequency: "monthly", priority: 0.6 },
   ];
 
   return routes.map((route) => ({

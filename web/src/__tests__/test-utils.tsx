@@ -120,9 +120,3 @@ export const mockIncomeTaxResponse = (overrides = {}) => ({
   ...overrides,
 });
 
-export const mockCotizacion = mockQuote;
-export const mockBrecha = mockGap;
-export const mockReservas = mockReserves;
-export const mockInflacion = mockInflation;
-
-export const mockGananciasResponse = mockIncomeTaxResponse;

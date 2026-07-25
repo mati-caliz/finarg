@@ -50,7 +50,7 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 - **Sistema de diseño:** dirección **"Editorial"** (periodística de datos) de Claude Design. Los
   tokens `oklch` (light + dark) viven en `src/app/globals.css`, bloque "Design system v2":
   superficies `--paper`/`--surface`/`--raise`, tinta `--ink`/`--ink2`/`--ink3`, líneas
-  `--line`/`--line2`, **`--brecha` ámbar** para discrepancias entre fuentes, **`--evento` violeta**
+  `--line`/`--line2`, **`--gap` ámbar** para discrepancias entre fuentes, **`--event` violeta**
   para eventos políticos, `--pos`/`--neg`, `--chart`. Tres tipografías: **Bricolage Grotesque**
   (`--font-display`, titulares), **Newsreader** (`--font-serif`, prosa), **JetBrains Mono**
   (`--font-jb-mono`, números/labels/eyebrows). Regla: ningún número va en serif/sans, siempre mono
@@ -61,8 +61,9 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 - Layout: **top-nav sticky sin sidebar** (`SiteHeader`/`SiteFooter`); ancho máximo 1200px centrado;
   headers de sección con eyebrow mono + regla 2px. Los componentes core (`src/components/core/`:
   AnnotatedSeriesChart, Card, Badge, Button, DataTable, etc.) usan los tokens v2.
-- Rutas: `/` (Estado del país), `/indicador/[code]` (serie anotada + comparador de fuentes),
-  `/congreso` (+ `/congreso/votacion/[actaId]`), calculadoras.
+- Rutas (URLs en inglés; el copy sigue en español): `/` (Estado del país), `/status`,
+  `/indicator/[code]` (serie anotada + comparador de fuentes), `/gaps`, `/indicators`,
+  `/congress` (+ `/congress/vote/[voteRecordId]`), `/news`, `/holidays`, `/calculators`.
 - Estilos: los componentes core usan estilos inline con variables del design system; el resto,
   utilidades de Tailwind. Números en formato argentino (punto de miles, coma decimal) y mono tabular.
 
@@ -75,8 +76,11 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 - **Sin `var`**; `const` por default, `let` sólo si se reasigna.
 - **Nombres completos y semánticos** (`product`, no `p`; `transaction`, no `tx`). `i`/`j` sólo en
   loops triviales. Sin magic numbers/strings: extraer constantes.
-- Nombres de variables/funciones/clases en inglés; términos de dominio argentino en español están
-  bien (`cotizacion`, `inflacion`, `brecha`, `reservas`).
+- **Todo identificador de código en inglés**: nombres de variables, funciones, clases, tipos,
+  propiedades y nombres de archivos/carpetas van en inglés, incluidos los términos de dominio
+  (`quote` no `cotizacion`, `inflation` no `inflacion`, `gap` no `brecha`, `reserves` no `reservas`).
+  El español queda **sólo** para el texto que ve el usuario (copy de la UI, labels, contenido). El
+  nombre del producto "La Brecha" y el token de marca no son identificadores traducibles.
 - Python: inyección por módulo/función, tipado con pydantic; conectores del scraper extienden la
   clase base y registran en `scrape_runs`.
 

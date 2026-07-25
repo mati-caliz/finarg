@@ -2,13 +2,13 @@ import Link from "next/link";
 import { BrandMark } from "@/components/layout/SiteHeader";
 
 const SECTION_LINKS = [
-  { label: "Indicadores", href: "/indicadores" },
-  { label: "Brechas", href: "/brechas" },
+  { label: "Indicadores", href: "/indicators" },
+  { label: "Brechas", href: "/gaps" },
   { label: "Ideas", href: "/ideas" },
-  { label: "Congreso", href: "/congreso" },
-  { label: "Noticias", href: "/noticias" },
-  { label: "Feriados", href: "/feriados" },
-  { label: "Calculadoras", href: "/calculadoras" },
+  { label: "Congreso", href: "/congress" },
+  { label: "Noticias", href: "/news" },
+  { label: "Feriados", href: "/holidays" },
+  { label: "Calculadoras", href: "/calculators" },
 ];
 
 const SOURCES = "INDEC · BCRA · datos.gob.ar · Congreso de la Nación · consultoras (REM) · UTDT";

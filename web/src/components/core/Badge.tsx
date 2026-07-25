@@ -15,17 +15,17 @@ const tones: Record<BadgeTone, CSSProperties> = {
     border: "1px solid var(--line)",
   },
   accent: {
-    background: "var(--evento-bg)",
-    color: "var(--evento)",
-    border: "1px solid var(--evento-ln)",
+    background: "var(--event-bg)",
+    color: "var(--event)",
+    border: "1px solid var(--event-ln)",
   },
   pos: { background: "var(--pos-bg)", color: "var(--pos)", border: "1px solid transparent" },
   neg: { background: "var(--neg-bg)", color: "var(--neg)", border: "1px solid transparent" },
-  gap: { background: "var(--brecha-bg)", color: "var(--brecha)", border: "1px solid var(--brecha-ln)" },
+  gap: { background: "var(--gap-bg)", color: "var(--gap)", border: "1px solid var(--gap-ln)" },
   evento: {
-    background: "var(--evento-bg)",
-    color: "var(--evento)",
-    border: "1px solid var(--evento-ln)",
+    background: "var(--event-bg)",
+    color: "var(--event)",
+    border: "1px solid var(--event-ln)",
   },
 };
 

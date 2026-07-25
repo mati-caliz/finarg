@@ -46,7 +46,7 @@ class ScrapeRun(Base):
 class CongressVote(Base):
     __tablename__ = "congress_votes"
 
-    acta_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    vote_record_id: Mapped[str] = mapped_column(String(20), primary_key=True)
     period_number: Mapped[int | None] = mapped_column(Integer)
     session_type: Mapped[str | None] = mapped_column(String(60))
     date: Mapped[date | None] = mapped_column(Date)
@@ -63,7 +63,7 @@ class CongressVoteDetail(Base):
     __tablename__ = "congress_vote_details"
 
     vote_detail_id: Mapped[str] = mapped_column(String(20), primary_key=True)
-    acta_id: Mapped[str] = mapped_column(String(20))
+    vote_record_id: Mapped[str] = mapped_column(String(20))
     deputy_name: Mapped[str | None] = mapped_column(String(200))
     bloc: Mapped[str | None] = mapped_column(String(200))
     district: Mapped[str | None] = mapped_column(String(120))
@@ -84,28 +84,28 @@ class SanctionedLaw(Base):
     summary: Mapped[str | None] = mapped_column(Text)
 
 
-class RentByBarrio(Base):
-    __tablename__ = "rent_by_barrio"
+class RentByNeighborhood(Base):
+    __tablename__ = "rent_by_neighborhood"
 
-    barrio: Mapped[str] = mapped_column(String(80), primary_key=True)
-    comuna: Mapped[str | None] = mapped_column(String(20))
+    neighborhood: Mapped[str] = mapped_column(String(80), primary_key=True)
+    commune: Mapped[str | None] = mapped_column(String(20))
     date: Mapped[date] = mapped_column(Date)
     price: Mapped[Decimal] = mapped_column(Numeric(16, 2))
     rooms: Mapped[str | None] = mapped_column(String(20))
 
 
-class CoparticipacionShare(Base):
-    __tablename__ = "coparticipacion_shares"
+class RevenueSharingShare(Base):
+    __tablename__ = "revenue_sharing_shares"
 
     province: Mapped[str] = mapped_column(String(60), primary_key=True)
     coefficient: Mapped[Decimal] = mapped_column(Numeric(12, 8))
     source: Mapped[str] = mapped_column(String(40))
 
 
-class BoletinSummary(Base):
-    __tablename__ = "boletin_summaries"
+class GazetteSummary(Base):
+    __tablename__ = "gazette_summaries"
 
-    norma_id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    regulation_id: Mapped[str] = mapped_column(String(40), primary_key=True)
     date: Mapped[date] = mapped_column(Date)
     section: Mapped[str] = mapped_column(String(40))
     title: Mapped[str] = mapped_column(Text)
@@ -117,7 +117,7 @@ class BoletinSummary(Base):
 class TaxChange(Base):
     __tablename__ = "tax_changes"
 
-    norma_id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    regulation_id: Mapped[str] = mapped_column(String(40), primary_key=True)
     date: Mapped[date] = mapped_column(Date)
     change_type: Mapped[str] = mapped_column(String(20))
     tax_name: Mapped[str] = mapped_column(Text)

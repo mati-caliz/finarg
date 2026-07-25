@@ -27,7 +27,7 @@ router = APIRouter(prefix="/calculators", tags=["calculators"])
 ONE_HUNDRED = Decimal(100)
 RATE_PRECISION = Decimal("0.0000000001")
 MONEY = Decimal("0.01")
-IPC_INDICATOR = "ipc_mensual"
+IPC_INDICATOR = "cpi_monthly"
 
 
 def _money(value: Decimal) -> Decimal:

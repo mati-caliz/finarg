@@ -6,13 +6,13 @@ SHELL=/bin/bash
 COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
 
 # Cotizaciones del dólar: cada 15 minutos en horario de mercado.
-*/15 * * * *  $COMPOSE run --rm scraper run dolar        >> /var/log/labrecha/dolar.log 2>&1
+*/15 * * * *  $COMPOSE run --rm scraper run dollar       >> /var/log/labrecha/dollar.log 2>&1
 
 # Indicadores diarios: una vez al día (07:30).
-30 7 * * *    $COMPOSE run --rm scraper run riesgo_pais  >> /var/log/labrecha/riesgo_pais.log 2>&1
-35 7 * * *    $COMPOSE run --rm scraper run inflacion    >> /var/log/labrecha/inflacion.log 2>&1
+30 7 * * *    $COMPOSE run --rm scraper run country_risk >> /var/log/labrecha/country_risk.log 2>&1
+35 7 * * *    $COMPOSE run --rm scraper run inflation    >> /var/log/labrecha/inflation.log 2>&1
 40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
-45 7 * * *    $COMPOSE run --rm scraper run reservas_bcra >> /var/log/labrecha/reservas_bcra.log 2>&1
+45 7 * * *    $COMPOSE run --rm scraper run reserves_bcra >> /var/log/labrecha/reserves_bcra.log 2>&1
 
 # Cripto: snapshot diario (la fuente sólo da precio spot). 07:50.
 50 7 * * *    $COMPOSE run --rm scraper run crypto       >> /var/log/labrecha/crypto.log 2>&1
@@ -21,10 +21,10 @@ COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
 55 7 * * *    $COMPOSE run --rm scraper run news         >> /var/log/labrecha/news.log 2>&1
 
 # Congreso: votaciones nominales, baja frecuencia (por sesión). Semanal, lunes 08:00.
-0 8 * * 1     $COMPOSE run --rm scraper run congreso     >> /var/log/labrecha/congreso.log 2>&1
+0 8 * * 1     $COMPOSE run --rm scraper run congress     >> /var/log/labrecha/congress.log 2>&1
 
 # Senado: composición actual, cambia poco. Semanal, lunes 08:05.
-5 8 * * 1     $COMPOSE run --rm scraper run senado       >> /var/log/labrecha/senado.log 2>&1
+5 8 * * 1     $COMPOSE run --rm scraper run senate       >> /var/log/labrecha/senate.log 2>&1
 
 # Feriados: cambian poco; refresco mensual (día 1, 08:10) trae el año siguiente.
 10 8 1 * *    $COMPOSE run --rm scraper run holidays     >> /var/log/labrecha/holidays.log 2>&1

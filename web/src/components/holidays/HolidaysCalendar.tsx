@@ -39,7 +39,7 @@ function useCountdown(targetISO: string | undefined) {
 
 function TypeBadge({ holiday }: { holiday: Holiday }) {
   const fixed = holiday.is_fixed === true;
-  const color = fixed ? "var(--evento)" : "var(--brecha)";
+  const color = fixed ? "var(--event)" : "var(--gap)";
   return (
     <span style={{ fontFamily: MONO, fontSize: "0.68rem", color, border: `1px solid ${color}`, borderRadius: "var(--radius-pill)", padding: "4px 12px", whiteSpace: "nowrap" }}>
       {fixed ? "Inamovible" : "Trasladable"}
@@ -51,10 +51,10 @@ function CountdownHero({ holiday, targetISO }: { holiday: Holiday; targetISO: st
   const countdown = useCountdown(targetISO);
   return (
     <div
-      className="lb-feriado-hero"
+      className="lb-holiday-hero"
       style={{
-        background: "var(--brecha-bg)",
-        border: "1px solid var(--brecha)",
+        background: "var(--gap-bg)",
+        border: "1px solid var(--gap)",
         borderRadius: 14,
         padding: "36px 40px",
         marginBottom: 40,
@@ -63,7 +63,7 @@ function CountdownHero({ holiday, targetISO }: { holiday: Holiday; targetISO: st
       }}
     >
       <div>
-        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--brecha)", marginBottom: 14 }}>
+        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--gap)", marginBottom: 14 }}>
           Próximo feriado
         </div>
         <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 10px", color: "var(--ink)" }}>
@@ -149,7 +149,7 @@ export function HolidaysCalendar() {
               return (
                 <div
                   key={`${holiday.date}-${holiday.name}`}
-                  className="lb-feriado-row"
+                  className="lb-holiday-row"
                   style={{
                     alignItems: "center",
                     gap: 20,

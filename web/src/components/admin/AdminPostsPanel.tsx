@@ -122,8 +122,8 @@ function LoginForm({ onAuthenticated }: LoginFormProps) {
           style={{
             padding: "8px 16px",
             borderRadius: "var(--radius-md)",
-            border: "1px solid var(--brecha)",
-            background: "var(--brecha)",
+            border: "1px solid var(--gap)",
+            background: "var(--gap)",
             color: "#fff",
             fontSize: "0.875rem",
             fontWeight: 600,
@@ -374,8 +374,8 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
             style={{
               padding: "8px 16px",
               borderRadius: "var(--radius-md)",
-              border: "1px solid var(--brecha)",
-              background: "var(--brecha)",
+              border: "1px solid var(--gap)",
+              background: "var(--gap)",
               color: "#fff",
               fontSize: "0.875rem",
               fontWeight: 600,

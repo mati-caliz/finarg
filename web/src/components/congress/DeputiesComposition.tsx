@@ -17,7 +17,7 @@ const UNKNOWN_BLOC = "Sin bloque";
 export function DeputiesComposition() {
   const latestVoteQuery = useCongressVotes({ limit: 1 });
   const latestVote = latestVoteQuery.data?.[0];
-  const detailsQuery = useCongressVoteDetails(latestVote?.acta_id ?? "");
+  const detailsQuery = useCongressVoteDetails(latestVote?.vote_record_id ?? "");
 
   if (latestVoteQuery.isLoading || (latestVote && detailsQuery.isLoading)) {
     return <Skeleton className="h-80 w-full rounded-[10px]" />;

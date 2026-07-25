@@ -50,7 +50,7 @@ class ScrapeRunOut(BaseModel):
 
 
 class CongressVoteOut(BaseModel):
-    acta_id: str
+    vote_record_id: str
     period_number: int | None
     session_type: str | None
     date: date | None
@@ -64,29 +64,29 @@ class CongressVoteOut(BaseModel):
 
 
 class CongressVoteDetailOut(BaseModel):
-    acta_id: str
+    vote_record_id: str
     deputy_name: str | None
     bloc: str | None
     district: str | None
     vote: str | None
 
 
-class CoparticipacionShareOut(BaseModel):
+class RevenueSharingShareOut(BaseModel):
     province: str
     coefficient: Decimal
     share_pct: Decimal
 
 
-class RentByBarrioOut(BaseModel):
-    barrio: str
-    comuna: str | None
+class RentByNeighborhoodOut(BaseModel):
+    neighborhood: str
+    commune: str | None
     date: date
     price: Decimal
     rooms: str | None
 
 
-class BoletinSummaryOut(BaseModel):
-    norma_id: str
+class GazetteSummaryOut(BaseModel):
+    regulation_id: str
     date: date
     section: str
     title: str
@@ -96,7 +96,7 @@ class BoletinSummaryOut(BaseModel):
 
 
 class TaxChangeOut(BaseModel):
-    norma_id: str
+    regulation_id: str
     date: date
     change_type: str
     tax_name: str

@@ -38,9 +38,9 @@ function CategoryBadge({ category }: { category: Post["category"] }) {
         fontWeight: 600,
         letterSpacing: "0.06em",
         textTransform: "uppercase",
-        color: "var(--evento)",
-        border: "1px solid var(--evento-ln)",
-        background: "var(--evento-bg)",
+        color: "var(--event)",
+        border: "1px solid var(--event-ln)",
+        background: "var(--event-bg)",
         padding: "2px 9px",
         borderRadius: "var(--radius-pill)",
       }}

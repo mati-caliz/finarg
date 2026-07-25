@@ -7,7 +7,7 @@ from decimal import Decimal
 from labrecha_scraper.base import Connector, IndicatorPoint
 
 ICG_URL = "https://www.utdt.edu/ver_contenido.php?id_contenido=1439&id_item_menu=2964"
-INDICATOR_CODE = "confianza_gobierno"
+INDICATOR_CODE = "government_confidence"
 MIN_EXPECTED_POINTS = 6
 
 MONTHS = {

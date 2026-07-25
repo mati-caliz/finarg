@@ -48,7 +48,7 @@ class CryptoConnector(Connector):
             change_24h = data.get(f"{VS_CURRENCY}_24h_change")
             points.append(
                 IndicatorPoint(
-                    indicator_code=f"cripto_{symbol}",
+                    indicator_code=f"crypto_{symbol}",
                     source=self.source,
                     date=today,
                     value=Decimal(str(price)),

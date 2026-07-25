@@ -130,7 +130,7 @@ export function AnnotatedSeriesChart({
             </text>
           ) : null,
         )}
-        {gapArea && <path d={gapArea} fill="var(--brecha)" opacity="0.12" />}
+        {gapArea && <path d={gapArea} fill="var(--gap)" opacity="0.12" />}
         {events.map((event) => (
           <g key={`ev-${event.index}-${event.label}`}>
             <line
@@ -138,7 +138,7 @@ export function AnnotatedSeriesChart({
               x2={X(event.index)}
               y1={padT - 6}
               y2={H - padB}
-              stroke="var(--evento)"
+              stroke="var(--event)"
               strokeWidth="1"
               strokeDasharray="3 3"
               opacity="0.7"
@@ -149,7 +149,7 @@ export function AnnotatedSeriesChart({
               width="8"
               height="8"
               rx="1.5"
-              fill="var(--evento)"
+              fill="var(--event)"
               transform={`rotate(45 ${X(event.index)} ${padT - 8})`}
             />
           </g>
@@ -250,7 +250,7 @@ export function AnnotatedSeriesChart({
                   marginTop: 5,
                   paddingTop: 5,
                   borderTop: "1px solid var(--line)",
-                  color: "var(--evento)",
+                  color: "var(--event)",
                   fontWeight: 600,
                 }}
               >
@@ -293,7 +293,7 @@ export function AnnotatedSeriesChart({
                 width: 8,
                 height: 8,
                 borderRadius: 2,
-                background: "var(--evento)",
+                background: "var(--event)",
                 transform: "rotate(45deg)",
               }}
             />
@@ -306,7 +306,7 @@ export function AnnotatedSeriesChart({
               style={{
                 width: 12,
                 height: 10,
-                background: "var(--brecha)",
+                background: "var(--gap)",
                 opacity: 0.25,
                 borderRadius: 2,
               }}

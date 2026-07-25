@@ -82,7 +82,7 @@ function LeadArticle({ article }: { article: NewsArticle }) {
       <div className="lb-media-row">
         <div className="lb-media-body">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--brecha)", border: "1px solid var(--brecha)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
+            <span style={{ fontFamily: MONO, fontSize: "0.68rem", fontWeight: 600, color: "var(--gap)", border: "1px solid var(--gap)", padding: "3px 10px", borderRadius: "var(--radius-pill)" }}>
               {categoryLabel(article.category)}
             </span>
             <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
@@ -189,7 +189,7 @@ export function NewsFeed() {
                       textDecoration: "none",
                     }}
                   >
-                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.25rem", color: index === 0 ? "var(--brecha)" : "var(--ink3)" }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.25rem", color: index === 0 ? "var(--gap)" : "var(--ink3)" }}>
                       {index + 1}
                     </span>
                     <div>

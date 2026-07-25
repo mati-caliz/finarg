@@ -28,13 +28,13 @@ def list_changes(
     statement = (
         select(TaxChange)
         .where(*conditions)
-        .order_by(TaxChange.date.desc(), TaxChange.norma_id.desc())
+        .order_by(TaxChange.date.desc(), TaxChange.regulation_id.desc())
         .limit(limit)
         .offset(offset)
     )
     return [
         TaxChangeOut(
-            norma_id=item.norma_id,
+            regulation_id=item.regulation_id,
             date=item.date,
             change_type=item.change_type,
             tax_name=item.tax_name,
