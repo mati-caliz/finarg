@@ -1,57 +1,36 @@
+import type { IndicatorSeriesParams, PoliticalEventsParams, PostCategory } from "@/lib/labrechaApi";
 import {
-  type IndicatorSeriesParams,
-  type PoliticalEventsParams,
-  type PostCategory,
-  congressApi,
-  gazetteApi,
-  holidaysApi,
-  housingApi,
-  indicatorsApi,
-  newsApi,
-  politicalEventsApi,
-  postsApi,
-  revenueSharingApi,
-  scrapeRunsApi,
-  senateApi,
-  taxesApi,
-} from "@/lib/labrechaApi";
+  congressAttendanceQuery,
+  congressLawsQuery,
+  congressVoteDetailsQuery,
+  congressVoteQuery,
+  congressVotesQuery,
+  gazetteSummariesQuery,
+  holidaysQuery,
+  indicatorSeriesQuery,
+  indicatorSourcesQuery,
+  indicatorsQuery,
+  newsQuery,
+  politicalEventsQuery,
+  postQuery,
+  postsQuery,
+  rentByNeighborhoodQuery,
+  revenueSharingQuery,
+  scrapeRunsQuery,
+  senateBlocsQuery,
+  senateMembersQuery,
+  taxChangesQuery,
+} from "@/lib/queries";
 import { useQueries, useQuery } from "@tanstack/react-query";
 
-export const labrechaKeys = {
-  indicators: ["labrecha", "indicators"] as const,
-  indicatorSeries: (code: string, params?: IndicatorSeriesParams) =>
-    ["labrecha", "indicators", code, params ?? {}] as const,
-  indicatorSources: (code: string) => ["labrecha", "indicators", code, "sources"] as const,
-  politicalEvents: (params?: object) => ["labrecha", "political-events", params ?? {}] as const,
-  congressVotes: (params?: object) => ["labrecha", "congress", "votes", params ?? {}] as const,
-  congressVote: (actaId: string) => ["labrecha", "congress", "votes", actaId] as const,
-  congressLaws: (params?: object) => ["labrecha", "congress", "laws", params ?? {}] as const,
-  congressAttendance: ["labrecha", "congress", "attendance"] as const,
-  congressVoteDetails: (actaId: string, params?: object) =>
-    ["labrecha", "congress", "votes", actaId, "details", params ?? {}] as const,
-  senateMembers: (params?: object) => ["labrecha", "senate", "members", params ?? {}] as const,
-  senateBlocs: ["labrecha", "senate", "blocs"] as const,
-  holidays: (params?: object) => ["labrecha", "holidays", params ?? {}] as const,
-  news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
-  posts: (params?: object) => ["labrecha", "posts", params ?? {}] as const,
-  post: (slug: string) => ["labrecha", "posts", slug] as const,
-  gazette: (params?: object) => ["labrecha", "gazette", params ?? {}] as const,
-  revenueSharing: ["labrecha", "revenue-sharing"] as const,
-  taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
-  rentByNeighborhood: ["labrecha", "housing", "rent-by-neighborhood"] as const,
-  scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
-};
+export { labrechaKeys } from "@/lib/queries";
 
 export function useIndicators() {
-  return useQuery({ queryKey: labrechaKeys.indicators, queryFn: () => indicatorsApi.list() });
+  return useQuery(indicatorsQuery());
 }
 
 export function useIndicatorSeries(code: string, params?: IndicatorSeriesParams) {
-  return useQuery({
-    queryKey: labrechaKeys.indicatorSeries(code, params),
-    queryFn: () => indicatorsApi.series(code, params),
-    enabled: code.length > 0,
-  });
+  return useQuery({ ...indicatorSeriesQuery(code, params), enabled: code.length > 0 });
 }
 
 export function useIndicatorSeriesMulti(
@@ -61,8 +40,7 @@ export function useIndicatorSeriesMulti(
 ) {
   return useQueries({
     queries: sources.map((source) => ({
-      queryKey: labrechaKeys.indicatorSeries(code, { ...params, source }),
-      queryFn: () => indicatorsApi.series(code, { ...params, source }),
+      ...indicatorSeriesQuery(code, { ...params, source }),
       enabled: code.length > 0,
     })),
   });
@@ -70,31 +48,18 @@ export function useIndicatorSeriesMulti(
 
 export function useLegLatest(legs: { code: string; source: string }[]) {
   return useQueries({
-    queries: legs.map((leg) => ({
-      queryKey: labrechaKeys.indicatorSeries(leg.code, {
-        source: leg.source,
-        limit: 1,
-        order: "desc" as const,
-      }),
-      queryFn: () =>
-        indicatorsApi.series(leg.code, { source: leg.source, limit: 1, order: "desc" }),
-    })),
+    queries: legs.map((leg) =>
+      indicatorSeriesQuery(leg.code, { source: leg.source, limit: 1, order: "desc" }),
+    ),
   });
 }
 
 export function useIndicatorSources(code: string) {
-  return useQuery({
-    queryKey: labrechaKeys.indicatorSources(code),
-    queryFn: () => indicatorsApi.sources(code),
-    enabled: code.length > 0,
-  });
+  return useQuery({ ...indicatorSourcesQuery(code), enabled: code.length > 0 });
 }
 
 export function usePoliticalEvents(params?: PoliticalEventsParams) {
-  return useQuery({
-    queryKey: labrechaKeys.politicalEvents(params),
-    queryFn: () => politicalEventsApi.list(params),
-  });
+  return useQuery(politicalEventsQuery(params));
 }
 
 export function useCongressVotes(params?: {
@@ -105,10 +70,7 @@ export function useCongressVotes(params?: {
   limit?: number;
   offset?: number;
 }) {
-  return useQuery({
-    queryKey: labrechaKeys.congressVotes(params),
-    queryFn: () => congressApi.votes(params),
-  });
+  return useQuery(congressVotesQuery(params));
 }
 
 export function useCongressLaws(params?: {
@@ -118,51 +80,37 @@ export function useCongressLaws(params?: {
   limit?: number;
   offset?: number;
 }) {
-  return useQuery({
-    queryKey: labrechaKeys.congressLaws(params),
-    queryFn: () => congressApi.laws(params),
-  });
+  return useQuery(congressLawsQuery(params));
 }
 
 export function useCongressAttendance() {
-  return useQuery({
-    queryKey: labrechaKeys.congressAttendance,
-    queryFn: () => congressApi.attendance(),
-  });
+  return useQuery(congressAttendanceQuery());
 }
 
-export function useCongressVote(actaId: string) {
-  return useQuery({
-    queryKey: labrechaKeys.congressVote(actaId),
-    queryFn: () => congressApi.vote(actaId),
-    enabled: actaId.length > 0,
-  });
+export function useCongressVote(voteRecordId: string) {
+  return useQuery({ ...congressVoteQuery(voteRecordId), enabled: voteRecordId.length > 0 });
 }
 
-export function useCongressVoteDetails(actaId: string, params?: { vote?: string; bloc?: string }) {
+export function useCongressVoteDetails(
+  voteRecordId: string,
+  params?: { vote?: string; bloc?: string },
+) {
   return useQuery({
-    queryKey: labrechaKeys.congressVoteDetails(actaId, params),
-    queryFn: () => congressApi.voteDetails(actaId, params),
-    enabled: actaId.length > 0,
+    ...congressVoteDetailsQuery(voteRecordId, params),
+    enabled: voteRecordId.length > 0,
   });
 }
 
 export function useSenateMembers(params?: { bloc?: string; province?: string }) {
-  return useQuery({
-    queryKey: labrechaKeys.senateMembers(params),
-    queryFn: () => senateApi.members(params),
-  });
+  return useQuery(senateMembersQuery(params));
 }
 
 export function useSenateBlocs() {
-  return useQuery({ queryKey: labrechaKeys.senateBlocs, queryFn: () => senateApi.blocs() });
+  return useQuery(senateBlocsQuery());
 }
 
 export function useHolidays(params?: { year?: number; date_from?: string; date_to?: string }) {
-  return useQuery({
-    queryKey: labrechaKeys.holidays(params),
-    queryFn: () => holidaysApi.list(params),
-  });
+  return useQuery(holidaysQuery(params));
 }
 
 export function useNews(params?: {
@@ -171,19 +119,15 @@ export function useNews(params?: {
   limit?: number;
   offset?: number;
 }) {
-  return useQuery({ queryKey: labrechaKeys.news(params), queryFn: () => newsApi.list(params) });
+  return useQuery(newsQuery(params));
 }
 
 export function usePosts(params?: { category?: PostCategory; limit?: number; offset?: number }) {
-  return useQuery({ queryKey: labrechaKeys.posts(params), queryFn: () => postsApi.list(params) });
+  return useQuery(postsQuery(params));
 }
 
 export function usePost(slug: string) {
-  return useQuery({
-    queryKey: labrechaKeys.post(slug),
-    queryFn: () => postsApi.bySlug(slug),
-    enabled: slug.length > 0,
-  });
+  return useQuery({ ...postQuery(slug), enabled: slug.length > 0 });
 }
 
 export function useBoletinSummaries(params?: {
@@ -191,17 +135,11 @@ export function useBoletinSummaries(params?: {
   limit?: number;
   offset?: number;
 }) {
-  return useQuery({
-    queryKey: labrechaKeys.gazette(params),
-    queryFn: () => gazetteApi.summaries(params),
-  });
+  return useQuery(gazetteSummariesQuery(params));
 }
 
 export function useCoparticipacion() {
-  return useQuery({
-    queryKey: labrechaKeys.revenueSharing,
-    queryFn: () => revenueSharingApi.shares(),
-  });
+  return useQuery(revenueSharingQuery());
 }
 
 export function useTaxChanges(params?: {
@@ -210,22 +148,13 @@ export function useTaxChanges(params?: {
   limit?: number;
   offset?: number;
 }) {
-  return useQuery({
-    queryKey: labrechaKeys.taxChanges(params),
-    queryFn: () => taxesApi.changes(params),
-  });
+  return useQuery(taxChangesQuery(params));
 }
 
 export function useScrapeRuns(params?: { limit?: number }) {
-  return useQuery({
-    queryKey: labrechaKeys.scrapeRuns(params),
-    queryFn: () => scrapeRunsApi.list(params),
-  });
+  return useQuery(scrapeRunsQuery(params));
 }
 
 export function useRentByNeighborhood() {
-  return useQuery({
-    queryKey: labrechaKeys.rentByNeighborhood,
-    queryFn: () => housingApi.rentByNeighborhood(),
-  });
+  return useQuery(rentByNeighborhoodQuery());
 }

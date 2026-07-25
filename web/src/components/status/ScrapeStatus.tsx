@@ -5,6 +5,7 @@ import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useScrapeRuns } from "@/hooks/useLabrecha";
 import type { ScrapeRun } from "@/lib/labrechaApi";
+import { SCRAPE_RUNS_PARAMS } from "@/lib/queryParams";
 
 const SKELETON_KEYS = ["e1", "e2", "e3", "e4", "e5", "e6"];
 
@@ -126,7 +127,7 @@ function StatusRow({ run }: { run: ScrapeRun }) {
 }
 
 export function ScrapeStatus() {
-  const { data, isLoading, isError, error, refetch } = useScrapeRuns({ limit: 200 });
+  const { data, isLoading, isError, error, refetch } = useScrapeRuns(SCRAPE_RUNS_PARAMS);
 
   if (isError) {
     return <QueryError error={error} onRetry={() => refetch()} />;

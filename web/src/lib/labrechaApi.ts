@@ -1,3 +1,4 @@
+import { buildQueryString, serverGet } from "@/lib/serverApi";
 import axios from "axios";
 
 const LABRECHA_API_URL = process.env.NEXT_PUBLIC_LABRECHA_API_URL || "/api/data";
@@ -307,6 +308,9 @@ export interface TaxImpactResponse {
 }
 
 async function get<T>(path: string, params?: object): Promise<T> {
+  if (typeof window === "undefined") {
+    return serverGet<T>(`${path}${buildQueryString(params)}`);
+  }
   const response = await labrechaApi.get<T>(path, { params });
   return response.data;
 }

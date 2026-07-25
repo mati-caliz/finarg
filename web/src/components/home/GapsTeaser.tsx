@@ -3,8 +3,7 @@
 import { Eyebrow } from "@/components/home/homeShared";
 import { useIndicatorSources } from "@/hooks/useLabrecha";
 import { formatNumberAR, getIndicatorDisplay, sourceLabel } from "@/lib/indicators";
-
-const TEASER_CODES = ["international_reserves", "cpi_monthly", "dollar_official"];
+import { TEASER_CODES } from "@/lib/queryParams";
 
 function GapItem({ code }: { code: string }) {
   const indicator = getIndicatorDisplay(code);

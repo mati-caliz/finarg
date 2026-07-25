@@ -1,4 +1,6 @@
 import { IndicatorCatalog } from "@/components/indicator/IndicatorCatalog";
+import { indicatorCatalogQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -48,7 +50,9 @@ export default function IndicatorsPage() {
           familia. Cada una abre su serie histórica anotada, con fuente y fecha.
         </p>
       </header>
-      <IndicatorCatalog />
+      <PrefetchedQueries queries={indicatorCatalogQueries()}>
+        <IndicatorCatalog />
+      </PrefetchedQueries>
     </div>
   );
 }

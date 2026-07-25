@@ -1,4 +1,6 @@
 import { ScrapeStatus } from "@/components/status/ScrapeStatus";
+import { scrapeStatusQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,7 +23,7 @@ export default function StatusPage() {
       <header style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <h1
           style={{
-            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-sans)",
+            font: "var(--fw-bold) var(--fs-h1)/var(--lh-heading) var(--font-display)",
             color: "var(--ink)",
             margin: 0,
             letterSpacing: "-0.01em",
@@ -36,7 +38,9 @@ export default function StatusPage() {
         </p>
       </header>
 
-      <ScrapeStatus />
+      <PrefetchedQueries queries={scrapeStatusQueries()}>
+        <ScrapeStatus />
+      </PrefetchedQueries>
     </div>
   );
 }

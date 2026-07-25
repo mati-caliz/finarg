@@ -4,13 +4,20 @@ import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicatorSeries, usePoliticalEvents } from "@/hooks/useLabrecha";
 import { GAP_BY_ID, computeGap } from "@/lib/gaps";
-import { RANGE_MONTHS, SOURCE_METHODOLOGY, formatDateAR, sourceLabel } from "@/lib/indicators";
+import {
+  DEFAULT_RANGE,
+  RANGE_MONTHS,
+  SOURCE_METHODOLOGY,
+  formatDateAR,
+  sourceLabel,
+} from "@/lib/indicators";
 import {
   alignSources,
   eventsToChartEvents,
   mergePoints,
   parsePoints,
   rangeDateFrom,
+  todayISO,
   yearLabels,
 } from "@/lib/series";
 import { type CSSProperties, useState } from "react";
@@ -22,10 +29,6 @@ function seriesColor(index: number): string {
   return SERIES_COLORS[index % SERIES_COLORS.length] ?? "var(--chart)";
 }
 const MONO = "var(--font-jb-mono)";
-
-function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
 
 const rangeStyle = (active: boolean): CSSProperties => ({
   fontFamily: MONO,
@@ -39,7 +42,7 @@ const rangeStyle = (active: boolean): CSSProperties => ({
 });
 
 export function GapComparison({ id }: { id: string }) {
-  const [range, setRange] = useState("1A");
+  const [range, setRange] = useState(DEFAULT_RANGE);
   const def = GAP_BY_ID[id];
   const dateFrom = rangeDateFrom(todayISO(), RANGE_MONTHS[range] ?? 12);
 
