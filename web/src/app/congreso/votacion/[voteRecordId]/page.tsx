@@ -1,4 +1,6 @@
 import { VoteDetail } from "@/components/congress/VoteDetail";
+import { congressVoteQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,5 +15,9 @@ interface VotePageProps {
 
 export default async function VotePage({ params }: VotePageProps) {
   const { voteRecordId } = await params;
-  return <VoteDetail voteRecordId={voteRecordId} />;
+  return (
+    <PrefetchedQueries queries={congressVoteQueries(voteRecordId)}>
+      <VoteDetail voteRecordId={voteRecordId} />
+    </PrefetchedQueries>
+  );
 }

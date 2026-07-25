@@ -1,4 +1,6 @@
 import { NewsFeed } from "@/components/news/NewsFeed";
+import { newsQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -54,7 +56,9 @@ export default function NewsPage() {
           Agregado de medios · con enlace a la fuente
         </span>
       </header>
-      <NewsFeed />
+      <PrefetchedQueries queries={newsQueries()}>
+        <NewsFeed />
+      </PrefetchedQueries>
     </div>
   );
 }

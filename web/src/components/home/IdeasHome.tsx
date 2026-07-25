@@ -6,6 +6,7 @@ import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImp
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
 import type { Post } from "@/lib/labrechaApi";
+import { HOME_POSTS_PARAMS } from "@/lib/queryParams";
 import Link from "next/link";
 
 function CategoryBadge({ post }: { post: Post }) {
@@ -143,7 +144,7 @@ function IdeaListItem({ post, last }: { post: Post; last: boolean }) {
 }
 
 export function IdeasHome() {
-  const { data, isLoading } = usePosts({ limit: 4 });
+  const { data, isLoading } = usePosts(HOME_POSTS_PARAMS);
   const posts = data ?? [];
   const leadPost = posts[0];
 

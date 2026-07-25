@@ -628,6 +628,8 @@ export const SOURCE_METHODOLOGY: Record<string, string> = {
   utdt: "Índice de Confianza en el Gobierno (ICG) de la Escuela de Gobierno de la UTDT, escala 0 a 5.",
 };
 
+export const DEFAULT_RANGE = "1A";
+
 export const RANGE_MONTHS: Record<string, number> = {
   "1M": 1,
   "6M": 6,

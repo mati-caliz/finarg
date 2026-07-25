@@ -1,12 +1,56 @@
+import { JsonLd } from "@/components/JsonLd";
 import { PostDetail } from "@/components/posts/PostDetail";
+import type { Post } from "@/lib/labrechaApi";
+import { postDetailQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
+import { postQuery } from "@/lib/queries";
+import { postStructuredData } from "@/lib/structuredData";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Ideas - La Brecha",
-  description: "Ideas, leyes y análisis para Argentina publicados por el observatorio.",
-};
+interface IdeaPageProps {
+  params: Promise<{ slug: string }>;
+}
 
-export default async function IdeaDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+async function loadPost(slug: string): Promise<Post | undefined> {
+  return postQuery(slug)
+    .queryFn()
+    .catch(() => undefined);
+}
+
+export async function generateMetadata({ params }: IdeaPageProps): Promise<Metadata> {
   const { slug } = await params;
-  return <PostDetail slug={slug} />;
+  const post = await loadPost(slug);
+  if (post === undefined) {
+    return {
+      title: "Ideas - La Brecha",
+      description: "Ideas, leyes y análisis para Argentina publicados por el observatorio.",
+    };
+  }
+  return {
+    title: `${post.title} - La Brecha`,
+    description: post.summary ?? undefined,
+    alternates: { canonical: `/ideas/${slug}` },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.summary ?? undefined,
+      url: `/ideas/${slug}`,
+      publishedTime: post.created_at,
+      modifiedTime: post.updated_at,
+    },
+  };
+}
+
+export default async function IdeaDetailPage({ params }: IdeaPageProps) {
+  const { slug } = await params;
+  const post = await loadPost(slug);
+
+  return (
+    <>
+      {post === undefined ? null : <JsonLd data={postStructuredData(post)} />}
+      <PrefetchedQueries queries={postDetailQueries(slug)}>
+        <PostDetail slug={slug} />
+      </PrefetchedQueries>
+    </>
+  );
 }

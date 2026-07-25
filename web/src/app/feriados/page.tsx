@@ -1,4 +1,6 @@
 import { HolidaysCalendar } from "@/components/holidays/HolidaysCalendar";
+import { holidaysQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -35,7 +37,9 @@ export default function HolidaysPage() {
           Feriados de Argentina
         </h1>
       </header>
-      <HolidaysCalendar />
+      <PrefetchedQueries queries={holidaysQueries()}>
+        <HolidaysCalendar />
+      </PrefetchedQueries>
     </div>
   );
 }

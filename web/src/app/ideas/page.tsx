@@ -1,4 +1,6 @@
 import { PostsFeed } from "@/components/posts/PostsFeed";
+import { postsFeedQueries } from "@/lib/pageQueries";
+import { PrefetchedQueries } from "@/lib/prefetch";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -52,7 +54,9 @@ export default function IdeasPage() {
           categoría, su impacto estimado y su fecha.
         </p>
       </header>
-      <PostsFeed />
+      <PrefetchedQueries queries={postsFeedQueries()}>
+        <PostsFeed />
+      </PrefetchedQueries>
     </div>
   );
 }

@@ -1,28 +1,13 @@
 "use client";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { CACHE_TIMES } from "@/lib/constants";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createQueryClient } from "@/lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { useState } from "react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: CACHE_TIMES.REALTIME_STALE,
-            refetchOnWindowFocus: false,
-            retry: 2,
-            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-          },
-          mutations: {
-            retry: 1,
-          },
-        },
-      }),
-  );
+  const [queryClient] = useState(createQueryClient);
 
   return (
     <ThemeProvider

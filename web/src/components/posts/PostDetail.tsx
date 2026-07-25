@@ -6,6 +6,7 @@ import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImp
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePost, usePosts } from "@/hooks/useLabrecha";
 import type { Post, PostImpact } from "@/lib/labrechaApi";
+import { RELATED_POSTS_PARAMS } from "@/lib/queryParams";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -80,7 +81,7 @@ function RelatedItem({ post }: { post: Post }) {
 
 export function PostDetail({ slug }: { slug: string }) {
   const { data: post, isLoading, isError, error, refetch } = usePost(slug);
-  const { data: allPosts } = usePosts({ limit: 6 });
+  const { data: allPosts } = usePosts(RELATED_POSTS_PARAMS);
 
   if (isError) {
     return (

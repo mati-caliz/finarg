@@ -1,32 +1,6 @@
+import { getRevalidateTime } from "@/lib/cacheRules";
+import { getBackendUrl } from "@/lib/serverApi";
 import type { NextRequest } from "next/server";
-
-const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
-  { pattern: /^political-events/, revalidate: 86400 },
-  { pattern: /^congress/, revalidate: 86400 },
-  { pattern: /^senate/, revalidate: 86400 },
-  { pattern: /^holidays/, revalidate: 86400 },
-  { pattern: /^scrape-runs/, revalidate: 300 },
-  { pattern: /^news/, revalidate: 900 },
-  { pattern: /^posts/, revalidate: 60 },
-  { pattern: /^indicators/, revalidate: 1800 },
-];
-
-function getBackendUrl(): string {
-  return (
-    process.env.LABRECHA_API_INTERNAL_URL ||
-    process.env.NEXT_PUBLIC_LABRECHA_API_URL ||
-    "http://localhost:8000"
-  );
-}
-
-function getRevalidateTime(path: string): number {
-  for (const rule of CACHE_RULES) {
-    if (rule.pattern.test(path)) {
-      return rule.revalidate;
-    }
-  }
-  return 1800;
-}
 
 export async function GET(
   request: NextRequest,

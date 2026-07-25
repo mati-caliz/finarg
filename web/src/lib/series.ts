@@ -149,3 +149,26 @@ export function rangeDateFrom(latestDate: string | undefined, months: number): s
   date.setMonth(date.getMonth() - months);
   return date.toISOString().slice(0, 10);
 }
+
+export function todayISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function orderIndicatorSources<T extends { source: string; count: number }>(
+  sources: T[],
+  preferredSource: string | undefined,
+): T[] {
+  return [...sources].sort((first, second) => {
+    if (first.source === preferredSource) {
+      return -1;
+    }
+    if (second.source === preferredSource) {
+      return 1;
+    }
+    return second.count - first.count;
+  });
+}
+
+export function latestSourceDate(sources: { last_date: string }[]): string {
+  return sources.reduce((max, source) => (source.last_date > max ? source.last_date : max), "");
+}

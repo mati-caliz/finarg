@@ -4,10 +4,10 @@ import { QueryError } from "@/components/QueryError";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNews } from "@/hooks/useLabrecha";
 import type { NewsArticle } from "@/lib/labrechaApi";
+import { NEWS_LIMIT } from "@/lib/queryParams";
 import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 
-const NEWS_LIMIT = 40;
 const MONO = "var(--font-jb-mono)";
 
 const CATEGORY_LABELS: Record<string, string> = {

@@ -11,6 +11,7 @@ import {
 import { freshnessForCode } from "@/lib/freshness";
 import { GAPS } from "@/lib/gaps";
 import {
+  DEFAULT_RANGE,
   INDICATOR_FAMILY_LABELS,
   type IndicatorDisplay,
   RANGE_MONTHS,
@@ -27,6 +28,8 @@ import {
   type ParsedPoint,
   alignSources,
   eventsToChartEvents,
+  latestSourceDate,
+  orderIndicatorSources,
   parsePoints,
   rangeDateFrom,
   yearLabels,
@@ -677,27 +680,16 @@ function SeriesTable({
 }
 
 export function IndicatorDetail({ code }: IndicatorDetailProps) {
-  const [range, setRange] = useState("1A");
+  const [range, setRange] = useState(DEFAULT_RANGE);
   const indicator = getIndicatorDisplay(code);
   const meta = getIndicatorMeta(code);
   const familyLabel = meta ? INDICATOR_FAMILY_LABELS[meta.family] : "Indicadores";
   const { data: sourcesData, isLoading: loadingSources } = useIndicatorSources(code);
 
   const sources = sourcesData ?? [];
-  const ordered = [...sources].sort((a, b) => {
-    if (a.source === indicator.preferredSource) {
-      return -1;
-    }
-    if (b.source === indicator.preferredSource) {
-      return 1;
-    }
-    return b.count - a.count;
-  });
+  const ordered = orderIndicatorSources(sources, indicator.preferredSource);
   const sourceCodes = ordered.map((source) => source.source);
-  const latestDate = ordered.reduce(
-    (max, source) => (source.last_date > max ? source.last_date : max),
-    "",
-  );
+  const latestDate = latestSourceDate(ordered);
   const dateFrom = rangeDateFrom(latestDate, RANGE_MONTHS[range] ?? 12);
 
   const seriesQueries = useIndicatorSeriesMulti(code, sourceCodes, {

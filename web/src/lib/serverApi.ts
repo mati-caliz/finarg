@@ -1,3 +1,5 @@
+import { getRevalidateTime } from "@/lib/cacheRules";
+
 const LEADING_SLASH = /^\//;
 
 export function getBackendUrl(): string {
@@ -8,10 +10,25 @@ export function getBackendUrl(): string {
   );
 }
 
-export async function serverGet<T>(path: string, revalidate = 1800): Promise<T> {
-  const url = `${getBackendUrl()}/${path.replace(LEADING_SLASH, "")}`;
+export function buildQueryString(params?: object): string {
+  if (!params) {
+    return "";
+  }
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      search.set(key, String(value));
+    }
+  }
+  const serialized = search.toString();
+  return serialized ? `?${serialized}` : "";
+}
+
+export async function serverGet<T>(path: string, revalidate?: number): Promise<T> {
+  const normalized = path.replace(LEADING_SLASH, "");
+  const url = `${getBackendUrl()}/${normalized}`;
   const res = await fetch(url, {
-    next: { revalidate },
+    next: { revalidate: revalidate ?? getRevalidateTime(normalized) },
     headers: { Accept: "application/json" },
   });
   if (!res.ok) {

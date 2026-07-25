@@ -12,12 +12,9 @@ import {
   sourceLabel,
 } from "@/lib/indicators";
 import type { PoliticalEvent } from "@/lib/labrechaApi";
+import { HERO_CODE, HERO_POINTS, HERO_SOURCE, TILE_CODES } from "@/lib/queryParams";
+import Link from "next/link";
 import type { CSSProperties } from "react";
-
-const HERO_CODE = "cpi_monthly";
-const HERO_SOURCE = "argentinadatos";
-const HERO_POINTS = 24;
-const TILE_CODES = ["dollar_official", "country_risk", "international_reserves", "unemployment"];
 
 interface Variation {
   text: string;
@@ -98,7 +95,7 @@ function StatTile({ code }: { code: string }) {
   );
 
   return (
-    <a
+    <Link
       href={indicator.href}
       style={{ ...TILE_STYLE, display: "block", textDecoration: "none", color: "var(--ink)" }}
     >
@@ -149,7 +146,7 @@ function StatTile({ code }: { code: string }) {
           {sourceLabel(latest.source)} · {formatDateAR(latest.date)}
         </span>
       </div>
-    </a>
+    </Link>
   );
 }
 
