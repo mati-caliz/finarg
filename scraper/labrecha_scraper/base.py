@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 from abc import ABC, abstractmethod
 from datetime import date
 from decimal import Decimal
@@ -15,6 +16,8 @@ from sqlalchemy.orm import Session
 from labrecha_scraper.config import settings
 
 logger = logging.getLogger("labrecha_scraper")
+
+ERROR_MAX_LENGTH = 8000
 
 
 class IndicatorPoint(BaseModel):
@@ -97,6 +100,15 @@ def _upsert(session: Session, points: list[IndicatorPoint]) -> int:
     return len(rows)
 
 
+def _format_error(error: Exception) -> str:
+    summary = f"{type(error).__name__}: {error}"
+    detail = "".join(traceback.format_exception(error)).rstrip()
+    full = f"{summary}\n\n{detail}"
+    if len(full) <= ERROR_MAX_LENGTH:
+        return full
+    return f"{summary}\n\n[traceback truncado]\n...{detail[-ERROR_MAX_LENGTH:]}"
+
+
 def run_job(session: Session, connector: Connector) -> ScrapeRun:
     run = ScrapeRun(job_name=connector.name, status="running")
     session.add(run)
@@ -113,11 +125,11 @@ def run_job(session: Session, connector: Connector) -> ScrapeRun:
     except Exception as error:
         session.rollback()
         run.status = "error"
-        run.error = f"{type(error).__name__}: {error}"[:4000]
+        run.error = _format_error(error)
         run.finished_at = func.now()
         session.add(run)
         session.commit()
-        logger.exception("job %s falló: %s", connector.name, run.error)
+        logger.exception("job %s falló", connector.name)
 
     session.refresh(run)
     return run

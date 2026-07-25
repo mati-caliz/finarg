@@ -1,30 +1,50 @@
-# La Brecha — cron del host invocando el scraper vía docker compose.
-# Instalar con: crontab crontab.example  (ajustar rutas y zona horaria).
-# Cadencias por frecuencia real de cada fuente.
+# La Brecha — cron del host. Cubre los 20 conectores del registry.
+# Instalar con: crontab crontab.example  (ajustar REPO y zona horaria).
+# Cada línea usa scripts/scrape-cron.sh, que corre el job en un contenedor efímero
+# (profile "scraper", restart:no). Todos los conectores son idempotentes (upsert).
+# El detalle de cada corrida queda en la tabla scrape_runs y en el log rotado del
+# volumen scraper_logs (LOG_DIR=/var/log/labrecha dentro del contenedor).
 
 SHELL=/bin/bash
-COMPOSE=/usr/bin/docker compose -f /ruta/al/repo/docker-compose.yml
+REPO=/ruta/al/repo
+SCRAPE=$REPO/scripts/scrape-cron.sh
+LOGS=/var/log/labrecha
 
-# Cotizaciones del dólar: cada 15 minutos en horario de mercado.
-*/15 * * * *  $COMPOSE run --rm scraper run dollar       >> /var/log/labrecha/dollar.log 2>&1
+# ── Alta frecuencia ───────────────────────────────────────────────────────────
+# Cotizaciones del dólar: spot, cada 15 minutos.
+*/15 * * * *  $SCRAPE dollar             >> $LOGS/dollar.log 2>&1
 
-# Indicadores diarios: una vez al día (07:30).
-30 7 * * *    $COMPOSE run --rm scraper run country_risk >> /var/log/labrecha/country_risk.log 2>&1
-35 7 * * *    $COMPOSE run --rm scraper run inflation    >> /var/log/labrecha/inflation.log 2>&1
-40 7 * * *    $COMPOSE run --rm scraper run series_datosgob >> /var/log/labrecha/series.log 2>&1
-45 7 * * *    $COMPOSE run --rm scraper run reserves_bcra >> /var/log/labrecha/reserves_bcra.log 2>&1
+# ── Diarios ───────────────────────────────────────────────────────────────────
+30 7 * * *    $SCRAPE country_risk       >> $LOGS/country_risk.log 2>&1
+35 7 * * *    $SCRAPE inflation          >> $LOGS/inflation.log 2>&1
+40 7 * * *    $SCRAPE series_datosgob    >> $LOGS/series_datosgob.log 2>&1
+45 7 * * *    $SCRAPE reserves_bcra      >> $LOGS/reserves_bcra.log 2>&1
+50 7 * * *    $SCRAPE icl_bcra           >> $LOGS/icl_bcra.log 2>&1
+55 7 * * *    $SCRAPE bcra_rates         >> $LOGS/bcra_rates.log 2>&1
+0 8 * * *     $SCRAPE crypto             >> $LOGS/crypto.log 2>&1
+5 8 * * *     $SCRAPE news               >> $LOGS/news.log 2>&1
+# Boletín Oficial: se publica de lunes a viernes por la mañana.
+30 9 * * 1-5  $SCRAPE official_gazette   >> $LOGS/official_gazette.log 2>&1
 
-# Cripto: snapshot diario (la fuente sólo da precio spot). 07:50.
-50 7 * * *    $COMPOSE run --rm scraper run crypto       >> /var/log/labrecha/crypto.log 2>&1
+# ── Semanales (lunes) ─────────────────────────────────────────────────────────
+0 6 * * 1     $SCRAPE congress           >> $LOGS/congress.log 2>&1
+10 6 * * 1    $SCRAPE senate             >> $LOGS/senate.log 2>&1
+20 6 * * 1    $SCRAPE laws               >> $LOGS/laws.log 2>&1
+30 6 * * 1    $SCRAPE credit_bcra        >> $LOGS/credit_bcra.log 2>&1
+# ICG (UTDT): mensual, pero la fecha de publicación se corre; se chequea semanal.
+40 6 * * 1    $SCRAPE icg                >> $LOGS/icg.log 2>&1
 
-# Noticias: feed RSS, refresco diario. 07:55.
-55 7 * * *    $COMPOSE run --rm scraper run news         >> /var/log/labrecha/news.log 2>&1
+# ── Mensuales (día 1) ─────────────────────────────────────────────────────────
+0 5 1 * *     $SCRAPE holidays           >> $LOGS/holidays.log 2>&1
+20 5 1 * *    $SCRAPE rent_caba          >> $LOGS/rent_caba.log 2>&1
+40 5 1 * *    $SCRAPE big_mac            >> $LOGS/big_mac.log 2>&1
+# Backfills históricos: idempotentes y pesados (crypto_historical respeta el rate
+# limit de CoinGecko). Reconcilian los huecos que dejen los jobs diarios.
+0 4 1 * *     $SCRAPE dollar_historical  >> $LOGS/dollar_historical.log 2>&1
+30 4 1 * *    $SCRAPE crypto_historical  >> $LOGS/crypto_historical.log 2>&1
 
-# Congreso: votaciones nominales, baja frecuencia (por sesión). Semanal, lunes 08:00.
-0 8 * * 1     $COMPOSE run --rm scraper run congress     >> /var/log/labrecha/congress.log 2>&1
-
-# Senado: composición actual, cambia poco. Semanal, lunes 08:05.
-5 8 * * 1     $COMPOSE run --rm scraper run senate       >> /var/log/labrecha/senate.log 2>&1
-
-# Feriados: cambian poco; refresco mensual (día 1, 08:10) trae el año siguiente.
-10 8 1 * *    $COMPOSE run --rm scraper run holidays     >> /var/log/labrecha/holidays.log 2>&1
+# ── Alerta ────────────────────────────────────────────────────────────────────
+# Avisa cuando un conector falla FAILURE_THRESHOLD corridas seguidas (default 3).
+# Con TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID notifica por Telegram; si no, sale != 0
+# para que lo capture el MAILTO del cron.
+0 12 * * *    $REPO/scripts/scrape-alert.sh >> $LOGS/scrape-alert.log 2>&1
