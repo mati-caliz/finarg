@@ -3,6 +3,7 @@ import {
   type PoliticalEventsParams,
   type PostCategory,
   congressApi,
+  gapsApi,
   gazetteApi,
   holidaysApi,
   housingApi,
@@ -14,6 +15,7 @@ import {
   scrapeRunsApi,
   senateApi,
   taxesApi,
+  termsApi,
 } from "@/lib/labrechaApi";
 
 export const labrechaKeys = {
@@ -39,6 +41,9 @@ export const labrechaKeys = {
   taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
   rentByNeighborhood: ["labrecha", "housing", "rent-by-neighborhood"] as const,
   scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
+  sourceGaps: (params?: object) => ["labrecha", "gaps", params ?? {}] as const,
+  indicatorTerms: (code: string, params?: object) =>
+    ["labrecha", "terms", code, params ?? {}] as const,
 };
 
 export const indicatorsQuery = () => ({
@@ -177,4 +182,14 @@ export const scrapeRunsQuery = (params?: { limit?: number }) => ({
 export const rentByNeighborhoodQuery = () => ({
   queryKey: labrechaKeys.rentByNeighborhood,
   queryFn: () => housingApi.rentByNeighborhood(),
+});
+
+export const sourceGapsQuery = (params?: { limit?: number; min_sources?: number }) => ({
+  queryKey: labrechaKeys.sourceGaps(params),
+  queryFn: () => gapsApi.list(params),
+});
+
+export const indicatorTermsQuery = (code: string, params?: { source?: string }) => ({
+  queryKey: labrechaKeys.indicatorTerms(code, params),
+  queryFn: () => termsApi.byIndicator(code, params),
 });

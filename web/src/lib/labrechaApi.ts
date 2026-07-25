@@ -39,6 +39,47 @@ export interface IndicatorSeries {
   points: IndicatorPoint[];
 }
 
+export interface GapMeasurement {
+  source: string;
+  value: string;
+}
+
+export interface SourceGap {
+  indicator_code: string;
+  date: string;
+  higher_source: string;
+  higher_value: string;
+  lower_source: string;
+  lower_value: string;
+  spread: string;
+  gap_pct: number;
+  measurements: GapMeasurement[];
+}
+
+export type TermMethod = "COMPOUNDED" | "ENDPOINTS";
+
+export interface IndicatorTermStat {
+  term_id: string;
+  president: string;
+  start: string;
+  end: string | null;
+  first_date: string;
+  last_date: string;
+  first_value: string;
+  last_value: string;
+  average: string;
+  points: number;
+  change_pct: string;
+  annualized_pct: string | null;
+}
+
+export interface IndicatorTerms {
+  indicator_code: string;
+  source: string;
+  method: TermMethod;
+  terms: IndicatorTermStat[];
+}
+
 export interface PoliticalEvent {
   date: string;
   title: string;
@@ -387,6 +428,16 @@ export const taxesApi = {
     limit?: number;
     offset?: number;
   }) => get<TaxChange[]>("/taxes/changes", params),
+};
+
+export const gapsApi = {
+  list: (params?: { limit?: number; min_sources?: number }) => get<SourceGap[]>("/gaps", params),
+  byCode: (code: string) => get<SourceGap>(`/gaps/${code}`),
+};
+
+export const termsApi = {
+  byIndicator: (code: string, params?: { source?: string }) =>
+    get<IndicatorTerms>(`/terms/${code}`, params),
 };
 
 export const scrapeRunsApi = {

@@ -6,6 +6,7 @@ from labrecha_api.routers import (
     calculators,
     congress,
     events,
+    gaps,
     gazette,
     holidays,
     housing,
@@ -16,6 +17,7 @@ from labrecha_api.routers import (
     senate,
     status,
     taxes,
+    terms,
 )
 
 app = FastAPI(
@@ -36,6 +38,8 @@ app.add_middleware(
 app.include_router(status.router)
 app.include_router(indicators.router)
 app.include_router(events.router)
+app.include_router(gaps.router)
+app.include_router(terms.router)
 app.include_router(congress.router)
 app.include_router(senate.router)
 app.include_router(holidays.router)

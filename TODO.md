@@ -17,10 +17,7 @@ usuarios, monetización por suscripción, módulo de inversiones) no vuelve a es
 
 ## Producto
 
-- [ ] **Brechas automáticas**: derivar las brechas de todo `indicator_code` con ≥2 `source` en vez
-      de la lista curada de `web/src/lib/gaps.ts`.
-- [ ] **Series anotadas por gestión**: inflación acumulada por gobierno, variación desde un evento.
-- [ ] **Página de metodología y fuentes**: qué mide cada indicador, cadencia y de dónde sale.
+- [ ] **Variación desde un evento puntual** (no sólo por mandato): p. ej. desde el DNU 70/2023.
 - [ ] **Semáforo público de frescura**: exponer por serie lo que ya calcula `lib/freshness.ts`.
 - [ ] **API pública documentada**: la FastAPI ya es de sólo lectura; falta rate limiting y docs.
 - [ ] **Alertas por email/RSS**: aviso cuando una brecha supera un umbral (sin cuentas de usuario).
