@@ -57,6 +57,9 @@ export function DataTable({ columns, rows, footer, style }: DataTableProps) {
             <tr key={row.id} style={{ borderTop: "1px solid var(--line2)" }}>
               {row.cells.map((cell, cellIndex) => {
                 const column = columns[cellIndex];
+                if (!column) {
+                  return null;
+                }
                 return (
                   <td
                     key={column.key}

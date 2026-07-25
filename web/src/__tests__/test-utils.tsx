@@ -119,4 +119,3 @@ export const mockIncomeTaxResponse = (overrides = {}) => ({
   ],
   ...overrides,
 });
-

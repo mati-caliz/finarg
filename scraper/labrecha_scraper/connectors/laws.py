@@ -5,6 +5,7 @@ import json
 from dataclasses import dataclass, field
 from datetime import date
 
+import httpx
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -82,7 +83,7 @@ class LawsConnector(Connector):
         assert isinstance(data, LawsData)
         return upsert_rows(session, SanctionedLaw, data.laws, ["law_number"])
 
-    def _resolve_json_url(self, client, dataset_id: str) -> str:
+    def _resolve_json_url(self, client: httpx.Client, dataset_id: str) -> str:
         response = client.get(CKAN_PACKAGE_URL, params={"id": dataset_id})
         response.raise_for_status()
         for resource in response.json()["result"]["resources"]:
@@ -90,7 +91,9 @@ class LawsConnector(Connector):
                 return resource["url"]
         raise ValueError(f"no se encontró recurso JSON en el dataset {dataset_id}")
 
-    def _download_records(self, client, dataset_id: str, timeout: float | None = None) -> list[dict]:
+    def _download_records(
+        self, client: httpx.Client, dataset_id: str, timeout: float | None = None
+    ) -> list[dict]:
         url = self._resolve_json_url(client, dataset_id)
         response = client.get(url) if timeout is None else client.get(url, timeout=timeout)
         response.raise_for_status()

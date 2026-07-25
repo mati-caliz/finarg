@@ -15,7 +15,10 @@ function weekdayName(isoDate: string): string {
 }
 
 function dayMonth(isoDate: string): string {
-  return new Date(`${isoDate}T00:00:00`).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
+  return new Date(`${isoDate}T00:00:00`).toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+  });
 }
 
 function useCountdown(targetISO: string | undefined) {
@@ -41,7 +44,17 @@ function TypeBadge({ holiday }: { holiday: Holiday }) {
   const fixed = holiday.is_fixed === true;
   const color = fixed ? "var(--event)" : "var(--gap)";
   return (
-    <span style={{ fontFamily: MONO, fontSize: "0.68rem", color, border: `1px solid ${color}`, borderRadius: "var(--radius-pill)", padding: "4px 12px", whiteSpace: "nowrap" }}>
+    <span
+      style={{
+        fontFamily: MONO,
+        fontSize: "0.68rem",
+        color,
+        border: `1px solid ${color}`,
+        borderRadius: "var(--radius-pill)",
+        padding: "4px 12px",
+        whiteSpace: "nowrap",
+      }}
+    >
       {fixed ? "Inamovible" : "Trasladable"}
     </span>
   );
@@ -63,21 +76,66 @@ function CountdownHero({ holiday, targetISO }: { holiday: Holiday; targetISO: st
       }}
     >
       <div>
-        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--gap)", marginBottom: 14 }}>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.68rem",
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "var(--gap)",
+            marginBottom: 14,
+          }}
+        >
           Próximo feriado
         </div>
-        <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.125rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 10px", color: "var(--ink)" }}>
+        <h2
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(1.75rem, 4vw, 2.125rem)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+            margin: "0 0 10px",
+            color: "var(--ink)",
+          }}
+        >
           {holidayLabel(holiday)}
         </h2>
-        <div style={{ fontFamily: MONO, fontSize: "0.82rem", color: "var(--ink2)", textTransform: "capitalize" }}>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.82rem",
+            color: "var(--ink2)",
+            textTransform: "capitalize",
+          }}
+        >
           {formatLongDate(holiday.date)}
         </div>
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "clamp(3rem, 9vw, 4.5rem)", lineHeight: 0.85, letterSpacing: "-0.04em", color: "var(--ink)", fontVariantNumeric: "tabular-nums" }}>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontWeight: 700,
+            fontSize: "clamp(3rem, 9vw, 4.5rem)",
+            lineHeight: 0.85,
+            letterSpacing: "-0.04em",
+            color: "var(--ink)",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
           {countdown?.days ?? "—"}
         </div>
-        <div style={{ fontFamily: MONO, fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink2)", marginTop: 8 }}>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.72rem",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "var(--ink2)",
+            marginTop: 8,
+          }}
+        >
           días · {countdown?.hms ?? "00:00:00"}
         </div>
       </div>
@@ -117,7 +175,12 @@ export function HolidaysCalendar() {
     <div>
       <div style={{ display: "flex", gap: 6, marginBottom: 30, flexWrap: "wrap" }}>
         {years.map((option) => (
-          <button key={option} type="button" onClick={() => setYear(option)} style={yearPillStyle(option === year)}>
+          <button
+            key={option}
+            type="button"
+            onClick={() => setYear(option)}
+            style={yearPillStyle(option === year)}
+          >
             {option}
           </button>
         ))}
@@ -139,7 +202,16 @@ export function HolidaysCalendar() {
             <CountdownHero holiday={nextHoliday} targetISO={nextHoliday.date} />
           )}
 
-          <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
+          <div
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.68rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--ink3)",
+              marginBottom: 16,
+            }}
+          >
             {year === currentYear ? "Los feriados del año" : `Feriados ${year}`}
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
@@ -158,19 +230,57 @@ export function HolidaysCalendar() {
                     opacity: isPast ? 0.5 : 1,
                   }}
                 >
-                  <div style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.9375rem", fontVariantNumeric: "tabular-nums" }}>
+                  <div
+                    style={{
+                      fontFamily: MONO,
+                      fontWeight: 600,
+                      fontSize: "0.9375rem",
+                      fontVariantNumeric: "tabular-nums",
+                    }}
+                  >
                     {dayMonth(holiday.date)}
                     <br />
-                    <span style={{ fontSize: "0.7rem", color: "var(--ink3)", fontWeight: 400, textTransform: "capitalize" }}>
+                    <span
+                      style={{
+                        fontSize: "0.7rem",
+                        color: "var(--ink3)",
+                        fontWeight: 400,
+                        textTransform: "capitalize",
+                      }}
+                    >
                       {weekdayName(holiday.date)}
                     </span>
                   </div>
-                  <div style={{ fontFamily: "var(--font-serif)", fontSize: "1.1875rem", color: "var(--ink)" }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-serif)",
+                      fontSize: "1.1875rem",
+                      color: "var(--ink)",
+                    }}
+                  >
                     {holidayLabel(holiday)}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
+                      justifyContent: "flex-end",
+                    }}
+                  >
                     {freeRun.length >= LONG_WEEKEND_MIN_DAYS && (
-                      <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink2)", background: "var(--surface)", border: "1px solid var(--line)", borderRadius: "var(--radius-pill)", padding: "4px 10px" }}>
+                      <span
+                        style={{
+                          fontFamily: MONO,
+                          fontSize: "0.68rem",
+                          color: "var(--ink2)",
+                          background: "var(--surface)",
+                          border: "1px solid var(--line)",
+                          borderRadius: "var(--radius-pill)",
+                          padding: "4px 10px",
+                        }}
+                      >
                         Finde de {freeRun.length} días
                       </span>
                     )}
@@ -181,7 +291,9 @@ export function HolidaysCalendar() {
             })}
           </div>
 
-          <div style={{ marginTop: 24, fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)" }}>
+          <div
+            style={{ marginTop: 24, fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)" }}
+          >
             Fuente: calendario oficial de feriados nacionales · Nager.Date.
           </div>
         </>

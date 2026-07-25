@@ -1,12 +1,12 @@
 "use client";
 
-import { Card } from "@/components/core";
 import {
   BlocLegend,
-  HemicycleChart,
   type HemicycleBloc,
+  HemicycleChart,
   type HemicycleSeat,
 } from "@/components/congress/HemicycleChart";
+import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSenateMembers } from "@/hooks/useLabrecha";
 import { blocColor } from "@/lib/congress";

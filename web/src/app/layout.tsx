@@ -1,5 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Bricolage_Grotesque, IBM_Plex_Mono, JetBrains_Mono, Newsreader } from "next/font/google";
+import {
+  Archivo,
+  Bricolage_Grotesque,
+  IBM_Plex_Mono,
+  JetBrains_Mono,
+  Newsreader,
+} from "next/font/google";
 import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";

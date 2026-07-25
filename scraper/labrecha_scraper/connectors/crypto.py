@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import timezone
+from datetime import UTC
 from datetime import datetime as datetime_type
 from decimal import Decimal
 
@@ -36,7 +36,7 @@ class CryptoConnector(Connector):
             response.raise_for_status()
             payload = response.json()
 
-        today = datetime_type.now(timezone.utc).date()
+        today = datetime_type.now(UTC).date()
         points: list[IndicatorPoint] = []
         for symbol, coingecko_id in COINGECKO_IDS.items():
             data = payload.get(coingecko_id)

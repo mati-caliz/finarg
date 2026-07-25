@@ -53,7 +53,10 @@ export function SectionHead({
   );
 }
 
-export function Eyebrow({ children, color = "var(--gap)" }: { children: ReactNode; color?: string }) {
+export function Eyebrow({
+  children,
+  color = "var(--gap)",
+}: { children: ReactNode; color?: string }) {
   return (
     <div
       style={{

@@ -1,13 +1,5 @@
 import type { PostImpactKind } from "@/lib/labrechaApi";
-import {
-  Clock,
-  Eye,
-  HeartPulse,
-  Landmark,
-  Leaf,
-  type LucideIcon,
-  Wallet,
-} from "lucide-react";
+import { Clock, Eye, HeartPulse, Landmark, Leaf, type LucideIcon, Wallet } from "lucide-react";
 
 export interface ImpactKindMeta {
   label: string;
@@ -63,8 +55,9 @@ export const POST_IMPACT_META: Record<PostImpactKind, ImpactKindMeta> = {
 };
 
 const WORDS_PER_MINUTE = 200;
+const WHITESPACE = /\s+/;
 
 export function readingTimeMinutes(content: string): number {
-  const words = content.split(/\s+/).filter((word) => word.length > 0).length;
+  const words = content.split(WHITESPACE).filter((word) => word.length > 0).length;
   return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
 }

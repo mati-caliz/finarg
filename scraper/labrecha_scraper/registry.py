@@ -3,7 +3,6 @@ from __future__ import annotations
 from labrecha_scraper.base import Connector
 from labrecha_scraper.connectors.bcra_rates import BcraRatesConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
-from labrecha_scraper.connectors.official_gazette import OfficialGazetteConnector
 from labrecha_scraper.connectors.congress import CongressConnector
 from labrecha_scraper.connectors.country_risk import CountryRiskConnector
 from labrecha_scraper.connectors.credit_bcra import CreditBcraConnector
@@ -17,6 +16,7 @@ from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
 from labrecha_scraper.connectors.inflation import InflationConnector
 from labrecha_scraper.connectors.laws import LawsConnector
 from labrecha_scraper.connectors.news import NewsConnector
+from labrecha_scraper.connectors.official_gazette import OfficialGazetteConnector
 from labrecha_scraper.connectors.rent_caba import RentCabaConnector
 from labrecha_scraper.connectors.reserves_bcra import ReservesBcraConnector
 from labrecha_scraper.connectors.senate import SenateConnector

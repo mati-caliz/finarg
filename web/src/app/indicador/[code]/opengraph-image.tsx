@@ -89,7 +89,15 @@ export default async function Image({ params }: { params: Promise<{ code: string
           {indicator.label}
         </div>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 14 }}>
-          <div style={{ display: "flex", fontSize: 120, fontWeight: 700, color: COLORS.ink, lineHeight: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 120,
+              fontWeight: 700,
+              color: COLORS.ink,
+              lineHeight: 1,
+            }}
+          >
             {latest ? indicator.format(latest.value) : "—"}
           </div>
           {indicator.unit && (

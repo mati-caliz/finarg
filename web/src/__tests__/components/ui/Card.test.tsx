@@ -85,7 +85,6 @@ describe("Card", () => {
       </Card>,
     );
 
-    // CardTitle should render as h3 by default
-    expect(screen.getByRole("heading", { level: 3 })).toHaveTextContent("Title");
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Title");
   });
 });

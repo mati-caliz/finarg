@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+from collections.abc import Callable
 
 from sqlalchemy import select
 
@@ -10,8 +11,8 @@ from labrecha_scraper.base import run_job
 from labrecha_scraper.db import SessionLocal, engine
 from labrecha_scraper.models import Base, ScrapeRun
 from labrecha_scraper.registry import CONNECTORS, get_connector
-from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
 from labrecha_scraper.seed_events import seed_events
+from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
 from labrecha_scraper.seed_taxes import seed_taxes
 
 
@@ -82,6 +83,16 @@ def _status() -> None:
                 )
 
 
+COMMAND_HANDLERS: dict[str, Callable[[], None]] = {
+    "init-db": _init_db,
+    "list": _list_jobs,
+    "seed-events": _seed_events,
+    "seed-taxes": _seed_taxes,
+    "seed-revenue-sharing": _seed_revenue_sharing,
+    "status": _status,
+}
+
+
 def main(argv: list[str] | None = None) -> int:
     _configure_logging()
     parser = argparse.ArgumentParser(prog="labrecha-scraper")
@@ -98,27 +109,13 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
-    if args.command == "init-db":
-        _init_db()
-        return 0
-    if args.command == "list":
-        _list_jobs()
-        return 0
-    if args.command == "seed-events":
-        _seed_events()
-        return 0
-    if args.command == "seed-taxes":
-        _seed_taxes()
-        return 0
-    if args.command == "seed-revenue-sharing":
-        _seed_revenue_sharing()
-        return 0
-    if args.command == "status":
-        _status()
-        return 0
     if args.command == "run":
         return _run(args.job)
-    return 1
+    handler = COMMAND_HANDLERS.get(args.command)
+    if handler is None:
+        return 1
+    handler()
+    return 0
 
 
 if __name__ == "__main__":

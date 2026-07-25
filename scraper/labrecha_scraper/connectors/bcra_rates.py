@@ -3,7 +3,10 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+import httpx
+
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.clock import today_in_argentina
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias"
 PAGE_LIMIT = 1000
@@ -26,7 +29,9 @@ class BcraRatesConnector(Connector):
                 points.extend(self._fetch_variable(client, id_variable, indicator_code))
         return points
 
-    def _fetch_variable(self, client, id_variable: int, indicator_code: str) -> list[IndicatorPoint]:
+    def _fetch_variable(
+        self, client: httpx.Client, id_variable: int, indicator_code: str
+    ) -> list[IndicatorPoint]:
         result: list[IndicatorPoint] = []
         offset = 0
         while True:
@@ -34,7 +39,7 @@ class BcraRatesConnector(Connector):
                 f"{BASE_URL}/{id_variable}",
                 params={
                     "desde": BACKFILL_FROM,
-                    "hasta": date.today().isoformat(),
+                    "hasta": today_in_argentina().isoformat(),
                     "limit": PAGE_LIMIT,
                     "offset": offset,
                 },

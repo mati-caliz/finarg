@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+import httpx
+
 from labrecha_scraper.base import Connector, IndicatorPoint
 
 MONTHLY_URL = "https://api.argentinadatos.com/v1/finanzas/indices/inflacion"
@@ -20,7 +22,9 @@ class InflationConnector(Connector):
             points.extend(self._fetch_series(client, YEAR_OVER_YEAR_URL, "cpi_yoy"))
         return points
 
-    def _fetch_series(self, client, url: str, indicator_code: str) -> list[IndicatorPoint]:
+    def _fetch_series(
+        self, client: httpx.Client, url: str, indicator_code: str
+    ) -> list[IndicatorPoint]:
         response = client.get(url)
         response.raise_for_status()
         result: list[IndicatorPoint] = []

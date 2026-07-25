@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from datetime import date, timezone
+from datetime import UTC, date
 from datetime import datetime as datetime_type
 
+import httpx
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -28,10 +29,10 @@ class HolidaysConnector(Connector):
         return upsert_rows(session, Holiday, data, ["date", "name"])
 
     def _years(self) -> range:
-        current_year = datetime_type.now(timezone.utc).year
+        current_year = datetime_type.now(UTC).year
         return range(BACKFILL_START_YEAR, current_year + 2)
 
-    def _fetch_year(self, client, year: int) -> list[dict]:
+    def _fetch_year(self, client: httpx.Client, year: int) -> list[dict]:
         response = client.get(HOLIDAYS_URL.format(year=year))
         response.raise_for_status()
         rows: list[dict] = []

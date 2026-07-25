@@ -48,15 +48,33 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 24px 72px" }}>
-      <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}>
+      <div
+        style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}
+      >
         <Link href="/congreso" style={{ color: "var(--ink3)", textDecoration: "none" }}>
           Congreso
         </Link>{" "}
         / <span style={{ color: "var(--ink2)" }}>Votación</span>
       </div>
 
-      <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 12, padding: "28px 30px", marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+      <div
+        style={{
+          background: "var(--raise)",
+          border: "1px solid var(--line)",
+          borderRadius: 12,
+          padding: "28px 30px",
+          marginBottom: 24,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 16,
+            flexWrap: "wrap",
+          }}
+        >
           <span
             style={{
               fontFamily: MONO,
@@ -79,7 +97,17 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
             {vote.president_name ? ` · preside ${vote.president_name}` : ""}
           </span>
         </div>
-        <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.75rem, 4vw, 2.375rem)", lineHeight: 1.05, letterSpacing: "-0.025em", margin: "0 0 22px", color: "var(--ink)" }}>
+        <h1
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(1.75rem, 4vw, 2.375rem)",
+            lineHeight: 1.05,
+            letterSpacing: "-0.025em",
+            margin: "0 0 22px",
+            color: "var(--ink)",
+          }}
+        >
           {vote.title ?? "Votación"}
         </h1>
         <div style={{ marginBottom: 8 }}>
@@ -88,17 +116,47 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
         <TallyCounts tally={tally} />
       </div>
 
-      <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 12, padding: "28px 30px" }}>
-        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 4 }}>
+      <div
+        style={{
+          background: "var(--raise)",
+          border: "1px solid var(--line)",
+          borderRadius: 12,
+          padding: "28px 30px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.68rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--ink3)",
+            marginBottom: 4,
+          }}
+        >
           Voto por bloque
         </div>
-        <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", color: "var(--ink2)", margin: "0 0 20px" }}>
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "0.9rem",
+            color: "var(--ink2)",
+            margin: "0 0 20px",
+          }}
+        >
           Cómo votó cada bloque de la cámara.
         </p>
         {loadingDetails ? (
           <Skeleton className="h-40 w-full rounded-[6px]" />
         ) : blocs.length === 0 ? (
-          <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", color: "var(--ink2)", margin: 0 }}>
+          <p
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "0.9rem",
+              color: "var(--ink2)",
+              margin: 0,
+            }}
+          >
             No hay detalle de voto por diputado para esta votación.
           </p>
         ) : (

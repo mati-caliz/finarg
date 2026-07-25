@@ -198,12 +198,18 @@ export interface Post {
   updated_at: string;
 }
 
+export interface PoliticalEventsParams {
+  date_from?: string | undefined;
+  date_to?: string | undefined;
+  category?: string | undefined;
+}
+
 export interface IndicatorSeriesParams {
-  source?: string;
-  date_from?: string;
-  date_to?: string;
-  limit?: number;
-  order?: SortOrder;
+  source?: string | undefined;
+  date_from?: string | undefined;
+  date_to?: string | undefined;
+  limit?: number | undefined;
+  order?: SortOrder | undefined;
 }
 
 export interface CompoundInterestRequest {
@@ -211,7 +217,7 @@ export interface CompoundInterestRequest {
   annual_rate: number;
   years: number;
   compounding_frequency: "MONTHLY" | "QUARTERLY" | "YEARLY";
-  periodic_contribution?: number;
+  periodic_contribution?: number | undefined;
 }
 
 export interface CompoundInterestPeriod {
@@ -253,7 +259,7 @@ export interface IncomeTaxRequest {
   has_spouse?: boolean;
   number_of_children?: number;
   children_with_disabilities_count?: number;
-  housing_rent?: number | null;
+  housing_rent?: number | null | undefined;
   domestic_service?: number | null;
   education_expenses?: number | null;
   life_insurance?: number | null;
@@ -271,7 +277,7 @@ export interface IncomeTaxResponse {
   net_monthly_salary: string;
   calculation_details: Record<string, string>;
   deduction_breakdown: Record<string, string>;
-  tax_brackets: Array<Record<string, string | number>>;
+  tax_brackets: Record<string, string | number>[];
 }
 
 export interface TaxImpactRequest {
@@ -318,8 +324,7 @@ export const indicatorsApi = {
 };
 
 export const politicalEventsApi = {
-  list: (params?: { date_from?: string; date_to?: string; category?: string }) =>
-    get<PoliticalEvent[]>("/political-events", params),
+  list: (params?: PoliticalEventsParams) => get<PoliticalEvent[]>("/political-events", params),
 };
 
 export const congressApi = {

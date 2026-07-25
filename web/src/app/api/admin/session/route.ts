@@ -8,14 +8,17 @@ import type { NextRequest } from "next/server";
 
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
-export async function GET(request: NextRequest) {
+export function GET(request: NextRequest) {
   return Response.json({ authenticated: hasValidSession(request) });
 }
 
 export async function POST(request: NextRequest) {
   const body: unknown = await request.json().catch(() => null);
   const password =
-    typeof body === "object" && body !== null && "password" in body && typeof body.password === "string"
+    typeof body === "object" &&
+    body !== null &&
+    "password" in body &&
+    typeof body.password === "string"
       ? body.password
       : "";
 
@@ -31,7 +34,7 @@ export async function POST(request: NextRequest) {
   return response;
 }
 
-export async function DELETE() {
+export function DELETE() {
   const response = Response.json({ authenticated: false });
   response.headers.set(
     "Set-Cookie",

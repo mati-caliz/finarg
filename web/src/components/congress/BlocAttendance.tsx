@@ -56,13 +56,20 @@ export function BlocAttendance() {
                     width: `${fill}%`,
                     height: "100%",
                     borderRadius: 3,
-                    background: pct >= 85 ? "var(--pos)" : pct >= 75 ? "var(--serie-1)" : "var(--neg)",
+                    background:
+                      pct >= 85 ? "var(--pos)" : pct >= 75 ? "var(--serie-1)" : "var(--neg)",
                   }}
                 />
               </div>
               <span
                 className="num"
-                style={{ width: 46, fontSize: "0.6875rem", fontWeight: 600, textAlign: "right", flexShrink: 0 }}
+                style={{
+                  width: 46,
+                  fontSize: "0.6875rem",
+                  fontWeight: 600,
+                  textAlign: "right",
+                  flexShrink: 0,
+                }}
               >
                 {formatNumberAR(pct, 1)}%
               </span>

@@ -72,7 +72,13 @@ export default function CalculatorsPage() {
         </p>
       </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+          gap: 14,
+        }}
+      >
         {CALCULATORS.map((calculator) => (
           <Link
             key={calculator.href}
@@ -100,10 +106,25 @@ export default function CalculatorsPage() {
             >
               {calculator.title}
             </h2>
-            <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.97rem", lineHeight: 1.45, color: "var(--ink2)", margin: 0 }}>
+            <p
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontSize: "0.97rem",
+                lineHeight: 1.45,
+                color: "var(--ink2)",
+                margin: 0,
+              }}
+            >
               {calculator.description}
             </p>
-            <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.72rem", color: "var(--gap)", marginTop: 4 }}>
+            <span
+              style={{
+                fontFamily: "var(--font-jb-mono)",
+                fontSize: "0.72rem",
+                color: "var(--gap)",
+                marginTop: 4,
+              }}
+            >
               Abrir →
             </span>
           </Link>

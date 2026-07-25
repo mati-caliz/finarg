@@ -174,9 +174,7 @@ export default function CompoundInterestCalculatorPage() {
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
-                    Interés ganado
-                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Interés ganado</div>
                   <div className="num" style={{ fontWeight: 600, color: "var(--pos)" }}>
                     {formatMoneyAR(Number.parseFloat(result.total_interest))}
                   </div>

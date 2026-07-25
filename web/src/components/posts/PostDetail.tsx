@@ -1,8 +1,8 @@
 "use client";
 
 import { QueryError } from "@/components/QueryError";
-import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
 import { PostCover } from "@/components/posts/PostCover";
+import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePost, usePosts } from "@/hooks/useLabrecha";
@@ -39,7 +39,9 @@ function ImpactTile({ impact }: { impact: PostImpact }) {
       >
         {meta.label}
       </div>
-      <div style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.9375rem", color: "var(--ink)" }}>
+      <div
+        style={{ fontFamily: MONO, fontWeight: 600, fontSize: "0.9375rem", color: "var(--ink)" }}
+      >
         {impact.value}
       </div>
     </div>
@@ -91,7 +93,16 @@ export function PostDetail({ slug }: { slug: string }) {
 
   if (isLoading || !post) {
     return (
-      <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "52px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div
+        style={{
+          maxWidth: NARROW,
+          margin: "0 auto",
+          padding: "52px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
         <Skeleton className="h-[48px] w-2/3 rounded-[10px]" />
         <Skeleton className="h-[320px] rounded-[10px]" />
       </div>
@@ -104,7 +115,9 @@ export function PostDetail({ slug }: { slug: string }) {
   return (
     <article style={{ fontFamily: "var(--font-serif)" }}>
       <div style={{ maxWidth: NARROW, margin: "0 auto", padding: "52px 24px 0" }}>
-        <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}>
+        <div
+          style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}
+        >
           <Link href="/ideas" style={{ color: "var(--ink3)", textDecoration: "none" }}>
             Ideas
           </Link>{" "}
@@ -200,7 +213,13 @@ export function PostDetail({ slug }: { slug: string }) {
           >
             Impacto estimado
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+              gap: 12,
+            }}
+          >
             {impacts.map((impact) => (
               <ImpactTile key={`${impact.kind}-${impact.value}`} impact={impact} />
             ))}
@@ -236,7 +255,14 @@ export function PostDetail({ slug }: { slug: string }) {
             lineHeight: 1.7,
           }}
         >
-          <span style={{ color: "var(--ink3)", textTransform: "uppercase", letterSpacing: "0.1em", fontSize: "0.66rem" }}>
+          <span
+            style={{
+              color: "var(--ink3)",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              fontSize: "0.66rem",
+            }}
+          >
             Atribución
           </span>
           <br />
@@ -246,10 +272,23 @@ export function PostDetail({ slug }: { slug: string }) {
 
         {related.length > 0 && (
           <div style={{ marginTop: 40, borderTop: "2px solid var(--ink)", paddingTop: 22 }}>
-            <h3 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.25rem", margin: "0 0 18px" }}>
+            <h3
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: "1.25rem",
+                margin: "0 0 18px",
+              }}
+            >
               Seguir leyendo
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: 20,
+              }}
+            >
               {related.map((item) => (
                 <RelatedItem key={item.id} post={item} />
               ))}

@@ -8,10 +8,11 @@ import {
   useIndicatorSources,
   usePoliticalEvents,
 } from "@/hooks/useLabrecha";
-import { GAPS } from "@/lib/gaps";
 import { freshnessForCode } from "@/lib/freshness";
+import { GAPS } from "@/lib/gaps";
 import {
   INDICATOR_FAMILY_LABELS,
+  type IndicatorDisplay,
   RANGE_MONTHS,
   SOURCE_METHODOLOGY,
   formatDateAR,
@@ -20,7 +21,9 @@ import {
   getIndicatorMeta,
   sourceLabel,
 } from "@/lib/indicators";
+import type { IndicatorSourceSummary } from "@/lib/labrechaApi";
 import {
+  type AlignedSeries,
   type ParsedPoint,
   alignSources,
   eventsToChartEvents,
@@ -33,6 +36,10 @@ import { type CSSProperties, useState } from "react";
 
 const RANGE_OPTIONS = ["6M", "1A", "5A", "Máx"];
 const SOURCE_COLORS = ["var(--chart)", "var(--gap)", "var(--serie-3)"];
+
+function sourceColor(index: number): string {
+  return SOURCE_COLORS[index % SOURCE_COLORS.length] ?? "var(--chart)";
+}
 const MONO = "var(--font-jb-mono)";
 
 interface IndicatorDetailProps {
@@ -158,7 +165,9 @@ function VariationRow({
         >
           {label}
         </div>
-        <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>{reference}</div>
+        <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
+          {reference}
+        </div>
       </div>
       <span
         style={{
@@ -171,6 +180,498 @@ function VariationRow({
       >
         {variation?.text ?? "—"}
       </span>
+    </div>
+  );
+}
+
+function variationVsPreviousPoint(
+  indicator: IndicatorDisplay,
+  points: ParsedPoint[],
+): VariationDisplay | undefined {
+  const lastPoint = points[points.length - 1];
+  const previousPoint = points[points.length - 2];
+  if (!lastPoint || !previousPoint) {
+    return undefined;
+  }
+  return computeVariation(
+    lastPoint.value,
+    previousPoint.value,
+    indicator.variation,
+    indicator.variationSuffix,
+    indicator.goodWhen,
+  );
+}
+
+function variationVsMonthsAgo(
+  indicator: IndicatorDisplay,
+  points: ParsedPoint[],
+  monthsAgo: number,
+): VariationDisplay | undefined {
+  const lastPoint = points[points.length - 1];
+  if (!lastPoint) {
+    return undefined;
+  }
+  return computeVariation(
+    lastPoint.value,
+    valueBefore(points, shiftDate(lastPoint.date, monthsAgo)),
+    indicator.variation,
+    indicator.variationSuffix,
+    indicator.goodWhen,
+  );
+}
+
+function gapPercent(first: number | undefined, second: number | undefined): number | undefined {
+  if (first === undefined || second === undefined) {
+    return undefined;
+  }
+  const base = Math.max(Math.abs(first), Math.abs(second)) || 1;
+  return (Math.abs(first - second) / base) * 100;
+}
+
+interface TableRow {
+  date: string;
+  values: number[];
+  gap: number | undefined;
+}
+
+const TABLE_ROW_LIMIT = 8;
+
+function buildTableRows(aligned: AlignedSeries): TableRow[] {
+  const firstRowIndex = Math.max(0, aligned.axis.length - TABLE_ROW_LIMIT);
+  const rows: TableRow[] = [];
+  for (let index = aligned.axis.length - 1; index >= firstRowIndex; index -= 1) {
+    const values = aligned.lines.map((line) => line.data[index] ?? 0);
+    rows.push({ date: aligned.axis[index] ?? "", values, gap: gapPercent(values[0], values[1]) });
+  }
+  return rows;
+}
+
+function IndicatorHero({
+  code,
+  familyLabel,
+  indicator,
+  primaryValue,
+  stepVariation,
+  sources,
+  stale,
+}: {
+  code: string;
+  familyLabel: string;
+  indicator: IndicatorDisplay;
+  primaryValue: number | undefined;
+  stepVariation: VariationDisplay | undefined;
+  sources: IndicatorSourceSummary[];
+  stale: boolean;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        gap: 32,
+        flexWrap: "wrap",
+        borderBottom: "2px solid var(--ink)",
+        paddingBottom: 24,
+        marginBottom: 28,
+      }}
+    >
+      <div>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.72rem",
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: "var(--ink3)",
+            marginBottom: 12,
+          }}
+        >
+          {familyLabel} · /indicador/{code}
+        </div>
+        <h1
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(2rem, 5vw, 2.875rem)",
+            lineHeight: 1.0,
+            letterSpacing: "-0.025em",
+            margin: "0 0 18px",
+            color: "var(--ink)",
+          }}
+        >
+          {indicator.label}
+        </h1>
+        {primaryValue !== undefined && (
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 18, flexWrap: "wrap" }}>
+            <span
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                fontSize: "clamp(2.25rem, 6vw, 3.25rem)",
+                lineHeight: 0.85,
+                letterSpacing: "-0.03em",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {indicator.format(primaryValue)}
+              {indicator.unit ? (
+                <span style={{ fontSize: "0.5em", color: "var(--ink3)" }}> {indicator.unit}</span>
+              ) : null}
+            </span>
+            {stepVariation ? (
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: stepVariation.color,
+                  background: stepVariation.background,
+                  padding: "4px 9px",
+                  borderRadius: 5,
+                  marginBottom: 6,
+                }}
+              >
+                {stepVariation.text}
+              </span>
+            ) : null}
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
+        {sources.map((source, index) => (
+          <SourceChipDot
+            key={source.source}
+            source={sourceLabel(source.source)}
+            date={formatDateAR(source.last_date)}
+            color={sourceColor(index)}
+          />
+        ))}
+        {stale ? (
+          <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--gap)" }}>
+            ⚠ dato desactualizado
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function RangeSelector({
+  range,
+  onRangeChange,
+}: {
+  range: string;
+  onRangeChange: (range: string) => void;
+}) {
+  return (
+    <div
+      style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}
+    >
+      {RANGE_OPTIONS.map((option) => {
+        const active = option === range;
+        return (
+          <button
+            key={option}
+            type="button"
+            onClick={() => onRangeChange(option)}
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.75rem",
+              padding: "7px 15px",
+              borderRadius: "var(--radius-pill)",
+              cursor: "pointer",
+              border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
+              background: active ? "var(--ink)" : "transparent",
+              color: active ? "var(--paper)" : "var(--ink2)",
+            }}
+          >
+            {option}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function GapPanel({
+  indicator,
+  gapPct,
+  sources,
+}: {
+  indicator: IndicatorDisplay;
+  gapPct: number;
+  sources: IndicatorSourceSummary[];
+}) {
+  const [firstSource, secondSource] = sources;
+  if (!firstSource || !secondSource) {
+    return null;
+  }
+  return (
+    <div
+      style={{
+        background: "var(--gap-bg)",
+        border: "1px solid var(--gap-ln)",
+        borderRadius: 10,
+        padding: "28px 30px",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: MONO,
+          fontSize: "0.72rem",
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          color: "var(--gap)",
+          marginBottom: 20,
+        }}
+      >
+        ◆ La brecha entre fuentes
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 14,
+          marginBottom: 22,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: MONO,
+            fontWeight: 700,
+            fontSize: "clamp(2.75rem, 8vw, 4rem)",
+            lineHeight: 0.8,
+            color: "var(--gap)",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {formatNumberAR(gapPct, 1)}%
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "1.0625rem",
+            color: "var(--ink2)",
+            lineHeight: 1.35,
+          }}
+        >
+          de diferencia entre {sourceLabel(firstSource.source)} y {sourceLabel(secondSource.source)}{" "}
+          hoy.
+        </span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {sources.slice(0, 2).map((source, index) => (
+          <div
+            key={source.source}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              background: "var(--raise)",
+              padding: "14px 16px",
+              borderRadius: index === 0 ? "7px 7px 0 0" : "0 0 7px 7px",
+            }}
+          >
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: sourceColor(index),
+              }}
+            />
+            <span style={{ fontFamily: MONO, fontSize: "0.78rem", color: "var(--ink2)", flex: 1 }}>
+              {sourceLabel(source.source)}
+            </span>
+            <span
+              style={{
+                fontFamily: MONO,
+                fontWeight: 600,
+                fontSize: "1.125rem",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {indicator.format(Number.parseFloat(source.latest_value))}
+            </span>
+          </div>
+        ))}
+      </div>
+      <p
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: "0.9rem",
+          lineHeight: 1.5,
+          color: "var(--ink2)",
+          margin: "18px 0 0",
+        }}
+      >
+        {SOURCE_METHODOLOGY[firstSource.source] ??
+          "Cada fuente publica con su propia metodología y rezago."}
+      </p>
+    </div>
+  );
+}
+
+function SourcePanel({ primary }: { primary: IndicatorSourceSummary | undefined }) {
+  return (
+    <div style={{ ...CARD_STYLE, padding: "28px 30px" }}>
+      <div
+        style={{
+          fontFamily: MONO,
+          fontSize: "0.72rem",
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          color: "var(--ink3)",
+          marginBottom: 14,
+        }}
+      >
+        Fuente
+      </div>
+      <p
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: "1rem",
+          lineHeight: 1.5,
+          color: "var(--ink2)",
+          margin: 0,
+        }}
+      >
+        {primary
+          ? (SOURCE_METHODOLOGY[primary.source] ??
+            `Serie publicada por ${sourceLabel(primary.source)}.`)
+          : "Sin datos de fuente."}
+      </p>
+    </div>
+  );
+}
+
+function RelatedGapLinks({ code }: { code: string }) {
+  const relatedGaps = GAPS.filter((gap) => gap.legs.some((leg) => leg.code === code));
+  if (relatedGaps.length === 0) {
+    return null;
+  }
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
+      {relatedGaps.map((gap) => (
+        <Link
+          key={gap.id}
+          href={`/brechas#${gap.id}`}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 14px",
+            borderRadius: "var(--radius-pill)",
+            border: "1px solid var(--gap-ln)",
+            background: "var(--gap-bg)",
+            textDecoration: "none",
+            color: "var(--gap)",
+            fontFamily: MONO,
+            fontSize: "0.75rem",
+          }}
+        >
+          ◆ {gap.label} →
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+const CELL_PAD = "12px 16px";
+
+function SeriesTable({
+  indicator,
+  aligned,
+  rows,
+  isComparator,
+}: {
+  indicator: IndicatorDisplay;
+  aligned: AlignedSeries;
+  rows: TableRow[];
+  isComparator: boolean;
+}) {
+  if (rows.length === 0) {
+    return (
+      <p
+        style={{
+          fontFamily: "var(--font-serif)",
+          color: "var(--ink2)",
+          margin: 0,
+          padding: "18px 24px",
+        }}
+      >
+        Sin datos en el rango seleccionado.
+      </p>
+    );
+  }
+  return (
+    <div style={{ overflowX: "auto" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontFamily: MONO,
+          fontSize: "0.8125rem",
+        }}
+      >
+        <thead>
+          <tr
+            style={{
+              color: "var(--ink3)",
+              fontSize: "0.68rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            <th style={{ textAlign: "left", padding: CELL_PAD, fontWeight: 500 }}>Fecha</th>
+            {aligned.lines.map((line) => (
+              <th
+                key={line.source}
+                style={{ textAlign: "right", padding: CELL_PAD, fontWeight: 500 }}
+              >
+                {sourceLabel(line.source)}
+              </th>
+            ))}
+            {isComparator ? (
+              <th style={{ textAlign: "right", padding: CELL_PAD, fontWeight: 500 }}>Brecha</th>
+            ) : null}
+          </tr>
+        </thead>
+        <tbody style={{ color: "var(--ink)" }}>
+          {rows.map((row) => (
+            <tr key={row.date} style={{ borderTop: "1px solid var(--line2)" }}>
+              <td style={{ textAlign: "left", padding: CELL_PAD }}>{formatDateAR(row.date)}</td>
+              {row.values.map((value, index) => (
+                <td
+                  key={aligned.lines[index]?.source ?? index}
+                  style={{
+                    textAlign: "right",
+                    padding: CELL_PAD,
+                    fontVariantNumeric: "tabular-nums",
+                    color: index === 0 ? "var(--ink)" : "var(--ink2)",
+                  }}
+                >
+                  {indicator.format(value)}
+                </td>
+              ))}
+              {isComparator ? (
+                <td
+                  style={{
+                    textAlign: "right",
+                    padding: CELL_PAD,
+                    color: "var(--gap)",
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {row.gap === undefined ? "—" : `${formatNumberAR(row.gap, 1)}%`}
+                </td>
+              ) : null}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -219,8 +720,11 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   const aligned = alignSources(parsedSources);
   const chartSeries: ChartSeries[] = aligned.lines.map((line, index) => ({
     name: sourceLabel(line.source),
-    color: SOURCE_COLORS[index % SOURCE_COLORS.length],
-    data: line.data.map((value, position) => ({ t: formatDateAR(aligned.axis[position]), v: value })),
+    color: sourceColor(index),
+    data: line.data.map((value, position) => ({
+      t: formatDateAR(aligned.axis[position] ?? ""),
+      v: value,
+    })),
   }));
   const chartEvents = eventsToChartEvents(aligned.axis, eventsData ?? []);
   const xLabels = yearLabels(aligned.axis);
@@ -231,174 +735,38 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   const primaryPoints =
     parsedSources.find((source) => source.source === primary?.source)?.points ?? [];
   const primaryValue = primary ? Number.parseFloat(primary.latest_value) : undefined;
-  const lastPoint = primaryPoints[primaryPoints.length - 1];
-  const prevPoint = primaryPoints[primaryPoints.length - 2];
-
-  const stepVariation =
-    lastPoint && prevPoint
-      ? computeVariation(lastPoint.value, prevPoint.value, indicator.variation, indicator.variationSuffix, indicator.goodWhen)
-      : undefined;
-  const monthVariation =
-    lastPoint
-      ? computeVariation(lastPoint.value, valueBefore(primaryPoints, shiftDate(lastPoint.date, 1)), indicator.variation, indicator.variationSuffix, indicator.goodWhen)
-      : undefined;
-  const yearVariation =
-    lastPoint
-      ? computeVariation(lastPoint.value, valueBefore(primaryPoints, shiftDate(lastPoint.date, 12)), indicator.variation, indicator.variationSuffix, indicator.goodWhen)
-      : undefined;
+  const stepVariation = variationVsPreviousPoint(indicator, primaryPoints);
+  const monthVariation = variationVsMonthsAgo(indicator, primaryPoints, 1);
+  const yearVariation = variationVsMonthsAgo(indicator, primaryPoints, 12);
 
   const secondValue =
     isComparator && ordered[1] ? Number.parseFloat(ordered[1].latest_value) : undefined;
-  const gapBase =
-    primaryValue !== undefined && secondValue !== undefined
-      ? Math.max(Math.abs(primaryValue), Math.abs(secondValue)) || 1
-      : undefined;
-  const gapPct =
-    primaryValue !== undefined && secondValue !== undefined && gapBase !== undefined
-      ? (Math.abs(primaryValue - secondValue) / gapBase) * 100
-      : undefined;
-
-  const relatedGaps = GAPS.filter((gap) => gap.legs.some((leg) => leg.code === code));
-
-  const tableStart = Math.max(0, aligned.axis.length - 8);
-  const tableRows: { date: string; values: number[]; gap: number | undefined }[] = [];
-  for (let i = aligned.axis.length - 1; i >= tableStart; i -= 1) {
-    const values = aligned.lines.map((line) => line.data[i]);
-    let gap: number | undefined;
-    if (values.length >= 2) {
-      const base = Math.max(Math.abs(values[0]), Math.abs(values[1])) || 1;
-      gap = (Math.abs(values[0] - values[1]) / base) * 100;
-    }
-    tableRows.push({ date: aligned.axis[i], values, gap });
-  }
-
+  const gapPct = gapPercent(primaryValue, secondValue);
+  const tableRows = buildTableRows(aligned);
   const stale = primary ? freshnessForCode(code, primary.last_date).stale : false;
-  const cellPad = "12px 16px";
 
   return (
     <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "28px 24px 72px" }}>
-      <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 20 }}>
+      <div
+        style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 20 }}
+      >
         <Link href="/indicadores" style={{ color: "var(--ink3)", textDecoration: "none" }}>
           Indicadores
         </Link>{" "}
         / {familyLabel} / <span style={{ color: "var(--ink2)" }}>{indicator.label}</span>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "flex-end",
-          justifyContent: "space-between",
-          gap: 32,
-          flexWrap: "wrap",
-          borderBottom: "2px solid var(--ink)",
-          paddingBottom: 24,
-          marginBottom: 28,
-        }}
-      >
-        <div>
-          <div
-            style={{
-              fontFamily: MONO,
-              fontSize: "0.72rem",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "var(--ink3)",
-              marginBottom: 12,
-            }}
-          >
-            {familyLabel} · /indicador/{code}
-          </div>
-          <h1
-            style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 800,
-              fontSize: "clamp(2rem, 5vw, 2.875rem)",
-              lineHeight: 1.0,
-              letterSpacing: "-0.025em",
-              margin: "0 0 18px",
-              color: "var(--ink)",
-            }}
-          >
-            {indicator.label}
-          </h1>
-          {primaryValue !== undefined && (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 18, flexWrap: "wrap" }}>
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontWeight: 700,
-                  fontSize: "clamp(2.25rem, 6vw, 3.25rem)",
-                  lineHeight: 0.85,
-                  letterSpacing: "-0.03em",
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {indicator.format(primaryValue)}
-                {indicator.unit ? (
-                  <span style={{ fontSize: "0.5em", color: "var(--ink3)" }}> {indicator.unit}</span>
-                ) : null}
-              </span>
-              {stepVariation ? (
-                <span
-                  style={{
-                    fontFamily: MONO,
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    color: stepVariation.color,
-                    background: stepVariation.background,
-                    padding: "4px 9px",
-                    borderRadius: 5,
-                    marginBottom: 6,
-                  }}
-                >
-                  {stepVariation.text}
-                </span>
-              ) : null}
-            </div>
-          )}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
-          {ordered.map((source, index) => (
-            <SourceChipDot
-              key={source.source}
-              source={sourceLabel(source.source)}
-              date={formatDateAR(source.last_date)}
-              color={SOURCE_COLORS[index % SOURCE_COLORS.length]}
-            />
-          ))}
-          {stale ? (
-            <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--gap)" }}>
-              ⚠ dato desactualizado
-            </span>
-          ) : null}
-        </div>
-      </div>
+      <IndicatorHero
+        code={code}
+        familyLabel={familyLabel}
+        indicator={indicator}
+        primaryValue={primaryValue}
+        stepVariation={stepVariation}
+        sources={ordered}
+        stale={stale}
+      />
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
-        {RANGE_OPTIONS.map((option) => {
-          const active = option === range;
-          return (
-            <button
-              key={option}
-              type="button"
-              onClick={() => setRange(option)}
-              style={{
-                fontFamily: MONO,
-                fontSize: "0.75rem",
-                padding: "7px 15px",
-                borderRadius: "var(--radius-pill)",
-                cursor: "pointer",
-                border: active ? "1px solid var(--ink)" : "1px solid var(--line)",
-                background: active ? "var(--ink)" : "transparent",
-                color: active ? "var(--paper)" : "var(--ink2)",
-              }}
-            >
-              {option}
-            </button>
-          );
-        })}
-      </div>
+      <RangeSelector range={range} onRangeChange={setRange} />
 
       <div style={{ ...CARD_STYLE, padding: "26px 28px 22px", marginBottom: 24 }}>
         {hasSeries ? (
@@ -420,122 +788,31 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
 
       <div className="lb-indicator-grid" style={{ marginBottom: 24 }}>
         {isComparator && gapPct !== undefined ? (
-          <div
-            style={{
-              background: "var(--gap-bg)",
-              border: "1px solid var(--gap-ln)",
-              borderRadius: 10,
-              padding: "28px 30px",
-            }}
-          >
-            <div
-              style={{
-                fontFamily: MONO,
-                fontSize: "0.72rem",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "var(--gap)",
-                marginBottom: 20,
-              }}
-            >
-              ◆ La brecha entre fuentes
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 22, flexWrap: "wrap" }}>
-              <span
-                style={{
-                  fontFamily: MONO,
-                  fontWeight: 700,
-                  fontSize: "clamp(2.75rem, 8vw, 4rem)",
-                  lineHeight: 0.8,
-                  color: "var(--gap)",
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {formatNumberAR(gapPct, 1)}%
-              </span>
-              <span style={{ fontFamily: "var(--font-serif)", fontSize: "1.0625rem", color: "var(--ink2)", lineHeight: 1.35 }}>
-                de diferencia entre {sourceLabel(ordered[0].source)} y {sourceLabel(ordered[1].source)} hoy.
-              </span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {ordered.slice(0, 2).map((source, index) => (
-                <div
-                  key={source.source}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    background: "var(--raise)",
-                    padding: "14px 16px",
-                    borderRadius: index === 0 ? "7px 7px 0 0" : "0 0 7px 7px",
-                  }}
-                >
-                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: SOURCE_COLORS[index] }} />
-                  <span style={{ fontFamily: MONO, fontSize: "0.78rem", color: "var(--ink2)", flex: 1 }}>
-                    {sourceLabel(source.source)}
-                  </span>
-                  <span style={{ fontFamily: MONO, fontWeight: 600, fontSize: "1.125rem", fontVariantNumeric: "tabular-nums" }}>
-                    {indicator.format(Number.parseFloat(source.latest_value))}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", lineHeight: 1.5, color: "var(--ink2)", margin: "18px 0 0" }}>
-              {SOURCE_METHODOLOGY[ordered[0].source] ?? "Cada fuente publica con su propia metodología y rezago."}
-            </p>
-          </div>
+          <GapPanel indicator={indicator} gapPct={gapPct} sources={ordered} />
         ) : (
-          <div style={{ ...CARD_STYLE, padding: "28px 30px" }}>
-            <div
-              style={{
-                fontFamily: MONO,
-                fontSize: "0.72rem",
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "var(--ink3)",
-                marginBottom: 14,
-              }}
-            >
-              Fuente
-            </div>
-            <p style={{ fontFamily: "var(--font-serif)", fontSize: "1rem", lineHeight: 1.5, color: "var(--ink2)", margin: 0 }}>
-              {primary ? SOURCE_METHODOLOGY[primary.source] ?? `Serie publicada por ${sourceLabel(primary.source)}.` : "Sin datos de fuente."}
-            </p>
-          </div>
+          <SourcePanel primary={primary} />
         )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-          <VariationRow label="Variación reciente" reference="vs. dato anterior" variation={stepVariation} />
-          <VariationRow label="Variación mensual" reference="vs. hace 1 mes" variation={monthVariation} />
-          <VariationRow label="Variación interanual" reference="vs. hace 12 meses" variation={yearVariation} />
+          <VariationRow
+            label="Variación reciente"
+            reference="vs. dato anterior"
+            variation={stepVariation}
+          />
+          <VariationRow
+            label="Variación mensual"
+            reference="vs. hace 1 mes"
+            variation={monthVariation}
+          />
+          <VariationRow
+            label="Variación interanual"
+            reference="vs. hace 12 meses"
+            variation={yearVariation}
+          />
         </div>
       </div>
 
-      {relatedGaps.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
-          {relatedGaps.map((gap) => (
-            <Link
-              key={gap.id}
-              href={`/brechas#${gap.id}`}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 14px",
-                borderRadius: "var(--radius-pill)",
-                border: "1px solid var(--gap-ln)",
-                background: "var(--gap-bg)",
-                textDecoration: "none",
-                color: "var(--gap)",
-                fontFamily: MONO,
-                fontSize: "0.75rem",
-              }}
-            >
-              ◆ {gap.label} →
-            </Link>
-          ))}
-        </div>
-      )}
+      <RelatedGapLinks code={code} />
 
       <div style={{ ...CARD_STYLE, overflow: "hidden" }}>
         <div
@@ -549,7 +826,14 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
             flexWrap: "wrap",
           }}
         >
-          <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.1875rem", margin: 0 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: "1.1875rem",
+              margin: 0,
+            }}
+          >
             Tabla de datos
           </h2>
           <SeriesExport
@@ -563,55 +847,21 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
             }
           />
         </div>
-        {tableRows.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: MONO, fontSize: "0.8125rem" }}>
-              <thead>
-                <tr style={{ color: "var(--ink3)", fontSize: "0.68rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  <th style={{ textAlign: "left", padding: cellPad, fontWeight: 500 }}>Fecha</th>
-                  {aligned.lines.map((line) => (
-                    <th key={line.source} style={{ textAlign: "right", padding: cellPad, fontWeight: 500 }}>
-                      {sourceLabel(line.source)}
-                    </th>
-                  ))}
-                  {isComparator ? (
-                    <th style={{ textAlign: "right", padding: cellPad, fontWeight: 500 }}>Brecha</th>
-                  ) : null}
-                </tr>
-              </thead>
-              <tbody style={{ color: "var(--ink)" }}>
-                {tableRows.map((row) => (
-                  <tr key={row.date} style={{ borderTop: "1px solid var(--line2)" }}>
-                    <td style={{ textAlign: "left", padding: cellPad }}>{formatDateAR(row.date)}</td>
-                    {row.values.map((value, index) => (
-                      <td
-                        key={aligned.lines[index].source}
-                        style={{
-                          textAlign: "right",
-                          padding: cellPad,
-                          fontVariantNumeric: "tabular-nums",
-                          color: index === 0 ? "var(--ink)" : "var(--ink2)",
-                        }}
-                      >
-                        {indicator.format(value)}
-                      </td>
-                    ))}
-                    {isComparator ? (
-                      <td style={{ textAlign: "right", padding: cellPad, color: "var(--gap)", fontVariantNumeric: "tabular-nums" }}>
-                        {row.gap === undefined ? "—" : `${formatNumberAR(row.gap, 1)}%`}
-                      </td>
-                    ) : null}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)", margin: 0, padding: "18px 24px" }}>
-            Sin datos en el rango seleccionado.
-          </p>
-        )}
-        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--line)", fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink3)" }}>
+        <SeriesTable
+          indicator={indicator}
+          aligned={aligned}
+          rows={tableRows}
+          isComparator={isComparator}
+        />
+        <div
+          style={{
+            padding: "14px 24px",
+            borderTop: "1px solid var(--line)",
+            fontFamily: MONO,
+            fontSize: "0.68rem",
+            color: "var(--ink3)",
+          }}
+        >
           Fuentes: {ordered.map((source) => sourceLabel(source.source)).join(" · ")}
           {indicator.unit ? ` · en ${indicator.unit}` : ""}
           {latestDate ? ` · última actualización ${formatDateAR(latestDate)}` : ""}

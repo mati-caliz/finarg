@@ -3,9 +3,12 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+import httpx
+
 from labrecha_scraper.base import Connector, IndicatorPoint
 
 SERIES_URL = "https://apis.datos.gob.ar/series/api/series/"
+SERIES_ROW_FIELDS = 2
 
 
 class SeriesSpec:
@@ -35,9 +38,7 @@ SERIES: dict[str, SeriesSpec] = {
     "151.1_AARIADOTAC_2012_M_25": SeriesSpec("public_wage_employment", "miles_personas"),
     "151.1_IPENDIETAC_2012_M_34": SeriesSpec("self_employed_autonomous", "miles_personas"),
     "151.1_IPENDIETAC_2012_M_36": SeriesSpec("self_employed_monotax", "miles_personas"),
-    "151.1_IPENDIETAC_2012_M_43": SeriesSpec(
-        "self_employed_social_monotax", "miles_personas"
-    ),
+    "151.1_IPENDIETAC_2012_M_43": SeriesSpec("self_employed_social_monotax", "miles_personas"),
     "151.1_AARIADOTAC_2012_M_40": SeriesSpec("domestic_workers_employment", "miles_personas"),
     "52.2_ASDJ_0_0_37": SeriesSpec("informal_employment", "%", Decimal(100)),
     "452.2_ENERGIAGIA_0_T_7_56": SeriesSpec("energy_subsidies", "ARS_millones"),
@@ -58,7 +59,9 @@ class SeriesDatosGobConnector(Connector):
                 points.extend(self._fetch_series(client, series_id, spec))
         return points
 
-    def _fetch_series(self, client, series_id: str, spec: SeriesSpec) -> list[IndicatorPoint]:
+    def _fetch_series(
+        self, client: httpx.Client, series_id: str, spec: SeriesSpec
+    ) -> list[IndicatorPoint]:
         response = client.get(
             SERIES_URL,
             params={"ids": series_id, "limit": 5000, "sort": "asc", "format": "json"},
@@ -67,7 +70,7 @@ class SeriesDatosGobConnector(Connector):
         payload = response.json()
         result: list[IndicatorPoint] = []
         for row in payload.get("data", []):
-            if len(row) < 2 or row[0] is None or row[1] is None:
+            if len(row) < SERIES_ROW_FIELDS or row[0] is None or row[1] is None:
                 continue
             result.append(
                 IndicatorPoint(

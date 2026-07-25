@@ -3,8 +3,8 @@
 import { Badge } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressLaws } from "@/hooks/useLabrecha";
-import type { SanctionedLaw } from "@/lib/labrechaApi";
 import { formatDateAR } from "@/lib/indicators";
+import type { SanctionedLaw } from "@/lib/labrechaApi";
 
 interface TimelineStep {
   label: string;
@@ -12,9 +12,7 @@ interface TimelineStep {
 }
 
 function buildSteps(law: SanctionedLaw): TimelineStep[] {
-  const steps: TimelineStep[] = [
-    { label: "1ª media sanción", date: law.first_half_sanction },
-  ];
+  const steps: TimelineStep[] = [{ label: "1ª media sanción", date: law.first_half_sanction }];
   if (law.second_half_sanction) {
     steps.push({ label: "2ª media sanción", date: law.second_half_sanction });
   }
@@ -46,7 +44,9 @@ function LawCard({ law }: { law: SanctionedLaw }) {
         )}
       </div>
 
-      <div style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--ink)", lineHeight: 1.35 }}>
+      <div
+        style={{ fontSize: "0.9375rem", fontWeight: 600, color: "var(--ink)", lineHeight: 1.35 }}
+      >
         {law.title ?? `Ley ${law.law_number}`}
       </div>
 
@@ -79,7 +79,10 @@ function LawCard({ law }: { law: SanctionedLaw }) {
                     {step.label}
                   </span>
                 </span>
-                <span className="num" style={{ fontSize: "0.6875rem", color: "var(--ink3)", marginLeft: 15 }}>
+                <span
+                  className="num"
+                  style={{ fontSize: "0.6875rem", color: "var(--ink3)", marginLeft: 15 }}
+                >
                   {step.date ? formatDateAR(step.date) : "—"}
                 </span>
               </div>
@@ -116,9 +119,7 @@ export function RecentLaws() {
 
   const laws = data ?? [];
   if (laws.length === 0) {
-    return (
-      <p style={{ color: "var(--ink3)", fontSize: "0.875rem" }}>No hay leyes para mostrar.</p>
-    );
+    return <p style={{ color: "var(--ink3)", fontSize: "0.875rem" }}>No hay leyes para mostrar.</p>;
   }
 
   return (

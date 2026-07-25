@@ -108,7 +108,7 @@ export function formatDateDayShort(dateStr: string): string {
   if (dateStr.includes("T") || dateStr.includes("Z")) {
     date = new Date(dateStr);
   } else if (dateStr.includes("-")) {
-    const [year, month, day] = dateStr.split("-").map(Number);
+    const [year = 0, month = 1, day = 1] = dateStr.split("-").map(Number);
     date = new Date(year, month - 1, day);
   } else {
     date = new Date(dateStr);
@@ -162,6 +162,32 @@ interface ReferenceArea {
   label: string;
 }
 
+function axisValueAt(
+  chartData: ChartDataWithDate[],
+  index: number,
+  useIndex: boolean,
+): string | number {
+  if (useIndex) {
+    return index;
+  }
+  const point = chartData[index];
+  return point?.originalDate || point?.date || "";
+}
+
+function firstIndexOnOrAfter(chartData: ChartDataWithDate[], boundary: Date): number {
+  const index = chartData.findIndex((point) => new Date(point.originalDate) >= boundary);
+  return index === -1 ? 0 : index;
+}
+
+function lastIndexOnOrBefore(chartData: ChartDataWithDate[], boundary: Date): number {
+  for (let index = chartData.length - 1; index >= 0; index -= 1) {
+    if (new Date(chartData[index]?.originalDate ?? "") <= boundary) {
+      return index;
+    }
+  }
+  return chartData.length - 1;
+}
+
 export function generateReferenceAreas(
   chartData: ChartDataWithDate[],
   governments: Government[],
@@ -175,41 +201,13 @@ export function generateReferenceAreas(
   const lastDataDate = new Date(chartData[chartData.length - 1]?.originalDate || "");
 
   return governments
-    .filter((gov) => {
-      const govStart = new Date(gov.startDate);
-      const govEnd = new Date(gov.endDate);
-      return govStart <= lastDataDate && govEnd >= firstDataDate;
-    })
-    .map((gov) => {
-      const govStart = new Date(gov.startDate);
-      const govEnd = new Date(gov.endDate);
-
-      let x1: string | number = useIndex ? 0 : chartData[0]?.originalDate || chartData[0]?.date;
-      let x2: string | number = useIndex
-        ? chartData.length - 1
-        : chartData[chartData.length - 1]?.originalDate || chartData[chartData.length - 1]?.date;
-
-      for (let i = 0; i < chartData.length; i++) {
-        const date = new Date(chartData[i].originalDate);
-        if (date >= govStart) {
-          x1 = useIndex ? i : chartData[i].originalDate || chartData[i].date;
-          break;
-        }
-      }
-
-      for (let i = chartData.length - 1; i >= 0; i--) {
-        const date = new Date(chartData[i].originalDate);
-        if (date <= govEnd) {
-          x2 = useIndex ? i : chartData[i].originalDate || chartData[i].date;
-          break;
-        }
-      }
-
-      return {
-        x1,
-        x2,
-        fill: gov.color,
-        label: gov.label,
-      };
-    });
+    .filter(
+      (gov) => new Date(gov.startDate) <= lastDataDate && new Date(gov.endDate) >= firstDataDate,
+    )
+    .map((gov) => ({
+      x1: axisValueAt(chartData, firstIndexOnOrAfter(chartData, new Date(gov.startDate)), useIndex),
+      x2: axisValueAt(chartData, lastIndexOnOrBefore(chartData, new Date(gov.endDate)), useIndex),
+      fill: gov.color,
+      label: gov.label,
+    }));
 }

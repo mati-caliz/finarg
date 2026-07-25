@@ -31,7 +31,9 @@ export function mergePoints(history: ParsedPoint[], live: ParsedPoint[]): Parsed
   for (const point of live) {
     byDate.set(point.date, point);
   }
-  return Array.from(byDate.values()).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  return Array.from(byDate.values()).sort((a, b) =>
+    a.date < b.date ? -1 : a.date > b.date ? 1 : 0,
+  );
 }
 
 function downsample(dates: string[], maxPoints: number): string[] {
@@ -40,10 +42,11 @@ function downsample(dates: string[], maxPoints: number): string[] {
   }
   const step = (dates.length - 1) / (maxPoints - 1);
   const sampled: string[] = [];
+  const lastDate = dates[dates.length - 1] ?? "";
   for (let i = 0; i < maxPoints; i += 1) {
-    sampled.push(dates[Math.round(i * step)]);
+    sampled.push(dates[Math.round(i * step)] ?? lastDate);
   }
-  sampled[sampled.length - 1] = dates[dates.length - 1];
+  sampled[sampled.length - 1] = lastDate;
   return sampled;
 }
 
@@ -53,11 +56,13 @@ function resample(points: ParsedPoint[], axis: string[]): number[] {
   }
   const out: number[] = [];
   let index = 0;
-  let last = points[0].value;
+  let last = points[0]?.value ?? 0;
   for (const date of axis) {
-    while (index < points.length && points[index].date <= date) {
-      last = points[index].value;
+    let current = points[index];
+    while (current && current.date <= date) {
+      last = current.value;
       index += 1;
+      current = points[index];
     }
     out.push(last);
   }
@@ -88,13 +93,16 @@ function nearestIndex(axis: string[], date: string): number {
   let hi = axis.length - 1;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
-    if (axis[mid] < date) {
+    if ((axis[mid] ?? "") < date) {
       lo = mid + 1;
     } else {
       hi = mid;
     }
   }
-  if (lo > 0 && Math.abs(dateDiff(axis[lo - 1], date)) < Math.abs(dateDiff(axis[lo], date))) {
+  if (
+    lo > 0 &&
+    Math.abs(dateDiff(axis[lo - 1] ?? "", date)) < Math.abs(dateDiff(axis[lo] ?? "", date))
+  ) {
     return lo - 1;
   }
   return lo;
@@ -108,8 +116,8 @@ export function eventsToChartEvents(axis: string[], events: PoliticalEvent[]): C
   if (axis.length === 0) {
     return [];
   }
-  const first = axis[0];
-  const last = axis[axis.length - 1];
+  const first = axis[0] ?? "";
+  const last = axis[axis.length - 1] ?? "";
   return events
     .filter((event) => event.date >= first && event.date <= last)
     .map((event) => ({ index: nearestIndex(axis, event.date), label: event.title }));

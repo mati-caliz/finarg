@@ -64,14 +64,19 @@ export function AnnotatedSeriesChart({
     s.data.map((p, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
 
   let gapArea: string | null = null;
-  if (gapFill && series.length >= 2) {
-    const a = series[0].data;
-    const b = series[1].data;
+  const firstSeries = series[0];
+  const secondSeries = series[1];
+  if (gapFill && firstSeries && secondSeries) {
+    const a = firstSeries.data;
+    const b = secondSeries.data;
     const m = Math.min(a.length, b.length);
-    const fwd = Array.from({ length: m }, (_, i) => `${X(i).toFixed(1)},${Y(a[i].v).toFixed(1)}`);
+    const fwd = Array.from(
+      { length: m },
+      (_, i) => `${X(i).toFixed(1)},${Y(a[i]?.v ?? 0).toFixed(1)}`,
+    );
     const back = Array.from(
       { length: m },
-      (_, i) => `${X(m - 1 - i).toFixed(1)},${Y(b[m - 1 - i].v).toFixed(1)}`,
+      (_, i) => `${X(m - 1 - i).toFixed(1)},${Y(b[m - 1 - i]?.v ?? 0).toFixed(1)}`,
     );
     gapArea = `M${fwd.join(" L")} L${back.join(" L")} Z`;
   }
@@ -209,10 +214,8 @@ export function AnnotatedSeriesChart({
             minWidth: 150,
           }}
         >
-          <div
-            style={{ color: "var(--ink3)", marginBottom: 4, fontFamily: "var(--font-jb-mono)" }}
-          >
-            {series[0].data[hover]?.t}
+          <div style={{ color: "var(--ink3)", marginBottom: 4, fontFamily: "var(--font-jb-mono)" }}>
+            {series[0]?.data[hover]?.t}
           </div>
           {series.map((s, si) =>
             s.data[hover] ? (

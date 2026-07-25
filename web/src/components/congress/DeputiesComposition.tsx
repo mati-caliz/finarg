@@ -1,12 +1,12 @@
 "use client";
 
-import { Card } from "@/components/core";
 import {
   BlocLegend,
-  HemicycleChart,
   type HemicycleBloc,
+  HemicycleChart,
   type HemicycleSeat,
 } from "@/components/congress/HemicycleChart";
+import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
 import { blocColor } from "@/lib/congress";
@@ -51,9 +51,7 @@ export function DeputiesComposition() {
       id: `${detail.deputy_name ?? "banca"}-${index}`,
       occupantName: detail.deputy_name ?? "Banca sin datos",
       bloc: detail.bloc ?? UNKNOWN_BLOC,
-      detailLines: [detail.district].filter(
-        (line): line is string => line !== null && line !== "",
-      ),
+      detailLines: [detail.district].filter((line): line is string => line !== null && line !== ""),
     }));
 
   const total = seats.length;

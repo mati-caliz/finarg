@@ -45,7 +45,8 @@ function distributeSeatsByRow(total: number, rowRadii: number[]): number[] {
   let assigned = counts.reduce((sum, count) => sum + count, 0);
   let rowIndex = rowRadii.length - 1;
   while (assigned < total) {
-    counts[rowIndex % rowRadii.length] += 1;
+    const targetRow = rowIndex % rowRadii.length;
+    counts[targetRow] = (counts[targetRow] ?? 0) + 1;
     assigned += 1;
     rowIndex -= 1;
   }
@@ -63,7 +64,9 @@ function computeSeatPositions(total: number): SeatPosition[] {
 
   const minArcSpacing = Math.min(
     ...rowRadii.map((radius, rowNumber) =>
-      seatsPerRow[rowNumber] > 0 ? (Math.PI * radius) / seatsPerRow[rowNumber] : Number.POSITIVE_INFINITY,
+      (seatsPerRow[rowNumber] ?? 0) > 0
+        ? (Math.PI * radius) / (seatsPerRow[rowNumber] ?? 1)
+        : Number.POSITIVE_INFINITY,
     ),
   );
   const seatRadius =
@@ -71,7 +74,7 @@ function computeSeatPositions(total: number): SeatPosition[] {
 
   const positions: SeatPosition[] = [];
   rowRadii.forEach((radius, rowNumber) => {
-    const count = seatsPerRow[rowNumber];
+    const count = seatsPerRow[rowNumber] ?? 0;
     for (let seatNumber = 0; seatNumber < count; seatNumber += 1) {
       const angle = Math.PI * (1 - (seatNumber + 0.5) / count);
       positions.push({
@@ -135,9 +138,8 @@ export function HemicycleChart({ seats, blocs, ariaLabel, majority }: HemicycleC
   const positions = computeSeatPositions(seats.length);
   const colorByBloc = new Map(blocs.map((bloc) => [bloc.name, bloc.color]));
   const hoveredSeat = hoveredIndex !== null ? seats[hoveredIndex] : null;
-  const hoveredPosition = hoveredIndex !== null ? positions[hoveredIndex] : null;
-  const tooltipOnLeftHalf =
-    hoveredPosition !== null && hoveredPosition.x > CENTER_X;
+  const hoveredPosition = hoveredIndex !== null ? positions[hoveredIndex] : undefined;
+  const tooltipOnLeftHalf = hoveredPosition !== undefined && hoveredPosition.x > CENTER_X;
 
   return (
     <div style={{ position: "relative" }}>

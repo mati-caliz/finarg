@@ -6,10 +6,12 @@ import re
 from dataclasses import dataclass, field
 from datetime import date
 
+import httpx
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
+from labrecha_scraper.clock import today_in_argentina
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.llm import run_claude_json_array
 from labrecha_scraper.models import GazetteSummary, TaxChange
@@ -60,9 +62,7 @@ def _title(raw_html: str) -> str:
     if not match:
         return "Aviso del Boletín Oficial"
     title = html.unescape(match.group(1).strip())
-    if title.startswith(TITLE_PREFIX):
-        title = title[len(TITLE_PREFIX) :]
-    return title
+    return title.removeprefix(TITLE_PREFIX)
 
 
 def _body(clean_text: str) -> str:
@@ -72,22 +72,28 @@ def _body(clean_text: str) -> str:
 
 
 def _build_prompt(batch: list[Notice]) -> str:
-    payload = [{"regulation_id": notice.regulation_id, "titulo": notice.title, "texto": notice.body} for notice in batch]
+    payload = [
+        {"regulation_id": notice.regulation_id, "titulo": notice.title, "texto": notice.body}
+        for notice in batch
+    ]
     return (
         "Sos un analista que resume normas del Boletín Oficial argentino para un observatorio "
         "económico. Para cada norma decidí si es RELEVANTE para el ciudadano común en materia "
         "económica/regulatoria (impuestos, alícuotas, regulaciones, política monetaria, tarifas, "
-        "subsidios, empleo). Descartá lo puramente administrativo, designaciones y trámites internos. "
-        "Devolvé SOLO un array JSON, sin texto adicional ni backticks, con un objeto por norma en el "
-        "MISMO orden, con esta forma: {\"regulation_id\": \"<id>\", \"relevante\": true|false, "
-        "\"categoria\": \"impuesto|regulacion|monetario|laboral|subsidio|tarifa|otro\", "
-        "\"resumen\": [\"viñeta 1\", \"viñeta 2\", \"viñeta 3\"], "
-        "\"cambio_impositivo\": true|false, \"tipo_cambio\": \"alta|baja|modificacion\", "
-        "\"tributo\": \"<nombre corto del impuesto/tasa/contribución afectado>\", "
-        "\"jurisdiccion\": \"nacional|provincial|municipal\"}. Marcá \"cambio_impositivo\" en true SOLO "
-        "si la norma CREA (alta), DEROGA/ELIMINA (baja) o MODIFICA una alícuota/base (modificacion) de un "
-        "tributo concreto; en ese caso completá tributo y jurisdiccion. Si no es un cambio de un tributo "
-        "puntual, poné \"cambio_impositivo\": false y dejá los otros campos vacíos. El resumen debe tener "
+        "subsidios, empleo). Descartá lo puramente administrativo, designaciones y trámites "
+        "internos. "
+        "Devolvé SOLO un array JSON, sin texto adicional ni backticks, con un objeto por norma "
+        "en el "
+        'MISMO orden, con esta forma: {"regulation_id": "<id>", "relevante": true|false, '
+        '"categoria": "impuesto|regulacion|monetario|laboral|subsidio|tarifa|otro", '
+        '"resumen": ["viñeta 1", "viñeta 2", "viñeta 3"], '
+        '"cambio_impositivo": true|false, "tipo_cambio": "alta|baja|modificacion", '
+        '"tributo": "<nombre corto del impuesto/tasa/contribución afectado>", '
+        '"jurisdiccion": "nacional|provincial|municipal"}. Marcá "cambio_impositivo" en true '
+        "SOLO si la norma CREA (alta), DEROGA/ELIMINA (baja) o MODIFICA una alícuota/base "
+        "(modificacion) de un tributo concreto; en ese caso completá tributo y jurisdiccion. "
+        'Si no es un cambio de un tributo puntual, poné "cambio_impositivo": false y dejá los '
+        "otros campos vacíos. El resumen debe tener "
         "3 viñetas claras y cortas en español. Normas:\n" + json.dumps(payload, ensure_ascii=False)
     )
 
@@ -97,7 +103,7 @@ class OfficialGazetteConnector(Connector):
     source = "official_gazette"
 
     def fetch(self) -> GazetteData:
-        target_date = date.today()
+        target_date = today_in_argentina()
         with self.build_client() as client:
             notices = self._list_notices(client, target_date)
             pending = self._filter_pending(notices)[:MAX_NOTICES_PER_RUN]
@@ -116,7 +122,7 @@ class OfficialGazetteConnector(Connector):
         )
         return summaries + changes
 
-    def _list_notices(self, client, target_date: date) -> list[Notice]:
+    def _list_notices(self, client: httpx.Client, target_date: date) -> list[Notice]:
         response = client.get(f"{BASE_URL}/seccion/{SECTION}")
         response.raise_for_status()
         seen: set[str] = set()
@@ -143,12 +149,14 @@ class OfficialGazetteConnector(Connector):
         with SessionLocal() as session:
             existing = set(
                 session.scalars(
-                    select(GazetteSummary.regulation_id).where(GazetteSummary.regulation_id.in_(ids))
+                    select(GazetteSummary.regulation_id).where(
+                        GazetteSummary.regulation_id.in_(ids)
+                    )
                 ).all()
             )
         return [notice for notice in notices if notice.regulation_id not in existing]
 
-    def _load_body(self, client, notice: Notice) -> None:
+    def _load_body(self, client: httpx.Client, notice: Notice) -> None:
         response = client.get(notice.url)
         response.raise_for_status()
         notice.title = _title(response.text)
@@ -160,12 +168,16 @@ class OfficialGazetteConnector(Connector):
         for start in range(0, len(notices), BATCH_SIZE):
             batch = notices[start : start + BATCH_SIZE]
             results = run_claude_json_array(_build_prompt(batch))
-            by_id = {str(item.get("regulation_id")): item for item in results if isinstance(item, dict)}
+            by_id = {
+                str(item.get("regulation_id")): item for item in results if isinstance(item, dict)
+            }
             for notice in batch:
                 item = by_id.get(notice.regulation_id)
                 if item is None or not item.get("relevante"):
                     continue
-                bullets = [str(bullet).strip() for bullet in item.get("resumen", []) if str(bullet).strip()]
+                bullets = [
+                    str(bullet).strip() for bullet in item.get("resumen", []) if str(bullet).strip()
+                ]
                 if not bullets:
                     continue
                 summaries.append(

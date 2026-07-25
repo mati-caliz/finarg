@@ -71,7 +71,16 @@ export default function CongressPage() {
 
       <VotesBoard />
 
-      <div style={{ marginTop: 56, borderTop: "2px solid var(--ink)", paddingTop: 32, display: "flex", flexDirection: "column", gap: 40 }}>
+      <div
+        style={{
+          marginTop: 56,
+          borderTop: "2px solid var(--ink)",
+          paddingTop: 32,
+          display: "flex",
+          flexDirection: "column",
+          gap: 40,
+        }}
+      >
         <SenateComposition />
         <DeputiesComposition />
         <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>

@@ -26,13 +26,23 @@ function segments(tally: Tally): { key: keyof Tally; value: number; color: strin
 }
 
 export function TallyBar({ tally, height = 16 }: { tally: Tally; height?: number }) {
-  const total =
-    tally.afirmativos + tally.negativos + tally.abstenciones + tally.ausentes || 1;
+  const total = tally.afirmativos + tally.negativos + tally.abstenciones + tally.ausentes || 1;
   return (
-    <div style={{ display: "flex", height, borderRadius: 8, overflow: "hidden", background: "var(--line2)" }}>
+    <div
+      style={{
+        display: "flex",
+        height,
+        borderRadius: 8,
+        overflow: "hidden",
+        background: "var(--line2)",
+      }}
+    >
       {segments(tally).map((segment) =>
         segment.value > 0 ? (
-          <div key={segment.key} style={{ width: `${(segment.value / total) * 100}%`, background: segment.color }} />
+          <div
+            key={segment.key}
+            style={{ width: `${(segment.value / total) * 100}%`, background: segment.color }}
+          />
         ) : null,
       )}
     </div>
@@ -46,7 +56,16 @@ export function TallyCounts({ tally }: { tally: Tally }) {
     { label: "Abstenciones", value: tally.abstenciones, color: VOTE_COLORS.abstenciones },
   ];
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", fontFamily: MONO, fontSize: "0.75rem" }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        gap: 12,
+        flexWrap: "wrap",
+        fontFamily: MONO,
+        fontSize: "0.75rem",
+      }}
+    >
       {items.map((item) => (
         <span key={item.label} style={{ color: item.color }}>
           {item.label} <b style={{ fontSize: "0.9375rem" }}>{item.value}</b>
@@ -59,7 +78,16 @@ export function TallyCounts({ tally }: { tally: Tally }) {
 export function BlocRow({ tally }: { tally: BlocVoteTally }) {
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontFamily: MONO, fontSize: "0.78rem", marginBottom: 7 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 12,
+          fontFamily: MONO,
+          fontSize: "0.78rem",
+          marginBottom: 7,
+        }}
+      >
         <span style={{ color: "var(--ink)" }}>{tally.bloc}</span>
         <span style={{ color: "var(--ink3)" }}>{tally.total}</span>
       </div>
@@ -78,7 +106,17 @@ export function VoteLegend() {
   return (
     <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
       {items.map((item) => (
-        <span key={item.label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink2)" }}>
+        <span
+          key={item.label}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            fontFamily: MONO,
+            fontSize: "0.68rem",
+            color: "var(--ink2)",
+          }}
+        >
           <span style={{ width: 11, height: 11, borderRadius: 3, background: item.color }} />
           {item.label}
         </span>
