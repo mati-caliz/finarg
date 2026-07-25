@@ -40,7 +40,8 @@ cd web && npm install && npm run dev
 El scraper se corre on-demand:
 
 ```bash
-docker compose run --rm scraper run all      # o: run <job>, list, status, seed-events, init-db
+docker compose run --rm scraper run all      # o: run <job>, list, status, seed-events
+docker compose run --rm scraper db upgrade   # aplicar migraciones del esquema
 ```
 
 ## Variables de entorno
