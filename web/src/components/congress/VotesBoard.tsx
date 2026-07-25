@@ -29,7 +29,7 @@ function tallyOf(vote: CongressVote) {
 }
 
 function FeaturedFicha({ vote }: { vote: CongressVote }) {
-  const { data: details, isLoading } = useCongressVoteDetails(vote.acta_id);
+  const { data: details, isLoading } = useCongressVoteDetails(vote.vote_record_id);
   const chip = resultChip(vote);
   const blocs = tallyByBloc(details ?? []).slice(0, MAX_BLOCS);
 
@@ -54,7 +54,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
         </span>
         <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
           {vote.date ? formatDateAR(vote.date) : "s/f"}
-          {vote.acta_id ? ` · Acta ${vote.acta_id}` : ""}
+          {vote.vote_record_id ? ` · Acta ${vote.vote_record_id}` : ""}
         </span>
       </div>
       <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.5rem, 3.5vw, 1.875rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 22px", color: "var(--ink)" }}>
@@ -98,7 +98,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
 function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties }) {
   const chip = resultChip(vote);
   return (
-    <Link href={`/congreso/votacion/${vote.acta_id}`} style={{ display: "block", background: "var(--raise)", border: "1px solid var(--line)", padding: "16px 18px", textDecoration: "none", ...style }}>
+    <Link href={`/congress/vote/${vote.vote_record_id}`} style={{ display: "block", background: "var(--raise)", border: "1px solid var(--line)", padding: "16px 18px", textDecoration: "none", ...style }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
         <span style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", color: chip.color, background: chip.background, padding: "2px 8px", borderRadius: "var(--radius-pill)" }}>
           {chip.label}
@@ -123,7 +123,7 @@ export function VotesBoard() {
 
   if (isLoading) {
     return (
-      <div className="lb-congreso-grid" style={{ gap: 32 }}>
+      <div className="lb-congress-grid" style={{ gap: 32 }}>
         <Skeleton className="h-[520px] rounded-[12px]" />
         <Skeleton className="h-[520px] rounded-[12px]" />
       </div>
@@ -142,7 +142,7 @@ export function VotesBoard() {
   const recent = votes.slice(1, 6);
 
   return (
-    <div className="lb-congreso-grid" style={{ gap: 32 }}>
+    <div className="lb-congress-grid" style={{ gap: 32 }}>
       <FeaturedFicha vote={featured} />
       <div>
         <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
@@ -151,7 +151,7 @@ export function VotesBoard() {
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {recent.map((vote, index) => (
             <RecentItem
-              key={vote.acta_id}
+              key={vote.vote_record_id}
               vote={vote}
               style={{
                 borderTop: index === 0 ? "1px solid var(--line)" : "none",

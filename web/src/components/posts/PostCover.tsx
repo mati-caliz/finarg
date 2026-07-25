@@ -11,7 +11,7 @@ const INK = "var(--ink)";
 const INK2 = "var(--ink2)";
 const INK3 = "var(--ink3)";
 const LINE = "var(--line)";
-const ACC = "var(--brecha)";
+const ACC = "var(--gap)";
 const SURFACE = "var(--line2)";
 const SURFACE_2 = "var(--line)";
 
@@ -76,7 +76,7 @@ function Bolt({ x, y, scale = 1, fill = ACC }: { x: number; y: number; scale?: n
   );
 }
 
-function TransitoMotif() {
+function TrafficMotif() {
   return (
     <g>
       <rect x={0} y={150} width={W} height={86} fill={SURFACE_2} />
@@ -109,7 +109,7 @@ function TransitoMotif() {
   );
 }
 
-function PeajeMotif() {
+function TollMotif() {
   return (
     <g>
       <rect x={0} y={214} width={W} height={100} fill={SURFACE_2} />
@@ -132,7 +132,7 @@ function PeajeMotif() {
   );
 }
 
-function PatenteMotif() {
+function LicensePlateMotif() {
   return (
     <g>
       <rect x={110} y={96} width={420} height={168} rx={16} fill={SURFACE} stroke={INK} strokeWidth={3} />
@@ -158,7 +158,7 @@ function PatenteMotif() {
   );
 }
 
-function EstacionamientoMotif() {
+function ParkingMotif() {
   return (
     <g>
       <g stroke={INK3} strokeWidth={2.4}>
@@ -194,7 +194,7 @@ function EstacionamientoMotif() {
   );
 }
 
-function SoftwareEstadoMotif() {
+function StateSoftwareMotif() {
   const bars = [220, 148, 262, 176, 118, 236];
   return (
     <g>
@@ -229,7 +229,7 @@ function SoftwareEstadoMotif() {
   );
 }
 
-function AutoTramiteMotif() {
+function CarPaperworkMotif() {
   return (
     <g>
       <rect x={128} y={54} width={300} height={258} rx={10} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
@@ -255,7 +255,7 @@ function AutoTramiteMotif() {
   );
 }
 
-function FacturacionMotif() {
+function InvoicingMotif() {
   const qrCells: Array<[number, number]> = [
     [0, 0], [1, 0], [2, 0], [4, 0],
     [0, 1], [2, 1], [5, 1],
@@ -298,7 +298,7 @@ function FacturacionMotif() {
   );
 }
 
-function MovilidadMotif() {
+function MobilityMotif() {
   const lanes = [
     { label: "peatón", width: 420 },
     { label: "bici", width: 330 },
@@ -332,7 +332,7 @@ function MovilidadMotif() {
   );
 }
 
-function ElectricosMotif() {
+function ElectricMotif() {
   return (
     <g>
       <Car x={72} y={148} w={196} h={92} fill={SURFACE} />
@@ -350,7 +350,7 @@ function ElectricosMotif() {
   );
 }
 
-function EnchufarMotif() {
+function ChargingMotif() {
   return (
     <g>
       <rect x={96} y={48} width={224} height={266} rx={8} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
@@ -469,16 +469,16 @@ function NotaFallback() {
 }
 
 const SLUG_MOTIFS: Record<string, () => ReactNode> = {
-  "como-se-arregla-el-transito-en-argentina": TransitoMotif,
-  "peajes-sin-frenar-free-flow": PeajeMotif,
-  "patentes-que-sistema-conviene": PatenteMotif,
-  "estacionamiento-gratis-no-es-gratis": EstacionamientoMotif,
-  "organismo-software-del-estado": SoftwareEstadoMotif,
-  "el-auto-como-tramite": AutoTramiteMotif,
-  "facturacion-electronica-el-mejor-sistema-posible": FacturacionMotif,
-  "como-organizar-la-movilidad-de-una-ciudad": MovilidadMotif,
-  "autos-y-bicis-electricas-vale-la-pena-incentivar": ElectricosMotif,
-  "derecho-a-enchufar-cargadores-en-edificios": EnchufarMotif,
+  "como-se-arregla-el-transito-en-argentina": TrafficMotif,
+  "peajes-sin-frenar-free-flow": TollMotif,
+  "patentes-que-sistema-conviene": LicensePlateMotif,
+  "estacionamiento-gratis-no-es-gratis": ParkingMotif,
+  "organismo-software-del-estado": StateSoftwareMotif,
+  "el-auto-como-tramite": CarPaperworkMotif,
+  "facturacion-electronica-el-mejor-sistema-posible": InvoicingMotif,
+  "como-organizar-la-movilidad-de-una-ciudad": MobilityMotif,
+  "autos-y-bicis-electricas-vale-la-pena-incentivar": ElectricMotif,
+  "derecho-a-enchufar-cargadores-en-edificios": ChargingMotif,
 };
 
 function motifFor(slug: string, category: PostCategory, seed: number): ReactNode {

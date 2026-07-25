@@ -21,15 +21,15 @@ export const POST_IMPACT_META: Record<PostImpactKind, ImpactKindMeta> = {
   tiempo: {
     label: "Tiempo",
     icon: Clock,
-    color: "var(--brecha)",
-    background: "var(--brecha-bg)",
-    border: "var(--brecha-ln)",
+    color: "var(--gap)",
+    background: "var(--gap-bg)",
+    border: "var(--gap-ln)",
   },
   dinero: {
     label: "Plata",
     icon: Wallet,
-    color: "var(--brecha)",
-    background: "var(--brecha-bg)",
+    color: "var(--gap)",
+    background: "var(--gap-bg)",
     border: "transparent",
   },
   ambiente: {
@@ -49,8 +49,8 @@ export const POST_IMPACT_META: Record<PostImpactKind, ImpactKindMeta> = {
   estado: {
     label: "Estado",
     icon: Landmark,
-    color: "var(--evento)",
-    background: "var(--evento-bg)",
+    color: "var(--event)",
+    background: "var(--event-bg)",
     border: "transparent",
   },
   transparencia: {

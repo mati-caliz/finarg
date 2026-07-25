@@ -1,5 +1,5 @@
-import { BrechasTeaser } from "@/components/home/BrechasTeaser";
-import { EstadoPais } from "@/components/home/EstadoPais";
+import { CountryStatus } from "@/components/home/CountryStatus";
+import { GapsTeaser } from "@/components/home/GapsTeaser";
 import { HomeHero } from "@/components/home/HomeHero";
 import { IdeasHome } from "@/components/home/IdeasHome";
 
@@ -7,8 +7,8 @@ export default function HomePage() {
   return (
     <div>
       <HomeHero />
-      <EstadoPais />
-      <BrechasTeaser />
+      <CountryStatus />
+      <GapsTeaser />
       <IdeasHome />
     </div>
   );

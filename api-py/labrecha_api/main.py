@@ -3,19 +3,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from labrecha_api.config import settings
 from labrecha_api.routers import (
-    boletin,
     calculators,
     congress,
-    coparticipacion,
     events,
+    gazette,
     holidays,
+    housing,
     indicators,
     news,
     posts,
+    revenue_sharing,
     senate,
     status,
     taxes,
-    vivienda,
 )
 
 app = FastAPI(
@@ -39,8 +39,8 @@ app.include_router(senate.router)
 app.include_router(holidays.router)
 app.include_router(news.router)
 app.include_router(posts.router)
-app.include_router(boletin.router)
-app.include_router(coparticipacion.router)
+app.include_router(gazette.router)
+app.include_router(revenue_sharing.router)
 app.include_router(taxes.router)
-app.include_router(vivienda.router)
+app.include_router(housing.router)
 app.include_router(calculators.router)

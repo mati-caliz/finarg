@@ -14,12 +14,12 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "El país", href: "/" },
-  { label: "Indicadores", href: "/indicadores" },
-  { label: "Brechas", href: "/brechas" },
+  { label: "Indicadores", href: "/indicators" },
+  { label: "Brechas", href: "/gaps" },
   { label: "Ideas", href: "/ideas" },
-  { label: "Congreso", href: "/congreso" },
-  { label: "Noticias", href: "/noticias" },
-  { label: "Calculadoras", href: "/calculadoras" },
+  { label: "Congreso", href: "/congress" },
+  { label: "Noticias", href: "/news" },
+  { label: "Calculadoras", href: "/calculators" },
 ];
 
 const CAFECITO_URL = "https://cafecito.app/finlatam";
@@ -28,7 +28,7 @@ function isActive(pathname: string, href: string): boolean {
   if (href === "/") {
     return pathname === "/";
   }
-  if (href === "/calculadoras") {
+  if (href === "/calculators") {
     return pathname.startsWith("/calculadora");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -62,7 +62,7 @@ export function BrandMark({ fontSize = 21 }: { fontSize?: number }) {
           height: 7,
           flexShrink: 0,
           borderRadius: "50%",
-          background: "var(--brecha)",
+          background: "var(--gap)",
           transform: "translateY(-2px)",
         }}
       />
@@ -195,7 +195,7 @@ export function SiteHeader() {
               borderRadius: "var(--radius-pill)",
               border: "1px solid var(--line)",
               background: "var(--surface)",
-              color: "var(--brecha)",
+              color: "var(--gap)",
               fontFamily: "var(--font-jb-mono)",
               fontSize: "0.75rem",
               fontWeight: 600,
@@ -275,7 +275,7 @@ export function SiteHeader() {
               borderRadius: "var(--radius-md)",
               fontFamily: "var(--font-jb-mono)",
               fontSize: "0.8125rem",
-              color: "var(--brecha)",
+              color: "var(--gap)",
               textDecoration: "none",
             }}
           >

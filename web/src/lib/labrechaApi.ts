@@ -46,7 +46,7 @@ export interface PoliticalEvent {
 }
 
 export interface CongressVote {
-  acta_id: string;
+  vote_record_id: string;
   period_number: number | null;
   session_type: string | null;
   date: string | null;
@@ -60,7 +60,7 @@ export interface CongressVote {
 }
 
 export interface CongressVoteDetail {
-  acta_id: string;
+  vote_record_id: string;
   deputy_name: string | null;
   bloc: string | null;
   district: string | null;
@@ -111,22 +111,22 @@ export interface Holiday {
   types: string | null;
 }
 
-export interface RentByBarrio {
-  barrio: string;
-  comuna: string | null;
+export interface RentByNeighborhood {
+  neighborhood: string;
+  commune: string | null;
   date: string;
   price: string;
   rooms: string | null;
 }
 
-export interface CoparticipacionShare {
+export interface RevenueSharingShare {
   province: string;
   coefficient: string;
   share_pct: string;
 }
 
-export interface BoletinSummary {
-  norma_id: string;
+export interface GazetteSummary {
+  regulation_id: string;
   date: string;
   section: string;
   title: string;
@@ -136,7 +136,7 @@ export interface BoletinSummary {
 }
 
 export interface TaxChange {
-  norma_id: string;
+  regulation_id: string;
   date: string;
   change_type: string;
   tax_name: string;
@@ -366,9 +366,9 @@ export const postsApi = {
   bySlug: (slug: string) => get<Post>(`/posts/${slug}`),
 };
 
-export const boletinApi = {
+export const gazetteApi = {
   summaries: (params?: { category?: string; limit?: number; offset?: number }) =>
-    get<BoletinSummary[]>("/boletin/summaries", params),
+    get<GazetteSummary[]>("/gazette/summaries", params),
 };
 
 export const taxesApi = {
@@ -384,12 +384,12 @@ export const scrapeRunsApi = {
   list: (params?: { limit?: number }) => get<ScrapeRun[]>("/scrape-runs", params),
 };
 
-export const coparticipacionApi = {
-  shares: () => get<CoparticipacionShare[]>("/coparticipacion"),
+export const revenueSharingApi = {
+  shares: () => get<RevenueSharingShare[]>("/revenue-sharing"),
 };
 
-export const viviendaApi = {
-  rentByBarrio: () => get<RentByBarrio[]>("/vivienda/rent-by-barrio"),
+export const housingApi = {
+  rentByNeighborhood: () => get<RentByNeighborhood[]>("/housing/rent-by-neighborhood"),
 };
 
 export const calculatorsApi = {

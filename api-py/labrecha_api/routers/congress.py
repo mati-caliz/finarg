@@ -26,7 +26,7 @@ router = APIRouter(prefix="/congress", tags=["congress"])
 
 def _to_vote_out(vote: CongressVote) -> CongressVoteOut:
     return CongressVoteOut(
-        acta_id=vote.acta_id,
+        vote_record_id=vote.vote_record_id,
         period_number=vote.period_number,
         session_type=vote.session_type,
         date=vote.date,
@@ -63,7 +63,7 @@ def list_votes(
     statement = (
         select(CongressVote)
         .where(*conditions)
-        .order_by(CongressVote.date.desc().nullslast(), CongressVote.acta_id.desc())
+        .order_by(CongressVote.date.desc().nullslast(), CongressVote.vote_record_id.desc())
         .limit(limit)
         .offset(offset)
     )
@@ -136,25 +136,25 @@ def list_laws(
     ]
 
 
-@router.get("/votes/{acta_id}", response_model=CongressVoteOut)
-def get_vote(acta_id: str, session: Session = Depends(get_session)) -> CongressVoteOut:
-    vote = session.get(CongressVote, acta_id)
+@router.get("/votes/{vote_record_id}", response_model=CongressVoteOut)
+def get_vote(vote_record_id: str, session: Session = Depends(get_session)) -> CongressVoteOut:
+    vote = session.get(CongressVote, vote_record_id)
     if vote is None:
-        raise HTTPException(status_code=404, detail=f"acta desconocida: {acta_id}")
+        raise HTTPException(status_code=404, detail=f"acta desconocida: {vote_record_id}")
     return _to_vote_out(vote)
 
 
-@router.get("/votes/{acta_id}/details", response_model=list[CongressVoteDetailOut])
+@router.get("/votes/{vote_record_id}/details", response_model=list[CongressVoteDetailOut])
 def list_vote_details(
-    acta_id: str,
+    vote_record_id: str,
     vote: str | None = Query(default=None),
     bloc: str | None = Query(default=None),
     session: Session = Depends(get_session),
 ) -> list[CongressVoteDetailOut]:
-    if session.get(CongressVote, acta_id) is None:
-        raise HTTPException(status_code=404, detail=f"acta desconocida: {acta_id}")
+    if session.get(CongressVote, vote_record_id) is None:
+        raise HTTPException(status_code=404, detail=f"acta desconocida: {vote_record_id}")
 
-    conditions = [CongressVoteDetail.acta_id == acta_id]
+    conditions = [CongressVoteDetail.vote_record_id == vote_record_id]
     if vote is not None:
         conditions.append(CongressVoteDetail.vote == vote)
     if bloc is not None:
@@ -167,7 +167,7 @@ def list_vote_details(
     )
     return [
         CongressVoteDetailOut(
-            acta_id=detail.acta_id,
+            vote_record_id=detail.vote_record_id,
             deputy_name=detail.deputy_name,
             bloc=detail.bloc,
             district=detail.district,

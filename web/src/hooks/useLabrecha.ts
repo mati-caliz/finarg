@@ -1,11 +1,11 @@
 import {
   type IndicatorSeriesParams,
   type PostCategory,
-  boletinApi,
+  gazetteApi,
   postsApi,
   congressApi,
-  coparticipacionApi,
-  viviendaApi,
+  revenueSharingApi,
+  housingApi,
   holidaysApi,
   indicatorsApi,
   newsApi,
@@ -34,10 +34,10 @@ export const labrechaKeys = {
   news: (params?: object) => ["labrecha", "news", params ?? {}] as const,
   posts: (params?: object) => ["labrecha", "posts", params ?? {}] as const,
   post: (slug: string) => ["labrecha", "posts", slug] as const,
-  boletin: (params?: object) => ["labrecha", "boletin", params ?? {}] as const,
-  coparticipacion: ["labrecha", "coparticipacion"] as const,
+  gazette: (params?: object) => ["labrecha", "gazette", params ?? {}] as const,
+  revenueSharing: ["labrecha", "revenue-sharing"] as const,
   taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
-  rentByBarrio: ["labrecha", "vivienda", "rent-by-barrio"] as const,
+  rentByNeighborhood: ["labrecha", "housing", "rent-by-neighborhood"] as const,
   scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
 };
 
@@ -194,15 +194,15 @@ export function useBoletinSummaries(params?: {
   offset?: number;
 }) {
   return useQuery({
-    queryKey: labrechaKeys.boletin(params),
-    queryFn: () => boletinApi.summaries(params),
+    queryKey: labrechaKeys.gazette(params),
+    queryFn: () => gazetteApi.summaries(params),
   });
 }
 
 export function useCoparticipacion() {
   return useQuery({
-    queryKey: labrechaKeys.coparticipacion,
-    queryFn: () => coparticipacionApi.shares(),
+    queryKey: labrechaKeys.revenueSharing,
+    queryFn: () => revenueSharingApi.shares(),
   });
 }
 
@@ -225,9 +225,9 @@ export function useScrapeRuns(params?: { limit?: number }) {
   });
 }
 
-export function useRentByBarrio() {
+export function useRentByNeighborhood() {
   return useQuery({
-    queryKey: labrechaKeys.rentByBarrio,
-    queryFn: () => viviendaApi.rentByBarrio(),
+    queryKey: labrechaKeys.rentByNeighborhood,
+    queryFn: () => housingApi.rentByNeighborhood(),
   });
 }

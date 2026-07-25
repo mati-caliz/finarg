@@ -148,16 +148,42 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: "/ganancias", destination: "/calculadora-sueldo-neto", permanent: true },
-      { source: "/reservas", destination: "/indicador/reservas_internacionales", permanent: true },
+      { source: "/ganancias", destination: "/calculator-net-salary", permanent: true },
+      { source: "/reservas", destination: "/indicator/international_reserves", permanent: true },
       {
         source: "/reservas-bcra",
-        destination: "/indicador/reservas_internacionales",
+        destination: "/indicator/international_reserves",
         permanent: true,
       },
-      { source: "/cotizaciones", destination: "/indicador/dolar_blue", permanent: true },
-      { source: "/inflacion", destination: "/indicador/ipc_mensual", permanent: true },
-      { source: "/riesgo-pais", destination: "/indicador/riesgo_pais", permanent: true },
+      { source: "/cotizaciones", destination: "/indicator/dollar_blue", permanent: true },
+      { source: "/inflacion", destination: "/indicator/cpi_monthly", permanent: true },
+      { source: "/riesgo-pais", destination: "/indicator/country_risk", permanent: true },
+      { source: "/brechas", destination: "/gaps", permanent: true },
+      { source: "/calculadoras", destination: "/calculators", permanent: true },
+      { source: "/congreso", destination: "/congress", permanent: true },
+      { source: "/congreso/votacion/:id", destination: "/congress/vote/:id", permanent: true },
+      { source: "/estado", destination: "/status", permanent: true },
+      { source: "/feriados", destination: "/holidays", permanent: true },
+      { source: "/indicadores", destination: "/indicators", permanent: true },
+      { source: "/indicador/:code", destination: "/indicator/:code", permanent: true },
+      { source: "/noticias", destination: "/news", permanent: true },
+      {
+        source: "/calculadora-ajuste-inflacion",
+        destination: "/calculator-inflation-adjustment",
+        permanent: true,
+      },
+      {
+        source: "/calculadora-impacto-fiscal",
+        destination: "/calculator-fiscal-impact",
+        permanent: true,
+      },
+      {
+        source: "/calculadora-interes-compuesto",
+        destination: "/calculator-compound-interest",
+        permanent: true,
+      },
+      { source: "/calculadora-sueldo-neto", destination: "/calculator-net-salary", permanent: true },
+      { source: "/boletin.xml", destination: "/gazette.xml", permanent: true },
     ];
   },
 };

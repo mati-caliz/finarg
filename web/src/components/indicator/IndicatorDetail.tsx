@@ -8,7 +8,7 @@ import {
   useIndicatorSources,
   usePoliticalEvents,
 } from "@/hooks/useLabrecha";
-import { BRECHAS } from "@/lib/brechas";
+import { GAPS } from "@/lib/gaps";
 import { freshnessForCode } from "@/lib/freshness";
 import {
   INDICATOR_FAMILY_LABELS,
@@ -32,7 +32,7 @@ import Link from "next/link";
 import { type CSSProperties, useState } from "react";
 
 const RANGE_OPTIONS = ["6M", "1A", "5A", "Máx"];
-const SOURCE_COLORS = ["var(--chart)", "var(--brecha)", "var(--serie-3)"];
+const SOURCE_COLORS = ["var(--chart)", "var(--gap)", "var(--serie-3)"];
 const MONO = "var(--font-jb-mono)";
 
 interface IndicatorDetailProps {
@@ -258,7 +258,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
       ? (Math.abs(primaryValue - secondValue) / gapBase) * 100
       : undefined;
 
-  const relatedBrechas = BRECHAS.filter((brecha) => brecha.legs.some((leg) => leg.code === code));
+  const relatedGaps = GAPS.filter((gap) => gap.legs.some((leg) => leg.code === code));
 
   const tableStart = Math.max(0, aligned.axis.length - 8);
   const tableRows: { date: string; values: number[]; gap: number | undefined }[] = [];
@@ -278,7 +278,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   return (
     <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "28px 24px 72px" }}>
       <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 20 }}>
-        <Link href="/indicadores" style={{ color: "var(--ink3)", textDecoration: "none" }}>
+        <Link href="/indicators" style={{ color: "var(--ink3)", textDecoration: "none" }}>
           Indicadores
         </Link>{" "}
         / {familyLabel} / <span style={{ color: "var(--ink2)" }}>{indicator.label}</span>
@@ -307,7 +307,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
               marginBottom: 12,
             }}
           >
-            {familyLabel} · /indicador/{code}
+            {familyLabel} · /indicator/{code}
           </div>
           <h1
             style={{
@@ -368,7 +368,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
             />
           ))}
           {stale ? (
-            <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--brecha)" }}>
+            <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--gap)" }}>
               ⚠ dato desactualizado
             </span>
           ) : null}
@@ -418,12 +418,12 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
         )}
       </div>
 
-      <div className="lb-indicador-grid" style={{ marginBottom: 24 }}>
+      <div className="lb-indicator-grid" style={{ marginBottom: 24 }}>
         {isComparator && gapPct !== undefined ? (
           <div
             style={{
-              background: "var(--brecha-bg)",
-              border: "1px solid var(--brecha-ln)",
+              background: "var(--gap-bg)",
+              border: "1px solid var(--gap-ln)",
               borderRadius: 10,
               padding: "28px 30px",
             }}
@@ -434,7 +434,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
                 fontSize: "0.72rem",
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: "var(--brecha)",
+                color: "var(--gap)",
                 marginBottom: 20,
               }}
             >
@@ -447,7 +447,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
                   fontWeight: 700,
                   fontSize: "clamp(2.75rem, 8vw, 4rem)",
                   lineHeight: 0.8,
-                  color: "var(--brecha)",
+                  color: "var(--gap)",
                   fontVariantNumeric: "tabular-nums",
                 }}
               >
@@ -511,27 +511,27 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
         </div>
       </div>
 
-      {relatedBrechas.length > 0 && (
+      {relatedGaps.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
-          {relatedBrechas.map((brecha) => (
+          {relatedGaps.map((gap) => (
             <Link
-              key={brecha.id}
-              href={`/brechas#${brecha.id}`}
+              key={gap.id}
+              href={`/gaps#${gap.id}`}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
                 padding: "8px 14px",
                 borderRadius: "var(--radius-pill)",
-                border: "1px solid var(--brecha-ln)",
-                background: "var(--brecha-bg)",
+                border: "1px solid var(--gap-ln)",
+                background: "var(--gap-bg)",
                 textDecoration: "none",
-                color: "var(--brecha)",
+                color: "var(--gap)",
                 fontFamily: MONO,
                 fontSize: "0.75rem",
               }}
             >
-              ◆ {brecha.label} →
+              ◆ {gap.label} →
             </Link>
           ))}
         </div>
@@ -597,7 +597,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
                       </td>
                     ))}
                     {isComparator ? (
-                      <td style={{ textAlign: "right", padding: cellPad, color: "var(--brecha)", fontVariantNumeric: "tabular-nums" }}>
+                      <td style={{ textAlign: "right", padding: cellPad, color: "var(--gap)", fontVariantNumeric: "tabular-nums" }}>
                         {row.gap === undefined ? "—" : `${formatNumberAR(row.gap, 1)}%`}
                       </td>
                     ) : null}

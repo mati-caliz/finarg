@@ -25,7 +25,7 @@ function StatBlock({ label, value, accent }: { label: string; value: string; acc
           fontSize: "2.125rem",
           lineHeight: 1,
           fontVariantNumeric: "tabular-nums",
-          color: accent ? "var(--brecha)" : "var(--ink)",
+          color: accent ? "var(--gap)" : "var(--ink)",
         }}
       >
         {value}
@@ -62,7 +62,7 @@ export function HomeHero() {
             }}
           >
             Un país tiene muchas cifras. Mostramos las que{" "}
-            <span style={{ color: "var(--brecha)" }}>no coinciden</span>.
+            <span style={{ color: "var(--gap)" }}>no coinciden</span>.
           </h1>
           <p
             style={{

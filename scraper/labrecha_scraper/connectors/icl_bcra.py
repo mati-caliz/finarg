@@ -7,7 +7,7 @@ from labrecha_scraper.base import Connector, IndicatorPoint
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/40"
 PAGE_LIMIT = 1000
-BACKFILL_DESDE = "2020-06-30"
+BACKFILL_FROM = "2020-06-30"
 
 
 class IclBcraConnector(Connector):
@@ -22,7 +22,7 @@ class IclBcraConnector(Connector):
                 response = client.get(
                     BASE_URL,
                     params={
-                        "desde": BACKFILL_DESDE,
+                        "desde": BACKFILL_FROM,
                         "hasta": date.today().isoformat(),
                         "limit": PAGE_LIMIT,
                         "offset": offset,
@@ -31,23 +31,23 @@ class IclBcraConnector(Connector):
                 response.raise_for_status()
                 payload = response.json()
                 results = payload.get("results", [])
-                detalle = results[0].get("detalle", []) if results else []
-                for item in detalle:
-                    fecha = item.get("fecha")
-                    valor = item.get("valor")
-                    if fecha is None or valor is None:
+                detail = results[0].get("detalle", []) if results else []
+                for item in detail:
+                    raw_date = item.get("fecha")
+                    raw_value = item.get("valor")
+                    if raw_date is None or raw_value is None:
                         continue
                     points.append(
                         IndicatorPoint(
                             indicator_code="icl",
                             source=self.source,
-                            date=date.fromisoformat(fecha),
-                            value=Decimal(str(valor)),
+                            date=date.fromisoformat(raw_date),
+                            value=Decimal(str(raw_value)),
                             meta={"unit": "indice", "base": "30.6.2020=1", "id_variable": 40},
                         )
                     )
                 count = payload.get("metadata", {}).get("resultset", {}).get("count", 0)
                 offset += PAGE_LIMIT
-                if offset >= count or not detalle:
+                if offset >= count or not detail:
                     break
         return points

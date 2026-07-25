@@ -94,8 +94,8 @@ function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
   const stale = freshnessForCode(indicator.indicator_code, indicator.last_date).stale;
   return (
     <a
-      href={`/indicador/${indicator.indicator_code}`}
-      style={{ ...CARD_STYLE, borderColor: isComparator ? "var(--brecha-ln)" : "var(--line)" }}
+      href={`/indicator/${indicator.indicator_code}`}
+      style={{ ...CARD_STYLE, borderColor: isComparator ? "var(--gap-ln)" : "var(--line)" }}
     >
       <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.15, letterSpacing: "-0.015em" }}>
         {indicatorLabel(indicator.indicator_code)}
@@ -126,9 +126,9 @@ function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
               fontFamily: MONO,
               fontSize: "0.62rem",
               fontWeight: 600,
-              color: "var(--brecha)",
-              background: "var(--brecha-bg)",
-              border: "1px solid var(--brecha-ln)",
+              color: "var(--gap)",
+              background: "var(--gap-bg)",
+              border: "1px solid var(--gap-ln)",
               borderRadius: 5,
               padding: "2px 8px",
             }}
@@ -141,7 +141,7 @@ function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
         style={{
           fontFamily: MONO,
           fontSize: "0.66rem",
-          color: stale ? "var(--brecha)" : "var(--ink3)",
+          color: stale ? "var(--gap)" : "var(--ink3)",
           paddingTop: 6,
           borderTop: "1px solid var(--line2)",
         }}

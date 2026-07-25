@@ -73,7 +73,7 @@ export function SeriesExport({ code, indicator, sources, latest }: SeriesExportP
     const unit = indicator.unit ? ` ${indicator.unit}` : "";
     const text = `${indicator.label}: ${indicator.format(latest.value)}${unit} — fuente ${sourceLabel(
       latest.source,
-    )}, ${formatDateAR(latest.date)}. Vía labrecha.ar/indicador/${code}`;
+    )}, ${formatDateAR(latest.date)}. Vía labrecha.ar/indicator/${code}`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);

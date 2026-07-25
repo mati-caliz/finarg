@@ -119,9 +119,9 @@ export function PostDetail({ slug }: { slug: string }) {
               fontWeight: 600,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              color: "var(--evento)",
-              border: "1px solid var(--evento-ln)",
-              background: "var(--evento-bg)",
+              color: "var(--event)",
+              border: "1px solid var(--event-ln)",
+              background: "var(--event-bg)",
               padding: "3px 11px",
               borderRadius: "var(--radius-pill)",
             }}

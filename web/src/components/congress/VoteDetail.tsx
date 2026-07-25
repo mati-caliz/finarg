@@ -10,12 +10,12 @@ import Link from "next/link";
 const MONO = "var(--font-jb-mono)";
 
 interface VoteDetailProps {
-  actaId: string;
+  voteRecordId: string;
 }
 
-export function VoteDetail({ actaId }: VoteDetailProps) {
-  const { data: vote, isLoading: loadingVote } = useCongressVote(actaId);
-  const { data: details, isLoading: loadingDetails } = useCongressVoteDetails(actaId);
+export function VoteDetail({ voteRecordId }: VoteDetailProps) {
+  const { data: vote, isLoading: loadingVote } = useCongressVote(voteRecordId);
+  const { data: details, isLoading: loadingDetails } = useCongressVoteDetails(voteRecordId);
 
   if (loadingVote) {
     return (
@@ -49,7 +49,7 @@ export function VoteDetail({ actaId }: VoteDetailProps) {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 24px 72px" }}>
       <div style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", marginBottom: 22 }}>
-        <Link href="/congreso" style={{ color: "var(--ink3)", textDecoration: "none" }}>
+        <Link href="/congress" style={{ color: "var(--ink3)", textDecoration: "none" }}>
           Congreso
         </Link>{" "}
         / <span style={{ color: "var(--ink2)" }}>Votación</span>

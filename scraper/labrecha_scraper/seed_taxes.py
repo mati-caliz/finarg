@@ -31,10 +31,10 @@ TAX_SNAPSHOTS: list[dict] = [
 ]
 
 LEVEL_CODES = {
-    "total": "tributos_total",
-    "nacionales": "tributos_nacionales",
-    "provinciales": "tributos_provinciales",
-    "municipales": "tributos_municipales",
+    "total": "taxes_total",
+    "nacionales": "taxes_national",
+    "provinciales": "taxes_provincial",
+    "municipales": "taxes_municipal",
 }
 
 

@@ -41,7 +41,7 @@ def _parse(csv_text: str) -> list[IndicatorPoint]:
         )
         points.append(
             _point(
-                "big_mac_valuacion",
+                "big_mac_valuation",
                 fecha,
                 Decimal(row["USD_raw"]) * 100,
                 "porcentaje",

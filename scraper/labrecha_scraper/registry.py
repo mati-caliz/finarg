@@ -1,49 +1,49 @@
 from __future__ import annotations
 
 from labrecha_scraper.base import Connector
-from labrecha_scraper.connectors.alquiler_caba import AlquilerCabaConnector
-from labrecha_scraper.connectors.bcra_tasas import BcraTasasConnector
+from labrecha_scraper.connectors.bcra_rates import BcraRatesConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
-from labrecha_scraper.connectors.boletin_oficial import BoletinOficialConnector
-from labrecha_scraper.connectors.congreso import CongresoConnector
-from labrecha_scraper.connectors.credito_bcra import CreditoBcraConnector
+from labrecha_scraper.connectors.official_gazette import OfficialGazetteConnector
+from labrecha_scraper.connectors.congress import CongressConnector
+from labrecha_scraper.connectors.country_risk import CountryRiskConnector
+from labrecha_scraper.connectors.credit_bcra import CreditBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
-from labrecha_scraper.connectors.crypto_historico import CryptoHistoricoConnector
-from labrecha_scraper.connectors.dolar import DolarConnector
-from labrecha_scraper.connectors.dolar_historico import DolarHistoricoConnector
+from labrecha_scraper.connectors.crypto_historical import CryptoHistoricalConnector
+from labrecha_scraper.connectors.dollar import DollarConnector
+from labrecha_scraper.connectors.dollar_historical import DollarHistoricalConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.icg import IcgConnector
 from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
-from labrecha_scraper.connectors.inflacion import InflacionConnector
-from labrecha_scraper.connectors.leyes import LeyesConnector
+from labrecha_scraper.connectors.inflation import InflationConnector
+from labrecha_scraper.connectors.laws import LawsConnector
 from labrecha_scraper.connectors.news import NewsConnector
-from labrecha_scraper.connectors.reservas_bcra import ReservasBcraConnector
-from labrecha_scraper.connectors.riesgo_pais import RiesgoPaisConnector
-from labrecha_scraper.connectors.senado import SenadoConnector
+from labrecha_scraper.connectors.rent_caba import RentCabaConnector
+from labrecha_scraper.connectors.reserves_bcra import ReservesBcraConnector
+from labrecha_scraper.connectors.senate import SenateConnector
 from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
 
 CONNECTORS: dict[str, Connector] = {
     connector.name: connector
     for connector in (
-        AlquilerCabaConnector(),
-        BcraTasasConnector(),
+        RentCabaConnector(),
+        BcraRatesConnector(),
         BigMacConnector(),
-        BoletinOficialConnector(),
-        CongresoConnector(),
-        CreditoBcraConnector(),
+        OfficialGazetteConnector(),
+        CongressConnector(),
+        CreditBcraConnector(),
         CryptoConnector(),
-        CryptoHistoricoConnector(),
-        DolarConnector(),
-        DolarHistoricoConnector(),
+        CryptoHistoricalConnector(),
+        DollarConnector(),
+        DollarHistoricalConnector(),
         HolidaysConnector(),
         IclBcraConnector(),
         IcgConnector(),
-        InflacionConnector(),
-        LeyesConnector(),
+        InflationConnector(),
+        LawsConnector(),
         NewsConnector(),
-        ReservasBcraConnector(),
-        RiesgoPaisConnector(),
-        SenadoConnector(),
+        ReservesBcraConnector(),
+        CountryRiskConnector(),
+        SenateConnector(),
         SeriesDatosGobConnector(),
     )
 }
