@@ -1,3 +1,4 @@
+import { FreshnessBoard } from "@/components/status/FreshnessBoard";
 import { ScrapeStatus } from "@/components/status/ScrapeStatus";
 import { scrapeStatusQueries } from "@/lib/pageQueries";
 import { PrefetchedQueries } from "@/lib/prefetch";
@@ -40,6 +41,7 @@ export default function StatusPage() {
 
       <PrefetchedQueries queries={scrapeStatusQueries()}>
         <ScrapeStatus />
+        <FreshnessBoard />
       </PrefetchedQueries>
     </div>
   );

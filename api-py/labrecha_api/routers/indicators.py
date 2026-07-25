@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import csv
+import io
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from labrecha_db import IndicatorHistory
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -129,4 +132,40 @@ def get_indicator_series(
             IndicatorPoint(date=row.date, value=row.value, source=row.source, meta=row.meta or {})
             for row in rows
         ],
+    )
+
+
+CSV_HEADER = ["date", "indicator_code", "source", "value"]
+
+
+@router.get("/{indicator_code}/csv", response_class=StreamingResponse)
+def get_indicator_csv(
+    indicator_code: str,
+    source: str | None = Query(default=None),
+    date_from: date | None = Query(default=None),
+    date_to: date | None = Query(default=None),
+    limit: int = Query(default=MAX_LIMIT, ge=1, le=MAX_LIMIT),
+    session: Session = Depends(get_session),
+) -> StreamingResponse:
+    series = get_indicator_series(
+        indicator_code=indicator_code,
+        source=source,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+        order="asc",
+        session=session,
+    )
+
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(CSV_HEADER)
+    for point in series.points:
+        writer.writerow([point.date.isoformat(), indicator_code, point.source, point.value])
+    buffer.seek(0)
+
+    return StreamingResponse(
+        iter([buffer.getvalue()]),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{indicator_code}.csv"'},
     )

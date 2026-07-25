@@ -17,10 +17,9 @@ usuarios, monetización por suscripción, módulo de inversiones) no vuelve a es
 
 ## Producto
 
+- [ ] **Alertas por email**: hoy el aviso de brechas es por RSS; el email necesita SMTP,
+      almacenamiento de suscriptores y doble opt-in.
 - [ ] **Variación desde un evento puntual** (no sólo por mandato): p. ej. desde el DNU 70/2023.
-- [ ] **Semáforo público de frescura**: exponer por serie lo que ya calcula `lib/freshness.ts`.
-- [ ] **API pública documentada**: la FastAPI ya es de sólo lectura; falta rate limiting y docs.
-- [ ] **Alertas por email/RSS**: aviso cuando una brecha supera un umbral (sin cuentas de usuario).
 
 ## Herramientas
 

@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg2://labrecha:labrecha123@localhost:5432/labrecha"
     cors_allowed_origins: str = "http://localhost:3000,http://localhost:3001"
     admin_token: str = ""
+    rate_limit_per_minute: int = 120
+    rate_limit_max_clients: int = 10000
 
     @property
     def cors_origins(self) -> list[str]:
