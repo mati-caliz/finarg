@@ -6,13 +6,13 @@ from datetime import date
 from decimal import Decimal
 
 import httpx
+from labrecha_db import IndicatorHistory, ScrapeRun
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.config import settings
-from labrecha_scraper.models import IndicatorHistory, ScrapeRun
 
 logger = logging.getLogger("labrecha_scraper")
 

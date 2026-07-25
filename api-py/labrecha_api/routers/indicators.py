@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from labrecha_db import IndicatorHistory
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import IndicatorHistory
 from labrecha_api.schemas import (
     IndicatorPoint,
     IndicatorSeries,

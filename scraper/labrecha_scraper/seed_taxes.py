@@ -3,10 +3,9 @@ from __future__ import annotations
 from datetime import date
 from decimal import Decimal
 
+from labrecha_db import IndicatorHistory
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
-
-from labrecha_scraper.models import IndicatorHistory
 
 SOURCE = "iaraf"
 SOURCE_REF = "IARAF — Vademécum Tributario"

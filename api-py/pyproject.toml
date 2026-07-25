@@ -3,6 +3,8 @@ name = "labrecha-api"
 version = "0.1.0"
 description = "La Brecha - API de lectura (FastAPI) sobre los indicadores ingeridos en PostgreSQL"
 requires-python = ">=3.12"
+# labrecha-db (modelos compartidos) se instala aparte desde ../shared:
+#   pip install ../shared
 dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",

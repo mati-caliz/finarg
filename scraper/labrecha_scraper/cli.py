@@ -1,32 +1,81 @@
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
 from collections.abc import Callable
 
+from labrecha_db import ScrapeRun
+from labrecha_db.migrate import (
+    current_revision,
+    describe_schema_drift,
+    has_managed_tables,
+    head_revision,
+    stamp,
+    upgrade,
+)
 from sqlalchemy import select
 
 from labrecha_scraper.base import run_job
-from labrecha_scraper.db import SessionLocal, engine
-from labrecha_scraper.models import Base, ScrapeRun
+from labrecha_scraper.config import settings
+from labrecha_scraper.db import SessionLocal
+from labrecha_scraper.logging_setup import configure_logging
 from labrecha_scraper.registry import CONNECTORS, get_connector
 from labrecha_scraper.seed_events import seed_events
 from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
 from labrecha_scraper.seed_taxes import seed_taxes
 
 
-def _configure_logging() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s - %(message)s",
-    )
+def _db_upgrade() -> int:
+    if current_revision(settings.database_url) is None and has_managed_tables(
+        settings.database_url
+    ):
+        drift = describe_schema_drift(settings.database_url)
+        if drift:
+            print("la base ya tiene tablas pero su esquema difiere de los modelos:")
+            for difference in drift:
+                print(f"  - {difference}")
+            print("no se aplican migraciones a ciegas: revisá las diferencias o usá 'db stamp'")
+            return 1
+        stamp(settings.database_url)
+        print(
+            "base preexistente adoptada por Alembic (esquema idéntico a los modelos): "
+            f"revisión {current_revision(settings.database_url)}"
+        )
+        return 0
+
+    upgrade(settings.database_url)
+    print(f"migraciones aplicadas: revisión actual {current_revision(settings.database_url)}")
+    return 0
 
 
-def _init_db() -> None:
-    Base.metadata.create_all(engine)
-    tables = ", ".join(sorted(Base.metadata.tables))
-    print(f"tablas creadas/verificadas: {tables}")
+def _db_current() -> int:
+    print(f"revisión en la base: {current_revision(settings.database_url) or 'ninguna'}")
+    print(f"revisión más nueva del código: {head_revision() or 'ninguna'}")
+    return 0
+
+
+def _db_check() -> int:
+    drift = describe_schema_drift(settings.database_url)
+    if not drift:
+        print("el esquema de la base coincide con los modelos")
+        return 0
+    print(f"el esquema difiere de los modelos en {len(drift)} punto(s):")
+    for difference in drift:
+        print(f"  - {difference}")
+    return 1
+
+
+def _db_stamp(*, force: bool) -> int:
+    if not force and _db_check() != 0:
+        print("stamp cancelado: corregí las diferencias o volvé a correr con --force")
+        return 1
+    stamp(settings.database_url)
+    print(f"base marcada en la revisión {current_revision(settings.database_url)}")
+    return 0
+
+
+def _first_line(error: str | None) -> str:
+    return error.splitlines()[0] if error else ""
 
 
 def _list_jobs() -> None:
@@ -41,7 +90,7 @@ def _run(job: str) -> int:
         for name in jobs:
             connector = get_connector(name)
             run = run_job(session, connector)
-            print(f"{name:20s} {run.status:8s} filas={run.rows_upserted} {run.error or ''}")
+            print(f"{name:20s} {run.status:8s} filas={run.rows_upserted} {_first_line(run.error)}")
             if run.status != "success":
                 failures += 1
     return failures
@@ -79,12 +128,11 @@ def _status() -> None:
             else:
                 print(
                     f"{name:20s} {run.status:8s} filas={run.rows_upserted} "
-                    f"inicio={run.started_at:%Y-%m-%d %H:%M} {run.error or ''}"
+                    f"inicio={run.started_at:%Y-%m-%d %H:%M} {_first_line(run.error)}"
                 )
 
 
 COMMAND_HANDLERS: dict[str, Callable[[], None]] = {
-    "init-db": _init_db,
     "list": _list_jobs,
     "seed-events": _seed_events,
     "seed-taxes": _seed_taxes,
@@ -92,13 +140,38 @@ COMMAND_HANDLERS: dict[str, Callable[[], None]] = {
     "status": _status,
 }
 
+DB_HANDLERS: dict[str, Callable[[], int]] = {
+    "upgrade": _db_upgrade,
+    "current": _db_current,
+    "check": _db_check,
+}
+
+
+def _configure_db_parser(db_parser: argparse.ArgumentParser) -> None:
+    db_subparsers = db_parser.add_subparsers(dest="db_command", required=True)
+    db_subparsers.add_parser("upgrade", help="aplicar las migraciones pendientes")
+    db_subparsers.add_parser("current", help="revisión aplicada vs. revisión del código")
+    db_subparsers.add_parser("check", help="comparar el esquema de la base con los modelos")
+    stamp_parser = db_subparsers.add_parser(
+        "stamp", help="marcar una base preexistente como migrada, sin ejecutar DDL"
+    )
+    stamp_parser.add_argument(
+        "--force", action="store_true", help="marcar aunque el esquema difiera de los modelos"
+    )
+
+
+def _run_db_command(args: argparse.Namespace) -> int:
+    if args.db_command == "stamp":
+        return _db_stamp(force=args.force)
+    return DB_HANDLERS[args.db_command]()
+
 
 def main(argv: list[str] | None = None) -> int:
-    _configure_logging()
+    configure_logging()
     parser = argparse.ArgumentParser(prog="labrecha-scraper")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("init-db", help="crear tablas si no existen")
+    _configure_db_parser(subparsers.add_parser("db", help="migraciones del esquema (Alembic)"))
     subparsers.add_parser("list", help="listar jobs disponibles")
     subparsers.add_parser("seed-events", help="sembrar hitos políticos curados")
     subparsers.add_parser("seed-taxes", help="sembrar conteo de tributos (IARAF)")
@@ -109,6 +182,8 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
 
+    if args.command == "db":
+        return _run_db_command(args)
     if args.command == "run":
         return _run(args.job)
     handler = COMMAND_HANDLERS.get(args.command)

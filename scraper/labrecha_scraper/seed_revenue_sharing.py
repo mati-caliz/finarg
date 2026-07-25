@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from labrecha_db import RevenueSharingShare
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
-
-from labrecha_scraper.models import RevenueSharingShare
 
 SOURCE = "cfi"
 

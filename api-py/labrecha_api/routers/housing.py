@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
+from labrecha_db import RentByNeighborhood
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import RentByNeighborhood
 from labrecha_api.schemas import RentByNeighborhoodOut
 
 router = APIRouter(prefix="/housing", tags=["housing"])

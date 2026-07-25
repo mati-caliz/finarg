@@ -3,11 +3,11 @@ from __future__ import annotations
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query
+from labrecha_db import Holiday
 from sqlalchemy import extract, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.models import Holiday
 from labrecha_api.schemas import HolidayOut
 
 router = APIRouter(prefix="/holidays", tags=["holidays"])

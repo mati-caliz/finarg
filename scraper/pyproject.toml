@@ -3,6 +3,8 @@ name = "labrecha-scraper"
 version = "0.1.0"
 description = "La Brecha - ingesta de indicadores económicos y políticos de Argentina a PostgreSQL"
 requires-python = ">=3.12"
+# labrecha-db (modelos + migraciones compartidos) se instala aparte desde ../shared:
+#   pip install "../shared[migrations]"
 dependencies = [
     "httpx>=0.27",
     "sqlalchemy>=2.0",
@@ -10,6 +12,7 @@ dependencies = [
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
     "defusedxml>=0.7",
+    "alembic>=1.13",
 ]
 
 [project.scripts]

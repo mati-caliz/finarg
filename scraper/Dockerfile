@@ -5,8 +5,11 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-COPY pyproject.toml ./
-COPY labrecha_scraper ./labrecha_scraper
+COPY shared ./shared
+RUN pip install "./shared[migrations]"
+
+COPY scraper/pyproject.toml ./
+COPY scraper/labrecha_scraper ./labrecha_scraper
 
 RUN pip install .
 

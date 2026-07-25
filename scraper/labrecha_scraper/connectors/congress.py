@@ -5,10 +5,10 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import httpx
+from labrecha_db import CongressVote, CongressVoteDetail
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import CongressVote, CongressVoteDetail
 
 CKAN_PACKAGE_URL = "https://datos.hcdn.gob.ar/api/3/action/package_show"
 DATASET_ID = "votaciones_nominales"

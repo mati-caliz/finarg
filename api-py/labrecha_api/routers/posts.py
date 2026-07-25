@@ -4,12 +4,12 @@ import secrets
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from labrecha_db import Post
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_api.config import settings
 from labrecha_api.db import get_session
-from labrecha_api.models import Post
 from labrecha_api.schemas import PostCategory, PostCreate, PostImpact, PostOut, PostUpdate
 
 router = APIRouter(prefix="/posts", tags=["posts"])

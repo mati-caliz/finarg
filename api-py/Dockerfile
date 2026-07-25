@@ -5,8 +5,11 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-COPY pyproject.toml ./
-COPY labrecha_api ./labrecha_api
+COPY shared ./shared
+RUN pip install ./shared
+
+COPY api-py/pyproject.toml ./
+COPY api-py/labrecha_api ./labrecha_api
 
 RUN pip install .
 

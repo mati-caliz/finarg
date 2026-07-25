@@ -5,10 +5,10 @@ import io
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
+from labrecha_db import RentByNeighborhood
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-from labrecha_scraper.models import RentByNeighborhood
 
 CSV_URL = (
     "https://cdn.buenosaires.gob.ar/datosabiertos/datasets/instituto-de-vivienda/"

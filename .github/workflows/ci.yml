@@ -36,6 +36,7 @@ jobs:
             python:
               - 'api-py/**'
               - 'scraper/**'
+              - 'shared/**'
 
   frontend-lint:
     name: Frontend Linting
@@ -99,13 +100,13 @@ jobs:
         run: pip install ruff==0.16.0
 
       - name: Lint (ruff)
-        run: ruff check api-py/labrecha_api scraper/labrecha_scraper
+        run: ruff check api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db
 
       - name: Format check (ruff)
-        run: ruff format --check api-py/labrecha_api scraper/labrecha_scraper
+        run: ruff format --check api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db
 
       - name: Byte-compile sources
-        run: python -m compileall -q api-py/labrecha_api scraper/labrecha_scraper
+        run: python -m compileall -q api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db
 
   summary:
     name: CI Summary
