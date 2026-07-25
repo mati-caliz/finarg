@@ -4,8 +4,8 @@ import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congres
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
-import type { CongressVote } from "@/lib/labrechaApi";
 import { formatDateAR } from "@/lib/indicators";
+import type { CongressVote } from "@/lib/labrechaApi";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
@@ -34,8 +34,23 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
   const blocs = tallyByBloc(details ?? []).slice(0, MAX_BLOCS);
 
   return (
-    <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 12, padding: "28px 30px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+    <div
+      style={{
+        background: "var(--raise)",
+        border: "1px solid var(--line)",
+        borderRadius: 12,
+        padding: "28px 30px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 16,
+          flexWrap: "wrap",
+        }}
+      >
         <span
           style={{
             fontFamily: MONO,
@@ -57,7 +72,17 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
           {vote.vote_record_id ? ` · Acta ${vote.vote_record_id}` : ""}
         </span>
       </div>
-      <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "clamp(1.5rem, 3.5vw, 1.875rem)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 22px", color: "var(--ink)" }}>
+      <h2
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          fontSize: "clamp(1.5rem, 3.5vw, 1.875rem)",
+          lineHeight: 1.05,
+          letterSpacing: "-0.02em",
+          margin: "0 0 22px",
+          color: "var(--ink)",
+        }}
+      >
         {vote.title ?? "Votación sin título"}
       </h2>
 
@@ -68,13 +93,29 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
         <TallyCounts tally={tallyOf(vote)} />
       </div>
 
-      <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
+      <div
+        style={{
+          fontFamily: MONO,
+          fontSize: "0.68rem",
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: "var(--ink3)",
+          marginBottom: 16,
+        }}
+      >
         Por bloque
       </div>
       {isLoading ? (
         <Skeleton className="h-40 w-full rounded-[6px]" />
       ) : blocs.length === 0 ? (
-        <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9rem", color: "var(--ink2)", margin: 0 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "0.9rem",
+            color: "var(--ink2)",
+            margin: 0,
+          }}
+        >
           No hay detalle de voto por diputado para esta votación.
         </p>
       ) : (
@@ -85,9 +126,26 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 24, paddingTop: 16, borderTop: "1px solid var(--line)", flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          marginTop: 24,
+          paddingTop: 16,
+          borderTop: "1px solid var(--line)",
+          flexWrap: "wrap",
+        }}
+      >
         <VoteLegend />
-        <span style={{ marginLeft: "auto", fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
+        <span
+          style={{
+            marginLeft: "auto",
+            fontFamily: MONO,
+            fontSize: "0.66rem",
+            color: "var(--ink3)",
+          }}
+        >
           Fuente: HCDN{vote.date ? ` · ${formatDateAR(vote.date)}` : ""}
         </span>
       </div>
@@ -98,16 +156,55 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
 function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties }) {
   const chip = resultChip(vote);
   return (
-    <Link href={`/congreso/votacion/${vote.vote_record_id}`} style={{ display: "block", background: "var(--raise)", border: "1px solid var(--line)", padding: "16px 18px", textDecoration: "none", ...style }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-        <span style={{ fontFamily: MONO, fontSize: "0.62rem", fontWeight: 700, textTransform: "uppercase", color: chip.color, background: chip.background, padding: "2px 8px", borderRadius: "var(--radius-pill)" }}>
+    <Link
+      href={`/congreso/votacion/${vote.vote_record_id}`}
+      style={{
+        display: "block",
+        background: "var(--raise)",
+        border: "1px solid var(--line)",
+        padding: "16px 18px",
+        textDecoration: "none",
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 8,
+          marginBottom: 8,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.62rem",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            color: chip.color,
+            background: chip.background,
+            padding: "2px 8px",
+            borderRadius: "var(--radius-pill)",
+          }}
+        >
           {chip.label}
         </span>
         <span style={{ fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
           {vote.date ? formatDateAR(vote.date) : "s/f"}
         </span>
       </div>
-      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.15, letterSpacing: "-0.01em", marginBottom: 8, color: "var(--ink)" }}>
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: "1.0625rem",
+          lineHeight: 1.15,
+          letterSpacing: "-0.01em",
+          marginBottom: 8,
+          color: "var(--ink)",
+        }}
+      >
         {vote.title ?? "Votación sin título"}
       </div>
       <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)" }}>
@@ -130,7 +227,8 @@ export function VotesBoard() {
     );
   }
 
-  if (votes.length === 0) {
+  const featured = votes[0];
+  if (!featured) {
     return (
       <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)" }}>
         No hay votaciones para mostrar.
@@ -138,14 +236,22 @@ export function VotesBoard() {
     );
   }
 
-  const featured = votes[0];
   const recent = votes.slice(1, 6);
 
   return (
     <div className="lb-congress-grid" style={{ gap: 32 }}>
       <FeaturedFicha vote={featured} />
       <div>
-        <div style={{ fontFamily: MONO, fontSize: "0.68rem", letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16 }}>
+        <div
+          style={{
+            fontFamily: MONO,
+            fontSize: "0.68rem",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--ink3)",
+            marginBottom: 16,
+          }}
+        >
           Votaciones recientes
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>

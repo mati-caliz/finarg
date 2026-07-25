@@ -33,12 +33,8 @@ def _parse(csv_text: str) -> list[IndicatorPoint]:
         if row.get("iso_a3") != ISO_ARGENTINA:
             continue
         fecha = date.fromisoformat(row["date"])
-        points.append(
-            _point("big_mac_ars", fecha, Decimal(row["local_price"]), "ARS")
-        )
-        points.append(
-            _point("big_mac_usd", fecha, Decimal(row["dollar_price"]), "USD")
-        )
+        points.append(_point("big_mac_ars", fecha, Decimal(row["local_price"]), "ARS"))
+        points.append(_point("big_mac_usd", fecha, Decimal(row["dollar_price"]), "USD"))
         points.append(
             _point(
                 "big_mac_valuation",

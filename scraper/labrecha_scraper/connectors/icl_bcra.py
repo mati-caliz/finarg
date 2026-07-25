@@ -4,6 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.clock import today_in_argentina
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/40"
 PAGE_LIMIT = 1000
@@ -23,7 +24,7 @@ class IclBcraConnector(Connector):
                     BASE_URL,
                     params={
                         "desde": BACKFILL_FROM,
-                        "hasta": date.today().isoformat(),
+                        "hasta": today_in_argentina().isoformat(),
                         "limit": PAGE_LIMIT,
                         "offset": offset,
                     },

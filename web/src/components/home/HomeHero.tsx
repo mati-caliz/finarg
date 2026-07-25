@@ -43,10 +43,7 @@ export function HomeHero() {
 
   return (
     <section style={{ borderBottom: "1px solid var(--line)", background: "var(--surface)" }}>
-      <div
-        className="lb-container lb-hero-grid"
-        style={{ paddingTop: 56, paddingBottom: 48 }}
-      >
+      <div className="lb-container lb-hero-grid" style={{ paddingTop: 56, paddingBottom: 48 }}>
         <div>
           <Eyebrow>Observatorio político-económico de la Argentina</Eyebrow>
           <h1

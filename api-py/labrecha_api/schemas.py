@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
@@ -159,7 +159,7 @@ class NewsArticleOut(BaseModel):
     image_url: str | None
 
 
-class CompoundingFrequency(str, Enum):
+class CompoundingFrequency(StrEnum):
     MONTHLY = "MONTHLY"
     QUARTERLY = "QUARTERLY"
     YEARLY = "YEARLY"
@@ -234,7 +234,7 @@ class TaxImpactRequest(BaseModel):
     gross_monthly_salary: Decimal = Field(gt=0)
     monthly_expenses: Decimal = Field(ge=0)
     retired: bool = False
-    iibb_rate: Decimal = Field(default=Decimal("4"), ge=0, le=15)
+    iibb_rate: Decimal = Field(default=Decimal(4), ge=0, le=15)
 
 
 class TaxImpactItem(BaseModel):
@@ -297,14 +297,14 @@ class IncomeTaxResponse(BaseModel):
     tax_brackets: list[TaxBracketOut]
 
 
-class PostCategory(str, Enum):
+class PostCategory(StrEnum):
     IDEA = "idea"
     LEY = "ley"
     ANALISIS = "analisis"
     NOTA = "nota"
 
 
-class PostImpactKind(str, Enum):
+class PostImpactKind(StrEnum):
     TIEMPO = "tiempo"
     DINERO = "dinero"
     AMBIENTE = "ambiente"
@@ -343,7 +343,9 @@ class PostCreate(BaseModel):
 
 
 class PostUpdate(BaseModel):
-    slug: str | None = Field(default=None, min_length=1, max_length=160, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+    slug: str | None = Field(
+        default=None, min_length=1, max_length=160, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    )
     title: str | None = Field(default=None, min_length=1, max_length=200)
     category: PostCategory | None = None
     summary: str | None = None

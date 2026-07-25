@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import httpx
@@ -14,6 +14,8 @@ HISTORY_DAYS = 365
 SECONDS_BETWEEN_REQUESTS = 20
 RATE_LIMIT_RETRIES = 4
 RATE_LIMIT_BACKOFF_SECONDS = 65
+TOO_MANY_REQUESTS_STATUS = 429
+PRICE_ENTRY_FIELDS = 2
 
 
 class CryptoHistoricalConnector(Connector):
@@ -40,7 +42,7 @@ class CryptoHistoricalConnector(Connector):
                     "interval": "daily",
                 },
             )
-            if response.status_code == 429 and attempt < RATE_LIMIT_RETRIES:
+            if response.status_code == TOO_MANY_REQUESTS_STATUS and attempt < RATE_LIMIT_RETRIES:
                 time.sleep(RATE_LIMIT_BACKOFF_SECONDS)
                 continue
             response.raise_for_status()
@@ -52,9 +54,9 @@ class CryptoHistoricalConnector(Connector):
     ) -> list[IndicatorPoint]:
         by_date: dict[str, IndicatorPoint] = {}
         for entry in prices:
-            if len(entry) < 2 or entry[1] is None:
+            if len(entry) < PRICE_ENTRY_FIELDS or entry[1] is None:
                 continue
-            price_date = datetime.fromtimestamp(entry[0] / 1000, tz=timezone.utc).date()
+            price_date = datetime.fromtimestamp(entry[0] / 1000, tz=UTC).date()
             by_date[price_date.isoformat()] = IndicatorPoint(
                 indicator_code=f"crypto_{symbol}",
                 source=self.source,

@@ -21,7 +21,7 @@ interface SeriesExportProps {
   code: string;
   indicator: IndicatorDisplay;
   sources: ParsedSource[];
-  latest?: LatestValue;
+  latest?: LatestValue | undefined;
 }
 
 const buttonStyle = {
@@ -42,9 +42,7 @@ function buildCsv(sources: ParsedSource[]): string {
   const rows: string[] = ["fecha,fuente,valor"];
   const flat = sources
     .flatMap((source) => source.points.map((point) => ({ ...point, source: source.source })))
-    .sort((first, second) =>
-      first.date < second.date ? -1 : first.date > second.date ? 1 : 0,
-    );
+    .sort((first, second) => (first.date < second.date ? -1 : first.date > second.date ? 1 : 0));
   for (const row of flat) {
     rows.push(`${row.date},${row.source},${row.value}`);
   }

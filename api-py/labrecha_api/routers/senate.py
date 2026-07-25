@@ -23,9 +23,7 @@ def list_members(
     if province is not None:
         conditions.append(Senator.province == province)
 
-    statement = (
-        select(Senator).where(*conditions).order_by(Senator.last_name, Senator.first_name)
-    )
+    statement = select(Senator).where(*conditions).order_by(Senator.last_name, Senator.first_name)
     return [
         SenatorOut(
             senator_id=senator.senator_id,

@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
+from labrecha_api.clock import today_in_argentina
 from labrecha_api.income_tax import (
     MONTHS_PER_YEAR,
     PERCENTAGE_DIVISOR,
@@ -18,9 +19,9 @@ from labrecha_api.schemas import (
 
 MONEY = Decimal("0.01")
 SHARE_PRECISION = Decimal("0.01")
-VAT_RATE = Decimal("21")
+VAT_RATE = Decimal(21)
 VAT_BASE = PERCENTAGE_DIVISOR + VAT_RATE
-DAYS_IN_YEAR = Decimal("365")
+DAYS_IN_YEAR = Decimal(365)
 
 CATEGORY_TAX = "impuesto"
 CATEGORY_SOCIAL_SECURITY = "aporte"
@@ -68,7 +69,12 @@ def calculate_tax_impact(request: TaxImpactRequest) -> TaxImpactResponse:
     items = [
         _item("Impuesto a las Ganancias", CATEGORY_TAX, income_tax_annual, gross_annual_income),
         _item("IVA en tus gastos", CATEGORY_TAX, vat_annual, gross_annual_income),
-        _item("Ingresos Brutos en tus gastos", CATEGORY_TAX, gross_receipts_annual, gross_annual_income),
+        _item(
+            "Ingresos Brutos en tus gastos",
+            CATEGORY_TAX,
+            gross_receipts_annual,
+            gross_annual_income,
+        ),
         _item(
             "Aportes (jubilación, obra social, PAMI, sindicato)",
             CATEGORY_SOCIAL_SECURITY,
@@ -81,8 +87,10 @@ def calculate_tax_impact(request: TaxImpactRequest) -> TaxImpactResponse:
     total_pressure = _share(total_annual, gross_annual_income)
 
     fraction = total_annual / gross_annual_income if gross_annual_income > 0 else Decimal(0)
-    days_for_the_state = int(min(DAYS_IN_YEAR, (fraction * DAYS_IN_YEAR).to_integral_value(ROUND_HALF_UP)))
-    tax_freedom_date = date(date.today().year, 1, 1) + timedelta(days=days_for_the_state)
+    days_for_the_state = int(
+        min(DAYS_IN_YEAR, (fraction * DAYS_IN_YEAR).to_integral_value(ROUND_HALF_UP))
+    )
+    tax_freedom_date = date(today_in_argentina().year, 1, 1) + timedelta(days=days_for_the_state)
 
     return TaxImpactResponse(
         gross_annual_income=_money(gross_annual_income),

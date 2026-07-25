@@ -11,8 +11,8 @@ export const MAX_AGE_DAYS: Record<Cadence, number> = {
 };
 
 function toUtcMidnight(isoDate: string): number {
-  const [year, month, day] = isoDate.slice(0, 10).split("-").map(Number);
-  return Date.UTC(year, (month ?? 1) - 1, day ?? 1);
+  const [year = 0, month = 1, day = 1] = isoDate.slice(0, 10).split("-").map(Number);
+  return Date.UTC(year, month - 1, day);
 }
 
 export function daysSince(isoDate: string, fromMs: number = Date.now()): number {

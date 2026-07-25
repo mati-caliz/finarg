@@ -17,6 +17,10 @@ import { type CSSProperties, useState } from "react";
 
 const RANGE_OPTIONS = ["6M", "1A", "5A", "Máx"];
 const SERIES_COLORS = ["var(--chart)", "var(--gap)"];
+
+function seriesColor(index: number): string {
+  return SERIES_COLORS[index % SERIES_COLORS.length] ?? "var(--chart)";
+}
 const MONO = "var(--font-jb-mono)";
 
 function todayISO(): string {
@@ -41,8 +45,16 @@ export function GapComparison({ id }: { id: string }) {
 
   const legA = def?.legs[0] ?? { code: "", source: "", label: "" };
   const legB = def?.legs[1] ?? { code: "", source: "", label: "" };
-  const queryA = useIndicatorSeries(legA.code, { source: legA.source, order: "asc", date_from: dateFrom });
-  const queryB = useIndicatorSeries(legB.code, { source: legB.source, order: "asc", date_from: dateFrom });
+  const queryA = useIndicatorSeries(legA.code, {
+    source: legA.source,
+    order: "asc",
+    date_from: dateFrom,
+  });
+  const queryB = useIndicatorSeries(legB.code, {
+    source: legB.source,
+    order: "asc",
+    date_from: dateFrom,
+  });
   const historyQueryA = useIndicatorSeries(legA.code, {
     source: legA.historySource ?? legA.source,
     order: "asc",
@@ -78,8 +90,11 @@ export function GapComparison({ id }: { id: string }) {
   ]);
   const chartSeries: ChartSeries[] = aligned.lines.map((line, index) => ({
     name: line.source,
-    color: SERIES_COLORS[index % SERIES_COLORS.length],
-    data: line.data.map((value, position) => ({ t: formatDateAR(aligned.axis[position]), v: value })),
+    color: seriesColor(index),
+    data: line.data.map((value, position) => ({
+      t: formatDateAR(aligned.axis[position] ?? ""),
+      v: value,
+    })),
   }));
   const chartEvents = eventsToChartEvents(aligned.axis, eventsData ?? []);
   const xLabels = yearLabels(aligned.axis);
@@ -90,19 +105,55 @@ export function GapComparison({ id }: { id: string }) {
   const gap = latestA && latestB ? computeGap(def, latestA.value, latestB.value) : undefined;
 
   return (
-    <div style={{ background: "var(--raise)", border: "1px solid var(--line)", borderRadius: 10, padding: "26px 28px 22px" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap", marginBottom: 18 }}>
+    <div
+      style={{
+        background: "var(--raise)",
+        border: "1px solid var(--line)",
+        borderRadius: 10,
+        padding: "26px 28px 22px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+          marginBottom: 18,
+        }}
+      >
         <div>
-          <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.375rem", letterSpacing: "-0.015em", margin: "0 0 4px" }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: "1.375rem",
+              letterSpacing: "-0.015em",
+              margin: "0 0 4px",
+            }}
+          >
             {def.label}
           </h2>
-          <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.9375rem", color: "var(--ink2)", margin: 0 }}>
+          <p
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "0.9375rem",
+              color: "var(--ink2)",
+              margin: 0,
+            }}
+          >
             {def.subtitle}
           </p>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {RANGE_OPTIONS.map((option) => (
-            <button key={option} type="button" onClick={() => setRange(option)} style={rangeStyle(option === range)}>
+            <button
+              key={option}
+              type="button"
+              onClick={() => setRange(option)}
+              style={rangeStyle(option === range)}
+            >
               {option}
             </button>
           ))}
@@ -124,15 +175,36 @@ export function GapComparison({ id }: { id: string }) {
           }}
         >
           {[
-            { leg: legA, latest: latestA, color: SERIES_COLORS[0] },
-            { leg: legB, latest: latestB, color: SERIES_COLORS[1] },
+            { leg: legA, latest: latestA, color: seriesColor(0) },
+            { leg: legB, latest: latestB, color: seriesColor(1) },
           ].map(({ leg, latest, color }) => (
-            <div key={`${leg.code}-${leg.source}`} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink2)", fontWeight: 600 }}>
+            <div
+              key={`${leg.code}-${leg.source}`}
+              style={{ display: "flex", flexDirection: "column", gap: 3 }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontFamily: MONO,
+                  fontSize: "0.68rem",
+                  color: "var(--ink2)",
+                  fontWeight: 600,
+                }}
+              >
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: color }} />
                 {leg.label}
               </span>
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.375rem", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontWeight: 700,
+                  fontSize: "1.375rem",
+                  lineHeight: 1,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
                 {def.format(latest.value)}
               </span>
               <span style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>
@@ -141,10 +213,21 @@ export function GapComparison({ id }: { id: string }) {
             </div>
           ))}
           <div style={{ marginLeft: "auto", textAlign: "right" }}>
-            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "1.875rem", lineHeight: 1, color: "var(--gap)", fontVariantNumeric: "tabular-nums" }}>
+            <div
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                fontSize: "1.875rem",
+                lineHeight: 1,
+                color: "var(--gap)",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
               {gap.formattedGap}
             </div>
-            <span style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>brecha actual</span>
+            <span style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>
+              brecha actual
+            </span>
           </div>
         </div>
       )}
@@ -164,9 +247,21 @@ export function GapComparison({ id }: { id: string }) {
         </p>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          marginTop: 16,
+          paddingTop: 16,
+          borderTop: "1px solid var(--line)",
+        }}
+      >
         {[legA, legB].map((leg) => (
-          <div key={`${leg.code}-${leg.source}`} style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink3)", lineHeight: 1.5 }}>
+          <div
+            key={`${leg.code}-${leg.source}`}
+            style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink3)", lineHeight: 1.5 }}
+          >
             <b style={{ color: "var(--ink2)" }}>
               {leg.historySource
                 ? `${leg.label} — ${sourceLabel(leg.source)} + ${sourceLabel(leg.historySource)}`

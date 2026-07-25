@@ -42,7 +42,9 @@ function groupByFamily(
     if (normalizedQuery.length === 0) {
       return true;
     }
-    const haystack = normalize(`${indicator.indicator_code} ${indicatorLabel(indicator.indicator_code)}`);
+    const haystack = normalize(
+      `${indicator.indicator_code} ${indicatorLabel(indicator.indicator_code)}`,
+    );
     return haystack.includes(normalizedQuery);
   });
 
@@ -71,7 +73,10 @@ function groupByFamily(
   }
   for (const group of groups) {
     group.items.sort((first, second) =>
-      indicatorLabel(first.indicator_code).localeCompare(indicatorLabel(second.indicator_code), "es"),
+      indicatorLabel(first.indicator_code).localeCompare(
+        indicatorLabel(second.indicator_code),
+        "es",
+      ),
     );
   }
   return groups;
@@ -97,7 +102,15 @@ function CatalogCard({ indicator }: { indicator: IndicatorSummary }) {
       href={`/indicador/${indicator.indicator_code}`}
       style={{ ...CARD_STYLE, borderColor: isComparator ? "var(--gap-ln)" : "var(--line)" }}
     >
-      <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.0625rem", lineHeight: 1.15, letterSpacing: "-0.015em" }}>
+      <div
+        style={{
+          fontFamily: "var(--font-display)",
+          fontWeight: 700,
+          fontSize: "1.0625rem",
+          lineHeight: 1.15,
+          letterSpacing: "-0.015em",
+        }}
+      >
         {indicatorLabel(indicator.indicator_code)}
       </div>
       <div style={{ fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
@@ -179,7 +192,13 @@ export function IndicatorCatalog() {
 
   if (isLoading) {
     return (
-      <div style={{ display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))" }}>
+      <div
+        style={{
+          display: "grid",
+          gap: 14,
+          gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
+        }}
+      >
         {SKELETON_KEYS.map((key) => (
           <Skeleton key={key} className="h-[130px] rounded-[9px]" />
         ))}
@@ -189,7 +208,15 @@ export function IndicatorCatalog() {
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 32, flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "center",
+          marginBottom: 32,
+          flexWrap: "wrap",
+        }}
+      >
         <input
           type="search"
           value={query}
@@ -209,7 +236,11 @@ export function IndicatorCatalog() {
           }}
         />
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          <button type="button" onClick={() => setFamily(null)} style={filterStyle(family === null)}>
+          <button
+            type="button"
+            onClick={() => setFamily(null)}
+            style={filterStyle(family === null)}
+          >
             {ALL_FILTER}
           </button>
           {INDICATOR_FAMILY_ORDER.map((familyKey) => (
@@ -225,8 +256,12 @@ export function IndicatorCatalog() {
         </div>
       </div>
 
-      <p style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", margin: "0 0 26px" }}>
-        {query.trim().length > 0 || family ? `${shown} de ${total} indicadores` : `${total} indicadores`}
+      <p
+        style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)", margin: "0 0 26px" }}
+      >
+        {query.trim().length > 0 || family
+          ? `${shown} de ${total} indicadores`
+          : `${total} indicadores`}
       </p>
 
       {groups.length === 0 && (
@@ -239,14 +274,28 @@ export function IndicatorCatalog() {
         {groups.map((group) => (
           <section key={group.key}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 18 }}>
-              <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.375rem", letterSpacing: "-0.015em", margin: 0 }}>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: "1.375rem",
+                  letterSpacing: "-0.015em",
+                  margin: 0,
+                }}
+              >
                 {group.label}
               </h2>
               <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
                 {group.items.length} indicadores
               </span>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 14 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
+                gap: 14,
+              }}
+            >
               {group.items.map((indicator) => (
                 <CatalogCard key={indicator.indicator_code} indicator={indicator} />
               ))}

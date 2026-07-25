@@ -4,12 +4,7 @@ import { Badge, Button, Card } from "@/components/core";
 import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
 import { POST_IMPACT_META } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  AdminApiError,
-  type PostDraft,
-  adminPostsApi,
-  adminSessionApi,
-} from "@/lib/adminPostsApi";
+import { AdminApiError, type PostDraft, adminPostsApi, adminSessionApi } from "@/lib/adminPostsApi";
 import {
   POST_CATEGORIES,
   POST_IMPACT_KINDS,
@@ -152,7 +147,8 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
   const [draft, setDraft] = useState<PostDraft>(initialDraft);
   const [slugTouched, setSlugTouched] = useState(!isNew);
 
-  const canSave = draft.title.trim().length > 0 && draft.slug.length > 0 && draft.content.trim().length > 0;
+  const canSave =
+    draft.title.trim().length > 0 && draft.slug.length > 0 && draft.content.trim().length > 0;
 
   return (
     <Card>
@@ -168,7 +164,12 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
         }}
         style={{ display: "flex", flexDirection: "column", gap: 14 }}
       >
-        <h2 style={{ font: "var(--fw-semibold) 1.125rem/var(--lh-heading) var(--font-sans)", margin: 0 }}>
+        <h2
+          style={{
+            font: "var(--fw-semibold) 1.125rem/var(--lh-heading) var(--font-sans)",
+            margin: 0,
+          }}
+        >
           {isNew ? "Nueva publicación" : `Editando: ${initialDraft.title}`}
         </h2>
 
@@ -285,7 +286,12 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
                     ),
                   }));
                 }}
-                style={{ ...fieldStyle, width: 160, flex: "0 1 auto", fontFamily: "var(--font-jb-mono)" }}
+                style={{
+                  ...fieldStyle,
+                  width: 160,
+                  flex: "0 1 auto",
+                  fontFamily: "var(--font-jb-mono)",
+                }}
               />
               <input
                 value={impact.label}
@@ -346,19 +352,29 @@ function PostForm({ initialDraft, isNew, saving, errorMessage, onSave, onCancel 
           <textarea
             id="post-content"
             value={draft.content}
-            onChange={(event) => setDraft((current) => ({ ...current, content: event.target.value }))}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, content: event.target.value }))
+            }
             rows={14}
             style={{ ...fieldStyle, fontFamily: "var(--font-jb-mono)", resize: "vertical" }}
           />
         </div>
 
         <label
-          style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.875rem", cursor: "pointer" }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: "0.875rem",
+            cursor: "pointer",
+          }}
         >
           <input
             type="checkbox"
             checked={draft.published}
-            onChange={(event) => setDraft((current) => ({ ...current, published: event.target.checked }))}
+            onChange={(event) =>
+              setDraft((current) => ({ ...current, published: event.target.checked }))
+            }
           />
           Publicado (visible en /ideas)
         </label>
@@ -488,7 +504,9 @@ export function AdminPostsPanel() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sp-5)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+      <div
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}
+      >
         <Button
           icon={<Plus className="h-4 w-4" />}
           onClick={() => {
@@ -549,7 +567,9 @@ export function AdminPostsPanel() {
                 borderRadius: "var(--radius-lg)",
               }}
             >
-              <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
+              <div
+                style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}
+              >
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <Badge tone={post.published ? "pos" : "neutral"}>
                     {post.published ? "Publicado" : "Borrador"}

@@ -1,11 +1,8 @@
 "use client";
 
 import { QueryError } from "@/components/QueryError";
-import {
-  POST_CATEGORY_LABELS,
-  formatPostDate,
-} from "@/components/posts/postCategories";
 import { PostCover } from "@/components/posts/PostCover";
+import { POST_CATEGORY_LABELS, formatPostDate } from "@/components/posts/postCategories";
 import { POST_IMPACT_META, readingTimeMinutes } from "@/components/posts/postImpacts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePosts } from "@/hooks/useLabrecha";
@@ -85,7 +82,15 @@ function FeaturedIdea({ post }: { post: Post }) {
     >
       <div className="lb-media-row">
         <div className="lb-media-body">
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 18,
+              flexWrap: "wrap",
+            }}
+          >
             <CategoryBadge category={post.category} />
             <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
               {formatPostDate(post.created_at)} · {readingTimeMinutes(post.content)} min
@@ -162,7 +167,15 @@ function IdeaCard({ post }: { post: Post }) {
         {post.title}
       </h3>
       {post.summary ? (
-        <p style={{ fontFamily: "var(--font-serif)", fontSize: "0.97rem", lineHeight: 1.45, color: "var(--ink2)", margin: 0 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "0.97rem",
+            lineHeight: 1.45,
+            color: "var(--ink2)",
+            margin: 0,
+          }}
+        >
           {post.summary}
         </p>
       ) : null}
@@ -202,7 +215,10 @@ export function PostsFeed() {
     activeCategory ? { category: activeCategory } : undefined,
   );
 
-  const filterItems = [ALL_FILTER, ...POST_CATEGORIES.map((category) => POST_CATEGORY_LABELS[category])];
+  const filterItems = [
+    ALL_FILTER,
+    ...POST_CATEGORIES.map((category) => POST_CATEGORY_LABELS[category]),
+  ];
   const posts = data ?? [];
   const [featured, ...rest] = posts;
 
@@ -224,7 +240,13 @@ export function PostsFeed() {
       {isError && <QueryError error={error} onRetry={() => refetch()} />}
 
       {isLoading && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 1 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+            gap: 1,
+          }}
+        >
           {SKELETON_KEYS.map((key) => (
             <Skeleton key={key} className="h-[220px] rounded-[10px]" />
           ))}

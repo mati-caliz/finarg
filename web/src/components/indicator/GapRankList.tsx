@@ -115,15 +115,41 @@ export function GapRankList() {
               {String(index + 1).padStart(2, "0")}
             </span>
             <div>
-              <div style={{ fontFamily: MONO, fontSize: "0.66rem", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ink3)", marginBottom: 7 }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.66rem",
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "var(--ink3)",
+                  marginBottom: 7,
+                }}
+              >
                 {gap.familyLabel}
               </div>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.375rem", letterSpacing: "-0.015em", color: "var(--ink)" }}>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: "1.375rem",
+                  letterSpacing: "-0.015em",
+                  color: "var(--ink)",
+                }}
+              >
                 {gap.label}
               </div>
             </div>
             <div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontFamily: MONO, fontSize: "0.72rem", marginBottom: 8, gap: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontFamily: MONO,
+                  fontSize: "0.72rem",
+                  marginBottom: 8,
+                  gap: 10,
+                }}
+              >
                 <span style={{ color: "var(--ink2)" }}>
                   {gap.legALabel} <b style={{ color: "var(--ink)" }}>{gap.valueAText}</b>
                 </span>
@@ -131,18 +157,49 @@ export function GapRankList() {
                   {gap.legBLabel} <b style={{ color: "var(--ink)" }}>{gap.valueBText}</b>
                 </span>
               </div>
-              <div style={{ height: 8, background: "var(--line2)", borderRadius: "var(--radius-pill)", overflow: "hidden" }}>
-                <div style={{ width: `${gap.barWidth}%`, height: "100%", background: "var(--gap)", opacity: 0.9 }} />
+              <div
+                style={{
+                  height: 8,
+                  background: "var(--line2)",
+                  borderRadius: "var(--radius-pill)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    width: `${gap.barWidth}%`,
+                    height: "100%",
+                    background: "var(--gap)",
+                    opacity: 0.9,
+                  }}
+                />
               </div>
-              <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)", marginTop: 6 }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.62rem",
+                  color: "var(--ink3)",
+                  marginTop: 6,
+                }}
+              >
                 {gap.sourcesText}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "2rem", color: "var(--gap)", fontVariantNumeric: "tabular-nums" }}>
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontWeight: 700,
+                  fontSize: "2rem",
+                  color: "var(--gap)",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
                 {gap.formattedGap}
               </div>
-              <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>de brecha</div>
+              <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>
+                de brecha
+              </div>
             </div>
           </Link>
         );

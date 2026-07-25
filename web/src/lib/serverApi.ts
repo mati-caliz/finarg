@@ -1,3 +1,5 @@
+const LEADING_SLASH = /^\//;
+
 export function getBackendUrl(): string {
   return (
     process.env.LABRECHA_API_INTERNAL_URL ||
@@ -7,7 +9,7 @@ export function getBackendUrl(): string {
 }
 
 export async function serverGet<T>(path: string, revalidate = 1800): Promise<T> {
-  const url = `${getBackendUrl()}/${path.replace(/^\//, "")}`;
+  const url = `${getBackendUrl()}/${path.replace(LEADING_SLASH, "")}`;
   const res = await fetch(url, {
     next: { revalidate },
     headers: { Accept: "application/json" },

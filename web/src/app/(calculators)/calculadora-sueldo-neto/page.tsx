@@ -161,17 +161,13 @@ export default function IncomeTaxPage() {
               </div>
               <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
-                    Ganancias mensual
-                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Ganancias mensual</div>
                   <div className="num" style={{ fontWeight: 600, color: "var(--neg)" }}>
                     {formatMoneyAR(Number.parseFloat(result.monthly_tax))}
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
-                    Alícuota efectiva
-                  </div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Alícuota efectiva</div>
                   <div className="num" style={{ fontWeight: 600 }}>
                     {formatNumberAR(Number.parseFloat(result.effective_rate), 1)}%
                   </div>
@@ -187,7 +183,7 @@ export default function IncomeTaxPage() {
                     id: item.key,
                     cells: [
                       item.label,
-                      formatMoneyAR(Number.parseFloat(result.deduction_breakdown[item.key])),
+                      formatMoneyAR(Number.parseFloat(result.deduction_breakdown[item.key] ?? "0")),
                     ],
                   }),
                 )}

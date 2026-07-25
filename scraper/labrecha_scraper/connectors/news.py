@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import html
 import re
-import xml.etree.ElementTree as ElementTree
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 
+import httpx
+from defusedxml import ElementTree
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -54,12 +55,13 @@ def _parse_date(raw: str | None) -> datetime:
     if raw:
         try:
             parsed = parsedate_to_datetime(raw)
-            if parsed.tzinfo is not None:
-                parsed = parsed.astimezone(timezone.utc).replace(tzinfo=None)
-            return parsed
         except (TypeError, ValueError):
             pass
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+        else:
+            if parsed.tzinfo is not None:
+                parsed = parsed.astimezone(UTC).replace(tzinfo=None)
+            return parsed
+    return datetime.now(UTC).replace(tzinfo=None)
 
 
 class NewsConnector(Connector):
@@ -82,12 +84,12 @@ class NewsConnector(Connector):
         assert isinstance(data, list)
         return upsert_rows(session, NewsArticle, data, ["source_url"], update_on_conflict=False)
 
-    def _fetch_feed(self, client, feed: RssFeed) -> list[dict]:
+    def _fetch_feed(self, client: httpx.Client, feed: RssFeed) -> list[dict]:
         response = client.get(feed.url)
         response.raise_for_status()
         root = ElementTree.fromstring(response.content)
 
-        now = datetime.now(timezone.utc).replace(tzinfo=None)
+        now = datetime.now(UTC).replace(tzinfo=None)
         rows: list[dict] = []
         for item in list(root.iter("item"))[:MAX_ITEMS_PER_FEED]:
             title = _strip_html(item.findtext("title"))

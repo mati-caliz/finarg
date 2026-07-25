@@ -5,6 +5,7 @@ from datetime import date
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.clock import today_in_argentina
 
 ICG_URL = "https://www.utdt.edu/ver_contenido.php?id_contenido=1439&id_item_menu=2964"
 INDICATOR_CODE = "government_confidence"
@@ -72,7 +73,7 @@ def _parse(text: str) -> list[IndicatorPoint]:
 
     anchor_index = next(index for index, (month, _) in enumerate(matches) if month in MONTHS)
     anchor_month = MONTHS[matches[anchor_index][0]]
-    today = date.today()
+    today = today_in_argentina()
     anchor_year = today.year if anchor_month <= today.month else today.year - 1
     year, month = _add_months(anchor_year, anchor_month, -anchor_index)
 

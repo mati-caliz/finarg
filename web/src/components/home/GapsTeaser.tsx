@@ -13,13 +13,22 @@ function GapItem({ code }: { code: string }) {
   if (sources.length < 2) {
     return null;
   }
-  const values = sources.map((source) => Number.parseFloat(source.latest_value));
-  const base = Math.max(Math.abs(values[0]), Math.abs(values[1])) || 1;
-  const gapPct = (Math.abs(values[0] - values[1]) / base) * 100;
+  const [firstValue = 0, secondValue = 0] = sources.map((source) =>
+    Number.parseFloat(source.latest_value),
+  );
+  const base = Math.max(Math.abs(firstValue), Math.abs(secondValue)) || 1;
+  const gapPct = (Math.abs(firstValue - secondValue) / base) * 100;
 
   return (
     <div style={{ background: "var(--raise)", padding: "18px 20px" }}>
-      <div style={{ fontFamily: "var(--font-serif)", fontSize: "1rem", marginBottom: 12, color: "var(--ink)" }}>
+      <div
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontSize: "1rem",
+          marginBottom: 12,
+          color: "var(--ink)",
+        }}
+      >
         {indicator.label}
       </div>
       <div
@@ -34,11 +43,20 @@ function GapItem({ code }: { code: string }) {
       >
         {formatNumberAR(gapPct, 1)}%
       </div>
-      <div style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.7rem", color: "var(--ink2)", lineHeight: 1.7 }}>
+      <div
+        style={{
+          fontFamily: "var(--font-jb-mono)",
+          fontSize: "0.7rem",
+          color: "var(--ink2)",
+          lineHeight: 1.7,
+        }}
+      >
         {sources.map((source, index) => (
           <span key={source.source}>
             {sourceLabel(source.source)}{" "}
-            <b style={{ color: "var(--ink)" }}>{indicator.format(values[index])}</b>
+            <b style={{ color: "var(--ink)" }}>
+              {indicator.format(index === 0 ? firstValue : secondValue)}
+            </b>
             {index === 0 ? " · " : ""}
           </span>
         ))}

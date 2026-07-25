@@ -38,14 +38,17 @@ function itemXml(summary: GazetteSummary): string {
 export async function GET() {
   let summaries: GazetteSummary[] = [];
   try {
-    summaries = await serverGet<GazetteSummary[]>("/gazette/summaries?limit=50", REVALIDATE_SECONDS);
+    summaries = await serverGet<GazetteSummary[]>(
+      "/gazette/summaries?limit=50",
+      REVALIDATE_SECONDS,
+    );
   } catch {
     summaries = [];
   }
 
   const items = summaries.map(itemXml).join("\n");
-  const lastBuild =
-    summaries.length > 0 ? toRfc822(summaries[0].date) : new Date().toUTCString();
+  const firstSummary = summaries[0];
+  const lastBuild = firstSummary ? toRfc822(firstSummary.date) : new Date().toUTCString();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">

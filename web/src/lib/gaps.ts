@@ -31,7 +31,12 @@ export const GAPS: GapDef[] = [
     narrowIsGood: true,
     legs: [
       { code: "dollar_blue", source: "dolarapi", historySource: "argentinadatos", label: "Blue" },
-      { code: "dollar_official", source: "dolarapi", historySource: "argentinadatos", label: "Oficial" },
+      {
+        code: "dollar_official",
+        source: "dolarapi",
+        historySource: "argentinadatos",
+        label: "Oficial",
+      },
     ],
   },
   {
@@ -44,7 +49,12 @@ export const GAPS: GapDef[] = [
     narrowIsGood: true,
     legs: [
       { code: "dollar_mep", source: "dolarapi", historySource: "argentinadatos", label: "MEP" },
-      { code: "dollar_official", source: "dolarapi", historySource: "argentinadatos", label: "Oficial" },
+      {
+        code: "dollar_official",
+        source: "dolarapi",
+        historySource: "argentinadatos",
+        label: "Oficial",
+      },
     ],
   },
   {

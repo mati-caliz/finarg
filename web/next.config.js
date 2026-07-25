@@ -184,7 +184,11 @@ const nextConfig = {
         destination: "/calculadora-interes-compuesto",
         permanent: true,
       },
-      { source: "/calculator-net-salary", destination: "/calculadora-sueldo-neto", permanent: true },
+      {
+        source: "/calculator-net-salary",
+        destination: "/calculadora-sueldo-neto",
+        permanent: true,
+      },
       { source: "/gazette.xml", destination: "/boletin.xml", permanent: true },
     ];
   },

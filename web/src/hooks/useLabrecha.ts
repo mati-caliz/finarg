@@ -1,15 +1,16 @@
 import {
   type IndicatorSeriesParams,
+  type PoliticalEventsParams,
   type PostCategory,
-  gazetteApi,
-  postsApi,
   congressApi,
-  revenueSharingApi,
-  housingApi,
+  gazetteApi,
   holidaysApi,
+  housingApi,
   indicatorsApi,
   newsApi,
   politicalEventsApi,
+  postsApi,
+  revenueSharingApi,
   scrapeRunsApi,
   senateApi,
   taxesApi,
@@ -75,7 +76,8 @@ export function useLegLatest(legs: { code: string; source: string }[]) {
         limit: 1,
         order: "desc" as const,
       }),
-      queryFn: () => indicatorsApi.series(leg.code, { source: leg.source, limit: 1, order: "desc" }),
+      queryFn: () =>
+        indicatorsApi.series(leg.code, { source: leg.source, limit: 1, order: "desc" }),
     })),
   });
 }
@@ -88,11 +90,7 @@ export function useIndicatorSources(code: string) {
   });
 }
 
-export function usePoliticalEvents(params?: {
-  date_from?: string;
-  date_to?: string;
-  category?: string;
-}) {
+export function usePoliticalEvents(params?: PoliticalEventsParams) {
   return useQuery({
     queryKey: labrechaKeys.politicalEvents(params),
     queryFn: () => politicalEventsApi.list(params),

@@ -61,9 +61,7 @@ def list_all_posts(session: Session = Depends(get_session)) -> list[PostOut]:
 
 @router.get("/{slug}", response_model=PostOut)
 def get_published_post(slug: str, session: Session = Depends(get_session)) -> PostOut:
-    post = session.scalars(
-        select(Post).where(Post.slug == slug, Post.published.is_(True))
-    ).first()
+    post = session.scalars(select(Post).where(Post.slug == slug, Post.published.is_(True))).first()
     if post is None:
         raise HTTPException(status_code=404, detail="Post no encontrado")
     return to_post_out(post)

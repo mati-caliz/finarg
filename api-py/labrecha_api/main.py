@@ -21,7 +21,9 @@ from labrecha_api.routers import (
 app = FastAPI(
     title="La Brecha API",
     version="0.1.0",
-    description="API de lectura sobre los indicadores político-económicos ingeridos por el scraper.",
+    description=(
+        "API de lectura sobre los indicadores político-económicos ingeridos por el scraper."
+    ),
 )
 
 app.add_middleware(

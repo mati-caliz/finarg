@@ -11,6 +11,7 @@ import {
   getIndicatorDisplay,
   sourceLabel,
 } from "@/lib/indicators";
+import type { PoliticalEvent } from "@/lib/labrechaApi";
 import type { CSSProperties } from "react";
 
 const HERO_CODE = "cpi_monthly";
@@ -82,6 +83,9 @@ function StatTile({ code }: { code: string }) {
     return null;
   }
   const latest = points[0];
+  if (!latest) {
+    return null;
+  }
   const latestValue = Number.parseFloat(latest.value);
   const previous = points[1] ? Number.parseFloat(points[1].value) : undefined;
   const ascending = [...points].reverse().map((point) => Number.parseFloat(point.value));
@@ -94,7 +98,10 @@ function StatTile({ code }: { code: string }) {
   );
 
   return (
-    <a href={indicator.href} style={{ ...TILE_STYLE, display: "block", textDecoration: "none", color: "var(--ink)" }}>
+    <a
+      href={indicator.href}
+      style={{ ...TILE_STYLE, display: "block", textDecoration: "none", color: "var(--ink)" }}
+    >
       <div
         style={{
           fontFamily: "var(--font-jb-mono)",
@@ -124,7 +131,9 @@ function StatTile({ code }: { code: string }) {
         ) : null}
       </div>
       <MiniSparkline data={ascending} style={{ margin: "8px 0 6px" }} />
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+      <div
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}
+      >
         <span
           style={{
             fontFamily: "var(--font-jb-mono)",
@@ -134,12 +143,42 @@ function StatTile({ code }: { code: string }) {
         >
           {variation?.text ?? ""}
         </span>
-        <span style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.62rem", color: "var(--ink3)" }}>
+        <span
+          style={{ fontFamily: "var(--font-jb-mono)", fontSize: "0.62rem", color: "var(--ink3)" }}
+        >
           {sourceLabel(latest.source)} · {formatDateAR(latest.date)}
         </span>
       </div>
     </a>
   );
+}
+
+function lastIndexOnOrBefore(dates: string[], date: string): number {
+  let matchIndex = -1;
+  for (let index = 0; index < dates.length; index += 1) {
+    if ((dates[index] ?? "") <= date) {
+      matchIndex = index;
+    }
+  }
+  return matchIndex;
+}
+
+function buildChartEvents(dates: string[], events: PoliticalEvent[]): ChartEvent[] {
+  const firstDate = dates[0] ?? "";
+  const lastDate = dates[dates.length - 1] ?? "";
+  const chartEvents: ChartEvent[] = [];
+  const seen = new Set<number>();
+  for (const event of events) {
+    if (event.date < firstDate || event.date > lastDate) {
+      continue;
+    }
+    const matchIndex = lastIndexOnOrBefore(dates, event.date);
+    if (matchIndex >= 0 && !seen.has(matchIndex)) {
+      seen.add(matchIndex);
+      chartEvents.push({ index: matchIndex, label: event.title });
+    }
+  }
+  return chartEvents;
 }
 
 function HeroIndicator() {
@@ -164,6 +203,9 @@ function HeroIndicator() {
   const latest = ascending[ascending.length - 1];
   const latestValue = values[values.length - 1];
   const previousValue = values[values.length - 2];
+  if (!latest || latestValue === undefined || previousValue === undefined) {
+    return null;
+  }
   const variation = computeVariation(
     latestValue,
     previousValue,
@@ -172,34 +214,30 @@ function HeroIndicator() {
     indicator.goodWhen,
   );
 
-  const chartEvents: ChartEvent[] = [];
-  const seen = new Set<number>();
-  for (const event of eventsQuery.data ?? []) {
-    if (event.date < datesAsc[0] || event.date > datesAsc[datesAsc.length - 1]) {
-      continue;
-    }
-    let matchIndex = -1;
-    for (let i = 0; i < datesAsc.length; i += 1) {
-      if (datesAsc[i] <= event.date) {
-        matchIndex = i;
-      }
-    }
-    if (matchIndex >= 0 && !seen.has(matchIndex)) {
-      seen.add(matchIndex);
-      chartEvents.push({ index: matchIndex, label: event.title });
-    }
-  }
+  const chartEvents = buildChartEvents(datesAsc, eventsQuery.data ?? []);
 
   const step = Math.max(1, Math.floor(datesAsc.length / 4));
   const xLabels = datesAsc.map((date, index) =>
     index % step === 0 || index === datesAsc.length - 1
-      ? new Date(`${date}T00:00:00`).toLocaleDateString("es-AR", { month: "short", year: "2-digit" })
+      ? new Date(`${date}T00:00:00`).toLocaleDateString("es-AR", {
+          month: "short",
+          year: "2-digit",
+        })
       : "",
   );
 
   return (
     <article style={{ ...TILE_STYLE, padding: "28px 30px 26px" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 20, marginBottom: 20, flexWrap: "wrap" }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          justifyContent: "space-between",
+          gap: 20,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
         <div>
           <div
             style={{
@@ -249,7 +287,13 @@ function HeroIndicator() {
       </div>
 
       <AnnotatedSeriesChart
-        series={[{ name: "IPC mensual", color: "var(--chart)", data: values.map((v, i) => ({ t: formatDateAR(datesAsc[i]), v })) }]}
+        series={[
+          {
+            name: "IPC mensual",
+            color: "var(--chart)",
+            data: values.map((v, i) => ({ t: formatDateAR(datesAsc[i] ?? ""), v })),
+          },
+        ]}
         events={chartEvents}
         xLabels={xLabels}
         gapFill={false}
@@ -257,7 +301,15 @@ function HeroIndicator() {
         yFormat={(value) => `${formatNumberAR(value, 1)}%`}
       />
 
-      <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line)", display: "flex", justifyContent: "flex-end" }}>
+      <div
+        style={{
+          marginTop: 16,
+          paddingTop: 16,
+          borderTop: "1px solid var(--line)",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
         <ActionLink href={indicator.href}>Ver serie completa →</ActionLink>
       </div>
     </article>

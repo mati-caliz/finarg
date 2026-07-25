@@ -8,7 +8,7 @@ from decimal import Decimal, InvalidOperation
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
-'from labrecha_scraper.models import RentByNeighborhood
+from labrecha_scraper.models import RentByNeighborhood
 
 CSV_URL = (
     "https://cdn.buenosaires.gob.ar/datosabiertos/datasets/instituto-de-vivienda/"
@@ -87,5 +87,7 @@ def _latest_by_neighborhood(csv_text: str) -> list[dict]:
             )
     rows = [entry[1] for entry in latest.values()]
     if len(rows) < MIN_EXPECTED_ROWS:
-        raise ValueError("el CSV de alquileres CABA no trajo suficientes barrios (¿cambió el formato?)")
+        raise ValueError(
+            "el CSV de alquileres CABA no trajo suficientes barrios (¿cambió el formato?)"
+        )
     return rows

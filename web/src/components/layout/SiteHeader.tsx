@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Calculadoras", href: "/calculadoras" },
 ];
 
+const APPLE_PLATFORM = /Mac|iPhone|iPad/;
 const CAFECITO_URL = "https://cafecito.app/finlatam";
 
 function isActive(pathname: string, href: string): boolean {
@@ -75,7 +76,7 @@ function CommandTrigger() {
   const [isMac, setIsMac] = useState(false);
 
   useEffect(() => {
-    setIsMac(/Mac|iPhone|iPad/.test(navigator.platform));
+    setIsMac(APPLE_PLATFORM.test(navigator.platform));
   }, []);
 
   return (

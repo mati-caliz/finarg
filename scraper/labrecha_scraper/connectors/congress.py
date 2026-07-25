@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass, field
 from datetime import date
 
+import httpx
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -69,7 +70,7 @@ class CongressConnector(Connector):
         details = upsert_rows(session, CongressVoteDetail, data.details, ["vote_detail_id"])
         return votes + details
 
-    def _resolve_resources(self, client) -> tuple[list[str], list[str]]:
+    def _resolve_resources(self, client: httpx.Client) -> tuple[list[str], list[str]]:
         response = client.get(CKAN_PACKAGE_URL, params={"id": DATASET_ID})
         response.raise_for_status()
         resources = response.json()["result"]["resources"]
@@ -90,7 +91,7 @@ class CongressConnector(Connector):
             raise ValueError("no se encontraron recursos JSON de cabecera y detalle en CKAN")
         return header_urls, detail_urls
 
-    def _download_json(self, client, url: str) -> dict:
+    def _download_json(self, client: httpx.Client, url: str) -> dict:
         response = client.get(url)
         response.raise_for_status()
         return json.loads(response.content.decode("utf-8-sig"))

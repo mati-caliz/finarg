@@ -92,7 +92,9 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 ## Verificación
 
 - Frontend (`cd web`): `npx tsc --noEmit`, `npm run lint:check` (Biome, no ESLint), `npm run build`.
-- API/scraper: byte-compile con `python -m compileall labrecha_api` / `labrecha_scraper`.
+- API/scraper: `ruff check api-py/labrecha_api scraper/labrecha_scraper` + `ruff format --check` (la
+  config de `ruff.toml` es estricta: casi todas las familias de reglas), y byte-compile con
+  `python -m compileall labrecha_api` / `labrecha_scraper`.
 - Datos: el scraper corre con `python -m labrecha_scraper run <job|all>` (ver `list`, `status`,
   `seed-events`, `init-db`); Postgres del volumen compartido en el puerto 5433 en local.
 - `docker compose up -d` levanta postgres + api-py + web; el scraper corre on-demand

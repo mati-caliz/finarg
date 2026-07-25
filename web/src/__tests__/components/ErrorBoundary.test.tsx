@@ -71,15 +71,13 @@ describe("ErrorBoundary", () => {
 
     expect(screen.getByText(/algo salió mal/i)).toBeInTheDocument();
 
-    // Click retry
-    fireEvent.click(screen.getByRole("button", { name: /reintentar/i }));
-
-    // Rerender with non-throwing component
     rerender(
       <ErrorBoundary>
         <ThrowError shouldThrow={false} />
       </ErrorBoundary>,
     );
+
+    fireEvent.click(screen.getByRole("button", { name: /reintentar/i }));
 
     expect(screen.getByText("No error")).toBeInTheDocument();
   });

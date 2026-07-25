@@ -25,7 +25,6 @@ async function proxyToBackend(
 
   const url = `${getBackendUrl()}/${pathSegments.join("/")}`;
   const hasBody = method === "POST" || method === "PUT";
-  const body = hasBody ? await request.text() : undefined;
 
   const backendResponse = await fetch(url, {
     method,
@@ -35,14 +34,16 @@ async function proxyToBackend(
       Accept: "application/json",
       "X-Admin-Token": adminToken,
     },
-    body,
+    ...(hasBody ? { body: await request.text() } : {}),
   });
 
   if (backendResponse.status === 204) {
     return new Response(null, { status: 204 });
   }
 
-  const data = await backendResponse.json().catch(() => ({ error: "Respuesta inválida del backend" }));
+  const data = await backendResponse
+    .json()
+    .catch(() => ({ error: "Respuesta inválida del backend" }));
   return Response.json(data, { status: backendResponse.status });
 }
 

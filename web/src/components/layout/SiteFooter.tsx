@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { BrandMark } from "@/components/layout/SiteHeader";
+import Link from "next/link";
 
 const SECTION_LINKS = [
   { label: "Indicadores", href: "/indicadores" },
@@ -24,7 +24,9 @@ export function SiteFooter() {
   };
 
   return (
-    <footer style={{ borderTop: "1px solid var(--line)", marginTop: 48, background: "var(--surface)" }}>
+    <footer
+      style={{ borderTop: "1px solid var(--line)", marginTop: 48, background: "var(--surface)" }}
+    >
       <div
         style={{
           maxWidth: "var(--container-max)",

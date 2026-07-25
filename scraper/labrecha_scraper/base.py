@@ -52,6 +52,7 @@ def upsert_rows(
     model: type,
     rows: list[dict],
     index_elements: list[str],
+    *,
     update_on_conflict: bool = True,
     batch_size: int = UPSERT_BATCH_SIZE,
 ) -> int:
@@ -116,7 +117,7 @@ def run_job(session: Session, connector: Connector) -> ScrapeRun:
         run.finished_at = func.now()
         session.add(run)
         session.commit()
-        logger.error("job %s falló: %s", connector.name, run.error)
+        logger.exception("job %s falló: %s", connector.name, run.error)
 
     session.refresh(run)
     return run

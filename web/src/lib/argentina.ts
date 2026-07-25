@@ -3,7 +3,7 @@ export interface ProvinceCentroid {
   lat: number;
 }
 
-export const PROVINCE_CENTROIDS: Record<string, ProvinceCentroid> = {
+export const PROVINCE_CENTROIDS = {
   "Buenos Aires": { lon: -60.56, lat: -36.68 },
   CABA: { lon: -58.45, lat: -34.61 },
   Catamarca: { lon: -66.95, lat: -27.34 },
@@ -28,7 +28,7 @@ export const PROVINCE_CENTROIDS: Record<string, ProvinceCentroid> = {
   "Santiago del Estero": { lon: -63.25, lat: -27.78 },
   "Tierra del Fuego": { lon: -68.3, lat: -54.0 },
   Tucumán: { lon: -65.36, lat: -26.95 },
-};
+} satisfies Record<string, ProvinceCentroid>;
 
 const LON_MIN = -73.6;
 const LON_MAX = -53.6;
@@ -50,8 +50,7 @@ export function projectCentroid(
   const latSpan = LAT_MAX - LAT_MIN;
   const usableWidth = height * (lonSpan / latSpan);
   const offsetX = (width - usableWidth) / 2;
-  const x =
-    offsetX + ((centroid.lon - LON_MIN) * MEAN_LAT_COS) / lonSpan * usableWidth;
+  const x = offsetX + (((centroid.lon - LON_MIN) * MEAN_LAT_COS) / lonSpan) * usableWidth;
   const y = ((LAT_MAX - centroid.lat) / latSpan) * height;
   return { x, y };
 }

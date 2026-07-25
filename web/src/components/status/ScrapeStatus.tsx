@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/components/core";
 import { QueryError } from "@/components/QueryError";
+import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useScrapeRuns } from "@/hooks/useLabrecha";
 import type { ScrapeRun } from "@/lib/labrechaApi";
@@ -84,8 +84,19 @@ function StatusRow({ run }: { run: ScrapeRun }) {
         }}
       />
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 4 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <span className="num" style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--ink)" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <span
+            className="num"
+            style={{ fontSize: "0.875rem", fontWeight: 600, color: "var(--ink)" }}
+          >
             {run.job_name}
           </span>
           <span style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>
@@ -172,7 +183,11 @@ export function ScrapeStatus() {
           <div>
             <span
               className="num"
-              style={{ fontSize: "1.5rem", fontWeight: 700, color: errors === 0 ? "var(--pos)" : "var(--neg)" }}
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 700,
+                color: errors === 0 ? "var(--pos)" : "var(--neg)",
+              }}
             >
               {errors}
             </span>

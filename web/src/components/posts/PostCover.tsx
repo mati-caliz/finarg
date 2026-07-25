@@ -32,16 +32,7 @@ function Car({
 }) {
   return (
     <g transform={`translate(${x} ${y})`}>
-      <rect
-        x={0}
-        y={0}
-        width={w}
-        height={h}
-        rx={7}
-        fill={fill}
-        stroke={stroke}
-        strokeWidth={2.2}
-      />
+      <rect x={0} y={0} width={w} height={h} rx={7} fill={fill} stroke={stroke} strokeWidth={2.2} />
       <rect
         x={w * 0.14}
         y={h * 0.22}
@@ -66,7 +57,12 @@ function Car({
   );
 }
 
-function Bolt({ x, y, scale = 1, fill = ACC }: { x: number; y: number; scale?: number; fill?: string }) {
+function Bolt({
+  x,
+  y,
+  scale = 1,
+  fill = ACC,
+}: { x: number; y: number; scale?: number; fill?: string }) {
   return (
     <path
       transform={`translate(${x} ${y}) scale(${scale})`}
@@ -81,25 +77,24 @@ function TrafficMotif() {
     <g>
       <rect x={0} y={150} width={W} height={86} fill={SURFACE_2} />
       <rect x={276} y={0} width={110} height={H} fill={SURFACE_2} />
-      <path
-        d="M0 193 H250 M412 193 H640"
-        stroke={INK3}
-        strokeWidth={2.5}
-        strokeDasharray="18 14"
-      />
-      <path
-        d="M331 0 V128 M331 258 V360"
-        stroke={INK3}
-        strokeWidth={2.5}
-        strokeDasharray="18 14"
-      />
+      <path d="M0 193 H250 M412 193 H640" stroke={INK3} strokeWidth={2.5} strokeDasharray="18 14" />
+      <path d="M331 0 V128 M331 258 V360" stroke={INK3} strokeWidth={2.5} strokeDasharray="18 14" />
       <Car x={92} y={158} />
       <Car x={462} y={196} />
       <g transform="translate(296 62) rotate(90 35 15)">
         <Car x={0} y={0} stroke={INK2} />
       </g>
       <g>
-        <rect x={40} y={54} width={54} height={126} rx={12} fill={SURFACE} stroke={INK} strokeWidth={2.4} />
+        <rect
+          x={40}
+          y={54}
+          width={54}
+          height={126}
+          rx={12}
+          fill={SURFACE}
+          stroke={INK}
+          strokeWidth={2.4}
+        />
         <circle cx={67} cy={86} r={13} fill={ACC} />
         <circle cx={67} cy={117} r={13} fill="none" stroke={INK3} strokeWidth={2} />
         <circle cx={67} cy={148} r={13} fill="none" stroke={INK3} strokeWidth={2} />
@@ -114,9 +109,36 @@ function TollMotif() {
     <g>
       <rect x={0} y={214} width={W} height={100} fill={SURFACE_2} />
       <path d="M0 264 H640" stroke={INK3} strokeWidth={2.5} strokeDasharray="20 16" />
-      <rect x={148} y={92} width={20} height={160} rx={4} fill="none" stroke={INK} strokeWidth={2.4} />
-      <rect x={472} y={92} width={20} height={160} rx={4} fill="none" stroke={INK} strokeWidth={2.4} />
-      <rect x={140} y={70} width={360} height={26} rx={6} fill={SURFACE} stroke={INK} strokeWidth={2.4} />
+      <rect
+        x={148}
+        y={92}
+        width={20}
+        height={160}
+        rx={4}
+        fill="none"
+        stroke={INK}
+        strokeWidth={2.4}
+      />
+      <rect
+        x={472}
+        y={92}
+        width={20}
+        height={160}
+        rx={4}
+        fill="none"
+        stroke={INK}
+        strokeWidth={2.4}
+      />
+      <rect
+        x={140}
+        y={70}
+        width={360}
+        height={26}
+        rx={6}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={2.4}
+      />
       <rect x={222} y={44} width={44} height={26} rx={5} fill={ACC} />
       <rect x={374} y={44} width={44} height={26} rx={5} fill={ACC} />
       <g stroke={ACC} strokeWidth={2.2} fill="none" strokeLinecap="round">
@@ -135,8 +157,26 @@ function TollMotif() {
 function LicensePlateMotif() {
   return (
     <g>
-      <rect x={110} y={96} width={420} height={168} rx={16} fill={SURFACE} stroke={INK} strokeWidth={3} />
-      <rect x={126} y={112} width={388} height={136} rx={9} fill="none" stroke={LINE} strokeWidth={2} />
+      <rect
+        x={110}
+        y={96}
+        width={420}
+        height={168}
+        rx={16}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={3}
+      />
+      <rect
+        x={126}
+        y={112}
+        width={388}
+        height={136}
+        rx={9}
+        fill="none"
+        stroke={LINE}
+        strokeWidth={2}
+      />
       <rect x={126} y={112} width={54} height={136} rx={9} fill={ACC} opacity={0.9} />
       <circle cx={153} cy={148} r={9} fill={SURFACE} />
       <circle cx={132} cy={128} r={5} fill={LINE} />
@@ -198,7 +238,16 @@ function StateSoftwareMotif() {
   const bars = [220, 148, 262, 176, 118, 236];
   return (
     <g>
-      <rect x={92} y={72} width={456} height={216} rx={12} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
+      <rect
+        x={92}
+        y={72}
+        width={456}
+        height={216}
+        rx={12}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={2.6}
+      />
       <path d="M92 110 H548" stroke={INK} strokeWidth={2.2} />
       <circle cx={116} cy={91} r={6} fill={ACC} />
       <circle cx={136} cy={91} r={6} fill={LINE} />
@@ -232,7 +281,16 @@ function StateSoftwareMotif() {
 function CarPaperworkMotif() {
   return (
     <g>
-      <rect x={128} y={54} width={300} height={258} rx={10} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
+      <rect
+        x={128}
+        y={54}
+        width={300}
+        height={258}
+        rx={10}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={2.6}
+      />
       <g fill={LINE}>
         <rect x={158} y={90} width={150} height={11} rx={5.5} />
         <rect x={158} y={252} width={196} height={9} rx={4.5} />
@@ -256,13 +314,30 @@ function CarPaperworkMotif() {
 }
 
 function InvoicingMotif() {
-  const qrCells: Array<[number, number]> = [
-    [0, 0], [1, 0], [2, 0], [4, 0],
-    [0, 1], [2, 1], [5, 1],
-    [0, 2], [1, 2], [2, 2], [3, 2], [4, 2],
-    [2, 3], [4, 3], [5, 3],
-    [0, 4], [1, 4], [3, 4], [5, 4],
-    [1, 5], [2, 5], [4, 5], [5, 5],
+  const qrCells: [number, number][] = [
+    [0, 0],
+    [1, 0],
+    [2, 0],
+    [4, 0],
+    [0, 1],
+    [2, 1],
+    [5, 1],
+    [0, 2],
+    [1, 2],
+    [2, 2],
+    [3, 2],
+    [4, 2],
+    [2, 3],
+    [4, 3],
+    [5, 3],
+    [0, 4],
+    [1, 4],
+    [3, 4],
+    [5, 4],
+    [1, 5],
+    [2, 5],
+    [4, 5],
+    [5, 5],
   ];
   return (
     <g>
@@ -281,7 +356,16 @@ function InvoicingMotif() {
       </g>
       <rect x={164} y={218} width={110} height={13} rx={6.5} fill={ACC} />
       <g transform="translate(422 118)">
-        <rect x={-14} y={-14} width={140} height={140} rx={10} fill={SURFACE} stroke={INK} strokeWidth={2.4} />
+        <rect
+          x={-14}
+          y={-14}
+          width={140}
+          height={140}
+          rx={10}
+          fill={SURFACE}
+          stroke={INK}
+          strokeWidth={2.4}
+        />
         {qrCells.map(([c, r]) => (
           <rect
             key={`qr-${c}-${r}`}
@@ -311,7 +395,14 @@ function MobilityMotif() {
         const y = 74 + i * 62;
         return (
           <g key={lane.label}>
-            <rect x={150} y={y} width={lane.width} height={34} rx={17} fill={i === 0 ? ACC : LINE} />
+            <rect
+              x={150}
+              y={y}
+              width={lane.width}
+              height={34}
+              rx={17}
+              fill={i === 0 ? ACC : LINE}
+            />
             <text
               x={134}
               y={y + 24}
@@ -342,7 +433,10 @@ function ElectricMotif() {
       <g stroke={INK} strokeWidth={2.6} fill="none">
         <circle cx={432} cy={252} r={40} />
         <circle cx={548} cy={252} r={40} />
-        <path d="M432 252 L474 178 L520 252 M474 178 L512 178 M548 252 L512 186" strokeLinejoin="round" />
+        <path
+          d="M432 252 L474 178 L520 252 M474 178 L512 178 M548 252 L512 186"
+          strokeLinejoin="round"
+        />
         <path d="M456 172 h36" strokeLinecap="round" />
       </g>
       <Bolt x={310} y={128} scale={1.7} />
@@ -353,15 +447,40 @@ function ElectricMotif() {
 function ChargingMotif() {
   return (
     <g>
-      <rect x={96} y={48} width={224} height={266} rx={8} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
+      <rect
+        x={96}
+        y={48}
+        width={224}
+        height={266}
+        rx={8}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={2.6}
+      />
       <g fill={LINE}>
         {[0, 1, 2, 3, 4].map((r) =>
           [0, 1, 2].map((c) => (
-            <rect key={`${r}-${c}`} x={124 + c * 68} y={78 + r * 48} width={44} height={32} rx={4} />
+            <rect
+              key={`${r}-${c}`}
+              x={124 + c * 68}
+              y={78 + r * 48}
+              width={44}
+              height={32}
+              rx={4}
+            />
           )),
         )}
       </g>
-      <rect x={192} y={266} width={44} height={48} rx={3} fill={SURFACE_2} stroke={INK2} strokeWidth={2} />
+      <rect
+        x={192}
+        y={266}
+        width={44}
+        height={48}
+        rx={3}
+        fill={SURFACE_2}
+        stroke={INK2}
+        strokeWidth={2}
+      />
       <path
         d="M320 132 C400 132 400 210 452 210"
         fill="none"
@@ -370,7 +489,16 @@ function ChargingMotif() {
         strokeLinecap="round"
       />
       <g transform="translate(452 168)">
-        <rect x={0} y={0} width={92} height={84} rx={12} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
+        <rect
+          x={0}
+          y={0}
+          width={92}
+          height={84}
+          rx={12}
+          fill={SURFACE}
+          stroke={INK}
+          strokeWidth={2.6}
+        />
         <circle cx={30} cy={34} r={8} fill={INK2} />
         <circle cx={62} cy={34} r={8} fill={INK2} />
         <rect x={26} y={54} width={40} height={9} rx={4.5} fill={INK2} />
@@ -457,7 +585,16 @@ function AnalisisFallback({ seed }: { seed: number }) {
 function NotaFallback() {
   return (
     <g>
-      <rect x={148} y={68} width={344} height={230} rx={10} fill={SURFACE} stroke={INK} strokeWidth={2.6} />
+      <rect
+        x={148}
+        y={68}
+        width={344}
+        height={230}
+        rx={10}
+        fill={SURFACE}
+        stroke={INK}
+        strokeWidth={2.6}
+      />
       <rect x={180} y={104} width={160} height={14} rx={7} fill={ACC} />
       <g fill={LINE}>
         {[0, 1, 2, 3, 4].map((i) => (

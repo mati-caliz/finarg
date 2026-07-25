@@ -96,10 +96,13 @@ jobs:
           python-version: '3.12'
 
       - name: Install ruff
-        run: pip install ruff
+        run: pip install ruff==0.16.0
 
       - name: Lint (ruff)
         run: ruff check api-py/labrecha_api scraper/labrecha_scraper
+
+      - name: Format check (ruff)
+        run: ruff format --check api-py/labrecha_api scraper/labrecha_scraper
 
       - name: Byte-compile sources
         run: python -m compileall -q api-py/labrecha_api scraper/labrecha_scraper

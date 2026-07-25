@@ -27,7 +27,7 @@ async function adminRequest<ResponseBody>(
   const response = await fetch(`/api/admin/${path}`, {
     method,
     headers: { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   if (response.status === 204) {
     return undefined as ResponseBody;
@@ -35,9 +35,15 @@ async function adminRequest<ResponseBody>(
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const detail =
-      typeof data === "object" && data !== null && "detail" in data && typeof data.detail === "string"
+      typeof data === "object" &&
+      data !== null &&
+      "detail" in data &&
+      typeof data.detail === "string"
         ? data.detail
-        : typeof data === "object" && data !== null && "error" in data && typeof data.error === "string"
+        : typeof data === "object" &&
+            data !== null &&
+            "error" in data &&
+            typeof data.error === "string"
           ? data.error
           : `Error ${response.status}`;
     throw new AdminApiError(response.status, detail);
@@ -47,7 +53,8 @@ async function adminRequest<ResponseBody>(
 
 export const adminSessionApi = {
   check: () => adminRequest<{ authenticated: boolean }>("session", "GET"),
-  login: (password: string) => adminRequest<{ authenticated: boolean }>("session", "POST", { password }),
+  login: (password: string) =>
+    adminRequest<{ authenticated: boolean }>("session", "POST", { password }),
   logout: () => adminRequest<{ authenticated: boolean }>("session", "DELETE"),
 };
 

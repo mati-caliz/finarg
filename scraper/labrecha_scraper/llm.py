@@ -25,6 +25,7 @@ def run_claude_json_array(prompt: str) -> list:
             [CLAUDE_BIN, "-p", prompt],
             capture_output=True,
             text=True,
+            check=False,
             timeout=CLAUDE_TIMEOUT_SECONDS,
         )
     except FileNotFoundError as error:

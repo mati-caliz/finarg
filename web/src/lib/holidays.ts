@@ -7,8 +7,8 @@ export function todayISO(): string {
 }
 
 function toUtcMidnight(isoDate: string): number {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  return Date.UTC(year, (month ?? 1) - 1, day ?? 1);
+  const [year = 0, month = 1, day = 1] = isoDate.split("-").map(Number);
+  return Date.UTC(year, month - 1, day);
 }
 
 export function daysUntil(isoDate: string, fromISO: string = todayISO()): number {
@@ -20,8 +20,8 @@ export function holidayLabel(holiday: Holiday): string {
 }
 
 export function formatLongDate(isoDate: string): string {
-  const [year, month, day] = isoDate.split("-").map(Number);
-  const date = new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1));
+  const [year = 0, month = 1, day = 1] = isoDate.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
   return date.toLocaleDateString("es-AR", {
     weekday: "long",
     day: "numeric",

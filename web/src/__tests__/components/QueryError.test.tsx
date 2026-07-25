@@ -6,7 +6,7 @@ import { AlertCircle } from "lucide-react";
 describe("QueryError", () => {
   it("renders error message", () => {
     render(<QueryError error={new Error("Test error")} />);
-    expect(screen.getByText(/error/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Error" })).toBeInTheDocument();
   });
 
   it("shows retry button when onRetry is provided", () => {
@@ -57,7 +57,7 @@ describe("QueryError", () => {
 
   it("handles null error gracefully", () => {
     render(<QueryError error={null} />);
-    expect(screen.getByText(/error/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Error" })).toBeInTheDocument();
   });
 });
 
