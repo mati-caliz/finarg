@@ -32,6 +32,7 @@ INSERT INTO code_rename (old_code, new_code) VALUES
   ('dolar_cripto', 'dollar_crypto'),
   ('dolar_mayorista', 'dollar_wholesale'),
   ('dolar_oficial', 'dollar_official'),
+  ('dolar_solidario', 'dollar_solidario'),
   ('dolar_tarjeta', 'dollar_card'),
   ('empleo_asalariado_privado', 'private_wage_employment'),
   ('empleo_asalariado_publico', 'public_wage_employment'),
