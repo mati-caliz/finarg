@@ -14,25 +14,6 @@ permissions:
   security-events: write
 
 jobs:
-  # CodeQL requires GitHub Advanced Security (paid feature for private repos)
-  # Disabled for now - enable when repo is public or has Advanced Security
-  # codeql:
-  #   name: CodeQL Analysis
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       language: ['java', 'javascript']
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #     - name: Initialize CodeQL
-  #       uses: github/codeql-action/init@v3
-  #       with:
-  #         languages: ${{ matrix.language }}
-  #     - name: Perform CodeQL Analysis
-  #       uses: github/codeql-action/analyze@v3
-
   trivy-backend:
     name: Trivy - Backend Docker Image
     runs-on: ubuntu-latest
@@ -47,7 +28,8 @@ jobs:
       - name: Build backend image with cache
         uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5
         with:
-          context: ./api
+          context: .
+          file: api-py/Dockerfile
           push: false
           load: true
           tags: api:scan
@@ -81,10 +63,7 @@ jobs:
           load: true
           tags: web:scan
           build-args: |
-            NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-            NEXT_PUBLIC_GOOGLE_CLIENT_ID=dummy-client-id
             NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-            BACKEND_URL=http://localhost:8080
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
