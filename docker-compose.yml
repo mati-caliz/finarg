@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     container_name: labrecha-postgres
     environment:
-      POSTGRES_DB: ${DB_NAME:-finarg}
-      POSTGRES_USER: ${DB_USERNAME:-finarg}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-finarg123}
+      POSTGRES_DB: ${DB_NAME:-labrecha}
+      POSTGRES_USER: ${DB_USERNAME:-labrecha}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-labrecha123}
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
@@ -13,7 +13,7 @@ services:
     networks:
       - labrecha-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-finarg}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-labrecha}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -67,7 +67,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-finarg}:${DB_PASSWORD:-finarg123}@postgres:5432/${DB_NAME:-finarg}
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-labrecha}:${DB_PASSWORD:-labrecha123}@postgres:5432/${DB_NAME:-labrecha}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001}
       ADMIN_TOKEN: ${ADMIN_TOKEN:-}
     ports:
@@ -102,7 +102,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-finarg}:${DB_PASSWORD:-finarg123}@postgres:5432/${DB_NAME:-finarg}
+      DATABASE_URL: postgresql+psycopg2://${DB_USERNAME:-labrecha}:${DB_PASSWORD:-labrecha123}@postgres:5432/${DB_NAME:-labrecha}
       HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
       HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
     networks:
