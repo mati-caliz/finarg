@@ -18,11 +18,20 @@ El nombre juega con el doble sentido: brecha cambiaria + brecha entre mediciones
 Monorepo de tres piezas; **PostgreSQL es el contrato** entre ellas (sin colas ni mensajería):
 
 ```
+shared/    Paquete `labrecha_db`: los modelos SQLAlchemy (única definición del esquema)
+           y las migraciones Alembic. Lo instalan tanto el scraper como la API.
 scraper/   Python (SQLAlchemy + httpx + pydantic). Un conector = un módulo en
            labrecha_scraper/connectors/. Corridos por cron, escriben a Postgres.
 api-py/    FastAPI de solo lectura sobre Postgres + calculadoras. Sin estado, sin auth.
 web/       Next.js 16 (App Router) + React 18 + TS + Tailwind + Recharts.
 ```
+
+Los modelos viven **sólo** en `shared/labrecha_db/models.py`: ni el scraper ni la API definen
+tablas propias. Todo cambio de esquema va con una migración Alembic
+(`shared/labrecha_db/migrations/versions/`), que se aplica con `labrecha-scraper db upgrade`
+(el deploy la corre antes de levantar los servicios). Como el contexto de build de las imágenes
+Python es la raíz del repo (necesitan `shared/`), los Dockerfiles se referencian como
+`dockerfile: api-py/Dockerfile` / `scraper/Dockerfile`.
 
 No hay backend Java ni Redis: el stack Spring original fue retirado por completo.
 
@@ -45,8 +54,23 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 - Consume la FastAPI vía un **proxy same-origin (BFF)**: el navegador pega a `/api/data/...` y el
   route handler `src/app/api/data/[...path]/route.ts` proxya a la FastAPI
   (`LABRECHA_API_INTERNAL_URL`, default `api-py:8000`) con caché ISR por ruta (GET) y reenvío de POST
-  (calculadoras). El cliente axios está en `src/lib/labrechaApi.ts`; los hooks TanStack Query en
-  `src/hooks/useLabrecha.ts`.
+  (calculadoras). El cliente de datos está en `src/lib/labrechaApi.ts` y es **isomórfico**: en el
+  navegador pega al proxy con axios, y en el servidor va directo a la FastAPI vía `serverGet`
+  (`src/lib/serverApi.ts`), sin el salto extra del BFF y con la caché de datos de Next. Los TTL por
+  ruta son únicos y viven en `src/lib/cacheRules.ts` (los usan el proxy y `serverGet`).
+- **Datos en el servidor:** cada `page.tsx` es un Server Component que prefetchea sus queries y las
+  hidrata con `<PrefetchedQueries>` (`src/lib/prefetch.tsx`); los componentes siguen siendo client
+  components con `useQuery` y reciben la data ya cacheada, así que el HTML sale con contenido real
+  (no skeletons) y las páginas se prerenderizan con ISR. Para que la clave del prefetch no pueda
+  divergir de la del hook, ambas salen de las mismas factorías en `src/lib/queries.ts`; qué queries
+  necesita cada ruta está en `src/lib/pageQueries.ts` y los parámetros compartidos en
+  `src/lib/queryParams.ts` (módulo plano: un `"use client"` exporta referencias, no valores, así que
+  las constantes que lee el servidor **no** pueden vivir en un componente cliente). Los hooks de
+  `src/hooks/useLabrecha.ts` son la cara cliente de esas mismas factorías.
+- **SEO:** JSON-LD en `src/lib/structuredData.ts` (`WebSite` en el layout, `Dataset` +
+  `BreadcrumbList` por indicador, `Article` por idea), emitido con `<JsonLd>`, que escapa
+  `<`/`>`/`&` a `\uXXXX` para poder inyectarlo como texto (biome tiene `security: all`, así que no
+  se usa `dangerouslySetInnerHTML`).
 - **Sistema de diseño:** dirección **"Editorial"** (periodística de datos) de Claude Design. Los
   tokens `oklch` (light + dark) viven en `src/app/globals.css`, bloque "Design system v2":
   superficies `--paper`/`--surface`/`--raise`, tinta `--ink`/`--ink2`/`--ink3`, líneas
@@ -92,11 +116,16 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 ## Verificación
 
 - Frontend (`cd web`): `npx tsc --noEmit`, `npm run lint:check` (Biome, no ESLint), `npm run build`.
-- API/scraper: `ruff check api-py/labrecha_api scraper/labrecha_scraper` + `ruff format --check` (la
-  config de `ruff.toml` es estricta: casi todas las familias de reglas), y byte-compile con
-  `python -m compileall labrecha_api` / `labrecha_scraper`.
+- API/scraper/shared: `ruff check api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db`
+  + `ruff format --check` (la config de `ruff.toml` es estricta: casi todas las familias de reglas),
+  y byte-compile con `python -m compileall` sobre esos tres paquetes.
 - Datos: el scraper corre con `python -m labrecha_scraper run <job|all>` (ver `list`, `status`,
-  `seed-events`, `init-db`); Postgres del volumen compartido en el puerto 5433 en local.
+  `seed-events`); el esquema se crea/actualiza con `db upgrade` y se audita con `db check`
+  (compara la base real contra los modelos). Postgres en el puerto 5433 en local.
+  Una base preexistente creada con el viejo `create_all` la adopta el propio `db upgrade`: si no
+  tiene `alembic_version` pero su esquema es idéntico a los modelos, la marca en la revisión actual
+  en vez de re-crear tablas; si difiere, corta y lista las diferencias en vez de migrar a ciegas
+  (`db stamp --force` fuerza la marca).
 - `docker compose up -d` levanta postgres + api-py + web; el scraper corre on-demand
   (`docker compose run --rm scraper <job>`).
 

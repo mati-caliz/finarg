@@ -1,53 +1,39 @@
 # TODO La Brecha
 
-## POST MVP
+Ideas para después del MVP. Lo que se descartó en el pivot desde FinArg (otros países, sistema de
+usuarios, monetización por suscripción, módulo de inversiones) no vuelve a esta lista: está en
+`ROADMAP.md` con el motivo de la baja.
 
-- [ ] **Calculadora de Interés Compuesto**: Herramienta para calcular rendimientos con reinversión de intereses.
+## Datos e indicadores
 
-- [ ] **Agregar funcionalidades para otros países**: Expandir features y datos para los países ya soportados (Colombia, Brasil, Chile, Uruguay) y evaluar nuevos mercados.
+- [ ] **Evolución del salario mínimo**: histórico ajustado por inflación.
+- [ ] **Evolución de las jubilaciones**: haberes y poder adquisitivo en el tiempo.
+- [ ] **Salarios promedio por sector**: estadísticas por rama de actividad.
+- [ ] **Reservas netas sin overrides**: hoy el valor mezcla fuentes; separar la serie neta propia.
+- [ ] **Tablero de reservas vs. base monetaria**: relación entre reservas del BCRA y emisión.
+- [ ] **Tablero de riesgo país y bonos**: spreads, rendimientos y ratings.
+- [ ] **Calendario económico**: fechas de publicación (IPC, PBI, tasas, EMAE).
+- [ ] **Índice de paridad de poder adquisitivo regional**: costo de vida comparado entre provincias.
 
-- [ ] **Integrar más billeteras virtuales**: Explorar otros endpoints de api.argentinadatos.com para incluir más billeteras en el comparador de tasas. *(RatesService.java)*
+## Producto
 
-- [ ] **Reservas netas sin APIs externas**: Implementar una forma de obtener solo los datos hardcodeados de reservas netas (sin overrides de APIs externas). *(ReservesService.java)*
+- [ ] **Brechas automáticas**: derivar las brechas de todo `indicator_code` con ≥2 `source` en vez
+      de la lista curada de `web/src/lib/gaps.ts`.
+- [ ] **Series anotadas por gestión**: inflación acumulada por gobierno, variación desde un evento.
+- [ ] **Página de metodología y fuentes**: qué mide cada indicador, cadencia y de dónde sale.
+- [ ] **Semáforo público de frescura**: exponer por serie lo que ya calcula `lib/freshness.ts`.
+- [ ] **API pública documentada**: la FastAPI ya es de sólo lectura; falta rate limiting y docs.
+- [ ] **Alertas por email/RSS**: aviso cuando una brecha supera un umbral (sin cuentas de usuario).
 
-- [ ] **Conversor de Monedas en Tiempo Real**: Conversión entre múltiples monedas con tasas actualizadas.
+## Herramientas
 
-- [ ] **Calculadora de Poder de Compra Histórico**: Ver cuánto valía una suma de dinero en el pasado vs hoy.
+- [ ] **Calculadora de poder de compra histórico**: cuánto valía una suma en el pasado vs. hoy.
+- [ ] **Conversor de monedas**: conversión con las cotizaciones ya ingeridas.
+- [ ] **Simulador de inversiones**: proyección de carteras en el tiempo.
 
-- [ ] **Optimización de Impuestos**: Calculadora para planificación fiscal y deducciones.
+## Calidad
 
-- [ ] **Simulador de Inversiones en el Tiempo**: Proyección de carteras con diferentes instrumentos.
-
-- [ ] **Heatmap de Inversiones**: Mapa de calor mostrando performance de diferentes activos.
-
-- [ ] **Tablero de Riesgo País y Bonos**: Dashboard con spreads, rendimientos y ratings.
-
-- [ ] **Índice Big Mac**: Paridad de poder adquisitivo basada en el índice Big Mac.
-
-- [ ] **Índice de Paridad de Poder Adquisitivo Regional**: Comparación del costo de vida entre regiones.
-
-- [ ] **Calendario Económico**: Fechas importantes (inflación, tasas, PBI, etc.).
-
-- [ ] **Salarios Promedios**: Estadísticas de salarios por sector/profesión.
-
-- [ ] **Evolución del Salario Mínimo**: Gráficos históricos del salario mínimo ajustado por inflación.
-
-- [ ] **Evolución de las Jubilaciones**: Histórico de haberes jubilatorios y poder adquisitivo.
-
-- [ ] **Tablero de Reservas vs Base Monetaria**: Relación entre reservas del BCRA y emisión monetaria.
-
-- [ ] **IA Predictora de Inflación**: Modelo de ML para predecir la inflación del mes actual basado en datos históricos.
-
-- [ ] **Alertas Personalizadas**: Sistema de notificaciones cuando se cumplen condiciones (ej: dólar > X, brecha > Y%).
-
-- [ ] **API Pública/Privada Monetizable**: Endpoints para terceros con diferentes tiers de acceso (free/premium).
-
-- [ ] **Temas y personalización**: Permitir más opciones de customización visual.
-
-- [ ] **Sistema de usuarios**: Registro, login, portfolios personalizados.
-
-- [ ] **Dashboard personalizable**: Widgets arrastrables y configurables.
-
-- [ ] **Módulo de inversiones inmobiliarias (Real State Intelligence)**: Calculadoras y comparadores de propiedades, con ROI para comprar y alquilar, IA que diga un resumen de estado, comparador de m2, etc.
-
-- [ ] **UX 2.0**: Mejorar toda la UX de la página.
+- [ ] **Tests de la lógica de plata**: `income_tax.py` y `tax_impact.py` no tienen tests.
+- [ ] **Correr los tests en CI**: los de Jest existen pero no los ejecuta nadie; el CI además sólo
+      dispara en pull request y los commits van directo a `main`.
+- [ ] **UX 2.0**: repaso general de la experiencia.
