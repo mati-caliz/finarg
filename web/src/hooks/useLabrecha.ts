@@ -30,7 +30,7 @@ export function useIndicators() {
 }
 
 export function useIndicatorSeries(code: string, params?: IndicatorSeriesParams) {
-  return useQuery({ ...indicatorSeriesQuery(code, params), enabled: code.length > 0 });
+  return useQuery({ ...indicatorSeriesQuery(code, params), enabled: Boolean(code) });
 }
 
 export function useIndicatorSeriesMulti(
@@ -41,7 +41,7 @@ export function useIndicatorSeriesMulti(
   return useQueries({
     queries: sources.map((source) => ({
       ...indicatorSeriesQuery(code, { ...params, source }),
-      enabled: code.length > 0,
+      enabled: Boolean(code),
     })),
   });
 }
@@ -55,7 +55,7 @@ export function useLegLatest(legs: { code: string; source: string }[]) {
 }
 
 export function useIndicatorSources(code: string) {
-  return useQuery({ ...indicatorSourcesQuery(code), enabled: code.length > 0 });
+  return useQuery({ ...indicatorSourcesQuery(code), enabled: Boolean(code) });
 }
 
 export function usePoliticalEvents(params?: PoliticalEventsParams) {
@@ -88,7 +88,7 @@ export function useCongressAttendance() {
 }
 
 export function useCongressVote(voteRecordId: string) {
-  return useQuery({ ...congressVoteQuery(voteRecordId), enabled: voteRecordId.length > 0 });
+  return useQuery({ ...congressVoteQuery(voteRecordId), enabled: Boolean(voteRecordId) });
 }
 
 export function useCongressVoteDetails(
@@ -97,7 +97,7 @@ export function useCongressVoteDetails(
 ) {
   return useQuery({
     ...congressVoteDetailsQuery(voteRecordId, params),
-    enabled: voteRecordId.length > 0,
+    enabled: Boolean(voteRecordId),
   });
 }
 
@@ -127,7 +127,7 @@ export function usePosts(params?: { category?: PostCategory; limit?: number; off
 }
 
 export function usePost(slug: string) {
-  return useQuery({ ...postQuery(slug), enabled: slug.length > 0 });
+  return useQuery({ ...postQuery(slug), enabled: Boolean(slug) });
 }
 
 export function useBoletinSummaries(params?: {
