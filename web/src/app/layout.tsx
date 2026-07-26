@@ -7,9 +7,7 @@ import { CafecitoModal } from "@/components/CafecitoModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { JsonLd } from "@/components/JsonLd";
 import { ServiceWorkerRegistration } from "@/components/ServiceWorkerRegistration";
-import { CommandPalette } from "@/components/layout/CommandPalette";
-import { SiteFooter } from "@/components/layout/SiteFooter";
-import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { layoutQueries } from "@/lib/pageQueries";
 import { PrefetchedQueries } from "@/lib/prefetch";
 import { SITE_URL } from "@/lib/site";
@@ -120,21 +118,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
         <Providers>
           <PrefetchedQueries queries={layoutQueries()}>
-            <div
-              className="min-h-screen"
-              style={{
-                background: "var(--paper)",
-                color: "var(--ink)",
-                fontFamily: "var(--font-serif)",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <SiteHeader />
-              <main style={{ flex: 1 }}>{children}</main>
-              <SiteFooter />
-            </div>
-            <CommandPalette />
+            <SiteChrome>{children}</SiteChrome>
           </PrefetchedQueries>
           <CafecitoModal />
         </Providers>
