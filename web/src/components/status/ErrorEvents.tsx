@@ -7,7 +7,6 @@ import type { ErrorEvent } from "@/lib/labrechaApi";
 
 const MONO = "var(--font-jb-mono)";
 const SKELETON_KEYS = ["e1", "e2", "e3"];
-const STACK_PREVIEW_LINES = 3;
 
 const ORIGIN_LABELS: Record<string, string> = {
   api: "API",
@@ -36,13 +35,6 @@ function relativeTime(iso: string): string {
   }
   const days = Math.floor(hours / 24);
   return `hace ${days} día${days === 1 ? "" : "s"}`;
-}
-
-function stackPreview(stack: string | null): string {
-  if (stack === null) {
-    return "";
-  }
-  return stack.split("\n").slice(0, STACK_PREVIEW_LINES).join("\n");
 }
 
 function ErrorRow({ event }: { event: ErrorEvent }) {
@@ -82,20 +74,6 @@ function ErrorRow({ event }: { event: ErrorEvent }) {
         <div style={{ fontFamily: MONO, fontSize: "0.68rem", color: "var(--ink3)" }}>
           {event.path}
         </div>
-      )}
-      {event.stack === null ? null : (
-        <pre
-          style={{
-            fontFamily: MONO,
-            fontSize: "0.6875rem",
-            color: "var(--ink3)",
-            margin: 0,
-            whiteSpace: "pre-wrap",
-            wordBreak: "break-word",
-          }}
-        >
-          {stackPreview(event.stack)}
-        </pre>
       )}
     </div>
   );

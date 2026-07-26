@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     log_dir: str = ""
     log_max_bytes: int = 5_000_000
     log_backup_count: int = 5
+    error_retention_days: int = 90
+    error_max_rows: int = 5000
 
 
 settings = Settings()

@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 
 const JSON_CONTENT_TYPE = "application/json";
 const CLIENT_IP_HEADERS = ["x-real-ip", "x-forwarded-for"];
+const WRITABLE_PATHS = new Set(["errors"]);
 
 function clientHeaders(request: NextRequest, accept: string): HeadersInit {
   const headers: Record<string, string> = { Accept: accept };
@@ -62,6 +63,9 @@ export async function POST(
 ) {
   const { path } = await params;
   const pathStr = path.join("/");
+  if (!WRITABLE_PATHS.has(pathStr)) {
+    return Response.json({ error: "Not found" }, { status: 404 });
+  }
   const url = `${getBackendUrl()}/${pathStr}`;
   const body = await request.text();
 

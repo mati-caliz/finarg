@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 from alembic import command
@@ -7,11 +9,21 @@ from alembic.autogenerate import compare_metadata
 from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.script import ScriptDirectory
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import Connection, create_engine, inspect
 
 from labrecha_db.models import Base
 
 MIGRATIONS_PATH = Path(__file__).resolve().parent / "migrations"
+
+
+@contextmanager
+def _connection(database_url: str) -> Iterator[Connection]:
+    engine = create_engine(database_url)
+    try:
+        with engine.connect() as connection:
+            yield connection
+    finally:
+        engine.dispose()
 
 
 def build_config(database_url: str) -> Config:
@@ -26,8 +38,7 @@ def upgrade(database_url: str, revision: str = "head") -> None:
 
 
 def has_managed_tables(database_url: str) -> bool:
-    engine = create_engine(database_url)
-    with engine.connect() as connection:
+    with _connection(database_url) as connection:
         existing = set(inspect(connection).get_table_names())
     return any(table in existing for table in Base.metadata.tables)
 
@@ -37,8 +48,7 @@ def stamp(database_url: str, revision: str = "head") -> None:
 
 
 def current_revision(database_url: str) -> str | None:
-    engine = create_engine(database_url)
-    with engine.connect() as connection:
+    with _connection(database_url) as connection:
         return MigrationContext.configure(connection).get_current_revision()
 
 
@@ -47,9 +57,8 @@ def head_revision() -> str | None:
 
 
 def describe_schema_drift(database_url: str) -> list[str]:
-    engine = create_engine(database_url)
     drift: list[str] = []
-    with engine.connect() as connection:
+    with _connection(database_url) as connection:
         context = MigrationContext.configure(connection)
         for difference in compare_metadata(context, Base.metadata):
             description = _describe(difference)

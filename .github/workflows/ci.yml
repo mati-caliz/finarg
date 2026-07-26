@@ -90,6 +90,23 @@ jobs:
     needs: changes
     if: needs.changes.outputs.python == 'true'
 
+    # Los tests de la API y de las migraciones corren contra un Postgres real: son los que
+    # verifican el SQL de los routers y que el esquema migrado coincida con los modelos.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: labrecha
+          POSTGRES_PASSWORD: labrecha123
+          POSTGRES_DB: labrecha
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U labrecha"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -111,10 +128,15 @@ jobs:
       - name: Byte-compile sources
         run: python -m compileall -q api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db
 
-      - name: Install API and shared packages
-        run: pip install ./shared "./api-py[dev]"
+      - name: Install API, scraper and shared packages
+        run: pip install "./shared[migrations]" "./api-py[dev]" ./scraper
 
       - name: Tests (pytest)
+        # REQUIRE_TEST_DATABASE=1 hace que la suite falle en vez de saltearse si no hay
+        # Postgres: en CI el skip silencioso sería peor que no tener los tests.
+        env:
+          REQUIRE_TEST_DATABASE: '1'
+          TEST_DATABASE_URL: postgresql+psycopg2://labrecha:labrecha123@localhost:5433/labrecha_test
         run: python -m pytest api-py/tests
 
   summary:

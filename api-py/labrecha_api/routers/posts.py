@@ -1,23 +1,17 @@
 from __future__ import annotations
 
-import secrets
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from labrecha_db import Post
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from labrecha_api.config import settings
+from labrecha_api.admin_auth import require_admin
 from labrecha_api.db import get_session
 from labrecha_api.schemas import PostCategory, PostCreate, PostImpact, PostOut, PostUpdate
 
 router = APIRouter(prefix="/posts", tags=["posts"])
-
-
-def require_admin(x_admin_token: str = Header(default="")) -> None:
-    if not settings.admin_token or not secrets.compare_digest(x_admin_token, settings.admin_token):
-        raise HTTPException(status_code=401, detail="No autorizado")
 
 
 def to_post_out(post: Post) -> PostOut:
