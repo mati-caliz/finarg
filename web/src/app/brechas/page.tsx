@@ -2,15 +2,23 @@ import { GapComparison } from "@/components/indicator/GapComparison";
 import { GapRankList } from "@/components/indicator/GapRankList";
 import { SourceGapList } from "@/components/indicator/SourceGapList";
 import { GAPS } from "@/lib/gaps";
+import type { SourceGap } from "@/lib/labrechaApi";
 import { gapsQueries } from "@/lib/pageQueries";
 import { PrefetchedQueries } from "@/lib/prefetch";
+import { sourceGapsQuery } from "@/lib/queries";
+import { gapsDescription } from "@/lib/seoDescriptions";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Brechas entre mediciones - La Brecha",
-  description:
-    "La brecha cambiaria, la brecha financiera, la inflación esperada vs. medida y las reservas según distintas fuentes: dos series superpuestas con su discrepancia, fuente y fecha.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const gaps = await sourceGapsQuery()
+    .queryFn()
+    .catch(() => [] as SourceGap[]);
+  return {
+    title: "Brechas entre mediciones - La Brecha",
+    description: gapsDescription(gaps),
+    alternates: { canonical: "/brechas" },
+  };
+}
 
 export default function GapsPage() {
   return (
