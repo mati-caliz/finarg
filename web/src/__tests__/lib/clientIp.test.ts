@@ -29,9 +29,7 @@ describe("clientIp", () => {
   it("cannot be split into many clients by a forged forwarded for", () => {
     const keys = new Set(
       Array.from({ length: 50 }, (_unused, attempt) =>
-        clientIp(
-          requestWith({ "x-real-ip": REAL_CLIENT, "x-forwarded-for": `10.0.0.${attempt}` }),
-        ),
+        clientIp(requestWith({ "x-real-ip": REAL_CLIENT, "x-forwarded-for": `10.0.0.${attempt}` })),
       ),
     );
 
