@@ -58,10 +58,10 @@ def _parse_date(raw: str | None) -> datetime:
         except (TypeError, ValueError):
             pass
         else:
-            if parsed.tzinfo is not None:
-                parsed = parsed.astimezone(UTC).replace(tzinfo=None)
-            return parsed
-    return datetime.now(UTC).replace(tzinfo=None)
+            return (
+                parsed.astimezone(UTC) if parsed.tzinfo is not None else parsed.replace(tzinfo=UTC)
+            )
+    return datetime.now(UTC)
 
 
 class NewsConnector(Connector):
@@ -89,7 +89,7 @@ class NewsConnector(Connector):
         response.raise_for_status()
         root = ElementTree.fromstring(response.content)
 
-        now = datetime.now(UTC).replace(tzinfo=None)
+        now = datetime.now(UTC)
         rows: list[dict] = []
         for item in list(root.iter("item"))[:MAX_ITEMS_PER_FEED]:
             title = _strip_html(item.findtext("title"))
