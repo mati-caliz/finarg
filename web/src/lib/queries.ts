@@ -44,6 +44,7 @@ export const labrechaKeys = {
   errorEvents: (params?: object) => ["labrecha", "errors", params ?? {}] as const,
   scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
   sourceGaps: (params?: object) => ["labrecha", "gaps", params ?? {}] as const,
+  gapHistory: (code: string) => ["labrecha", "gap-history", code] as const,
   indicatorVariation: (code: string, params: object) =>
     ["labrecha", "indicator-variation", code, params] as const,
   indicatorTerms: (code: string, params?: object) =>
@@ -196,6 +197,11 @@ export const rentByNeighborhoodQuery = () => ({
 export const sourceGapsQuery = (params?: { limit?: number; min_sources?: number }) => ({
   queryKey: labrechaKeys.sourceGaps(params),
   queryFn: () => gapsApi.list(params),
+});
+
+export const gapHistoryQuery = (code: string) => ({
+  queryKey: labrechaKeys.gapHistory(code),
+  queryFn: () => gapsApi.history(code),
 });
 
 export const indicatorVariationQuery = (

@@ -22,6 +22,7 @@ import {
   scrapeRunsQuery,
   senateBlocsQuery,
   senateMembersQuery,
+  gapHistoryQuery,
   sourceGapsQuery,
   taxChangesQuery,
 } from "@/lib/queries";
@@ -169,6 +170,10 @@ export function useRentByNeighborhood() {
 
 export function useSourceGaps(params?: { limit?: number; min_sources?: number }) {
   return useQuery(sourceGapsQuery(params));
+}
+
+export function useGapHistory(code: string) {
+  return useQuery({ ...gapHistoryQuery(code), enabled: Boolean(code) });
 }
 
 export function useIndicatorTerms(code: string, params?: { source?: string }) {
