@@ -364,6 +364,32 @@ class PostUpdate(BaseModel):
     published: bool | None = None
 
 
+class ErrorOrigin(StrEnum):
+    API = "api"
+    WEB_SERVER = "web-server"
+    WEB_BROWSER = "web-browser"
+
+
+class ErrorReportIn(BaseModel):
+    origin: ErrorOrigin
+    kind: str = Field(min_length=1, max_length=160)
+    message: str = Field(min_length=1, max_length=2000)
+    stack: str | None = Field(default=None, max_length=8000)
+    path: str | None = Field(default=None, max_length=300)
+
+
+class ErrorEventOut(BaseModel):
+    fingerprint: str
+    origin: str
+    kind: str
+    message: str
+    stack: str | None
+    path: str | None
+    occurrences: int
+    first_seen_at: datetime
+    last_seen_at: datetime
+
+
 class GapMeasurement(BaseModel):
     source: str
     value: Decimal

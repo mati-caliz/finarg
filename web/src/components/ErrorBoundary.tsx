@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { reportError } from "@/lib/errorReporter";
 import { AlertTriangle, Home, RefreshCw } from "lucide-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
@@ -37,6 +38,8 @@ export class ErrorBoundary extends Component<Props, State> {
     if (process.env.NODE_ENV === "development") {
       console.error("ErrorBoundary caught an error:", error);
       console.error("Component stack:", errorInfo.componentStack);
+    } else {
+      void reportError("web-browser", error, window.location.pathname);
     }
 
     this.props.onError?.(error, errorInfo);

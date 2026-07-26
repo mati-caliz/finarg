@@ -36,3 +36,17 @@ export async function serverGet<T>(path: string, revalidate?: number): Promise<T
   }
   return res.json() as Promise<T>;
 }
+
+export async function serverPost<T>(path: string, body: unknown): Promise<T> {
+  const normalized = path.replace(LEADING_SLASH, "");
+  const res = await fetch(`${getBackendUrl()}/${normalized}`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    throw new Error(`Backend responded ${res.status} for ${path}`);
+  }
+  return res.json() as Promise<T>;
+}
