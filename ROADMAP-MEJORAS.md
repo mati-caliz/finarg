@@ -279,19 +279,6 @@ cookie).
 **Criterio de salida.** N intentos fallidos bloquean temporalmente; una sesión vieja deja de valer
 sin tocar la password.
 
-### 4.c — El LLM deja de depender del CLI del host
-
-**Problema.** `scraper/labrecha_scraper/llm.py` invoca el binario `claude` por `subprocess` desde un
-cron de producción: depende de un CLI con auth interactiva instalado en el host, sin reintentos, sin
-control de costo y con parseo de JSON a mano sobre stdout.
-
-**Trabajo.** Migrar a la API de Anthropic con API key por variable de entorno (`ANTHROPIC_API_KEY`),
-con reintento y timeout explícitos. Afecta a `connectors/official_gazette.py` y
-`connectors/congress_summaries.py`, que ya aíslan bien la llamada detrás de `run_claude_json_array`.
-
-**Criterio de salida.** El scraper corre los conectores con IA en un contenedor limpio, sin el CLI
-instalado.
-
 ### 4.d — Observabilidad
 
 **Problema.** No hay ningún reporte de errores; `lib/logger.ts` no hace nada en producción. Un error
