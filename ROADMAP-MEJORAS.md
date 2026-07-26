@@ -27,7 +27,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | ~~3~~ | ~~Superficies muertas: service worker, manifest~~ ✅ | Bajo | Medio — el PWA está roto y nadie se entera |
 | 4 | Seguridad e infraestructura — 4.a/4.b ✅, 4.c y 4.d pendientes (decisión del usuario) | Medio | Medio |
 | ~~5~~ | ~~SEO y distribución~~ ✅ | Bajo | Medio — contenido que Google no ve |
-| 6 | Producto: recurrencia | Alto | — (es crecimiento, no deuda) |
+| 6 | Producto: recurrencia — 6.b/6.c ✅, 6.a omitida (falta dominio que pueda enviar mail) | Alto | — (es crecimiento, no deuda) |
 | 7 | Deuda de código | Bajo | Bajo |
 
 ---
@@ -401,20 +401,27 @@ VPS.
 
 ---
 
-## Fase 6 — Producto: recurrencia
+## Fase 6 — Producto: recurrencia (6.b y 6.c hechas, 2026-07-26)
 
-La plataforma tiene profundidad de datos; lo que no tiene es motivo para volver. Todo esto se apoya
-en datos ya ingeridos.
+La plataforma tiene profundidad de datos; lo que no tiene es motivo para volver. Todo esto se apoya en
+datos ya ingeridos. 6.c se apoya además en 6.b: la lectura post-votación usa el mismo endpoint de
+variación, así que el método de acumulación es uno solo en todo el producto.
 
-### 6.a — Alertas por email
+### 6.a — Alertas por email ⏸️ omitida por ahora (2026-07-26)
 
-Ya está en `TODO.md`. Con RSS solamente, la recurrencia depende de un lector que casi nadie usa.
-Necesita SMTP, tabla de suscriptores, doble opt-in y baja en un click. El contenido puede ser un
-digest semanal armado sobre lo que ya existe: movimiento de las brechas curadas, indicadores que
-cambiaron, novedades del Boletín. **Sin auth**: la suscripción es un email, no una cuenta — no
-reabre nada de lo podado en la Fase 0 del pivot.
+**Bloqueante encontrado al ir a hacerla.** El doble opt-in y el digest necesitan un dominio que pueda
+enviar mail, y **`labrecha.ar` todavía no resuelve** (sin registro A; el nginx sigue sirviendo
+`finlatamio.com`). Mandar desde un dominio sin SPF/DKIM/DMARC alineado significa que el digest cae en
+spam: sería estrenar otra superficie muerta, justo lo que esta auditoría vino a cerrar. Se necesita
+además elegir proveedor SMTP y cargar su credencial.
 
-**Criterio de salida.** Alguien se suscribe, recibe el digest y se puede dar de baja sin escribirnos.
+**Decisión del usuario:** omitirla hasta que exista el dominio. El diseño planificado sigue en pie
+(tabla de suscriptores, doble opt-in, baja en un click, digest semanal armado sobre lo que ya existe:
+movimiento de las brechas curadas, indicadores que cambiaron, novedades del Boletín; **sin auth**, la
+suscripción es un email y no una cuenta).
+
+**Criterio de salida (pendiente).** Alguien se suscribe, recibe el digest y se puede dar de baja sin
+escribirnos.
 
 ### 6.b — Variación desde un evento puntual ✅ (2026-07-26)
 
