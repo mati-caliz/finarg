@@ -1,6 +1,8 @@
 /**
  * @jest-environment node
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import nextConfig from "../../next.config.js";
 
 interface HeaderRule {
@@ -20,6 +22,33 @@ const REQUIRED_KEYS = [
 ];
 
 const FRAME_ANCESTORS = /frame-ancestors [^;]*/;
+const IMG_SRC = /img-src ([^;"]*)/;
+
+const NGINX_CONF_PATH = join(__dirname, "..", "..", "..", "nginx", "nginx.conf");
+const SITE_SERVER_NAME = "finlatamio.com";
+const NEWS_IMAGE_HOST = "https://statics.eleconomista.com.ar";
+const IMG_SRC_KEYWORDS = ["'self'", "data:"];
+
+function imageHostsOf(csp: string | undefined): string[] {
+  const directive = csp?.match(IMG_SRC)?.[1] ?? "";
+  return directive
+    .trim()
+    .split(/\s+/)
+    .filter((token) => token.length > 0 && !IMG_SRC_KEYWORDS.includes(token));
+}
+
+function nginxSiteImageHosts(): string[] {
+  const conf = readFileSync(NGINX_CONF_PATH, "utf8");
+  const siteBlock = conf
+    .split(/^\s*server\s*\{/m)
+    .find((block) => block.includes(`server_name ${SITE_SERVER_NAME}`) && block.includes("443 ssl"));
+  if (siteBlock === undefined) {
+    throw new Error(
+      `nginx.conf ya no tiene el server HTTPS de ${SITE_SERVER_NAME}: los dos CSP tienen que coincidir`,
+    );
+  }
+  return imageHostsOf(siteBlock);
+}
 
 function rulesFor(rules: HeaderRule[], pathname: string): HeaderRule[] {
   const embedded = pathname.startsWith("/embed/");
@@ -67,6 +96,20 @@ describe("the security headers of every route", () => {
       for (const required of REQUIRED_KEYS) {
         expect(keys).toContain(required);
       }
+    }
+  });
+
+  it("lets the nginx CSP load every image host the app declares, since the browser intersects both", () => {
+    const declared = imageHostsOf(
+      rulesFor(rules, "/noticias")[0]?.headers.find(
+        (header) => header.key === "Content-Security-Policy",
+      )?.value,
+    );
+    const allowedByNginx = nginxSiteImageHosts();
+
+    expect(declared).toContain(NEWS_IMAGE_HOST);
+    for (const host of declared) {
+      expect(allowedByNginx).toContain(host);
     }
   });
 
