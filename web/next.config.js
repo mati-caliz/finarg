@@ -43,6 +43,16 @@ const securityHeaders = [
   },
 ];
 
+const FRAME_ANCESTORS = /frame-ancestors [^;]+/;
+
+// Los /embed/* son para incrustar en cualquier sitio: se les afloja frame-ancestors y se
+// les saca el X-Frame-Options. El resto de las cabeceras de seguridad se mantiene igual.
+const embedHeaders = securityHeaders.map((header) =>
+  header.key === "Content-Security-Policy"
+    ? { key: header.key, value: header.value.replace(FRAME_ANCESTORS, "frame-ancestors *") }
+    : header,
+);
+
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
@@ -97,7 +107,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
+        source: "/embed/:path*",
+        headers: embedHeaders,
+      },
+      {
+        source: "/:path((?!embed/).*)",
         headers: securityHeaders,
       },
       {
