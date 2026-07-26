@@ -3,6 +3,7 @@ import {
   type PoliticalEventsParams,
   type PostCategory,
   congressApi,
+  errorsApi,
   gapsApi,
   gazetteApi,
   holidaysApi,
@@ -40,6 +41,7 @@ export const labrechaKeys = {
   revenueSharing: ["labrecha", "revenue-sharing"] as const,
   taxChanges: (params?: object) => ["labrecha", "taxes", "changes", params ?? {}] as const,
   rentByNeighborhood: ["labrecha", "housing", "rent-by-neighborhood"] as const,
+  errorEvents: (params?: object) => ["labrecha", "errors", params ?? {}] as const,
   scrapeRuns: (params?: object) => ["labrecha", "scrape-runs", params ?? {}] as const,
   sourceGaps: (params?: object) => ["labrecha", "gaps", params ?? {}] as const,
   indicatorVariation: (code: string, params: object) =>
@@ -174,6 +176,11 @@ export const taxChangesQuery = (params?: {
 }) => ({
   queryKey: labrechaKeys.taxChanges(params),
   queryFn: () => taxesApi.changes(params),
+});
+
+export const errorEventsQuery = (params?: { limit?: number }) => ({
+  queryKey: labrechaKeys.errorEvents(params),
+  queryFn: () => errorsApi.list(params),
 });
 
 export const scrapeRunsQuery = (params?: { limit?: number }) => ({

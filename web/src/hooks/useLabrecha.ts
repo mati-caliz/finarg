@@ -5,6 +5,7 @@ import {
   congressVoteDetailsQuery,
   congressVoteQuery,
   congressVotesQuery,
+  errorEventsQuery,
   gazetteSummariesQuery,
   holidaysQuery,
   indicatorSeriesQuery,
@@ -152,6 +153,10 @@ export function useTaxChanges(params?: {
   offset?: number;
 }) {
   return useQuery(taxChangesQuery(params));
+}
+
+export function useErrorEvents(params?: { limit?: number }) {
+  return useQuery(errorEventsQuery(params));
 }
 
 export function useScrapeRuns(params?: { limit?: number }) {

@@ -1,12 +1,20 @@
-from fastapi import FastAPI
+import logging
+import traceback
+
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from labrecha_api.config import settings
+from labrecha_api.db import SessionLocal
+from labrecha_api.error_events import record_error
 from labrecha_api.rate_limit import RateLimitMiddleware
 from labrecha_api.routers import (
     calculators,
     congress,
+    errors,
     events,
     gaps,
     gazette,
@@ -48,6 +56,7 @@ TAGS_METADATA = [
     {"name": "political-events", "description": "Hitos políticos para anotar las series."},
     {"name": "congress", "description": "Votaciones nominales de Diputados y leyes sancionadas."},
     {"name": "status", "description": "Salud del pipeline de ingesta."},
+    {"name": "errors", "description": "Errores de producción, agrupados."},
 ]
 
 app = FastAPI(
@@ -84,3 +93,34 @@ app.include_router(revenue_sharing.router)
 app.include_router(taxes.router)
 app.include_router(housing.router)
 app.include_router(calculators.router)
+app.include_router(errors.router)
+
+
+logger = logging.getLogger("labrecha_api")
+
+API_ORIGIN = "api"
+STACK_MAX_LENGTH = 8000
+UNHANDLED_DETAIL = "error interno"
+
+
+def _store_error(path: str, error: Exception, stack: str) -> None:
+    try:
+        with SessionLocal() as session:
+            record_error(
+                session,
+                origin=API_ORIGIN,
+                kind=type(error).__name__,
+                message=str(error) or type(error).__name__,
+                stack=stack[:STACK_MAX_LENGTH],
+                path=path,
+            )
+    except SQLAlchemyError:
+        logger.exception("no se pudo registrar el error de %s", path)
+
+
+@app.exception_handler(Exception)
+async def record_unhandled_error(request: Request, error: Exception) -> JSONResponse:
+    stack = "".join(traceback.format_exception(error))
+    logger.error("error no manejado en %s: %s", request.url.path, stack)
+    _store_error(request.url.path, error, stack)
+    return JSONResponse(status_code=500, content={"detail": UNHANDLED_DETAIL})

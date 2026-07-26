@@ -25,7 +25,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | ~~1~~ | ~~Red de seguridad: CI real + tests de la lógica de plata~~ ✅ | Bajo | Alto — se deploya sin verificar |
 | ~~2~~ | ~~Honestidad del dato: series, brechas, conectores mudos~~ ✅ | Medio | Alto — contradice la regla dura del producto |
 | ~~3~~ | ~~Superficies muertas: service worker, manifest~~ ✅ | Bajo | Medio — el PWA está roto y nadie se entera |
-| 4 | Seguridad e infraestructura — 4.a/4.b ✅, 4.c y 4.d pendientes (decisión del usuario) | Medio | Medio |
+| 4 | Seguridad e infraestructura — 4.a/4.b/4.d ✅, 4.c no se hace (decisión del usuario) | Medio | Medio |
 | ~~5~~ | ~~SEO y distribución~~ ✅ | Bajo | Medio — contenido que Google no ve |
 | 6 | Producto: recurrencia — 6.b/6.c ✅, 6.a omitida (falta dominio que pueda enviar mail) | Alto | — (es crecimiento, no deuda) |
 | ~~7~~ | ~~Deuda de código~~ ✅ (menos el DNS, que es del usuario) | Bajo | Bajo |
@@ -343,12 +343,56 @@ instalado y autenticado, y el contenedor del scraper conserva el set de caps def
 eso mismo. Si algún día se rota la cuenta del host o se cambia de VPS, esto se rompe en silencio
 hasta que `/estado` muestre el conector en rojo.
 
-### 4.d — Observabilidad ⏸️ pendiente
+### 4.d — Observabilidad ✅ (2026-07-26)
 
-**Estado.** Postergada a pedido del usuario: requiere una cuenta externa (Sentry o equivalente), su
-DSN, una dependencia nueva en `web` y en `api-py`, y sumar el host del colector al `connect-src` del
-CSP. Sigue en pie el problema: `lib/logger.ts` no hace nada en producción, así que un error de render
-en prod es invisible salvo que un usuario avise.
+**Problema.** No había ningún reporte de errores y `lib/logger.ts` no hacía nada en producción: un
+error de render en prod era invisible salvo que un usuario avisara.
+
+**Decisión: colector propio same-origin, no Sentry.** La restricción del usuario fue "gratis y sin que
+yo tenga que hacer nada", y tanto Sentry como GlitchTip exigen crear una cuenta o un proyecto y cargar
+un DSN. Lo propio, además, salió mejor en tres cosas concretas:
+
+- **Cero CSP para tocar.** El endpoint es same-origin (`/api/data/errors`), así que `connect-src 'self'`
+  ya lo permite. **Hallazgo:** el plan decía "sumar el host del colector a `connect-src` en
+  `next.config.js`", pero son **dos** CSP —`web/next.config.js` y `nginx/nginx.conf` (el archivo
+  compartido)— y el navegador aplica la intersección: con un colector externo había que editar los dos.
+- **Cero KB de bundle**, contra los ~35-40 KB del SDK de browser de Sentry.
+- Se ve en `/estado`, al lado de la salud del scraper.
+
+**Lo que se pierde, escrito:** no hay alertas push, ni release tracking, ni source maps, ni la UI de
+Sentry. El punto de captura está aislado, así que migrar a Sentry después es cambiar el destino, no
+reinstrumentar.
+
+**Hecho.**
+
+- Tabla `error_events` (migración `0005`) **agrupada por fingerprint**: `origin` + tipo + mensaje
+  normalizado + primera línea del stack, con los números y los valores entre comillas reemplazados por
+  placeholders. 500 ocurrencias del mismo bug son una fila con contador, `first_seen_at` y
+  `last_seen_at`, no 500 filas.
+- `api-py/labrecha_api/error_events.py` (lógica pura + upsert) y `POST /errors` / `GET /errors`. El
+  POST valida con pydantic y **topea los tamaños** (mensaje 2000, stack 8000), y queda cubierto por el
+  rate limit por IP real de 4.a: el BFF reenvía `x-real-ip`, así que un cliente no puede inundar la
+  tabla.
+- Un `exception_handler(Exception)` en la API registra sus propias excepciones no manejadas (con path y
+  traceback) y devuelve 500; los `HTTPException` normales (404, 422) **no** se registran, así que la
+  tabla no se llena de ruido.
+- En el front, tres puntos de captura: `instrumentation.ts` (`onRequestError`) para SSR y route
+  handlers, `ErrorBoundary` para el navegador y `lib/logger.ts`, que en producción pasó de no-op a
+  reportar. `lib/errorReporter.ts` arma el payload (recorta, tolera que lo tirado no sea un `Error`,
+  nunca manda mensaje vacío porque el schema lo rechaza), deduplica en la sesión y topea en 5 reportes
+  para que un loop de render no martille el endpoint. Si el reporte falla, se traga el error: no puede
+  tumbar la página que ya estaba fallando.
+- `/estado` muestra los errores agrupados con su origen, cuántas veces y hace cuánto.
+
+**Tests.** 10 en pytest del fingerprint (mismo error agrupa; números y valores entre comillas no
+parten el grupo; tipo, origen y lugar del stack sí; sha256) y 5 en jest del payload.
+
+**Verificado end-to-end** con la API y el front levantados contra un Postgres migrado: POST del
+navegador vía BFF → 201 y guardado; una excepción real de la API registrada con `origin=api`, path y
+traceback, y contador en 2 al repetirse; un 404 normal **no** registrado; una página que explota en el
+servidor registrada con `origin=web-server` y su path; y `/estado` renderizando todo server-side.
+
+**Criterio de salida.** ✅ Un error lanzado a propósito en el servidor aparece en el dashboard.
 
 ---
 

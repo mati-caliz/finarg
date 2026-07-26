@@ -1,4 +1,5 @@
-import { buildQueryString, serverGet } from "@/lib/serverApi";
+import type { ErrorReport } from "@/lib/errorReporter";
+import { buildQueryString, serverGet, serverPost } from "@/lib/serverApi";
 import axios from "axios";
 
 const LABRECHA_API_URL = process.env.NEXT_PUBLIC_LABRECHA_API_URL || "/api/data";
@@ -387,6 +388,13 @@ async function get<T>(path: string, params?: object): Promise<T> {
   return response.data;
 }
 
+function isomorphicPost<T>(path: string, body: unknown): Promise<T> {
+  if (typeof window === "undefined") {
+    return serverPost<T>(path, body);
+  }
+  return post<T>(path, body);
+}
+
 async function post<T>(path: string, body: unknown): Promise<T> {
   const response = await labrechaApi.post<T>(path, body);
   return response.data;
@@ -471,6 +479,23 @@ export const gapsApi = {
 export const termsApi = {
   byIndicator: (code: string, params?: { source?: string }) =>
     get<IndicatorTerms>(`/terms/${code}`, params),
+};
+
+export interface ErrorEvent {
+  fingerprint: string;
+  origin: string;
+  kind: string;
+  message: string;
+  stack: string | null;
+  path: string | null;
+  occurrences: number;
+  first_seen_at: string;
+  last_seen_at: string;
+}
+
+export const errorsApi = {
+  report: (report: ErrorReport) => isomorphicPost<ErrorEvent>("/errors", report),
+  list: (params?: { limit?: number }) => get<ErrorEvent[]>("/errors", params),
 };
 
 export const scrapeRunsApi = {

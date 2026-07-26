@@ -67,6 +67,13 @@ y `web/src/lib/clientIp.ts`.
   como `error` las corridas del mismo job en `running` hace más de 6 h (proceso muerto, deploy en el
   medio).
 - `political_events(date, title, category, description)` — anota las series.
+- `error_events` — errores de producción **agrupados por fingerprint** (origen + tipo + mensaje
+  normalizado + primera línea del stack, con números y valores entre comillas reemplazados), con
+  contador y `first/last_seen_at`. Lo escriben la API (`exception_handler`, sólo excepciones no
+  manejadas: los 404/422 no son ruido), el SSR de Next (`instrumentation.ts`) y el navegador
+  (`ErrorBoundary` y `lib/logger.ts`) vía `POST /errors`, que es same-origin —así no hay que tocar
+  ninguno de los **dos** CSP (el de `next.config.js` y el del nginx compartido)— y queda cubierto por
+  el rate limit por IP. Se ve en `/estado`.
 - Tablas propias para lo que no encaja en la genérica: `congress_votes`/`congress_vote_details`,
   `senators`, `holidays`, `news_articles`, `congress_vote_summaries`.
 - `congress_vote_summaries` — el título del acta es burocrático ("Expediente 0073-S-2019 - Votación en

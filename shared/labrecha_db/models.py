@@ -52,6 +52,27 @@ class ScrapeRun(Base):
     __table_args__ = (Index("ix_scrape_runs_job_started", "job_name", "started_at"),)
 
 
+class ErrorEvent(Base):
+    __tablename__ = "error_events"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    fingerprint: Mapped[str] = mapped_column(String(64), unique=True)
+    origin: Mapped[str] = mapped_column(String(20))
+    kind: Mapped[str] = mapped_column(String(160))
+    message: Mapped[str] = mapped_column(Text)
+    stack: Mapped[str | None] = mapped_column(Text, nullable=True)
+    path: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    occurrences: Mapped[int] = mapped_column(BigInteger, default=1)
+    first_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    last_seen_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    __table_args__ = (Index("ix_error_events_last_seen", "last_seen_at"),)
+
+
 class PoliticalEvent(Base):
     __tablename__ = "political_events"
 
