@@ -35,6 +35,7 @@ class IndicatorHistory(Base):
     __table_args__ = (
         UniqueConstraint("indicator_code", "source", "date", name="uq_indicator_source_date"),
         Index("ix_indicator_code_date", "indicator_code", "date"),
+        Index("ix_indicator_history_date", "date"),
     )
 
 
@@ -158,11 +159,13 @@ class NewsArticle(Base):
     source_url: Mapped[str] = mapped_column(String(2048), unique=True)
     country: Mapped[str] = mapped_column(String(255))
     category: Mapped[str] = mapped_column(String(255))
-    published_date: Mapped[datetime] = mapped_column(DateTime)
+    published_date: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     image_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     is_official: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (Index("ix_news_articles_published", "published_date"),)
 
 
 class Senator(Base):
