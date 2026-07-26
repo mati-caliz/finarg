@@ -1,4 +1,4 @@
-# La Brecha — cron del host. Cubre los 20 conectores del registry.
+# La Brecha — cron del host. Cubre los 24 conectores del registry.
 # Instalar con: crontab crontab.example  (ajustar REPO y zona horaria).
 # Cada línea usa scripts/scrape-cron.sh, que corre el job en un contenedor efímero
 # (profile "scraper", restart:no). Todos los conectores son idempotentes (upsert).
@@ -38,6 +38,9 @@ LOGS=/var/log/labrecha
 30 6 * * 1    $SCRAPE credit_bcra        >> $LOGS/credit_bcra.log 2>&1
 # ICG (UTDT): mensual, pero la fecha de publicación se corre; se chequea semanal.
 40 6 * * 1    $SCRAPE icg                >> $LOGS/icg.log 2>&1
+# IPC de las jurisdicciones que miden por su cuenta: alimenta la brecha contra el
+# IPC nacional. Cada agencia publica en su propia fecha, así que se chequea semanal.
+50 6 * * 1    $SCRAPE cpi_jurisdictions  >> $LOGS/cpi_jurisdictions.log 2>&1
 
 # ── Mensuales (día 1) ─────────────────────────────────────────────────────────
 0 5 1 * *     $SCRAPE holidays           >> $LOGS/holidays.log 2>&1
@@ -47,6 +50,12 @@ LOGS=/var/log/labrecha
 # limit de CoinGecko). Reconcilian los huecos que dejen los jobs diarios.
 0 4 1 * *     $SCRAPE dollar_historical  >> $LOGS/dollar_historical.log 2>&1
 30 4 1 * *    $SCRAPE crypto_historical  >> $LOGS/crypto_historical.log 2>&1
+
+# ── Mantenimiento ─────────────────────────────────────────────────────────────
+# error_events sólo crece: POST /errors es escritura anónima y cada fingerprint nuevo
+# es una fila. Se borran los vencidos (ERROR_RETENTION_DAYS) y se recorta al tope
+# (ERROR_MAX_ROWS), conservando siempre los más recientes.
+30 3 * * *    $REPO/scripts/prune-errors.sh >> $LOGS/prune-errors.log 2>&1
 
 # ── Alerta ────────────────────────────────────────────────────────────────────
 # Avisa cuando un conector falla FAILURE_THRESHOLD corridas seguidas (default 3).

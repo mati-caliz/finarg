@@ -19,6 +19,7 @@ from labrecha_scraper.base import STATUS_SUCCESS, run_job
 from labrecha_scraper.config import settings
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.logging_setup import configure_logging
+from labrecha_scraper.prune_errors import prune_error_events
 from labrecha_scraper.registry import CONNECTORS, get_connector
 from labrecha_scraper.seed_events import seed_events
 from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
@@ -114,6 +115,19 @@ def _seed_revenue_sharing() -> None:
     print(f"coeficientes de coparticipación (CFI) sembrados/actualizados: {count}")
 
 
+def _prune_errors() -> None:
+    with SessionLocal() as session:
+        result = prune_error_events(
+            session,
+            retention_days=settings.error_retention_days,
+            max_rows=settings.error_max_rows,
+        )
+    print(
+        f"error_events podados: {result.total} "
+        f"(vencidos: {result.expired}, excedentes: {result.overflowing})"
+    )
+
+
 def _status() -> None:
     with SessionLocal() as session:
         for name in sorted(CONNECTORS):
@@ -137,6 +151,7 @@ COMMAND_HANDLERS: dict[str, Callable[[], None]] = {
     "seed-events": _seed_events,
     "seed-taxes": _seed_taxes,
     "seed-revenue-sharing": _seed_revenue_sharing,
+    "prune-errors": _prune_errors,
     "status": _status,
 }
 
@@ -176,6 +191,9 @@ def main(argv: list[str] | None = None) -> int:
     subparsers.add_parser("seed-events", help="sembrar hitos políticos curados")
     subparsers.add_parser("seed-taxes", help="sembrar conteo de tributos (IARAF)")
     subparsers.add_parser("seed-revenue-sharing", help="sembrar coeficientes Ley 23.548 (CFI)")
+    subparsers.add_parser(
+        "prune-errors", help="borrar error_events vencidos y recortar al tope configurado"
+    )
     subparsers.add_parser("status", help="última corrida de cada job")
     run_parser = subparsers.add_parser("run", help="correr un job o 'all'")
     run_parser.add_argument("job", help="nombre del job o 'all'")

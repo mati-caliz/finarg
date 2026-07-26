@@ -9,7 +9,7 @@ from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
-from labrecha_api.config import settings
+from labrecha_api.config import get_settings
 
 FORWARDED_FOR = "x-forwarded-for"
 REAL_IP = "x-real-ip"
@@ -34,7 +34,7 @@ class SlidingWindowCounter:
             if len(hits) >= self._limit:
                 return max(1, int(hits[0] + self._window - now) + 1)
             hits.append(now)
-            if len(self._hits) > settings.rate_limit_max_clients:
+            if len(self._hits) > get_settings().rate_limit_max_clients:
                 self._evict_idle(cutoff)
             return None
 

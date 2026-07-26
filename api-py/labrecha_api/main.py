@@ -7,8 +7,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from labrecha_api.config import settings
-from labrecha_api.db import SessionLocal
+from labrecha_api.config import get_settings
+from labrecha_api.db import get_session_factory
 from labrecha_api.error_events import record_error
 from labrecha_api.rate_limit import RateLimitMiddleware
 from labrecha_api.routers import (
@@ -69,11 +69,11 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-app.add_middleware(RateLimitMiddleware, limit=settings.rate_limit_per_minute)
+app.add_middleware(RateLimitMiddleware, limit=get_settings().rate_limit_per_minute)
 app.add_middleware(GZipMiddleware, minimum_size=GZIP_MINIMUM_SIZE)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=get_settings().cors_origins,
     allow_methods=["GET"],
     allow_headers=["*"],
 )
@@ -105,7 +105,7 @@ UNHANDLED_DETAIL = "error interno"
 
 def _store_error(path: str, error: Exception, stack: str) -> None:
     try:
-        with SessionLocal() as session:
+        with get_session_factory()() as session:
             record_error(
                 session,
                 origin=API_ORIGIN,
