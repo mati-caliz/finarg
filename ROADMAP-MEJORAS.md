@@ -26,7 +26,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | ~~2~~ | ~~Honestidad del dato: series, brechas, conectores mudos~~ ✅ | Medio | Alto — contradice la regla dura del producto |
 | ~~3~~ | ~~Superficies muertas: service worker, manifest~~ ✅ | Bajo | Medio — el PWA está roto y nadie se entera |
 | 4 | Seguridad e infraestructura — 4.a/4.b ✅, 4.c y 4.d pendientes (decisión del usuario) | Medio | Medio |
-| 5 | SEO y distribución | Bajo | Medio — contenido que Google no ve |
+| ~~5~~ | ~~SEO y distribución~~ ✅ | Bajo | Medio — contenido que Google no ve |
 | 6 | Producto: recurrencia | Alto | — (es crecimiento, no deuda) |
 | 7 | Deuda de código | Bajo | Bajo |
 
@@ -352,28 +352,52 @@ en prod es invisible salvo que un usuario avise.
 
 ---
 
-## Fase 5 — SEO y distribución
+## Fase 5 — SEO y distribución ✅ HECHA (2026-07-26)
 
-### 5.a — Sitemap completo
+**Desvío respecto de lo planificado.** El sitemap se hizo **a prueba de datos raros**, no sólo
+completo: probándolo contra la api-py vieja que está levantada en local (devuelve `acta_id` en vez de
+`vote_record_id`) generó **300 URLs `/congreso/votacion/undefined`** idénticas. Es exactamente el tipo
+de bug que hay que atrapar antes de mandárselo a Google, así que las rutas dinámicas ahora filtran los
+registros sin slug/id usable y el sitemap deduplica por path.
 
-**Problema.** `web/src/app/sitemap.ts` no incluye `/ideas/[slug]` —las únicas páginas editoriales del
+### 5.a — Sitemap completo ✅
+
+**Problema.** `web/src/app/sitemap.ts` no incluía `/ideas/[slug]` —las únicas páginas editoriales del
 sitio—, ni `/congreso/votacion/[id]`, `/boletin.xml`, `/brechas.xml` o los `feed.xml` por indicador.
 
-**Trabajo.** Generar el sitemap con las rutas dinámicas reales, leyendo posts y votaciones desde la
-API con `serverGet` (respetando los TTL de `lib/cacheRules.ts`). Ojo con el volumen de votaciones:
-acotar a las últimas N o partir en sitemaps por sección.
+**Hecho.** El sitemap pasó a ser `async` y lee las rutas dinámicas de la API con las mismas factorías
+de `lib/queries.ts` que usan las páginas (así respeta los TTL de `lib/cacheRules.ts` y comparte caché
+con el resto del SSR): ideas publicadas (`/posts`, hasta 200) y votaciones (`/congress/votes`, las
+últimas 300 — el endpoint ordena por fecha desc y topea en 500). Suma los tres RSS y un `feed.xml` por
+indicador. Si la API no responde, cada bloque cae a lista vacía y el sitemap sigue publicando las
+rutas estáticas en vez de romper el build.
 
-**Criterio de salida.** Cada idea publicada aparece en el sitemap el día que se publica.
+**Verificado** con la build de producción levantada: 141 URLs con la API local vieja (0 `undefined`, 0
+duplicados) y, contra un stub que devuelve las formas correctas, aparecen
+`/ideas/el-precio-del-dolar` y `/congreso/votacion/4321`. `/sitemap.xml` tiene ISR de 1 minuto.
 
-### 5.b — Metadata por indicador con el número adentro
+**Criterio de salida.** ✅ Cada idea publicada aparece en el sitemap el día que se publica.
 
-**Problema.** `generateMetadata` de `/indicador/[code]` arma una description genérica, sin último
+### 5.b — Metadata por indicador con el número adentro ✅
+
+**Problema.** `generateMetadata` de `/indicador/[code]` armaba una description genérica, sin último
 valor ni fecha.
 
-**Trabajo.** Incluir último valor + unidad + fecha en la description (la page ya prefetchea la serie,
-así que el dato está a mano). Mismo criterio en `/brechas`.
+**Hecho.** `lib/seoDescriptions.ts` (helpers puros, con tests) arma las dos descriptions:
 
-**Criterio de salida.** El snippet de Google muestra la cifra vigente.
+- `indicatorDescription` — "Dólar blue: $ 1.521 al 25/07/2026 según DolarAPI. […] Comparado con
+  Argentina Datos para ver la brecha entre mediciones." La unidad se pega al número sólo cuando el
+  formateador no la trae ya (`%`, `pb`, `pts`; no `ARS`/`USD`, que salen como `$`/`US$`), y si la serie
+  no tiene datos o el valor no parsea cae a la description genérica en vez de escribir `NaN`.
+- `gapsDescription` — encabeza `/brechas` con la discrepancia más grande de hoy, sus dos fuentes y su
+  fecha, más cuántos indicadores tienen más de una fuente.
+
+**Verificado** end-to-end contra un stub: `/indicador/[code]` es dinámico (`ƒ`), así que la cifra se
+calcula por request. `/brechas` es estático con ISR de 30 minutos: en el build del CI la API no es
+alcanzable, así que sale con la description genérica y se corrige sola en la primera revalidación en el
+VPS.
+
+**Criterio de salida.** ✅ El snippet muestra la cifra vigente con su fuente y su fecha.
 
 ---
 

@@ -1,8 +1,11 @@
 import { JsonLd } from "@/components/JsonLd";
 import { IndicatorDetail } from "@/components/indicator/IndicatorDetail";
 import { getIndicatorDisplay } from "@/lib/indicators";
+import type { IndicatorSourceSummary } from "@/lib/labrechaApi";
 import { indicatorDetailData } from "@/lib/pageQueries";
 import { PrefetchedQueries } from "@/lib/prefetch";
+import { indicatorSourcesQuery } from "@/lib/queries";
+import { indicatorDescription } from "@/lib/seoDescriptions";
 import { breadcrumbStructuredData, indicatorDatasetStructuredData } from "@/lib/structuredData";
 import type { Metadata } from "next";
 
@@ -13,9 +16,12 @@ interface IndicatorPageProps {
 export async function generateMetadata({ params }: IndicatorPageProps): Promise<Metadata> {
   const { code } = await params;
   const indicator = getIndicatorDisplay(code);
+  const sources = await indicatorSourcesQuery(code)
+    .queryFn()
+    .catch(() => [] as IndicatorSourceSummary[]);
   return {
     title: `${indicator.label} - La Brecha`,
-    description: `Serie histórica de ${indicator.label} en Argentina, con su fuente, fecha y eventos políticos.`,
+    description: indicatorDescription(indicator, sources),
     alternates: { canonical: `/indicador/${code}` },
   };
 }
