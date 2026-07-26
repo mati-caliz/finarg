@@ -210,11 +210,10 @@ export function SiteHeader() {
           <ThemeToggle />
           <button
             type="button"
-            className="lg:hidden"
+            className="inline-flex lg:hidden"
             aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
             onClick={() => setMobileOpen((open) => !open)}
             style={{
-              display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
               width: 36,
@@ -233,12 +232,11 @@ export function SiteHeader() {
 
       {mobileOpen && (
         <nav
-          className="lg:hidden"
+          className="flex lg:hidden"
           style={{
             borderTop: "1px solid var(--line)",
             background: "var(--paper)",
             padding: "8px 16px 16px",
-            display: "flex",
             flexDirection: "column",
             gap: 2,
           }}
