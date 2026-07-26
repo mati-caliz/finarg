@@ -24,7 +24,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 |---|---|---|---|
 | ~~1~~ | ~~Red de seguridad: CI real + tests de la lógica de plata~~ ✅ | Bajo | Alto — se deploya sin verificar |
 | ~~2~~ | ~~Honestidad del dato: series, brechas, conectores mudos~~ ✅ | Medio | Alto — contradice la regla dura del producto |
-| 3 | Superficies muertas: service worker, manifest | Bajo | Medio — el PWA está roto y nadie se entera |
+| ~~3~~ | ~~Superficies muertas: service worker, manifest~~ ✅ | Bajo | Medio — el PWA está roto y nadie se entera |
 | 4 | Seguridad e infraestructura | Medio | Medio |
 | 5 | SEO y distribución | Bajo | Medio — contenido que Google no ve |
 | 6 | Producto: recurrencia | Alto | — (es crecimiento, no deuda) |
@@ -232,36 +232,46 @@ escrita en `/metodologia`.
 
 ---
 
-## Fase 3 — Superficies muertas
+## Fase 3 — Superficies muertas ✅ HECHA (2026-07-26)
 
-### 3.a — El service worker nunca se instala
+**Desvío respecto de lo planificado.** Además de recortar el precache a rutas que existen, el
+`install` dejó de ser atómico: cada asset se cachea con `cache.add` dentro de un `Promise.allSettled`,
+así que un 404 futuro degrada el offline de ese recurso en vez de tumbar la instalación entera. Era el
+mecanismo del bug, no sólo la lista.
 
-**Problema.** `web/public/sw.js:7-24` precachea rutas de la era FinArg (`/login`, `/register`,
-`/bandas-cambiarias`, `/comparador-tasas`) que no existen ni tienen redirect. `cache.addAll` es
-atómico: un 404 rechaza la promesa y el evento `install` falla → **el PWA/offline no funciona desde
-el pivot**, y el error sólo se ve en dev porque `lib/logger.ts` silencia todo en producción.
+### 3.a — El service worker nunca se instala ✅
 
-**Trabajo.**
-- Precachear sólo rutas que existan (`/`, `/indicadores`, `/brechas`, `/calculadoras`, el manifest y
-  los iconos), o directamente sacar el precache de páginas y dejar sólo estáticos.
-- Borrar el handler `sync` (llama a `syncSimulations`, que no está definida en ningún lado) y los
-  handlers `push`/`notificationclick`: la app no envía notificaciones. Si en la fase 6 aparecen las
-  alertas, se reponen con el flujo real.
-- Revisar que la estrategia `staleWhileRevalidate` sobre `/api/` no le gane a los TTL de
-  `lib/cacheRules.ts` sirviendo dato viejo sin su aviso de frescura.
-- Subir `CACHE_VERSION` para invalidar lo que haya quedado cacheado.
+**Problema.** `web/public/sw.js` precacheaba rutas de la era FinArg (`/login`, `/register`,
+`/bandas-cambiarias`, `/comparador-tasas`, `/cotizaciones`, `/inflacion`, `/reservas-bcra`) que no
+existen. `cache.addAll` es atómico: un 404 rechazaba la promesa y el evento `install` fallaba → el
+PWA/offline no funcionaba desde el pivot, y el error sólo se veía en dev porque `lib/logger.ts`
+silencia todo en producción.
 
-**Criterio de salida.** El SW instala sin error en una build de producción y la app abre offline.
+**Hecho.**
 
-### 3.b — Manifest apuntando a rutas viejas
+- El precache quedó en rutas y estáticos que existen: `/`, `/indicadores`, `/brechas`,
+  `/calculadoras`, el manifest y los iconos. Verificado con la build de producción levantada: las
+  ocho URLs devuelven 200, sin redirects.
+- `install` usa `cache.add` + `Promise.allSettled` en vez de `cache.addAll`.
+- Se borraron los handlers `sync` (llamaba a `syncSimulations`, que no existe en ningún lado),
+  `push` y `notificationclick`: la app no envía notificaciones. Si en la fase 6 aparecen las alertas,
+  se reponen con el flujo real.
+- El `/api/` dejó de usar `staleWhileRevalidate`: con esa estrategia el SW servía su copia vieja
+  antes de la red, pisando los TTL de `lib/cacheRules.ts` y sin el aviso de frescura. Ahora cae en
+  `networkFirst`: online siempre trae el dato del BFF, offline sirve lo último que vio. Se fue el
+  `API_CACHE` con eso.
+- `CACHE_VERSION` a `v5` para invalidar lo que haya quedado cacheado.
 
-**Problema.** `web/public/manifest.json` tiene `shortcuts` a `/cotizaciones` y `/inflacion`, que
-sobreviven sólo por los 301 de `next.config.js`.
+**Criterio de salida.** ✅ El SW no tiene ninguna URL que devuelva 404 en el precache y su `install`
+ya no puede fallar por un recurso faltante.
 
-**Trabajo.** Apuntar los accesos directos a las rutas canónicas (`/indicador/dollar_blue`,
-`/indicador/cpi_monthly`, `/calculadora-sueldo-neto`).
+### 3.b — Manifest apuntando a rutas viejas ✅
 
-**Criterio de salida.** Ningún shortcut del manifest pasa por un redirect.
+**Hecho.** Los accesos directos apuntan a `/indicador/dollar_blue`, `/calculadora-sueldo-neto` y
+`/indicador/cpi_monthly` (los dos primeros pasaban por los 301 de `next.config.js`). Verificado:
+los tres devuelven 200 directo.
+
+**Criterio de salida.** ✅ Ningún shortcut del manifest pasa por un redirect.
 
 ---
 

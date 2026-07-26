@@ -1,27 +1,25 @@
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const STATIC_CACHE = `labrecha-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `labrecha-dynamic-${CACHE_VERSION}`;
-const API_CACHE = `labrecha-api-${CACHE_VERSION}`;
 const CHUNKS_CACHE = `labrecha-chunks-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
   "/",
-  "/cotizaciones",
-  "/calculadora-sueldo-neto",
-  "/inflacion",
-  "/reservas-bcra",
-  "/comparador-tasas",
-  "/bandas-cambiarias",
-  "/login",
-  "/register",
+  "/indicadores",
+  "/brechas",
+  "/calculadoras",
   "/manifest.json",
   "/icon.svg",
+  "/icon-192.png",
+  "/icon-512.png",
 ];
+
+const KEPT_CACHES = [STATIC_CACHE, DYNAMIC_CACHE, CHUNKS_CACHE];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      return Promise.allSettled(STATIC_ASSETS.map((asset) => cache.add(asset)));
     }),
   );
   self.skipWaiting();
@@ -33,7 +31,7 @@ self.addEventListener("activate", (event) => {
       return Promise.all(
         cacheNames
           .filter((name) => {
-            return name !== STATIC_CACHE && name !== DYNAMIC_CACHE && name !== API_CACHE && name !== CHUNKS_CACHE;
+            return !KEPT_CACHES.includes(name);
           })
           .map((name) => {
             return caches.delete(name);
@@ -78,33 +76,6 @@ const cacheStrategies = {
       return new Response("Offline", { status: 503 });
     }
   },
-
-  staleWhileRevalidate: async (request) => {
-    if (request.method !== "GET") {
-      return fetch(request);
-    }
-    const cache = await caches.open(API_CACHE);
-    const cached = await cache.match(request);
-
-    const fetchPromise = fetch(request)
-      .then((response) => {
-        if (response.ok && request.method === "GET") {
-          cache.put(request, response.clone());
-        }
-        return response;
-      })
-      .catch(() => {
-        if (cached) {
-          return cached;
-        }
-        return new Response(JSON.stringify({ error: "Network error" }), {
-          status: 503,
-          headers: { "Content-Type": "application/json" },
-        });
-      });
-
-    return cached || fetchPromise;
-  },
 };
 
 self.addEventListener("fetch", (event) => {
@@ -119,11 +90,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.pathname.startsWith("/api/")) {
-    event.respondWith(cacheStrategies.staleWhileRevalidate(request));
-    return;
-  }
-
   if (
     request.destination === "image" ||
     request.destination === "font" ||
@@ -133,7 +99,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (request.destination === "script" && (url.pathname.includes("/_next/static/") || url.pathname.includes("/_next/chunks/"))) {
+  if (
+    request.destination === "script" &&
+    (url.pathname.includes("/_next/static/") || url.pathname.includes("/_next/chunks/"))
+  ) {
     event.respondWith(
       caches.open(CHUNKS_CACHE).then((cache) => {
         return cache.match(request).then((cached) => {
@@ -147,72 +116,10 @@ self.addEventListener("fetch", (event) => {
             return response;
           });
         });
-      })
+      }),
     );
     return;
   }
 
-  if (request.destination === "script") {
-    event.respondWith(cacheStrategies.networkFirst(request));
-    return;
-  }
-
-  if (request.mode === "navigate") {
-    event.respondWith(cacheStrategies.networkFirst(request));
-    return;
-  }
-
   event.respondWith(cacheStrategies.networkFirst(request));
-});
-
-self.addEventListener("sync", (event) => {
-  if (event.tag === "sync-simulations") {
-    event.waitUntil(syncSimulations());
-  }
-});
-
-self.addEventListener("push", (event) => {
-  let data = { title: "La Brecha", body: "Nueva actualización" };
-
-  if (event.data) {
-    data = event.data.json();
-  }
-
-  const options = {
-    body: data.body,
-    icon: "/icons/icon-192x192.png",
-    badge: "/icons/badge-72x72.png",
-    vibrate: [100, 50, 100],
-    data: {
-      url: data.url || "/",
-    },
-    actions: [
-      { action: "open", title: "Ver" },
-      { action: "close", title: "Cerrar" },
-    ],
-  };
-
-  event.waitUntil(self.registration.showNotification(data.title, options));
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-
-  if (event.action === "close") {
-    return;
-  }
-
-  event.waitUntil(
-    clients.matchAll({ type: "window" }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url === event.notification.data.url && "focus" in client) {
-          return client.focus();
-        }
-      }
-
-      if (clients.openWindow) {
-        return clients.openWindow(event.notification.data.url);
-      }
-    }),
-  );
 });
