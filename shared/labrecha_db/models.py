@@ -113,8 +113,13 @@ class CongressVoteSummary(Base):
     __tablename__ = "congress_vote_summaries"
 
     vote_record_id: Mapped[str] = mapped_column(String(20), primary_key=True)
-    summary: Mapped[str] = mapped_column(Text)
-    topic: Mapped[str] = mapped_column(String(40))
+    # summary/topic en NULL = la votación ya se intentó resumir y no se pudo (el acta no
+    # cita expediente, o el expediente no está en el dataset de proyectos de HCDN). La fila
+    # existe igual para marcar el intento: sin ella la votación volvería a ocupar lugar en
+    # la ventana de cada corrida y el backfill nunca avanzaría. Se reintenta después de
+    # RETRY_UNRESOLVED_AFTER_DAYS por si el dataset de HCDN incorpora el proyecto más tarde.
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    topic: Mapped[str | None] = mapped_column(String(40), nullable=True)
     file_numbers: Mapped[str | None] = mapped_column(Text, nullable=True)
     generated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
