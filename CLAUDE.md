@@ -58,7 +58,10 @@ No hay backend Java ni Redis: el stack Spring original fue retirado por completo
   0073-S-2019 - Votación en General"), así que el conector `congress_summaries` cruza los
   expedientes citados contra el dataset de proyectos parlamentarios de HCDN y le pide a Claude
   (vía `llm.py`, igual que el Boletín Oficial) una oración en lenguaje llano + un tema. El resumen
-  se muestra siempre junto al título oficial y aclarando que lo generó una IA.
+  se muestra siempre junto al título oficial y aclarando que lo generó una IA. Las votaciones que
+  no se pudieron resumir (acta sin expediente citado, o expediente ausente del dataset) guardan
+  igual su fila con `summary` en NULL: es la marca de "ya intentada", sin ella volverían a ocupar
+  la ventana acotada de cada corrida y el backfill nunca avanzaría. Se reintentan a los 30 días.
 
 **Regla dura de producto:** ningún dato se muestra sin su fuente + fecha visibles (requisito legal
 con algunas fuentes). El patrón de atribución es parte del diseño.

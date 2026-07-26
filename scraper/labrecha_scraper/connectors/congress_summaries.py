@@ -6,10 +6,11 @@ import io
 import json
 import re
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from labrecha_db import CongressVote, CongressVoteSummary
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -23,6 +24,9 @@ LARGE_DOWNLOAD_TIMEOUT_SECONDS = 300.0
 
 MAX_VOTES_PER_RUN = 40
 BATCH_SIZE = 5
+# Las votaciones que no se pudieron resumir quedan marcadas con summary NULL; se vuelven a
+# intentar recién pasado este plazo, por si HCDN publicó el proyecto después de la votación.
+RETRY_UNRESOLVED_AFTER_DAYS = 30
 MAX_FILES_PER_VOTE = 5
 MAX_PROJECT_TITLE_LENGTH = 300
 NOT_AVAILABLE = "NA"
@@ -111,21 +115,21 @@ class CongressSummariesConnector(Connector):
         pending = self._pending_votes()
         if not pending:
             return []
-        with self.build_client() as client:
-            titles_by_file = self._download_project_titles(client)
-        for vote in pending:
-            vote.project_titles = [
-                titles_by_file[key] for key in vote.file_numbers if key in titles_by_file
-            ]
+        if any(vote.file_numbers for vote in pending):
+            with self.build_client() as client:
+                titles_by_file = self._download_project_titles(client)
+            for vote in pending:
+                vote.project_titles = [
+                    titles_by_file[key] for key in vote.file_numbers if key in titles_by_file
+                ]
         return self._summarize(pending)
 
     def persist(self, session: Session, data: object) -> int:
         assert isinstance(data, list)
-        return upsert_rows(
-            session, CongressVoteSummary, data, ["vote_record_id"], update_on_conflict=False
-        )
+        return upsert_rows(session, CongressVoteSummary, data, ["vote_record_id"])
 
     def _pending_votes(self) -> list[PendingVote]:
+        retry_before = datetime.now(UTC) - timedelta(days=RETRY_UNRESOLVED_AFTER_DAYS)
         statement = (
             select(CongressVote.vote_record_id, CongressVote.title)
             .outerjoin(
@@ -133,7 +137,11 @@ class CongressSummariesConnector(Connector):
                 CongressVoteSummary.vote_record_id == CongressVote.vote_record_id,
             )
             .where(
-                CongressVoteSummary.vote_record_id.is_(None),
+                or_(
+                    CongressVoteSummary.vote_record_id.is_(None),
+                    (CongressVoteSummary.summary.is_(None))
+                    & (CongressVoteSummary.generated_at < retry_before),
+                ),
                 CongressVote.title.is_not(None),
             )
             .order_by(CongressVote.date.desc().nullslast(), CongressVote.vote_record_id.desc())
@@ -183,8 +191,21 @@ class CongressSummariesConnector(Connector):
         return titles_by_file
 
     def _summarize(self, pending: list[PendingVote]) -> list[dict]:
+        # Toda votación intentada se persiste: la que no se pudo resumir queda con summary
+        # NULL para no volver a ocupar la ventana de la próxima corrida.
+        attempted_at = datetime.now(UTC)
+        rows = {
+            vote.vote_record_id: {
+                "vote_record_id": vote.vote_record_id,
+                "summary": None,
+                "topic": None,
+                "file_numbers": FILE_SEPARATOR.join(vote.file_numbers) or None,
+                "generated_at": attempted_at,
+            }
+            for vote in pending
+        }
+
         summarizable = [vote for vote in pending if vote.project_titles]
-        rows: list[dict] = []
         for start in range(0, len(summarizable), BATCH_SIZE):
             batch = summarizable[start : start + BATCH_SIZE]
             results = run_claude_json_array(_build_prompt(batch))
@@ -199,12 +220,6 @@ class CongressSummariesConnector(Connector):
                 if not summary:
                     continue
                 topic = str(item.get("tema") or "").strip().lower()
-                rows.append(
-                    {
-                        "vote_record_id": vote.vote_record_id,
-                        "summary": summary,
-                        "topic": topic if topic in TOPICS else DEFAULT_TOPIC,
-                        "file_numbers": FILE_SEPARATOR.join(vote.file_numbers) or None,
-                    }
-                )
-        return rows
+                rows[vote.vote_record_id]["summary"] = summary
+                rows[vote.vote_record_id]["topic"] = topic if topic in TOPICS else DEFAULT_TOPIC
+        return list(rows.values())
