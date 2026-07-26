@@ -413,3 +413,17 @@ class IndicatorTermsOut(BaseModel):
     source: str
     method: TermMethod
     terms: list[IndicatorTermStat]
+
+
+class IndicatorVariationOut(BaseModel):
+    indicator_code: str
+    source: str
+    method: TermMethod
+    requested_from: date
+    first_date: date
+    last_date: date
+    first_value: Decimal
+    last_value: Decimal
+    points: int
+    change_pct: Decimal
+    annualized_pct: Decimal | None

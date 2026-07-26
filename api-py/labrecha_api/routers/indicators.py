@@ -16,12 +16,20 @@ from labrecha_api.schemas import (
     IndicatorSeries,
     IndicatorSourceSummary,
     IndicatorSummary,
+    IndicatorVariationOut,
+)
+from labrecha_api.series_change import (
+    accumulated_change,
+    annualize,
+    method_for,
+    most_covered_source,
 )
 
 router = APIRouter(prefix="/indicators", tags=["indicators"])
 
 DEFAULT_LIMIT = 5000
 MAX_LIMIT = 50000
+MIN_VARIATION_POINTS = 2
 
 
 @router.get("", response_model=list[IndicatorSummary])
@@ -93,6 +101,61 @@ def list_indicator_sources(
     if not results:
         raise HTTPException(status_code=404, detail=f"indicador desconocido: {indicator_code}")
     return results
+
+
+@router.get("/{indicator_code}/variation", response_model=IndicatorVariationOut)
+def indicator_variation_since(
+    indicator_code: str,
+    date_from: date = Query(),
+    source: str | None = Query(default=None),
+    session: Session = Depends(get_session),
+) -> IndicatorVariationOut:
+    conditions = [IndicatorHistory.indicator_code == indicator_code]
+    if source is not None:
+        conditions.append(IndicatorHistory.source == source)
+
+    statement = (
+        select(IndicatorHistory.date, IndicatorHistory.value, IndicatorHistory.source)
+        .where(*conditions)
+        .order_by(IndicatorHistory.date)
+    )
+    rows = session.execute(statement).all()
+    if not rows:
+        raise HTTPException(status_code=404, detail=f"sin datos para '{indicator_code}'")
+
+    resolved_source = source if source is not None else most_covered_source(rows)
+    window = [
+        (day, value)
+        for day, value, row_source in rows
+        if row_source == resolved_source and day >= date_from
+    ]
+    if len(window) < MIN_VARIATION_POINTS:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"'{indicator_code}' no tiene dos mediciones de '{resolved_source}' "
+                f"desde {date_from.isoformat()}"
+            ),
+        )
+
+    method = method_for(indicator_code)
+    first_date, first_value = window[0]
+    last_date, last_value = window[-1]
+    change = accumulated_change(window, method)
+
+    return IndicatorVariationOut(
+        indicator_code=indicator_code,
+        source=resolved_source,
+        method=method,
+        requested_from=date_from,
+        first_date=first_date,
+        last_date=last_date,
+        first_value=first_value,
+        last_value=last_value,
+        points=len(window),
+        change_pct=change,
+        annualized_pct=annualize(change, first_date, last_date),
+    )
 
 
 @router.get("/{indicator_code}", response_model=IndicatorSeries)

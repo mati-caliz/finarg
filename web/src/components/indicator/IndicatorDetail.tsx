@@ -3,6 +3,7 @@
 import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
 import { SeriesExport } from "@/components/indicator/SeriesExport";
 import { TermBreakdown } from "@/components/indicator/TermBreakdown";
+import { VariationSinceEvent } from "@/components/indicator/VariationSinceEvent";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useIndicatorSeriesMulti,
@@ -891,6 +892,8 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
       </div>
 
       <TermBreakdown code={code} source={primary?.source} />
+
+      <VariationSinceEvent code={code} source={primary?.source} />
     </div>
   );
 }
