@@ -34,6 +34,9 @@ scraper/   Python (SQLAlchemy + httpx + pydantic). Un conector = un módulo en
 api-py/    FastAPI de solo lectura sobre Postgres + calculadoras. Sin estado, sin auth. Es
            producto además de backend: gzip, rate limiting por IP (`rate_limit.py`, exento para
            la red interna así el SSR no se auto-limita), CSV por serie y docs en /docs.
+           La IP del cliente sale de `X-Real-IP` (nginx la sobrescribe siempre) o, si falta, del
+           **último** hop de `X-Forwarded-For` —nunca del primero, que lo controla el cliente—; el
+           BFF reenvía ambos headers. Misma regla en el front: `web/src/lib/clientIp.ts`.
 web/       Next.js 16 (App Router) + React 18 + TS + Tailwind + Recharts.
 ```
 
@@ -101,6 +104,10 @@ sólo pinta la banda de brecha donde las dos fuentes midieron de verdad.
   `src/lib/queryParams.ts` (módulo plano: un `"use client"` exporta referencias, no valores, así que
   las constantes que lee el servidor **no** pueden vivir en un componente cliente). Los hooks de
   `src/hooks/useLabrecha.ts` son la cara cliente de esas mismas factorías.
+- **Admin (única superficie de escritura):** `/admin` se autentica contra `ADMIN_PASSWORD` y guarda
+  una cookie HttpOnly cuyo token es `<expiresAt>.<hmac>` — con vencimiento **dentro** de la firma
+  (`lib/adminSession.ts`, TTL 7 días), no sólo en el `Max-Age`. `POST /api/admin/session` limita los
+  intentos fallidos por IP en memoria (`lib/loginAttempts.ts`).
 - **SEO:** JSON-LD en `src/lib/structuredData.ts` (`WebSite` en el layout, `Dataset` +
   `BreadcrumbList` por indicador, `Article` por idea), emitido con `<JsonLd>`, que escapa
   `<`/`>`/`&` a `\uXXXX` para poder inyectarlo como texto (biome tiene `security: all`, así que no
