@@ -87,6 +87,20 @@ export interface IndicatorTerms {
   terms: IndicatorTermStat[];
 }
 
+export interface IndicatorVariation {
+  indicator_code: string;
+  source: string;
+  method: TermMethod;
+  requested_from: string;
+  first_date: string;
+  last_date: string;
+  first_value: string;
+  last_value: string;
+  points: number;
+  change_pct: string;
+  annualized_pct: string | null;
+}
+
 export interface PoliticalEvent {
   date: string;
   title: string;
@@ -383,6 +397,8 @@ export const indicatorsApi = {
   series: (code: string, params?: IndicatorSeriesParams) =>
     get<IndicatorSeries>(`/indicators/${code}`, params),
   sources: (code: string) => get<IndicatorSourceSummary[]>(`/indicators/${code}/sources`),
+  variation: (code: string, params: { date_from: string; source?: string }) =>
+    get<IndicatorVariation>(`/indicators/${code}/variation`, params),
 };
 
 export const politicalEventsApi = {

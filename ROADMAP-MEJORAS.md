@@ -416,14 +416,34 @@ reabre nada de lo podado en la Fase 0 del pivot.
 
 **Criterio de salida.** Alguien se suscribe, recibe el digest y se puede dar de baja sin escribirnos.
 
-### 6.b — Variación desde un evento puntual
+### 6.b — Variación desde un evento puntual ✅ (2026-07-26)
 
-También en `TODO.md`. `/terms/{code}` ya corta cualquier serie por mandato; falta la versión libre:
-"cuánto se movió esto desde el DNU 70/2023". Los eventos ya están en `political_events` y el método
-de acumulación (composición para tasas, extremos para niveles) ya está resuelto y documentado en la
-respuesta de la API.
+**Hecho.** La lógica de acumulación que sólo vivía en el router de `/terms` se extrajo a
+`api-py/labrecha_api/series_change.py` (módulo puro, sin base): `method_for`, `compound`, `annualize`
+y `accumulated_change`. `/terms` ahora la importa en vez de tener sus propios helpers privados, así
+que la versión libre y la versión por mandato **no pueden divergir de método**.
 
-**Criterio de salida.** Desde la página de un indicador se elige un evento político y se ve la
+Sobre eso, `GET /indicators/{code}/variation?date_from=&source=` devuelve la variación acumulada desde
+cualquier fecha hasta el último dato, con el método usado, la ventana real medida (`first_date` /
+`last_date`, que pueden no coincidir con la fecha pedida), cuántas mediciones entraron y la
+anualizada. Sin dos mediciones posteriores a la fecha devuelve 404 con el motivo, en vez de un 0 % que
+parecería "no se movió".
+
+En el front, `components/indicator/VariationSinceEvent.tsx` cuelga de la página del indicador: un
+selector con los eventos de `political_events` (más recientes primero) y, al elegir uno, la variación
+acumulada con el valor inicial → final, el método explicitado, la ventana, la cantidad de mediciones,
+la fuente y la aclaración de que correlación no es causalidad.
+
+**Tests.** 7 nuevos en `api-py/tests/test_series_change.py`: niveles por extremos, tasas compuestas
+(10 % + 10 % = 21 %), ventana vacía, una sola medición (0 % para un nivel, la tasa misma para una
+tasa), primer valor 0 sin división por cero, primer valor negativo en valor absoluto y que el método
+depende del indicador y no de la ventana. Los 16 tests de `/terms` siguen verdes contra el módulo
+nuevo.
+
+**Verificado** contra el Postgres local: `+284 %` de base monetaria desde el 10/12/2023, 404 con el
+motivo para una fecha sin datos posteriores y 422 si falta `date_from`.
+
+**Criterio de salida.** ✅ Desde la página de un indicador se elige un evento político y se ve la
 variación acumulada desde esa fecha, con el método explicitado.
 
 ### 6.c — La brecha entre lo votado y lo que pasó

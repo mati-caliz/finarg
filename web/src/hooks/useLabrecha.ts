@@ -10,6 +10,7 @@ import {
   indicatorSeriesQuery,
   indicatorSourcesQuery,
   indicatorTermsQuery,
+  indicatorVariationQuery,
   indicatorsQuery,
   newsQuery,
   politicalEventsQuery,
@@ -167,4 +168,16 @@ export function useSourceGaps(params?: { limit?: number; min_sources?: number })
 
 export function useIndicatorTerms(code: string, params?: { source?: string }) {
   return useQuery({ ...indicatorTermsQuery(code, params), enabled: Boolean(code) });
+}
+
+export function useIndicatorVariation(
+  code: string,
+  params: { date_from: string; source?: string },
+  enabled = true,
+) {
+  return useQuery({
+    ...indicatorVariationQuery(code, params),
+    enabled: enabled && Boolean(code) && Boolean(params.date_from),
+    retry: false,
+  });
 }

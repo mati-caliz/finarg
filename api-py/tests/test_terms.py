@@ -4,47 +4,47 @@ from datetime import date
 from decimal import Decimal
 
 from labrecha_api.government_terms import TERMS, GovernmentTerm
-from labrecha_api.routers.terms import (
-    MONTHLY_RATE_INDICATORS,
-    _annualize,
-    _compound,
-    _method_for,
-    _most_covered_source,
-    _term_stat,
-)
+from labrecha_api.routers.terms import _term_stat
 from labrecha_api.schemas import TermMethod
+from labrecha_api.series_change import (
+    MONTHLY_RATE_INDICATORS,
+    annualize,
+    compound,
+    method_for,
+    most_covered_source,
+)
 
 TERM = GovernmentTerm("test", "Presidenta de prueba", date(2020, 1, 1), date(2024, 1, 1))
 
 
 def test_rate_indicators_are_compounded_and_the_rest_compare_endpoints() -> None:
     for code in MONTHLY_RATE_INDICATORS:
-        assert _method_for(code) is TermMethod.COMPOUNDED
-    assert _method_for("international_reserves") is TermMethod.ENDPOINTS
+        assert method_for(code) is TermMethod.COMPOUNDED
+    assert method_for("international_reserves") is TermMethod.ENDPOINTS
 
 
 def test_compounding_two_monthly_rates_is_not_their_sum() -> None:
-    assert _compound([Decimal(10), Decimal(10)]) == Decimal(21)
+    assert compound([Decimal(10), Decimal(10)]) == Decimal(21)
 
 
 def test_compounding_an_empty_series_yields_no_change() -> None:
-    assert _compound([]) == Decimal(0)
+    assert compound([]) == Decimal(0)
 
 
 def test_compounding_handles_negative_rates() -> None:
-    assert _compound([Decimal(10), Decimal(-10)]) == Decimal(-1)
+    assert compound([Decimal(10), Decimal(-10)]) == Decimal(-1)
 
 
 def test_annualizing_needs_a_time_span() -> None:
-    assert _annualize(Decimal(50), date(2020, 1, 1), date(2020, 1, 1)) is None
+    assert annualize(Decimal(50), date(2020, 1, 1), date(2020, 1, 1)) is None
 
 
 def test_annualizing_a_total_wipeout_is_undefined() -> None:
-    assert _annualize(Decimal(-100), date(2020, 1, 1), date(2022, 1, 1)) is None
+    assert annualize(Decimal(-100), date(2020, 1, 1), date(2022, 1, 1)) is None
 
 
 def test_annualized_change_is_lower_than_the_accumulated_one_over_several_years() -> None:
-    annualized = _annualize(Decimal(100), date(2020, 1, 1), date(2024, 1, 1))
+    annualized = annualize(Decimal(100), date(2020, 1, 1), date(2024, 1, 1))
 
     assert annualized is not None
     assert Decimal(0) < annualized < Decimal(100)
@@ -123,7 +123,7 @@ def test_the_resolved_source_is_the_one_with_most_points() -> None:
         (date(2020, 3, 1), Decimal(3), "datosgobar"),
     ]
 
-    assert _most_covered_source(rows) == "datosgobar"
+    assert most_covered_source(rows) == "datosgobar"
 
 
 def test_terms_are_chronological_and_only_the_current_one_is_open() -> None:
