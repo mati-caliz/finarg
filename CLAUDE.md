@@ -129,10 +129,16 @@ con algunas fuentes). El patrón de atribución es parte del diseño.
 
 ## Verificación
 
-- Frontend (`cd web`): `npx tsc --noEmit`, `npm run lint:check` (Biome, no ESLint), `npm run build`.
-- API/scraper/shared: `ruff check api-py/labrecha_api scraper/labrecha_scraper shared/labrecha_db`
-  + `ruff format --check` (la config de `ruff.toml` es estricta: casi todas las familias de reglas),
-  y byte-compile con `python -m compileall` sobre esos tres paquetes.
+- Frontend (`cd web`): `npx tsc --noEmit`, `npm run lint:check` (Biome, no ESLint), `npm test`
+  (Jest), `npm run build`.
+- API/scraper/shared: `ruff check api-py/labrecha_api api-py/tests scraper/labrecha_scraper
+  shared/labrecha_db` + `ruff format --check` (la config de `ruff.toml` es estricta: casi todas las
+  familias de reglas), y byte-compile con `python -m compileall` sobre los tres paquetes.
+- Tests de la API (`api-py/tests`, pytest): cubren la lógica pura de cálculo —Ganancias, presión
+  fiscal, series por mandato, brechas entre fuentes— sin tocar la base. Se corren con
+  `pip install ./shared "./api-py[dev]"` y `python -m pytest api-py/tests`.
+- **El CI corre todo esto y bloquea el deploy**: `deploy.yml` invoca a `ci.yml` (`needs: verify`),
+  así que un push a `main` que rompa lint/tipos/tests/build no llega al VPS.
 - Datos: el scraper corre con `python -m labrecha_scraper run <job|all>` (ver `list`, `status`,
   `seed-events`); el esquema se crea/actualiza con `db upgrade` y se audita con `db check`
   (compara la base real contra los modelos). Postgres en el puerto 5433 en local.
