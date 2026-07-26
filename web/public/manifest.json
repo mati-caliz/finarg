@@ -38,10 +38,10 @@
   "dir": "ltr",
   "shortcuts": [
     {
-      "name": "Cotizaciones",
+      "name": "Dólar blue",
       "short_name": "Dólar",
-      "description": "Ver cotizaciones del dólar",
-      "url": "/cotizaciones"
+      "description": "Cotización del dólar blue y su brecha con el oficial",
+      "url": "/indicador/dollar_blue"
     },
     {
       "name": "Calculadora Sueldo Neto",
@@ -52,8 +52,8 @@
     {
       "name": "Inflación",
       "short_name": "Inflación",
-      "description": "Inflación mensual e interanual de Argentina",
-      "url": "/inflacion"
+      "description": "Inflación mensual de Argentina, medida por el INDEC",
+      "url": "/indicador/cpi_monthly"
     }
   ],
   "related_applications": [],
