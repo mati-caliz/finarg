@@ -7,6 +7,7 @@ import httpx
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.units import Unit
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias"
 PAGE_LIMIT = 1000
@@ -14,16 +15,16 @@ BACKFILL_FROM = "2004-01-01"
 
 
 class VariableSpec:
-    def __init__(self, id_variable: int, code: str, unit: str) -> None:
+    def __init__(self, id_variable: int, code: str, unit: Unit) -> None:
         self.id_variable = id_variable
         self.code = code
         self.unit = unit
 
 
 VARIABLES: list[VariableSpec] = [
-    VariableSpec(144, "rate_personal_loans", "TNA_%"),
-    VariableSpec(13, "rate_overdraft", "TNA_%"),
-    VariableSpec(117, "private_sector_loans", "ARS_millones"),
+    VariableSpec(144, "rate_personal_loans", Unit.ANNUAL_NOMINAL_RATE),
+    VariableSpec(13, "rate_overdraft", Unit.ANNUAL_NOMINAL_RATE),
+    VariableSpec(117, "private_sector_loans", Unit.ARS_MILLIONS),
 ]
 
 

@@ -8,6 +8,7 @@ import httpx
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.connectors.crypto import COINGECKO_IDS, VS_CURRENCY
+from labrecha_scraper.units import Unit
 
 MARKET_CHART_URL = "https://api.coingecko.com/api/v3/coins/{coingecko_id}/market_chart"
 HISTORY_DAYS = 365
@@ -62,6 +63,6 @@ class CryptoHistoricalConnector(Connector):
                 source=self.source,
                 date=price_date,
                 value=Decimal(str(entry[1])),
-                meta={"coingecko_id": coingecko_id, "vs_currency": VS_CURRENCY},
+                meta={"unit": Unit.USD, "coingecko_id": coingecko_id, "vs_currency": VS_CURRENCY},
             )
         return list(by_date.values())

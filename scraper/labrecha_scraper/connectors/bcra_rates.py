@@ -7,6 +7,7 @@ import httpx
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.units import Unit
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias"
 PAGE_LIMIT = 1000
@@ -59,7 +60,7 @@ class BcraRatesConnector(Connector):
                         source=self.source,
                         date=date.fromisoformat(raw_date),
                         value=Decimal(str(raw_value)),
-                        meta={"unit": "TNA_%", "id_variable": id_variable},
+                        meta={"unit": Unit.ANNUAL_NOMINAL_RATE, "id_variable": id_variable},
                     )
                 )
             count = payload.get("metadata", {}).get("resultset", {}).get("count", 0)

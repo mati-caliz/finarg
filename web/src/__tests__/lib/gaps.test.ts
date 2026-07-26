@@ -1,4 +1,4 @@
-import { GAPS, GAP_BY_ID, type GapDef, computeGap } from "@/lib/gaps";
+import { GAPS, GAP_BY_ID, type GapDef, automaticGapMagnitude, computeGap } from "@/lib/gaps";
 
 const percentGap: GapDef = {
   id: "test-pct",
@@ -93,5 +93,31 @@ describe("the curated gaps catalog", () => {
         expect(leg.source.length).toBeGreaterThan(0);
       }
     }
+  });
+});
+
+describe("the magnitude of an automatic gap", () => {
+  it("reports percentage indicators in points, not as a ratio of percentages", () => {
+    const magnitude = automaticGapMagnitude("%", 0.6, 24.29);
+
+    expect(magnitude.headline).toBe("0,60 pp");
+    expect(magnitude.caption).toContain("más alta");
+  });
+
+  it("keeps the relative reading for indicators measured in levels", () => {
+    const magnitude = automaticGapMagnitude("ARS", 300, 25);
+
+    expect(magnitude.headline).toBe("25,00 %");
+    expect(magnitude.caption).toBe("de discrepancia");
+    expect(magnitude.barWidth).toBe(25);
+  });
+
+  it("caps the bar so a huge gap cannot overflow its track", () => {
+    expect(automaticGapMagnitude("ARS", 10, 900).barWidth).toBe(100);
+    expect(automaticGapMagnitude("%", 40, 5).barWidth).toBe(100);
+  });
+
+  it("ignores the sign of the spread", () => {
+    expect(automaticGapMagnitude("%", -0.6, -24.29).headline).toBe("0,60 pp");
   });
 });

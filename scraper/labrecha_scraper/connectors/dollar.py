@@ -4,6 +4,7 @@ from datetime import date, datetime
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.units import Unit
 
 DOLLAR_URL = "https://dolarapi.com/v1/dolares"
 
@@ -50,6 +51,7 @@ class DollarConnector(Connector):
                     date=_parse_date(item.get("fechaActualizacion")),
                     value=Decimal(str(sell_price)),
                     meta={
+                        "unit": Unit.ARS,
                         "nombre": item.get("nombre"),
                         "compra": item.get("compra"),
                         "venta": sell_price,

@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, IndicatorPoint, upsert_indicator_points
+from labrecha_scraper.units import Unit
 
 DERIVED_SOURCE = "labrecha"
 CPI_CODE = "cpi_level_general"
@@ -66,7 +67,7 @@ def _deflated_points(session: Session, nominal_code: str, real_code: str) -> lis
                 date=day,
                 value=(value * base_index / index).quantize(DEFLATED_DECIMALS),
                 meta={
-                    "unit": "ARS",
+                    "unit": Unit.ARS,
                     "derived_from": [nominal_code, CPI_CODE],
                     "method": "deflactado por IPC nivel general",
                     "base_month": DEFLATED_BASE_MONTH.isoformat(),
@@ -109,7 +110,7 @@ def _implicit_fx_points(session: Session) -> list[IndicatorPoint]:
                 date=day,
                 value=(base_value / reserve_value).quantize(RATE_DECIMALS),
                 meta={
-                    "unit": "ARS_por_USD",
+                    "unit": Unit.ARS_PER_USD,
                     "derived_from": [IMPLICIT_FX_NUMERATOR, IMPLICIT_FX_DENOMINATOR],
                     "method": "base monetaria sobre reservas internacionales, ambas del BCRA",
                     "reserves_date": reserve_date.isoformat(),

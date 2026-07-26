@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.units import Unit
 
 RESERVES_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/1"
 PAGE_LIMIT = 1000
@@ -44,7 +45,7 @@ class ReservesBcraConnector(Connector):
                             source=self.source,
                             date=date.fromisoformat(raw_date),
                             value=Decimal(str(raw_value)),
-                            meta={"unit": "USD_millones", "id_variable": 1},
+                            meta={"unit": Unit.USD_MILLIONS, "id_variable": 1},
                         )
                     )
                 count = payload.get("metadata", {}).get("resultset", {}).get("count", 0)

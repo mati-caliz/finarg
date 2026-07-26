@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.units import Unit
 
 BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/40"
 PAGE_LIMIT = 1000
@@ -44,7 +45,7 @@ class IclBcraConnector(Connector):
                             source=self.source,
                             date=date.fromisoformat(raw_date),
                             value=Decimal(str(raw_value)),
-                            meta={"unit": "indice", "base": "30.6.2020=1", "id_variable": 40},
+                            meta={"unit": Unit.INDEX, "base": "30.6.2020=1", "id_variable": 40},
                         )
                     )
                 count = payload.get("metadata", {}).get("resultset", {}).get("count", 0)

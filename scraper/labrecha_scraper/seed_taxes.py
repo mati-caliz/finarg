@@ -7,6 +7,8 @@ from labrecha_db import IndicatorHistory
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from labrecha_scraper.units import Unit
+
 SOURCE = "iaraf"
 SOURCE_REF = "IARAF — Vademécum Tributario"
 
@@ -47,7 +49,7 @@ def seed_taxes(session: Session) -> int:
                     "source": SOURCE,
                     "date": snapshot["date"],
                     "value": Decimal(snapshot[level]),
-                    "meta": {"unit": "tributos", "reference": snapshot["reference"]},
+                    "meta": {"unit": Unit.TAXES, "reference": snapshot["reference"]},
                 }
             )
     statement = insert(IndicatorHistory).values(rows)
