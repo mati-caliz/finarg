@@ -2,10 +2,10 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSourceGaps } from "@/hooks/useLabrecha";
+import { automaticGapMagnitude } from "@/lib/gaps";
 import {
   INDICATOR_FAMILY_LABELS,
   formatDateAR,
-  formatNumberAR,
   getIndicatorDisplay,
   getIndicatorMeta,
   sourceLabel,
@@ -14,7 +14,6 @@ import type { SourceGap } from "@/lib/labrechaApi";
 import Link from "next/link";
 
 const MONO = "var(--font-jb-mono)";
-const MAX_BAR_PCT = 100;
 const SKELETON_KEYS = ["g1", "g2", "g3"];
 
 function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
@@ -23,6 +22,7 @@ function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
   const familyLabel = meta ? INDICATOR_FAMILY_LABELS[meta.family] : "Indicador";
   const higher = Number.parseFloat(gap.higher_value);
   const lower = Number.parseFloat(gap.lower_value);
+  const magnitude = automaticGapMagnitude(gap.unit, Number.parseFloat(gap.spread), gap.gap_pct);
   const strong = position < 3;
 
   return (
@@ -107,7 +107,7 @@ function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
         >
           <div
             style={{
-              width: `${Math.min(Math.abs(gap.gap_pct), MAX_BAR_PCT)}%`,
+              width: `${magnitude.barWidth}%`,
               height: "100%",
               background: "var(--gap)",
               opacity: 0.9,
@@ -115,7 +115,8 @@ function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
           />
         </div>
         <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)", marginTop: 6 }}>
-          misma fecha y misma unidad ({gap.unit}) en ambas fuentes · {formatDateAR(gap.date)}
+          {gap.measurements.length} fuentes con la misma unidad ({gap.unit}) en la misma fecha ·{" "}
+          {formatDateAR(gap.date)}
         </div>
         {gap.excluded_sources.length > 0 && (
           <div
@@ -139,10 +140,10 @@ function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
             fontVariantNumeric: "tabular-nums",
           }}
         >
-          {formatNumberAR(Math.abs(gap.gap_pct), 2)} %
+          {magnitude.headline}
         </div>
         <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)" }}>
-          de discrepancia
+          {magnitude.caption}
         </div>
       </div>
     </Link>

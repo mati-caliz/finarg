@@ -6,9 +6,13 @@ from decimal import Decimal
 import httpx
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.units import Unit
 
 MONTHLY_URL = "https://api.argentinadatos.com/v1/finanzas/indices/inflacion"
 YEAR_OVER_YEAR_URL = "https://api.argentinadatos.com/v1/finanzas/indices/inflacionInteranual"
+
+NATIONAL_GEOGRAPHY = "Nacional"
+MEASURING_AGENCY = "INDEC"
 
 
 class InflationConnector(Connector):
@@ -39,6 +43,11 @@ class InflationConnector(Connector):
                     source=self.source,
                     date=date.fromisoformat(raw_date),
                     value=Decimal(str(raw_value)),
+                    meta={
+                        "unit": Unit.PERCENT,
+                        "geography": NATIONAL_GEOGRAPHY,
+                        "agency": MEASURING_AGENCY,
+                    },
                 )
             )
         return result

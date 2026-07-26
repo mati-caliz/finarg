@@ -4,6 +4,7 @@ from datetime import date
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.units import Unit
 
 COUNTRY_RISK_URL = "https://api.argentinadatos.com/v1/finanzas/indices/riesgo-pais"
 
@@ -30,6 +31,7 @@ class CountryRiskConnector(Connector):
                     source=self.source,
                     date=date.fromisoformat(raw_date),
                     value=Decimal(str(raw_value)),
+                    meta={"unit": Unit.POINTS},
                 )
             )
         return points

@@ -6,6 +6,7 @@ from datetime import date
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.units import Unit
 
 CSV_URL = (
     "https://raw.githubusercontent.com/TheEconomist/big-mac-data/master/"
@@ -33,14 +34,14 @@ def _parse(csv_text: str) -> list[IndicatorPoint]:
         if row.get("iso_a3") != ISO_ARGENTINA:
             continue
         fecha = date.fromisoformat(row["date"])
-        points.append(_point("big_mac_ars", fecha, Decimal(row["local_price"]), "ARS"))
-        points.append(_point("big_mac_usd", fecha, Decimal(row["dollar_price"]), "USD"))
+        points.append(_point("big_mac_ars", fecha, Decimal(row["local_price"]), Unit.ARS))
+        points.append(_point("big_mac_usd", fecha, Decimal(row["dollar_price"]), Unit.USD))
         points.append(
             _point(
                 "big_mac_valuation",
                 fecha,
                 Decimal(row["USD_raw"]) * 100,
-                "porcentaje",
+                Unit.PERCENT,
             )
         )
     if len(points) < MIN_EXPECTED_POINTS:
@@ -50,7 +51,7 @@ def _parse(csv_text: str) -> list[IndicatorPoint]:
     return points
 
 
-def _point(indicator_code: str, fecha: date, value: Decimal, unit: str) -> IndicatorPoint:
+def _point(indicator_code: str, fecha: date, value: Decimal, unit: Unit) -> IndicatorPoint:
     return IndicatorPoint(
         indicator_code=indicator_code,
         source="the_economist",

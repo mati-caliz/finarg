@@ -28,6 +28,14 @@ export const SOURCE_LABELS: Record<string, string> = {
   labrecha: "La Brecha (calculado)",
   iaraf: "IARAF",
   hcdn: "HCDN",
+  iec_caba: "IEC (CABA)",
+  dgeyc_cordoba: "DGEyC (Córdoba)",
+  deie_mendoza: "DEIE (Mendoza)",
+  dpec_neuquen: "DPEyC (Neuquén)",
+  dpec_san_luis: "DPEyC (San Luis)",
+  ipec_santa_fe: "IPEC (Santa Fe)",
+  de_tucuman: "DE (Tucumán)",
+  ipecd_chaco: "IPECD (Chaco)",
 };
 
 export function sourceLabel(source: string): string {

@@ -5,6 +5,7 @@ from datetime import datetime as datetime_type
 from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
+from labrecha_scraper.units import Unit
 
 SIMPLE_PRICE_URL = "https://api.coingecko.com/api/v3/simple/price"
 VS_CURRENCY = "usd"
@@ -53,6 +54,7 @@ class CryptoConnector(Connector):
                     date=today,
                     value=Decimal(str(price)),
                     meta={
+                        "unit": Unit.USD,
                         "coingecko_id": coingecko_id,
                         "vs_currency": VS_CURRENCY,
                         "change_24h": None if change_24h is None else str(change_24h),

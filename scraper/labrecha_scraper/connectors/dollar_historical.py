@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, IndicatorPoint, upsert_rows
 from labrecha_scraper.connectors.dollar import dollar_code
+from labrecha_scraper.units import Unit
 
 HISTORICAL_DOLLARS_URL = "https://api.argentinadatos.com/v1/cotizaciones/dolares"
 
@@ -36,7 +37,7 @@ class DollarHistoricalConnector(Connector):
                 source=self.source,
                 date=point_date,
                 value=Decimal(str(sell_price)),
-                meta={"compra": item.get("compra"), "venta": sell_price},
+                meta={"unit": Unit.ARS, "compra": item.get("compra"), "venta": sell_price},
             )
         return list(points_by_key.values())
 

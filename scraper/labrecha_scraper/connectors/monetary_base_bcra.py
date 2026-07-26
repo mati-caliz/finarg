@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from labrecha_scraper.base import Connector, IndicatorPoint
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.units import Unit
 
 MONETARY_BASE_URL = "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias/15"
 MONETARY_BASE_VARIABLE = 15
@@ -45,7 +46,7 @@ class MonetaryBaseBcraConnector(Connector):
                             source=self.source,
                             date=date.fromisoformat(raw_date),
                             value=Decimal(str(raw_value)),
-                            meta={"unit": "ARS_millones", "id_variable": MONETARY_BASE_VARIABLE},
+                            meta={"unit": Unit.ARS_MILLIONS, "id_variable": MONETARY_BASE_VARIABLE},
                         )
                     )
                 count = payload.get("metadata", {}).get("resultset", {}).get("count", 0)

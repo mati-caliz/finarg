@@ -105,3 +105,35 @@ export function computeGap(def: GapDef, valueA: number, valueB: number): GapResu
       : `${formatNumberAR(magnitude, 1)} pp`;
   return { gapPct, gapValue, formattedGap };
 }
+
+export const PERCENT_UNIT = "%";
+
+const PP_BAR_FULL_SCALE = 10;
+const PCT_BAR_FULL_SCALE = 100;
+
+export interface AutomaticGapMagnitude {
+  headline: string;
+  caption: string;
+  barWidth: number;
+}
+
+export function automaticGapMagnitude(
+  unit: string,
+  spread: number,
+  gapPct: number,
+): AutomaticGapMagnitude {
+  if (unit === PERCENT_UNIT) {
+    const points = Math.abs(spread);
+    return {
+      headline: `${formatNumberAR(points, 2)} pp`,
+      caption: "entre la medición más alta y la más baja",
+      barWidth: Math.min((points / PP_BAR_FULL_SCALE) * PCT_BAR_FULL_SCALE, PCT_BAR_FULL_SCALE),
+    };
+  }
+  const relative = Math.abs(gapPct);
+  return {
+    headline: `${formatNumberAR(relative, 2)} %`,
+    caption: "de discrepancia",
+    barWidth: Math.min(relative, PCT_BAR_FULL_SCALE),
+  };
+}
