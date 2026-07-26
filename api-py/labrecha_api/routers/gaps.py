@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -10,8 +11,15 @@ from labrecha_db import IndicatorHistory
 from sqlalchemy import func, select, tuple_
 from sqlalchemy.orm import Session
 
+from labrecha_api.clock import today_in_argentina
 from labrecha_api.db import get_session
-from labrecha_api.schemas import GapExclusion, GapMeasurement, GapOut
+from labrecha_api.schemas import (
+    GapExclusion,
+    GapHistoryOut,
+    GapHistoryPoint,
+    GapMeasurement,
+    GapOut,
+)
 
 router = APIRouter(prefix="/gaps", tags=["gaps"])
 
@@ -21,6 +29,9 @@ MAX_LIMIT = 200
 PERCENT = 100
 
 MISSING_UNIT_REASON = "sin unidad declarada en la medición"
+PERCENT_UNIT = "%"
+
+RECENT_WINDOW_DAYS = 400
 
 
 @dataclass(frozen=True)
@@ -30,12 +41,24 @@ class Measurement:
     unit: str | None
 
 
-def _latest_shared_dates(session: Session, min_sources: int) -> dict[str, date]:
+def _window_start(today: date) -> date:
+    return today - timedelta(days=RECENT_WINDOW_DAYS)
+
+
+def _latest_shared_dates(
+    session: Session, min_sources: int, indicator_code: str | None = None
+) -> dict[str, date]:
+    conditions = (
+        [IndicatorHistory.date >= _window_start(today_in_argentina())]
+        if indicator_code is None
+        else [IndicatorHistory.indicator_code == indicator_code]
+    )
     shared = (
         select(
             IndicatorHistory.indicator_code.label("indicator_code"),
             IndicatorHistory.date.label("date"),
         )
+        .where(*conditions)
         .group_by(IndicatorHistory.indicator_code, IndicatorHistory.date)
         .having(func.count(func.distinct(IndicatorHistory.source)) >= min_sources)
         .subquery()
@@ -146,7 +169,7 @@ def list_gaps(
 
 @router.get("/{indicator_code}", response_model=GapOut)
 def get_gap(indicator_code: str, session: Session = Depends(get_session)) -> GapOut:
-    latest_by_code = _latest_shared_dates(session, MIN_SOURCES)
+    latest_by_code = _latest_shared_dates(session, MIN_SOURCES, indicator_code)
     day = latest_by_code.get(indicator_code)
     if day is None:
         raise HTTPException(
@@ -164,3 +187,80 @@ def get_gap(indicator_code: str, session: Session = Depends(get_session)) -> Gap
             ),
         )
     return gap
+
+
+def _history_point(day: date, measurements: list[Measurement], unit: str) -> GapHistoryPoint | None:
+    comparable = [item for item in measurements if item.unit == unit]
+    if len(comparable) < MIN_SOURCES:
+        return None
+    ordered = sorted(comparable, key=lambda item: item.value, reverse=True)
+    higher, lower = ordered[0], ordered[-1]
+    spread = higher.value - lower.value
+    base = abs(lower.value)
+    return GapHistoryPoint(
+        date=day,
+        higher_source=higher.source,
+        lower_source=lower.source,
+        spread=spread,
+        gap_pct=round(float(spread / base * PERCENT) if base != 0 else 0.0, 4),
+        sources=len(ordered),
+    )
+
+
+def _magnitude_for(unit: str) -> Callable[[GapHistoryPoint], Decimal | float]:
+    if unit == PERCENT_UNIT:
+        return lambda point: abs(point.spread)
+    return lambda point: abs(point.gap_pct)
+
+
+def _measurements_by_date(session: Session, indicator_code: str) -> dict[date, list[Measurement]]:
+    statement = select(
+        IndicatorHistory.date,
+        IndicatorHistory.source,
+        IndicatorHistory.value,
+        IndicatorHistory.meta,
+    ).where(IndicatorHistory.indicator_code == indicator_code)
+    grouped: dict[date, list[Measurement]] = defaultdict(list)
+    for day, source, value, meta in session.execute(statement):
+        declared_unit = (meta or {}).get("unit")
+        grouped[day].append(
+            Measurement(
+                source=source, value=value, unit=str(declared_unit) if declared_unit else None
+            )
+        )
+    return grouped
+
+
+@router.get("/{indicator_code}/history", response_model=GapHistoryOut)
+def get_gap_history(indicator_code: str, session: Session = Depends(get_session)) -> GapHistoryOut:
+    by_date = _measurements_by_date(session, indicator_code)
+    unit = _comparable_unit([item for values in by_date.values() for item in values])
+    if unit is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"sin historia de brecha para '{indicator_code}': "
+                "no hay dos fuentes que declaren la misma unidad"
+            ),
+        )
+
+    points = [
+        point
+        for day in sorted(by_date)
+        if (point := _history_point(day, by_date[day], unit)) is not None
+    ]
+    if not points:
+        raise HTTPException(
+            status_code=404,
+            detail=f"'{indicator_code}' nunca tuvo dos fuentes midiendo la misma fecha",
+        )
+
+    magnitude = _magnitude_for(unit)
+    return GapHistoryOut(
+        indicator_code=indicator_code,
+        unit=unit,
+        points=points,
+        widest=max(points, key=magnitude),
+        narrowest=min(points, key=magnitude),
+        latest=points[-1],
+    )

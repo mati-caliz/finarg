@@ -64,6 +64,24 @@ export interface SourceGap {
   excluded_sources: GapExclusion[];
 }
 
+export interface GapHistoryPoint {
+  date: string;
+  higher_source: string;
+  lower_source: string;
+  spread: string;
+  gap_pct: number;
+  sources: number;
+}
+
+export interface GapHistory {
+  indicator_code: string;
+  unit: string;
+  points: GapHistoryPoint[];
+  widest: GapHistoryPoint;
+  narrowest: GapHistoryPoint;
+  latest: GapHistoryPoint;
+}
+
 export type TermMethod = "COMPOUNDED" | "ENDPOINTS";
 
 export interface IndicatorTermStat {
@@ -474,6 +492,7 @@ export const taxesApi = {
 export const gapsApi = {
   list: (params?: { limit?: number; min_sources?: number }) => get<SourceGap[]>("/gaps", params),
   byCode: (code: string) => get<SourceGap>(`/gaps/${code}`),
+  history: (code: string) => get<GapHistory>(`/gaps/${code}/history`),
 };
 
 export const termsApi = {

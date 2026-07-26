@@ -414,6 +414,24 @@ class GapOut(BaseModel):
     excluded_sources: list[GapExclusion] = []
 
 
+class GapHistoryPoint(BaseModel):
+    date: date
+    higher_source: str
+    lower_source: str
+    spread: Decimal
+    gap_pct: float
+    sources: int
+
+
+class GapHistoryOut(BaseModel):
+    indicator_code: str
+    unit: str
+    points: list[GapHistoryPoint]
+    widest: GapHistoryPoint
+    narrowest: GapHistoryPoint
+    latest: GapHistoryPoint
+
+
 class TermMethod(StrEnum):
     COMPOUNDED = "COMPOUNDED"
     ENDPOINTS = "ENDPOINTS"

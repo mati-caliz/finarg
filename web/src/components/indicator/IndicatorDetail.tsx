@@ -1,6 +1,7 @@
 "use client";
 
 import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
+import { GapHistory } from "@/components/indicator/GapHistory";
 import { SeriesExport } from "@/components/indicator/SeriesExport";
 import { TermBreakdown } from "@/components/indicator/TermBreakdown";
 import { VariationSinceEvent } from "@/components/indicator/VariationSinceEvent";
@@ -255,6 +256,8 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
       </div>
 
       <TermBreakdown code={code} source={primary?.source} />
+
+      <GapHistory code={code} />
 
       <VariationSinceEvent code={code} source={primary?.source} />
     </div>
