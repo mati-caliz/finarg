@@ -106,6 +106,7 @@ export async function indicatorDetailData(
     );
   }
   queries.push(politicalEventsQuery({ date_from: dateFrom, date_to: latestDate }));
+  queries.push(politicalEventsQuery());
   const primary = ordered[0];
   if (primary !== undefined) {
     queries.push(indicatorTermsQuery(code, { source: primary.source }));

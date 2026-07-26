@@ -118,7 +118,9 @@ function GapRow({ gap, position }: { gap: SourceGap; position: number }) {
           misma fecha y misma unidad ({gap.unit}) en ambas fuentes · {formatDateAR(gap.date)}
         </div>
         {gap.excluded_sources.length > 0 && (
-          <div style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)", marginTop: 4 }}>
+          <div
+            style={{ fontFamily: MONO, fontSize: "0.62rem", color: "var(--ink3)", marginTop: 4 }}
+          >
             fuera de la comparación:{" "}
             {gap.excluded_sources
               .map((excluded) => `${sourceLabel(excluded.source)} (${excluded.reason})`)

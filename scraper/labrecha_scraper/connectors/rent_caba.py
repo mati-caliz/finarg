@@ -51,16 +51,16 @@ class RentCabaConnector(Connector):
         with self.build_client() as client:
             response = client.get(CSV_URL)
             response.raise_for_status()
-        return _latest_by_neighborhood(response.content.decode("utf-8-sig"))
+        return _monthly_series(response.content.decode("utf-8-sig"))
 
     def persist(self, session: Session, data: object) -> int:
         assert isinstance(data, list)
-        return upsert_rows(session, RentByNeighborhood, data, ["neighborhood"])
+        return upsert_rows(session, RentByNeighborhood, data, ["neighborhood", "date"])
 
 
-def _latest_by_neighborhood(csv_text: str) -> list[dict]:
+def _monthly_series(csv_text: str) -> list[dict]:
     reader = csv.DictReader(io.StringIO(csv_text), delimiter=";")
-    latest: dict[str, tuple[date, dict]] = {}
+    by_neighborhood_and_month: dict[tuple[str, date], dict] = {}
     for row in reader:
         if row.get("ambientes") != ROOMS:
             continue
@@ -73,19 +73,14 @@ def _latest_by_neighborhood(csv_text: str) -> list[dict]:
         if month is None or not year.isdigit() or not neighborhood:
             continue
         point_date = date(int(year), month, 1)
-        current = latest.get(neighborhood)
-        if current is None or point_date > current[0]:
-            latest[neighborhood] = (
-                point_date,
-                {
-                    "neighborhood": neighborhood,
-                    "commune": (row.get("comuna") or "").strip() or None,
-                    "date": point_date,
-                    "price": price,
-                    "rooms": ROOMS,
-                },
-            )
-    rows = [entry[1] for entry in latest.values()]
+        by_neighborhood_and_month[(neighborhood, point_date)] = {
+            "neighborhood": neighborhood,
+            "date": point_date,
+            "commune": (row.get("comuna") or "").strip() or None,
+            "price": price,
+            "rooms": ROOMS,
+        }
+    rows = list(by_neighborhood_and_month.values())
     if len(rows) < MIN_EXPECTED_ROWS:
         raise ValueError(
             "el CSV de alquileres CABA no trajo suficientes barrios (¿cambió el formato?)"

@@ -3,11 +3,11 @@ import { type Cadence, cadenceForCode } from "@/lib/indicators";
 const MS_PER_DAY = 86_400_000;
 
 export const MAX_AGE_DAYS: Record<Cadence, number> = {
-  diaria: 5,
-  mensual: 55,
-  trimestral: 135,
-  semestral: 250,
-  anual: 430,
+  daily: 5,
+  monthly: 55,
+  quarterly: 135,
+  biannual: 250,
+  annual: 430,
 };
 
 function toUtcMidnight(isoDate: string): number {
