@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
 from labrecha_api.schemas import (
@@ -8,6 +9,7 @@ from labrecha_api.schemas import (
     IncomeTaxDeductionBreakdown,
     IncomeTaxRequest,
     IncomeTaxResponse,
+    IncomeTaxScaleInfo,
     TaxBracketOut,
 )
 
@@ -19,13 +21,6 @@ MAX_DEDUCTION_RATE = Decimal("0.40")
 PERCENTAGE_DIVISOR = Decimal(100)
 MAX_TAXABLE_INCOME = Decimal(999999999999)
 
-ANNUAL_MINIMUM_EXEMPTION = Decimal("4211886.94")
-SPECIAL_DEDUCTION_4TH = Decimal("20217057.35")
-SPOUSE_ALLOWANCE = Decimal("3966752.72")
-CHILD_ALLOWANCE = Decimal("2000447.87")
-CHILD_DISABILITY_ALLOWANCE = Decimal("4000895.74")
-LIFE_INSURANCE_ANNUAL_CAP = Decimal("573817.13")
-
 MONEY = Decimal("0.01")
 
 
@@ -36,17 +31,51 @@ class TaxBracketScale:
     rate: Decimal
 
 
-SCALES: list[TaxBracketScale] = [
-    TaxBracketScale(Decimal(0), Decimal("1749901.45"), Decimal(5)),
-    TaxBracketScale(Decimal("1749901.45"), Decimal("3499802.89"), Decimal(9)),
-    TaxBracketScale(Decimal("3499802.89"), Decimal("5249704.34"), Decimal(12)),
-    TaxBracketScale(Decimal("5249704.34"), Decimal("7874556.52"), Decimal(15)),
-    TaxBracketScale(Decimal("7874556.52"), Decimal("15749113.04"), Decimal(19)),
-    TaxBracketScale(Decimal("15749113.04"), Decimal("23623669.56"), Decimal(23)),
-    TaxBracketScale(Decimal("23623669.56"), Decimal("35435504.34"), Decimal(27)),
-    TaxBracketScale(Decimal("35435504.34"), Decimal("53153256.52"), Decimal(31)),
-    TaxBracketScale(Decimal("53153256.52"), MAX_TAXABLE_INCOME, Decimal(35)),
-]
+@dataclass(frozen=True)
+class IncomeTaxScale:
+    effective_from: date
+    period_label: str
+    source: str
+    source_url: str
+    minimum_exemption: Decimal
+    special_deduction: Decimal
+    spouse_allowance: Decimal
+    child_allowance: Decimal
+    child_disability_allowance: Decimal
+    life_insurance_annual_cap: Decimal
+    brackets: tuple[TaxBracketScale, ...]
+
+
+CURRENT_SCALE = IncomeTaxScale(
+    effective_from=date(2026, 7, 1),
+    period_label="julio a diciembre de 2026",
+    source=(
+        "ARCA — escala del art. 94 y deducciones del art. 30 de la Ley de Impuesto a las "
+        "Ganancias, régimen de retención RG 4.003, período julio a diciembre de 2026 "
+        "(importes acumulados a diciembre). Tope de seguro de vida: deducciones generales 2026."
+    ),
+    source_url=(
+        "https://www.arca.gob.ar/gananciasYBienes/ganancias/"
+        "personas-humanas-sucesiones-indivisas/deducciones/deducciones-personales.asp"
+    ),
+    minimum_exemption=Decimal("5585736.93"),
+    special_deduction=Decimal("26811537.29"),
+    spouse_allowance=Decimal("5260643.86"),
+    child_allowance=Decimal("2652961.90"),
+    child_disability_allowance=Decimal("5305923.78"),
+    life_insurance_annual_cap=Decimal("753472.14"),
+    brackets=(
+        TaxBracketScale(Decimal(0), Decimal("2168491.89"), Decimal(5)),
+        TaxBracketScale(Decimal("2168491.89"), Decimal("4336983.77"), Decimal(9)),
+        TaxBracketScale(Decimal("4336983.77"), Decimal("6505475.65"), Decimal(12)),
+        TaxBracketScale(Decimal("6505475.65"), Decimal("9758213.49"), Decimal(15)),
+        TaxBracketScale(Decimal("9758213.49"), Decimal("19516426.99"), Decimal(19)),
+        TaxBracketScale(Decimal("19516426.99"), Decimal("29274640.48"), Decimal(23)),
+        TaxBracketScale(Decimal("29274640.48"), Decimal("43911960.73"), Decimal(27)),
+        TaxBracketScale(Decimal("43911960.73"), Decimal("65867941.10"), Decimal(31)),
+        TaxBracketScale(Decimal("65867941.10"), MAX_TAXABLE_INCOME, Decimal(35)),
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -94,11 +123,11 @@ def _legal_deductions(request: IncomeTaxRequest, gross_annual: Decimal) -> _Lega
 def _family_allowances(request: IncomeTaxRequest) -> Decimal:
     allowances = Decimal(0)
     if request.has_spouse:
-        allowances += SPOUSE_ALLOWANCE
+        allowances += CURRENT_SCALE.spouse_allowance
     disabled = min(max(0, request.children_with_disabilities_count), request.number_of_children)
     regular = max(0, request.number_of_children - disabled)
-    allowances += CHILD_ALLOWANCE * regular
-    allowances += CHILD_DISABILITY_ALLOWANCE * disabled
+    allowances += CURRENT_SCALE.child_allowance * regular
+    allowances += CURRENT_SCALE.child_disability_allowance * disabled
     return allowances
 
 
@@ -108,11 +137,15 @@ def _personal_deductions(request: IncomeTaxRequest, gross_annual: Decimal) -> De
     if request.housing_rent is not None:
         deductions += min(request.housing_rent * MONTHS_PER_YEAR, max_by_rate)
     if request.domestic_service is not None:
-        deductions += min(request.domestic_service * MONTHS_PER_YEAR, ANNUAL_MINIMUM_EXEMPTION)
+        deductions += min(
+            request.domestic_service * MONTHS_PER_YEAR, CURRENT_SCALE.minimum_exemption
+        )
     if request.education_expenses is not None:
         deductions += min(request.education_expenses * MONTHS_PER_YEAR, max_by_rate)
     if request.life_insurance is not None and request.life_insurance > 0:
-        deductions += min(request.life_insurance * MONTHS_PER_YEAR, LIFE_INSURANCE_ANNUAL_CAP)
+        deductions += min(
+            request.life_insurance * MONTHS_PER_YEAR, CURRENT_SCALE.life_insurance_annual_cap
+        )
     return deductions
 
 
@@ -121,7 +154,7 @@ def _tax_by_brackets(taxable_income: Decimal) -> tuple[Decimal, list[TaxBracketO
     total_tax = Decimal(0)
     remaining = taxable_income
     bracket_number = 1
-    for scale in SCALES:
+    for scale in CURRENT_SCALE.brackets:
         if remaining <= 0:
             break
         bracket_range = scale.to_amount - scale.from_amount
@@ -153,7 +186,10 @@ def calculate_income_tax(request: IncomeTaxRequest) -> IncomeTaxResponse:
 
     legal_net_income = gross_annual - legal.total
     total_allowed_deductions = (
-        ANNUAL_MINIMUM_EXEMPTION + SPECIAL_DEDUCTION_4TH + family_allowances + personal_deductions
+        CURRENT_SCALE.minimum_exemption
+        + CURRENT_SCALE.special_deduction
+        + family_allowances
+        + personal_deductions
     )
     taxable_income = max(Decimal(0), legal_net_income - total_allowed_deductions)
 
@@ -170,6 +206,12 @@ def calculate_income_tax(request: IncomeTaxRequest) -> IncomeTaxResponse:
     )
 
     return IncomeTaxResponse(
+        scale=IncomeTaxScaleInfo(
+            effective_from=CURRENT_SCALE.effective_from,
+            period_label=CURRENT_SCALE.period_label,
+            source=CURRENT_SCALE.source,
+            source_url=CURRENT_SCALE.source_url,
+        ),
         gross_monthly_salary=_money(request.gross_monthly_salary),
         gross_annual_salary=_money(gross_annual),
         monthly_legal_deductions=monthly_legal,
@@ -180,8 +222,8 @@ def calculate_income_tax(request: IncomeTaxRequest) -> IncomeTaxResponse:
         effective_rate=_money(effective_rate),
         net_monthly_salary=_money(net_monthly),
         calculation_details=IncomeTaxCalculationDetails(
-            minimum_exemption=ANNUAL_MINIMUM_EXEMPTION,
-            special_deduction=SPECIAL_DEDUCTION_4TH,
+            minimum_exemption=CURRENT_SCALE.minimum_exemption,
+            special_deduction=CURRENT_SCALE.special_deduction,
             family_allowances=family_allowances,
             personal_deductions=personal_deductions,
             total_allowed_deductions=total_allowed_deductions,

@@ -44,6 +44,11 @@ export interface GapMeasurement {
   value: string;
 }
 
+export interface GapExclusion {
+  source: string;
+  reason: string;
+}
+
 export interface SourceGap {
   indicator_code: string;
   date: string;
@@ -53,7 +58,9 @@ export interface SourceGap {
   lower_value: string;
   spread: string;
   gap_pct: number;
+  unit: string;
   measurements: GapMeasurement[];
+  excluded_sources: GapExclusion[];
 }
 
 export type TermMethod = "COMPOUNDED" | "ENDPOINTS";
@@ -309,7 +316,15 @@ export interface IncomeTaxRequest {
   life_insurance?: number | null;
 }
 
+export interface IncomeTaxScaleInfo {
+  effective_from: string;
+  period_label: string;
+  source: string;
+  source_url: string;
+}
+
 export interface IncomeTaxResponse {
+  scale: IncomeTaxScaleInfo;
   gross_monthly_salary: string;
   gross_annual_salary: string;
   monthly_legal_deductions: string;

@@ -9,18 +9,39 @@ import { SCRAPE_RUNS_PARAMS } from "@/lib/queryParams";
 
 const SKELETON_KEYS = ["e1", "e2", "e3", "e4", "e5", "e6"];
 
+const STATUS_SUCCESS = "success";
+const STATUS_EMPTY = "empty";
+const STATUS_RUNNING = "running";
+
+const EMPTY_LABEL = "sin datos";
+const EMPTY_HINT = "el conector corrió sin errores pero no trajo filas nuevas";
+
 function isSuccess(run: ScrapeRun): boolean {
-  return run.status.toLowerCase() === "success";
+  return run.status.toLowerCase() === STATUS_SUCCESS;
+}
+
+function isEmpty(run: ScrapeRun): boolean {
+  return run.status.toLowerCase() === STATUS_EMPTY;
 }
 
 function statusColor(run: ScrapeRun): string {
   if (isSuccess(run)) {
     return "var(--pos)";
   }
-  if (run.status.toLowerCase() === "running") {
+  if (isEmpty(run) || run.status.toLowerCase() === STATUS_RUNNING) {
     return "var(--gap)";
   }
   return "var(--neg)";
+}
+
+function statusLabel(run: ScrapeRun): string {
+  if (isSuccess(run)) {
+    return "OK";
+  }
+  if (isEmpty(run)) {
+    return EMPTY_LABEL;
+  }
+  return run.status;
 }
 
 function relativeTime(iso: string | null): string {
@@ -105,10 +126,13 @@ function StatusRow({ run }: { run: ScrapeRun }) {
           </span>
         </div>
         <div style={{ fontSize: "0.75rem", color: "var(--ink2)" }}>
-          {ok ? "OK" : run.status} · {(run.rows_upserted ?? 0).toLocaleString("es-AR")} filas ·{" "}
+          {statusLabel(run)} · {(run.rows_upserted ?? 0).toLocaleString("es-AR")} filas ·{" "}
           {durationLabel(run)}
         </div>
-        {run.error && (
+        {isEmpty(run) && (
+          <div style={{ fontSize: "0.6875rem", color: "var(--gap)" }}>{EMPTY_HINT}</div>
+        )}
+        {run.error && !isEmpty(run) && (
           <div
             style={{
               fontFamily: "var(--font-jb-mono)",
@@ -164,7 +188,7 @@ export function ScrapeStatus() {
   });
 
   const total = runs.length;
-  const errors = runs.filter((run) => !isSuccess(run)).length;
+  const failing = runs.filter((run) => !isSuccess(run)).length;
 
   return (
     <Card
@@ -187,13 +211,13 @@ export function ScrapeStatus() {
               style={{
                 fontSize: "1.5rem",
                 fontWeight: 700,
-                color: errors === 0 ? "var(--pos)" : "var(--neg)",
+                color: failing === 0 ? "var(--pos)" : "var(--neg)",
               }}
             >
-              {errors}
+              {failing}
             </span>
             <span style={{ fontSize: "0.75rem", color: "var(--ink3)", marginLeft: 6 }}>
-              con error
+              con error o sin datos
             </span>
           </div>
         </div>

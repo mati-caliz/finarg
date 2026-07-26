@@ -3,13 +3,13 @@ from __future__ import annotations
 import logging
 import traceback
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 import httpx
 from labrecha_db import IndicatorHistory, ScrapeRun
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -18,6 +18,18 @@ from labrecha_scraper.config import settings
 logger = logging.getLogger("labrecha_scraper")
 
 ERROR_MAX_LENGTH = 8000
+
+STATUS_RUNNING = "running"
+STATUS_SUCCESS = "success"
+STATUS_EMPTY = "empty"
+STATUS_ERROR = "error"
+
+DEFAULT_MIN_ROWS = 1
+ZOMBIE_RUN_MAX_AGE = timedelta(hours=6)
+ZOMBIE_RUN_ERROR = (
+    "corrida interrumpida: quedó en curso más de "
+    f"{int(ZOMBIE_RUN_MAX_AGE.total_seconds() // 3600)} h sin cerrarse"
+)
 
 
 class IndicatorPoint(BaseModel):
@@ -31,6 +43,7 @@ class IndicatorPoint(BaseModel):
 class Connector(ABC):
     name: str
     source: str
+    min_rows: int = DEFAULT_MIN_ROWS
 
     def build_client(self) -> httpx.Client:
         return httpx.Client(
@@ -109,8 +122,30 @@ def _format_error(error: Exception) -> str:
     return f"{summary}\n\n[traceback truncado]\n...{detail[-ERROR_MAX_LENGTH:]}"
 
 
+def close_interrupted_runs(session: Session, job_name: str) -> int:
+    cutoff = datetime.now(UTC) - ZOMBIE_RUN_MAX_AGE
+    statement = (
+        update(ScrapeRun)
+        .where(
+            ScrapeRun.job_name == job_name,
+            ScrapeRun.status == STATUS_RUNNING,
+            ScrapeRun.started_at < cutoff,
+        )
+        .values(status=STATUS_ERROR, error=ZOMBIE_RUN_ERROR, finished_at=func.now())
+    )
+    closed = session.execute(statement).rowcount
+    session.commit()
+    if closed:
+        logger.warning(
+            "job %s: %s corrida(s) interrumpida(s) marcadas como error", job_name, closed
+        )
+    return closed
+
+
 def run_job(session: Session, connector: Connector) -> ScrapeRun:
-    run = ScrapeRun(job_name=connector.name, status="running")
+    close_interrupted_runs(session, connector.name)
+
+    run = ScrapeRun(job_name=connector.name, status=STATUS_RUNNING)
     session.add(run)
     session.commit()
 
@@ -118,13 +153,21 @@ def run_job(session: Session, connector: Connector) -> ScrapeRun:
         data = connector.fetch()
         upserted = connector.persist(session, data)
         run.rows_upserted = upserted
-        run.status = "success"
+        if upserted < connector.min_rows:
+            run.status = STATUS_EMPTY
+            run.error = (
+                f"el conector no trajo datos: {upserted} filas, "
+                f"mínimo esperado {connector.min_rows}"
+            )
+            logger.warning("job %s: sin datos (%s filas)", connector.name, upserted)
+        else:
+            run.status = STATUS_SUCCESS
+            logger.info("job %s: %s filas upserted", connector.name, upserted)
         run.finished_at = func.now()
         session.commit()
-        logger.info("job %s: %s filas upserted", connector.name, upserted)
     except Exception as error:
         session.rollback()
-        run.status = "error"
+        run.status = STATUS_ERROR
         run.error = _format_error(error)
         run.finished_at = func.now()
         session.add(run)

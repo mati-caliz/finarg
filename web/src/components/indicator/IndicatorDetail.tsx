@@ -18,12 +18,13 @@ import {
   RANGE_MONTHS,
   SOURCE_METHODOLOGY,
   formatDateAR,
+  formatMonthAR,
   formatNumberAR,
   getIndicatorDisplay,
   getIndicatorMeta,
   sourceLabel,
 } from "@/lib/indicators";
-import type { IndicatorSourceSummary } from "@/lib/labrechaApi";
+import type { IndicatorPoint, IndicatorSourceSummary } from "@/lib/labrechaApi";
 import {
   type AlignedSeries,
   type ParsedPoint,
@@ -224,8 +225,11 @@ function variationVsMonthsAgo(
   );
 }
 
-function gapPercent(first: number | undefined, second: number | undefined): number | undefined {
-  if (first === undefined || second === undefined) {
+function gapPercent(
+  first: number | null | undefined,
+  second: number | null | undefined,
+): number | undefined {
+  if (first === undefined || second === undefined || first === null || second === null) {
     return undefined;
   }
   const base = Math.max(Math.abs(first), Math.abs(second)) || 1;
@@ -234,7 +238,7 @@ function gapPercent(first: number | undefined, second: number | undefined): numb
 
 interface TableRow {
   date: string;
-  values: number[];
+  values: (number | null)[];
   gap: number | undefined;
 }
 
@@ -244,7 +248,7 @@ function buildTableRows(aligned: AlignedSeries): TableRow[] {
   const firstRowIndex = Math.max(0, aligned.axis.length - TABLE_ROW_LIMIT);
   const rows: TableRow[] = [];
   for (let index = aligned.axis.length - 1; index >= firstRowIndex; index -= 1) {
-    const values = aligned.lines.map((line) => line.data[index] ?? 0);
+    const values = aligned.lines.map((line) => line.data[index] ?? null);
     rows.push({ date: aligned.axis[index] ?? "", values, gap: gapPercent(values[0], values[1]) });
   }
   return rows;
@@ -584,6 +588,17 @@ function RelatedGapLinks({ code }: { code: string }) {
 }
 
 const CELL_PAD = "12px 16px";
+const NO_DATA_LABEL = "—";
+
+function baseMonthOf(points: IndicatorPoint[]): string | undefined {
+  for (const point of points) {
+    const baseMonth = point.meta.base_month;
+    if (typeof baseMonth === "string") {
+      return baseMonth;
+    }
+  }
+  return undefined;
+}
 
 function SeriesTable({
   indicator,
@@ -657,7 +672,7 @@ function SeriesTable({
                     color: index === 0 ? "var(--ink)" : "var(--ink2)",
                   }}
                 >
-                  {indicator.format(value)}
+                  {value === null ? NO_DATA_LABEL : indicator.format(value)}
                 </td>
               ))}
               {isComparator ? (
@@ -737,6 +752,7 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
   const gapPct = gapPercent(primaryValue, secondValue);
   const tableRows = buildTableRows(aligned);
   const stale = primary ? freshnessForCode(code, primary.last_date).stale : false;
+  const baseMonth = baseMonthOf(seriesQueries.flatMap((query) => query.data?.points ?? []));
 
   return (
     <div style={{ maxWidth: "var(--container-max)", margin: "0 auto", padding: "28px 24px 72px" }}>
@@ -775,6 +791,19 @@ export function IndicatorDetail({ code }: IndicatorDetailProps) {
           <p style={{ fontFamily: "var(--font-serif)", color: "var(--ink2)", margin: 0 }}>
             Todavía no hay suficiente serie histórica para graficar este indicador en el rango
             seleccionado.
+          </p>
+        )}
+        {baseMonth && (
+          <p
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.68rem",
+              color: "var(--ink3)",
+              margin: "12px 0 0",
+            }}
+          >
+            Serie a precios constantes, expresada en pesos de {formatMonthAR(baseMonth)} (base fija,
+            deflactada por el IPC nivel general del INDEC).
           </p>
         )}
       </div>

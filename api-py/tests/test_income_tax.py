@@ -1,19 +1,14 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from itertools import pairwise
 
 from labrecha_api.income_tax import (
-    ANNUAL_MINIMUM_EXEMPTION,
-    CHILD_ALLOWANCE,
-    CHILD_DISABILITY_ALLOWANCE,
+    CURRENT_SCALE,
     HEALTH_INSURANCE_RATE,
-    LIFE_INSURANCE_ANNUAL_CAP,
     MONTHS_PER_YEAR,
     RETIREMENT_RATE,
     SALARY_PAYMENTS_PER_YEAR,
-    SCALES,
-    SPECIAL_DEDUCTION_4TH,
-    SPOUSE_ALLOWANCE,
     _tax_by_brackets,
     calculate_income_tax,
 )
@@ -93,7 +88,9 @@ def test_family_allowances_add_spouse_and_children() -> None:
         )
     )
 
-    assert result.calculation_details.family_allowances == (SPOUSE_ALLOWANCE + CHILD_ALLOWANCE * 2)
+    assert result.calculation_details.family_allowances == (
+        CURRENT_SCALE.spouse_allowance + CURRENT_SCALE.child_allowance * 2
+    )
 
 
 def test_children_with_disabilities_are_capped_by_the_total_number_of_children() -> None:
@@ -105,7 +102,7 @@ def test_children_with_disabilities_are_capped_by_the_total_number_of_children()
         )
     )
 
-    assert result.calculation_details.family_allowances == CHILD_DISABILITY_ALLOWANCE
+    assert result.calculation_details.family_allowances == CURRENT_SCALE.child_disability_allowance
 
 
 def test_life_insurance_deduction_is_capped() -> None:
@@ -113,18 +110,18 @@ def test_life_insurance_deduction_is_capped() -> None:
         IncomeTaxRequest(gross_monthly_salary=HIGH_SALARY, life_insurance=Decimal(1000000))
     )
 
-    assert result.calculation_details.personal_deductions == LIFE_INSURANCE_ANNUAL_CAP
+    assert result.calculation_details.personal_deductions == CURRENT_SCALE.life_insurance_annual_cap
 
 
 def test_allowed_deductions_always_include_the_exemption_and_the_special_deduction() -> None:
     result = calculate_income_tax(IncomeTaxRequest(gross_monthly_salary=HIGH_SALARY))
 
     details = result.calculation_details
-    assert details.minimum_exemption == ANNUAL_MINIMUM_EXEMPTION
-    assert details.special_deduction == SPECIAL_DEDUCTION_4TH
+    assert details.minimum_exemption == CURRENT_SCALE.minimum_exemption
+    assert details.special_deduction == CURRENT_SCALE.special_deduction
     assert details.total_allowed_deductions == (
-        ANNUAL_MINIMUM_EXEMPTION
-        + SPECIAL_DEDUCTION_4TH
+        CURRENT_SCALE.minimum_exemption
+        + CURRENT_SCALE.special_deduction
         + details.family_allowances
         + details.personal_deductions
     )
@@ -140,7 +137,7 @@ def test_deductions_lower_the_tax() -> None:
 
 
 def test_first_bracket_is_taxed_at_its_own_rate() -> None:
-    first = SCALES[0]
+    first = CURRENT_SCALE.brackets[0]
     total, breakdown = _tax_by_brackets(first.to_amount)
 
     assert len(breakdown) == 1
@@ -148,7 +145,7 @@ def test_first_bracket_is_taxed_at_its_own_rate() -> None:
 
 
 def test_income_spanning_two_brackets_is_taxed_progressively() -> None:
-    first, second = SCALES[0], SCALES[1]
+    first, second = CURRENT_SCALE.brackets[0], CURRENT_SCALE.brackets[1]
     excess = Decimal(1000)
     total, breakdown = _tax_by_brackets(first.to_amount + excess)
 
@@ -173,3 +170,21 @@ def test_tax_grows_with_salary() -> None:
 
     assert higher.annual_tax > lower.annual_tax
     assert higher.effective_rate > lower.effective_rate
+
+
+def test_every_answer_carries_the_period_and_the_source_of_the_scale() -> None:
+    result = calculate_income_tax(IncomeTaxRequest(gross_monthly_salary=HIGH_SALARY))
+
+    assert result.scale.effective_from == CURRENT_SCALE.effective_from
+    assert result.scale.period_label == CURRENT_SCALE.period_label
+    assert "ARCA" in result.scale.source
+    assert result.scale.source_url.startswith("https://")
+
+
+def test_the_scale_is_a_continuous_ladder_of_growing_rates() -> None:
+    brackets = CURRENT_SCALE.brackets
+
+    assert brackets[0].from_amount == Decimal(0)
+    for lower, higher in pairwise(brackets):
+        assert lower.to_amount == higher.from_amount
+        assert lower.rate < higher.rate

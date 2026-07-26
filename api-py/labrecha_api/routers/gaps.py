@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
@@ -10,7 +11,7 @@ from sqlalchemy import func, select, tuple_
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
-from labrecha_api.schemas import GapMeasurement, GapOut
+from labrecha_api.schemas import GapExclusion, GapMeasurement, GapOut
 
 router = APIRouter(prefix="/gaps", tags=["gaps"])
 
@@ -18,6 +19,15 @@ MIN_SOURCES = 2
 DEFAULT_LIMIT = 30
 MAX_LIMIT = 200
 PERCENT = 100
+
+MISSING_UNIT_REASON = "sin unidad declarada en la medición"
+
+
+@dataclass(frozen=True)
+class Measurement:
+    source: str
+    value: Decimal
+    unit: str | None
 
 
 def _latest_shared_dates(session: Session, min_sources: int) -> dict[str, date]:
@@ -38,44 +48,81 @@ def _latest_shared_dates(session: Session, min_sources: int) -> dict[str, date]:
 
 def _measurements_at(
     session: Session, latest_by_code: dict[str, date]
-) -> dict[str, list[tuple[str, Decimal]]]:
+) -> dict[str, list[Measurement]]:
     if not latest_by_code:
         return {}
     statement = select(
         IndicatorHistory.indicator_code,
         IndicatorHistory.source,
         IndicatorHistory.value,
+        IndicatorHistory.meta,
     ).where(
         tuple_(IndicatorHistory.indicator_code, IndicatorHistory.date).in_(
             list(latest_by_code.items())
         )
     )
-    grouped: dict[str, list[tuple[str, Decimal]]] = defaultdict(list)
-    for code, source, value in session.execute(statement):
-        grouped[code].append((source, value))
+    grouped: dict[str, list[Measurement]] = defaultdict(list)
+    for code, source, value, meta in session.execute(statement):
+        declared_unit = (meta or {}).get("unit")
+        unit = str(declared_unit) if declared_unit else None
+        grouped[code].append(Measurement(source=source, value=value, unit=unit))
     return grouped
 
 
-def _build_gap(code: str, day: date, measurements: list[tuple[str, Decimal]]) -> GapOut | None:
-    if len(measurements) < MIN_SOURCES:
+def _comparable_unit(measurements: list[Measurement]) -> str | None:
+    by_unit: dict[str, list[Measurement]] = defaultdict(list)
+    for measurement in measurements:
+        if measurement.unit is not None:
+            by_unit[measurement.unit].append(measurement)
+    comparable = [unit for unit, group in by_unit.items() if len(group) >= MIN_SOURCES]
+    if not comparable:
         return None
-    ordered = sorted(measurements, key=lambda item: item[1], reverse=True)
-    higher_source, higher_value = ordered[0]
-    lower_source, lower_value = ordered[-1]
-    spread = higher_value - lower_value
-    base = abs(lower_value)
+    return min(comparable, key=lambda unit: (-len(by_unit[unit]), unit))
+
+
+def _exclusion_reason(measurement: Measurement, unit: str) -> str | None:
+    if measurement.unit is None:
+        return MISSING_UNIT_REASON
+    if measurement.unit != unit:
+        return f"unidad distinta: {measurement.unit} (se compara en {unit})"
+    return None
+
+
+def _build_gap(code: str, day: date, measurements: list[Measurement]) -> GapOut | None:
+    unit = _comparable_unit(measurements)
+    if unit is None:
+        return None
+
+    excluded = [
+        GapExclusion(source=measurement.source, reason=reason)
+        for measurement in sorted(measurements, key=lambda item: item.source)
+        if (reason := _exclusion_reason(measurement, unit)) is not None
+    ]
+    comparable = [measurement for measurement in measurements if measurement.unit == unit]
+    if len(comparable) < MIN_SOURCES:
+        return None
+
+    ordered = sorted(comparable, key=lambda item: item.value, reverse=True)
+    higher, lower = ordered[0], ordered[-1]
+    spread = higher.value - lower.value
+    base = abs(lower.value)
     gap_pct = float(spread / base * PERCENT) if base != 0 else 0.0
 
     return GapOut(
         indicator_code=code,
         date=day,
-        higher_source=higher_source,
-        higher_value=higher_value,
-        lower_source=lower_source,
-        lower_value=lower_value,
+        higher_source=higher.source,
+        higher_value=higher.value,
+        lower_source=lower.source,
+        lower_value=lower.value,
         spread=spread,
         gap_pct=round(gap_pct, 4),
-        measurements=[GapMeasurement(source=source, value=value) for source, value in ordered],
+        unit=unit,
+        measurements=[
+            GapMeasurement(source=measurement.source, value=measurement.value)
+            for measurement in ordered
+        ],
+        excluded_sources=excluded,
     )
 
 
@@ -110,6 +157,10 @@ def get_gap(indicator_code: str, session: Session = Depends(get_session)) -> Gap
     gap = _build_gap(indicator_code, day, measurements)
     if gap is None:
         raise HTTPException(
-            status_code=404, detail=f"sin brecha calculable para '{indicator_code}'"
+            status_code=404,
+            detail=(
+                f"sin brecha calculable para '{indicator_code}': "
+                "no hay dos fuentes que declaren la misma unidad"
+            ),
         )
     return gap

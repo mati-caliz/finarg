@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from bisect import bisect_right
 from datetime import date
 from decimal import Decimal
 
@@ -20,11 +21,13 @@ DEFLATED_SERIES: dict[str, str] = {
     "pension_minimum": "pension_minimum_real",
 }
 DEFLATED_SOURCE = "datosgobar"
+DEFLATED_BASE_MONTH = date(2024, 12, 1)
 
 IMPLICIT_FX_CODE = "implicit_fx_rate"
 IMPLICIT_FX_NUMERATOR = "monetary_base"
 IMPLICIT_FX_DENOMINATOR = "international_reserves"
 IMPLICIT_FX_SOURCE = "bcra"
+RESERVES_MAX_LAG_DAYS = 15
 
 
 def _load(session: Session, code: str, source: str) -> list[tuple[date, Decimal]]:
@@ -47,8 +50,8 @@ def _deflated_points(session: Session, nominal_code: str, real_code: str) -> lis
         return []
 
     cpi_by_month = _by_month(cpi)
-    base_month, base_index = cpi[-1][0], cpi[-1][1]
-    if base_index == 0:
+    base_index = cpi_by_month.get((DEFLATED_BASE_MONTH.year, DEFLATED_BASE_MONTH.month))
+    if base_index is None or base_index == 0:
         return []
 
     points: list[IndicatorPoint] = []
@@ -66,23 +69,38 @@ def _deflated_points(session: Session, nominal_code: str, real_code: str) -> lis
                     "unit": "ARS",
                     "derived_from": [nominal_code, CPI_CODE],
                     "method": "deflactado por IPC nivel general",
-                    "base_month": base_month.isoformat(),
+                    "base_month": DEFLATED_BASE_MONTH.isoformat(),
                 },
             )
         )
     return points
 
 
+def _latest_at_or_before(
+    series: list[tuple[date, Decimal]], day: date, max_lag_days: int
+) -> tuple[date, Decimal] | None:
+    position = bisect_right([row_date for row_date, _ in series], day)
+    if position == 0:
+        return None
+    row_date, value = series[position - 1]
+    if (day - row_date).days > max_lag_days:
+        return None
+    return row_date, value
+
+
 def _implicit_fx_points(session: Session) -> list[IndicatorPoint]:
     base = _load(session, IMPLICIT_FX_NUMERATOR, IMPLICIT_FX_SOURCE)
-    reserves = dict(_load(session, IMPLICIT_FX_DENOMINATOR, IMPLICIT_FX_SOURCE))
+    reserves = _load(session, IMPLICIT_FX_DENOMINATOR, IMPLICIT_FX_SOURCE)
     if not base or not reserves:
         return []
 
     points: list[IndicatorPoint] = []
     for day, base_value in base:
-        reserve_value = reserves.get(day)
-        if reserve_value is None or reserve_value <= 0:
+        matched = _latest_at_or_before(reserves, day, RESERVES_MAX_LAG_DAYS)
+        if matched is None:
+            continue
+        reserve_date, reserve_value = matched
+        if reserve_value <= 0:
             continue
         points.append(
             IndicatorPoint(
@@ -94,6 +112,7 @@ def _implicit_fx_points(session: Session) -> list[IndicatorPoint]:
                     "unit": "ARS_por_USD",
                     "derived_from": [IMPLICIT_FX_NUMERATOR, IMPLICIT_FX_DENOMINATOR],
                     "method": "base monetaria sobre reservas internacionales, ambas del BCRA",
+                    "reserves_date": reserve_date.isoformat(),
                 },
             )
         )

@@ -30,3 +30,9 @@ export function freshnessForCode(code: string, lastDate: string): Freshness {
   const days = daysSince(lastDate);
   return { stale: days > MAX_AGE_DAYS[cadence], days, cadence };
 }
+
+export const TAX_SCALE_MAX_AGE_DAYS = 185;
+
+export function isTaxScaleOutdated(effectiveFrom: string, fromMs: number = Date.now()): boolean {
+  return daysSince(effectiveFrom, fromMs) > TAX_SCALE_MAX_AGE_DAYS;
+}

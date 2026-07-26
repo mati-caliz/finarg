@@ -1,4 +1,10 @@
-import { MAX_AGE_DAYS, daysSince, freshnessForCode } from "@/lib/freshness";
+import {
+  MAX_AGE_DAYS,
+  TAX_SCALE_MAX_AGE_DAYS,
+  daysSince,
+  freshnessForCode,
+  isTaxScaleOutdated,
+} from "@/lib/freshness";
 
 const TODAY = "2026-07-25";
 const TODAY_MS = Date.UTC(2026, 6, 25);
@@ -77,5 +83,19 @@ describe("freshnessForCode", () => {
     expect(MAX_AGE_DAYS.mensual).toBeLessThan(MAX_AGE_DAYS.trimestral);
     expect(MAX_AGE_DAYS.trimestral).toBeLessThan(MAX_AGE_DAYS.semestral);
     expect(MAX_AGE_DAYS.semestral).toBeLessThan(MAX_AGE_DAYS.anual);
+  });
+});
+
+describe("isTaxScaleOutdated", () => {
+  const dayInMs = 86_400_000;
+  const dateDaysAgo = (days: number) =>
+    new Date(TODAY_MS - days * dayInMs).toISOString().slice(0, 10);
+
+  it("trusts a scale that started within the semester", () => {
+    expect(isTaxScaleOutdated(dateDaysAgo(TAX_SCALE_MAX_AGE_DAYS), TODAY_MS)).toBe(false);
+  });
+
+  it("warns about a scale older than the semester ARCA updates on", () => {
+    expect(isTaxScaleOutdated(dateDaysAgo(TAX_SCALE_MAX_AGE_DAYS + 1), TODAY_MS)).toBe(true);
   });
 });

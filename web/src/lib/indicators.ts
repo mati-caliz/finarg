@@ -45,6 +45,30 @@ export function formatDateAR(isoDate: string): string {
   return `${day}/${month}/${year}`;
 }
 
+const MONTH_NAMES_AR = [
+  "enero",
+  "febrero",
+  "marzo",
+  "abril",
+  "mayo",
+  "junio",
+  "julio",
+  "agosto",
+  "septiembre",
+  "octubre",
+  "noviembre",
+  "diciembre",
+];
+
+export function formatMonthAR(isoDate: string): string {
+  const [year, month] = isoDate.split("-");
+  const name = MONTH_NAMES_AR[Number(month) - 1];
+  if (!year || !name) {
+    return isoDate;
+  }
+  return `${name} de ${year}`;
+}
+
 export const SOURCE_LABELS: Record<string, string> = {
   bcra: "BCRA",
   datosgobar: "datos.gob.ar",
