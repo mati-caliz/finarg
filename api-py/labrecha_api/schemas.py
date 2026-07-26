@@ -61,6 +61,8 @@ class CongressVoteOut(BaseModel):
     negative_votes: int | None
     abstentions: int | None
     absents: int | None
+    summary: str | None
+    topic: str | None
 
 
 class CongressVoteDetailOut(BaseModel):

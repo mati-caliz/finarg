@@ -4,7 +4,7 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from labrecha_db import CongressVote, CongressVoteDetail, SanctionedLaw
+from labrecha_db import CongressVote, CongressVoteDetail, CongressVoteSummary, SanctionedLaw
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
@@ -24,7 +24,7 @@ ONE_HUNDRED = Decimal(100)
 router = APIRouter(prefix="/congress", tags=["congress"])
 
 
-def _to_vote_out(vote: CongressVote) -> CongressVoteOut:
+def _to_vote_out(vote: CongressVote, summary: CongressVoteSummary | None) -> CongressVoteOut:
     return CongressVoteOut(
         vote_record_id=vote.vote_record_id,
         period_number=vote.period_number,
@@ -37,6 +37,8 @@ def _to_vote_out(vote: CongressVote) -> CongressVoteOut:
         negative_votes=vote.negative_votes,
         abstentions=vote.abstentions,
         absents=vote.absents,
+        summary=summary.summary if summary is not None else None,
+        topic=summary.topic if summary is not None else None,
     )
 
 
@@ -61,13 +63,17 @@ def list_votes(
         conditions.append(CongressVote.period_number == period_number)
 
     statement = (
-        select(CongressVote)
+        select(CongressVote, CongressVoteSummary)
+        .outerjoin(
+            CongressVoteSummary,
+            CongressVoteSummary.vote_record_id == CongressVote.vote_record_id,
+        )
         .where(*conditions)
         .order_by(CongressVote.date.desc().nullslast(), CongressVote.vote_record_id.desc())
         .limit(limit)
         .offset(offset)
     )
-    return [_to_vote_out(vote) for vote in session.scalars(statement).all()]
+    return [_to_vote_out(vote, summary) for vote, summary in session.execute(statement).all()]
 
 
 @router.get("/attendance", response_model=list[BlocAttendanceOut])
@@ -141,7 +147,7 @@ def get_vote(vote_record_id: str, session: Session = Depends(get_session)) -> Co
     vote = session.get(CongressVote, vote_record_id)
     if vote is None:
         raise HTTPException(status_code=404, detail=f"acta desconocida: {vote_record_id}")
-    return _to_vote_out(vote)
+    return _to_vote_out(vote, session.get(CongressVoteSummary, vote_record_id))
 
 
 @router.get("/votes/{vote_record_id}/details", response_model=list[CongressVoteDetailOut])
