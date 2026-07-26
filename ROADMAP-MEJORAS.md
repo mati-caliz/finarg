@@ -446,15 +446,45 @@ motivo para una fecha sin datos posteriores y 422 si falta `date_from`.
 **Criterio de salida.** ✅ Desde la página de un indicador se elige un evento político y se ve la
 variación acumulada desde esa fecha, con el método explicitado.
 
-### 6.c — La brecha entre lo votado y lo que pasó
+### 6.c — La brecha entre lo votado y lo que pasó ✅ (2026-07-26)
 
-La extensión natural de la marca y contenido que nadie más arma: cruzar `congress_votes` (ya con
-resumen en lenguaje llano por IA) con las series económicas y `political_events`. Qué votó cada
-bloque, y qué hizo después el indicador que la ley tocaba. Requiere curaduría (qué votación se cruza
-con qué serie), así que arranca con un puñado de casos elegidos a mano, no automático.
+**Hecho.** Se apoya entera en 6.b: el catálogo curado vive en `web/src/lib/voteOutcomes.ts` (par
+votación + indicador + una lectura escrita a mano de por qué esa serie) y
+`components/congress/VotedVsHappened.tsx` lo renderiza en `/congreso` cruzando cada votación con la
+variación acumulada del indicador desde la fecha de esa votación, vía
+`GET /indicators/{code}/variation`.
 
-**Criterio de salida.** Al menos 3 votaciones tienen su serie asociada y su lectura post-votación,
-con la aclaración de que la correlación no es causalidad.
+Las tres votaciones se eligieron consultando los datos reales de producción, no de memoria:
+
+- **3934** (20/12/2019, ley de solidaridad social y reactivación productiva en general, 134 a favor /
+  110 en contra) → `dollar_blue`.
+- **3960** (29/01/2020, sostenibilidad de la deuda externa, 224 / 2) → `country_risk`.
+- **3961** (29/01/2020, acuerdo fiscal Nación-provincias-CABA, 157 / 54) → `primary_balance`.
+
+Cada tarjeta muestra el resumen en lenguaje llano que ya tenía la votación (aclarando que lo generó
+una IA y con el título oficial al lado), los votos, la variación del indicador con su valor inicial →
+final y su fecha, la lectura curada y links a las dos páginas. La aclaración de que correlación no es
+causalidad está en el encabezado de la sección y no es opcional.
+
+**Desvíos y dos cosas que la curaduría evitó.**
+
+- Las tarjetas nacieron sin contenido server-side (eran skeletons en el HTML, contra la convención de
+  prefetch del repo): se sumaron sus queries a `congressQueries()`, que ya era `async`, así que
+  `/congreso` sale prerenderizada con los tres cruces.
+- El resumen de la votación 3945 ("artículos 34 a 37") dice explícitamente que *no* se puede saber su
+  contenido con los datos disponibles, así que se descartó como caso en vez de escribir una lectura
+  inventada sobre qué artículos eran.
+- Verificando contra la api-py vieja apareció un bug: cuando la API no manda `summary`, el chequeo
+  `=== null` no atrapaba el `undefined` y la tarjeta rotulaba **"Resumen generado por IA" sobre el
+  título oficial**. Etiquetar como IA algo que no lo es rompe la regla de atribución, así que ahora
+  se decide por contenido real del campo, no por su tipo.
+
+**Tests.** 5 nuevos de integridad del catálogo: al menos tres votaciones distintas, cada
+`indicatorCode` existe en el catálogo de indicadores, sin pares repetidos, toda lectura explica su
+elección, y la búsqueda por id.
+
+**Criterio de salida.** ✅ Tres votaciones tienen su serie asociada y su lectura post-votación, con la
+aclaración de que la correlación no es causalidad.
 
 ---
 
