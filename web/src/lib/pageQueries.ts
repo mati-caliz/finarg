@@ -16,6 +16,7 @@ import {
   indicatorSeriesQuery,
   indicatorSourcesQuery,
   indicatorTermsQuery,
+  indicatorVariationQuery,
   indicatorsQuery,
   newsQuery,
   politicalEventsQuery,
@@ -40,6 +41,7 @@ import {
   TILE_CODES,
 } from "@/lib/queryParams";
 import { latestSourceDate, orderIndicatorSources, rangeDateFrom, todayISO } from "@/lib/series";
+import { VOTE_OUTCOMES } from "@/lib/voteOutcomes";
 
 export interface PageQuery {
   queryKey: readonly unknown[];
@@ -162,6 +164,21 @@ export async function congressQueries(): Promise<PageQuery[]> {
   const latestVoteRecordId = latestVotes[0]?.vote_record_id;
   if (latestVoteRecordId !== undefined) {
     queries.push(congressVoteDetailsQuery(latestVoteRecordId));
+  }
+
+  queries.push(...(await curatedOutcomeQueries()));
+  return queries;
+}
+
+async function curatedOutcomeQueries(): Promise<PageQuery[]> {
+  const queries: PageQuery[] = [];
+  for (const outcome of VOTE_OUTCOMES) {
+    const voteQuery = congressVoteQuery(outcome.voteRecordId);
+    queries.push(voteQuery);
+    const vote = await voteQuery.queryFn().catch(() => undefined);
+    if (vote?.date) {
+      queries.push(indicatorVariationQuery(outcome.indicatorCode, { date_from: vote.date }));
+    }
   }
   return queries;
 }

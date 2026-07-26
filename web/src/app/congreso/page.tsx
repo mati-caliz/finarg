@@ -2,6 +2,7 @@ import { BlocAttendance } from "@/components/congress/BlocAttendance";
 import { DeputiesComposition } from "@/components/congress/DeputiesComposition";
 import { RecentLaws } from "@/components/congress/RecentLaws";
 import { SenateComposition } from "@/components/congress/SenateComposition";
+import { VotedVsHappened } from "@/components/congress/VotedVsHappened";
 import { VotesBoard } from "@/components/congress/VotesBoard";
 import { congressQueries } from "@/lib/pageQueries";
 import { PrefetchedQueries } from "@/lib/prefetch";
@@ -86,6 +87,7 @@ export default async function CongressPage() {
             gap: 40,
           }}
         >
+          <VotedVsHappened />
           <SenateComposition />
           <DeputiesComposition />
           <section style={{ display: "flex", flexDirection: "column", gap: 16 }}>
