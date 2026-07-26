@@ -14,10 +14,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify:
+    name: Verify
+    uses: ./.github/workflows/ci.yml
+
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: verify
 
     steps:
       - name: Deploy via SSH
