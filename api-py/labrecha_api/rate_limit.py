@@ -12,8 +12,10 @@ from starlette.responses import JSONResponse
 from labrecha_api.config import settings
 
 FORWARDED_FOR = "x-forwarded-for"
+REAL_IP = "x-real-ip"
 SECONDS_PER_WINDOW = 60
 EXEMPT_PATHS = frozenset({"/health"})
+UNKNOWN_CLIENT = "desconocido"
 
 
 class SlidingWindowCounter:
@@ -43,11 +45,19 @@ class SlidingWindowCounter:
 
 
 def client_key(request: Request) -> str | None:
-    forwarded = request.headers.get(FORWARDED_FOR, "")
+    real_ip = request.headers.get(REAL_IP, "").strip()
+    if real_ip:
+        return real_ip
+    forwarded = _last_forwarded_for(request.headers.get(FORWARDED_FOR, ""))
     if forwarded:
-        return forwarded.split(",")[0].strip()
+        return forwarded
     peer = request.client.host if request.client is not None else ""
-    return None if _is_internal(peer) else (peer or "desconocido")
+    return None if _is_internal(peer) else (peer or UNKNOWN_CLIENT)
+
+
+def _last_forwarded_for(header: str) -> str:
+    hops = [hop.strip() for hop in header.split(",") if hop.strip()]
+    return hops[-1] if hops else ""
 
 
 def _is_internal(host: str) -> bool:

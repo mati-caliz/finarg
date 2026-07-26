@@ -25,7 +25,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | ~~1~~ | ~~Red de seguridad: CI real + tests de la lógica de plata~~ ✅ | Bajo | Alto — se deploya sin verificar |
 | ~~2~~ | ~~Honestidad del dato: series, brechas, conectores mudos~~ ✅ | Medio | Alto — contradice la regla dura del producto |
 | ~~3~~ | ~~Superficies muertas: service worker, manifest~~ ✅ | Bajo | Medio — el PWA está roto y nadie se entera |
-| 4 | Seguridad e infraestructura | Medio | Medio |
+| 4 | Seguridad e infraestructura — 4.a/4.b ✅, 4.c y 4.d pendientes (decisión del usuario) | Medio | Medio |
 | 5 | SEO y distribución | Bajo | Medio — contenido que Google no ve |
 | 6 | Producto: recurrencia | Alto | — (es crecimiento, no deuda) |
 | 7 | Deuda de código | Bajo | Bajo |
@@ -275,45 +275,80 @@ los tres devuelven 200 directo.
 
 ---
 
-## Fase 4 — Seguridad e infraestructura
+## Fase 4 — Seguridad e infraestructura (4.a y 4.b hechas, 2026-07-26)
 
-### 4.a — El rate limit de la API es cosmético
+Las dos que cierran agujeros reales de seguridad están hechas. Las otras dos quedaron **decididas y
+pendientes, no olvidadas**: 4.c porque el usuario prefiere seguir usando su suscripción vía el CLI
+del host, y 4.d porque implica una cuenta externa y una dependencia nueva.
 
-**Problema.** `api-py/labrecha_api/rate_limit.py:48` toma el primer elemento de `X-Forwarded-For`, y
-`nginx/nginx.conf:278` usa `$proxy_add_x_forwarded_for`, que **preserva y antepone el header que
-mandó el cliente**. Cualquiera manda un XFF aleatorio por request y saltea el limitador entero. Lo
-único que frena de verdad es `limit_req zone=api` de nginx.
+### 4.a — El rate limit de la API es cosmético ✅
 
-**Trabajo.** Usar `X-Real-IP` (nginx lo sobrescribe siempre, no es spoofeable) o tomar el **último**
-elemento del XFF. Conservar la exención de la red interna para que el SSR no se auto-limite. Test que
-verifique que un XFF forjado no crea claves nuevas.
+**Problema.** `rate_limit.py` tomaba el primer elemento de `X-Forwarded-For`, y el nginx usa
+`$proxy_add_x_forwarded_for`, que **preserva y antepone el header que mandó el cliente**: cualquiera
+mandaba un XFF aleatorio por request y salteaba el limitador entero.
 
-**Criterio de salida.** Cien requests con `X-Forwarded-For` distintos desde la misma IP dan 429.
+**Hecho.** Tres capas, de afuera hacia adentro:
 
-### 4.b — Endurecer el admin
+- El nginx del server de este sitio (sólo `location /` y `/api/data/`, sin tocar los otros sitios del
+  archivo compartido) manda `X-Forwarded-For $remote_addr` en vez de `$proxy_add_x_forwarded_for`,
+  así que el header deja de arrastrar lo que mandó el cliente.
+- El BFF (`app/api/data/[...path]/route.ts`) reenvía a la FastAPI tanto `x-real-ip` como
+  `x-forwarded-for` (antes sólo el segundo).
+- `client_key` prefiere `X-Real-IP` —que el nginx sobrescribe siempre— y, si no está, toma el
+  **último** hop del XFF, que es el que agregó el proxy. La exención de la red interna se conserva
+  para que el SSR no se auto-limite.
 
-**Problema.** En `web/src/lib/adminSession.ts` el token de sesión es un HMAC fijo de la password: no
-expira, no se puede revocar sin cambiar la password, y `/api/admin/session` no tiene límite de
-intentos, así que es brute-forceable desde internet. Con un solo admin es tolerable, pero es la única
-superficie de escritura de la app.
+**Tests.** `api-py/tests/test_rate_limit.py` (9): el `X-Real-IP` le gana a un XFF forjado, el último
+hop es el confiable, 100 XFF distintos desde la misma IP colapsan en **una** clave, la red interna
+sigue exenta, y los bordes del contador de ventana deslizante.
 
-**Trabajo.** Límite de intentos por IP en el route handler (basta un contador en memoria como el de
-la API) y expiración real de la sesión (timestamp firmado dentro del token, no sólo `Max-Age` de la
-cookie).
+**Criterio de salida.** ✅ Cien requests con `X-Forwarded-For` distintos desde la misma IP comparten
+la misma clave del limitador, así que dan 429.
 
-**Criterio de salida.** N intentos fallidos bloquean temporalmente; una sesión vieja deja de valer
+### 4.b — Endurecer el admin ✅
+
+**Problema.** El token de sesión era un HMAC fijo de la password: no expiraba, no se podía revocar sin
+cambiar la password, y `/api/admin/session` no tenía límite de intentos (brute-forceable desde
+internet).
+
+**Hecho.**
+
+- El token pasó a ser `<expiresAt>.<hmac(password, payload+expiresAt)>` con TTL real de 7 días
+  (`SESSION_TTL_SECONDS`), verificado contra el reloj además de la firma: estirar el `expiresAt` sin
+  re-firmar no valida, y el `Max-Age` de la cookie dejó de ser la única defensa. El payload subió a
+  `v2`, así que las sesiones viejas se invalidan solas con el deploy.
+- Límite de intentos por IP en el route handler (`lib/loginAttempts.ts`): 5 fallidos en 15 minutos →
+  429 con `Retry-After`; un login exitoso limpia el contador. La IP sale de `lib/clientIp.ts`, que
+  usa el mismo criterio que la API (`x-real-ip`, si no el último hop del XFF), así que un XFF forjado
+  no multiplica los buckets.
+
+**Tests.** 16 nuevos: expiración del token, `expiresAt` estirado sin re-firmar, tokens mal formados,
+cambio de password que invalida todo, bordes del límite de intentos y no-contaminación entre IPs.
+`jest.setup.ts` ahora guarda los mocks de browser detrás de un `typeof window`, para que las suites
+que necesitan el entorno `node` (las que construyen un `NextRequest`) puedan correr.
+
+**Criterio de salida.** ✅ N intentos fallidos bloquean temporalmente y una sesión vieja deja de valer
 sin tocar la password.
 
-### 4.d — Observabilidad
+### 4.c — El LLM deja de depender del CLI del host ⏸️ decidido no hacerlo (por ahora)
 
-**Problema.** No hay ningún reporte de errores; `lib/logger.ts` no hace nada en producción. Un error
-de render en prod es invisible salvo que un usuario avise.
+**Estado.** Se implementó la migración al SDK de Anthropic (API key por env, timeout y reintentos
+explícitos, manejo de `stop_reason: refusal`) y se revirtió a pedido del usuario: la suscripción
+que paga los conectores con IA vive en el CLI del host, y pasar a la API sería pagar tokens aparte.
+El `llm.py` sigue invocando el binario `claude` por `subprocess` y el `docker-compose.prod.yml`
+sigue montando el binario y las credenciales OAuth del usuario `deploy`.
 
-**Trabajo.** Sentry (o equivalente) en `web` y en `api-py`, con sampling bajo. Respetar el CSP: hay
-que sumar el host del colector a `connect-src` en `next.config.js` (el nginx es compartido: tocar
-sólo el server de este sitio).
+**Costo de la decisión, para que esté escrito:** el conector con IA sigue atado a un host con el CLI
+instalado y autenticado, y el contenedor del scraper conserva el set de caps default de Docker por
+eso mismo. Si algún día se rota la cuenta del host o se cambia de VPS, esto se rompe en silencio
+hasta que `/estado` muestre el conector en rojo.
 
-**Criterio de salida.** Un error lanzado a propósito en prod aparece en el dashboard.
+### 4.d — Observabilidad ⏸️ pendiente
+
+**Estado.** Postergada a pedido del usuario: requiere una cuenta externa (Sentry o equivalente), su
+DSN, una dependencia nueva en `web` y en `api-py`, y sumar el host del colector al `connect-src` del
+CSP. Sigue en pie el problema: `lib/logger.ts` no hace nada en producción, así que un error de render
+en prod es invisible salvo que un usuario avise.
 
 ---
 

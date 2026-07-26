@@ -3,13 +3,17 @@ import { getBackendUrl } from "@/lib/serverApi";
 import type { NextRequest } from "next/server";
 
 const JSON_CONTENT_TYPE = "application/json";
-const FORWARDED_FOR = "x-forwarded-for";
+const CLIENT_IP_HEADERS = ["x-real-ip", "x-forwarded-for"];
 
 function clientHeaders(request: NextRequest, accept: string): HeadersInit {
-  const forwardedFor = request.headers.get(FORWARDED_FOR);
-  return forwardedFor === null
-    ? { Accept: accept }
-    : { Accept: accept, [FORWARDED_FOR]: forwardedFor };
+  const headers: Record<string, string> = { Accept: accept };
+  for (const name of CLIENT_IP_HEADERS) {
+    const value = request.headers.get(name);
+    if (value !== null) {
+      headers[name] = value;
+    }
+  }
+  return headers;
 }
 
 export async function GET(
