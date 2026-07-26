@@ -2,9 +2,7 @@ import { AnnotatedSeriesChart, type ChartSeries } from "@/components/core";
 import { render, screen } from "@testing-library/react";
 
 function pathsOf(container: HTMLElement): string[] {
-  return Array.from(container.querySelectorAll("path")).map(
-    (path) => path.getAttribute("d") ?? "",
-  );
+  return Array.from(container.querySelectorAll("path")).map((path) => path.getAttribute("d") ?? "");
 }
 
 function series(name: string, values: (number | null)[]): ChartSeries {

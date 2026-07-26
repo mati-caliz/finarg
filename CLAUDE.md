@@ -2,9 +2,9 @@
 
 Observatorio público (solo lectura, sin auth) de métricas político-económicas de Argentina: reúne
 indicadores dispersos (INDEC, BCRA, datos.gob.ar, consultoras, Congreso) en una sola fuente. Dominio
-objetivo `labrecha.ar`. El pivot desde el proyecto original "FinArg" y su historial están en
-`ROADMAP.md`; el rediseño en `ROADMAP-REDISENO.md`; la auditoría 2026 y su plan en
-`ROADMAP-MEJORAS.md`.
+objetivo `labrecha.ar`. Nació como "FinArg" (stack Spring + Redis, ya retirado por completo) y pivoteó
+a observatorio; los roadmaps que documentaban ese pivot, el rediseño y la auditoría 2026 se fueron
+cumpliendo y se borraron: lo que sobrevive de ellos está en este archivo y en el historial de git.
 
 Dos features definitorias:
 
@@ -14,6 +14,16 @@ Dos features definitorias:
    `source` **que declaren la misma `meta.unit`**, comparado en la última fecha en que ambas midieron.
    Otra unidad o sin unidad declarada queda fuera del ranking (comparar millones contra unidades
    inventa brechas de escala) y viaja en `excluded_sources` con el motivo.
+   Quien alimenta el ranking es `connectors/cpi_jurisdictions`: las ocho jurisdicciones que miden
+   su propio IPC (CABA, Córdoba, Mendoza, Neuquén, San Luis, Santa Fe, Tucumán, Chaco) publican
+   **índices con bases distintas**, así que no se comparan niveles: se deriva la variación
+   mensual/interanual, que es independiente de la base, y se fecha a **fin de mes** para que caiga
+   en la misma fecha que la serie nacional de `argentinadatos`. La discrepancia que sale de ahí es
+   de cobertura geográfica además de metodológica: `meta.geography` y `meta.agency` viajan en cada
+   punto para poder decirlo. Para unidades en `%` la UI muestra la brecha en **pp**
+   (`automaticGapMagnitude`), no como cociente entre porcentajes. `GET /gaps/{code}/history` recorre
+   toda la serie y devuelve la brecha más ancha, la más angosta y la última; rankea por **pp** cuando la
+   unidad es `%` y por brecha relativa cuando son niveles, que es exactamente lo que muestra la UI.
 2. **Series anotadas con eventos políticos.** `GET /terms/{code}` corta cualquier serie por mandato
    presidencial (`api-py/labrecha_api/government_terms.py`): las tasas se acumulan **componiendo**
    (`MONTHLY_RATE_INDICATORS`), los niveles comparan extremos; la respuesta dice qué método usó y la
@@ -73,7 +83,12 @@ y `web/src/lib/clientIp.ts`.
   manejadas: los 404/422 no son ruido), el SSR de Next (`instrumentation.ts`) y el navegador
   (`ErrorBoundary` y `lib/logger.ts`) vía `POST /errors`, que es same-origin —así no hay que tocar
   ninguno de los **dos** CSP (el de `next.config.js` y el del nginx compartido)— y queda cubierto por
-  el rate limit por IP. Se ve en `/estado`.
+  el rate limit por IP. Se ve en `/estado`, pero **el `stack` no es público**: `GET /errors` sólo lo
+  devuelve con `X-Admin-Token` (`admin_auth.py`), porque expone rutas internas y, si el error vino de
+  SQLAlchemy, fragmentos de SQL. Tipo, mensaje, ruta y contador sí son públicos: la transparencia del
+  pipeline es parte del observatorio. Como `POST /errors` es escritura anónima y la tabla sólo crece,
+  `labrecha-scraper prune-errors` (cron diario, `scripts/prune-errors.sh`) borra lo vencido
+  (`ERROR_RETENTION_DAYS`) y recorta al tope (`ERROR_MAX_ROWS`).
 - Tablas propias para lo que no encaja en la genérica: `congress_votes`/`congress_vote_details`,
   `senators`, `holidays`, `news_articles`, `congress_vote_summaries`.
 - `congress_vote_summaries` — el título del acta es burocrático ("Expediente 0073-S-2019 - Votación en
@@ -90,7 +105,9 @@ y `web/src/lib/clientIp.ts`.
   proxya a la FastAPI (`LABRECHA_API_INTERNAL_URL`) con ISR por ruta. El cliente
   (`src/lib/labrechaApi.ts`) es **isomórfico**: en el browser va por el proxy, en el servidor directo
   a la API vía `serverGet` (`src/lib/serverApi.ts`). Los TTL son únicos y viven en
-  `src/lib/cacheRules.ts`.
+  `src/lib/cacheRules.ts`. El `POST` del proxy tiene whitelist (`WRITABLE_PATHS`): la API es de
+  lectura salvo `/errors`, y el proxy no debe ser el agujero por el que se llegue al próximo
+  endpoint de escritura que se agregue.
 - **Datos en el servidor:** cada `page.tsx` prefetchea sus queries y las hidrata con
   `<PrefetchedQueries>`, así el HTML sale con contenido real (no skeletons) y las páginas se
   prerenderizan. Para que la clave del prefetch no pueda divergir de la del hook, ambas salen de las
@@ -113,7 +130,20 @@ y `web/src/lib/clientIp.ts`.
   en inglés redirigen 301 en `next.config.js`. Los endpoints de la FastAPI **sí** quedan en inglés.
 - **SEO:** JSON-LD en `src/lib/structuredData.ts`, emitido con `<JsonLd>`, que escapa `<`/`>`/`&` a
   `\uXXXX` para inyectarlo como texto: biome corre con `security: all`, así que no se usa
-  `dangerouslySetInnerHTML`.
+  `dangerouslySetInnerHTML`. Las `opengraph-image.tsx` comparten el marco de marca en
+  `src/lib/ogImage.tsx`.
+- **`/comparar`** pone dos series en el mismo eje **indexadas a 100** en su primer mes en común
+  (`src/lib/compare.ts`): compara ritmos, nunca niveles, y si no hay ningún mes compartido lo dice en
+  vez de inventar una base. El par viaja en la URL (`?a=&b=`) para que sea compartible.
+- **`/embed/indicador/[code]`** es el gráfico incrustable. Va sin chrome porque `SiteChrome` detecta
+  el prefijo, y es el **único** lugar con `frame-ancestors *`. Eso vive en dos lados que tienen que
+  coincidir: `next.config.js` (donde la regla general es `/:path((?!embed/).*)` — si volviera a ser
+  `/:path*` matchearía también el embed y le pisaría el CSP) y el `location /embed/` del nginx
+  compartido, porque el navegador aplica la **intersección** de ambos CSP. Lo cubre
+  `__tests__/securityHeaders.test.ts`.
+- **Alertas por umbral:** `/indicador/[code]/feed.xml?umbral=N&direccion=arriba|abajo` filtra el RSS
+  a los datos que cruzan el umbral (`src/lib/feedAlerts.ts`). Es "avisame cuando" sin pedir un mail
+  ni guardar nada de nadie.
 
 ## Reglas de estilo de código
 
@@ -134,7 +164,11 @@ y `web/src/lib/clientIp.ts`.
   `npm run build`.
 - Python: `ruff check` + `ruff format --check` sobre `api-py/labrecha_api api-py/tests
   scraper/labrecha_scraper shared/labrecha_db` (`ruff.toml` es estricto), `python -m compileall` y
-  `python -m pytest api-py/tests` (lógica pura de cálculo, sin base).
+  `python -m pytest api-py/tests`. La suite tiene dos mitades: lógica pura de cálculo (corre sin
+  nada) y tests de integración que necesitan Postgres — los routers contra SQL real y las
+  migraciones contra los modelos. Sin base, esa mitad se saltea sola; con `REQUIRE_TEST_DATABASE=1`
+  (lo que usa el CI) el skip pasa a ser error. La base de test se crea sola; se apunta con
+  `TEST_DATABASE_URL` (default `…@localhost:5433/labrecha_test`).
 - **El CI corre todo esto y bloquea el deploy**: `deploy.yml` invoca a `ci.yml` (`needs: verify`), así
   que un push a `main` que rompa lint/tipos/tests/build no llega al VPS.
 - Datos: `python -m labrecha_scraper run <job|all>` (ver `list`, `status`). Postgres local en el 5433;

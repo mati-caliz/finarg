@@ -89,3 +89,6 @@ coverage/
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Reportes de Lighthouse (los genera scripts/lighthouse-audit.sh)
+lighthouse-reports/

@@ -86,7 +86,10 @@ describe("gapsDescription", () => {
   });
 
   it("counts how many indicators have more than one source", () => {
-    const description = gapsDescription([gap(), gap({ indicator_code: "cpi_monthly", gap_pct: 2 })]);
+    const description = gapsDescription([
+      gap(),
+      gap({ indicator_code: "cpi_monthly", gap_pct: 2 }),
+    ]);
 
     expect(description).toContain("2 indicadores");
   });

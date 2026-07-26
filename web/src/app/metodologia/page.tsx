@@ -122,9 +122,9 @@ export default function MethodologyPage() {
         </Rule>
         <Rule title="La brecha automática sólo compara la misma unidad">
           El ranking de discrepancias que sale solo de los datos exige que las dos mediciones
-          declaren la misma unidad. Si una fuente publica en millones y otra en unidades, o si una no
-          declara unidad, queda afuera de la comparación y se lista aparte con el motivo: una brecha
-          de escala no es una brecha de medición.
+          declaren la misma unidad. Si una fuente publica en millones y otra en unidades, o si una
+          no declara unidad, queda afuera de la comparación y se lista aparte con el motivo: una
+          brecha de escala no es una brecha de medición.
         </Rule>
         <Rule title="Un hueco en la serie se dibuja como hueco">
           Cuando una fuente todavía no empezó a medir, o dejó de hacerlo, el gráfico corta la línea
@@ -153,8 +153,8 @@ export default function MethodologyPage() {
           Cada corrida de cada conector queda registrada con su estado, las filas que ingirió y el
           error si falló. Está publicado en <b>/estado</b>: si una serie se congeló, se ve ahí. Una
           corrida que termina sin excepción pero no trae filas no cuenta como exitosa: se marca{" "}
-          <b>sin datos</b> en ámbar y dispara la misma alerta que un error, porque un scraper mudo es
-          indistinguible de un scraper roto.
+          <b>sin datos</b> en ámbar y dispara la misma alerta que un error, porque un scraper mudo
+          es indistinguible de un scraper roto.
         </Rule>
       </section>
 
