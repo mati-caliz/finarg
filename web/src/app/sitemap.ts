@@ -20,6 +20,7 @@ const STATIC_ROUTES: SitemapRoute[] = [
   { path: "", changeFrequency: "hourly", priority: 1 },
   { path: "/indicadores", changeFrequency: "daily", priority: 0.9 },
   { path: "/brechas", changeFrequency: "daily", priority: 0.9 },
+  { path: "/comparar", changeFrequency: "weekly", priority: 0.8 },
   { path: "/congreso", changeFrequency: "weekly", priority: 0.8 },
   { path: "/noticias", changeFrequency: "hourly", priority: 0.6 },
   { path: "/ideas", changeFrequency: "weekly", priority: 0.7 },

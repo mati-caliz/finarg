@@ -1,21 +1,14 @@
 import { formatDateAR, getIndicatorDisplay, sourceLabel } from "@/lib/indicators";
 import type { IndicatorSeries } from "@/lib/labrechaApi";
+import { OG_COLORS, OG_CONTENT_TYPE, OG_SIZE, OgBrand } from "@/lib/ogImage";
 import { serverGet } from "@/lib/serverApi";
 import { ImageResponse } from "next/og";
 
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const size = OG_SIZE;
+export const contentType = OG_CONTENT_TYPE;
 export const alt = "Indicador de La Brecha";
 
-const COLORS = {
-  bg: "#f7f4ee",
-  card: "#ffffff",
-  ink: "#1a1f24",
-  muted: "#6b7280",
-  border: "#e5e0d6",
-  accent: "#1e4fa3",
-  brecha: "#c77b1e",
-};
+const COLORS = OG_COLORS;
 
 function sparklinePath(values: number[], width: number, height: number): string {
   if (values.length < 2) {
@@ -73,16 +66,7 @@ export default async function Image({ params }: { params: Promise<{ code: string
         fontFamily: "sans-serif",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: COLORS.ink }}>La</div>
-        <div style={{ width: 5, height: 30, background: COLORS.brecha, borderRadius: 3 }} />
-        <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: COLORS.ink }}>
-          Brecha
-        </div>
-        <div style={{ display: "flex", marginLeft: 14, fontSize: 22, color: COLORS.muted }}>
-          Observatorio político-económico de Argentina
-        </div>
-      </div>
+      <OgBrand />
 
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ display: "flex", fontSize: 38, fontWeight: 600, color: COLORS.muted }}>

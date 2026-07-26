@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "El país", href: "/" },
   { label: "Indicadores", href: "/indicadores" },
   { label: "Brechas", href: "/brechas" },
+  { label: "Comparar", href: "/comparar" },
   { label: "Ideas", href: "/ideas" },
   { label: "Congreso", href: "/congreso" },
   { label: "Noticias", href: "/noticias" },
