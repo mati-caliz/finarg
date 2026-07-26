@@ -520,9 +520,16 @@ aclaración de que la correlación no es causalidad.
   `(neighborhood, date)`; el conector ahora ingiere todos los meses y `GET /housing/rent-by-neighborhood`
   devuelve el último mes por barrio, así que la respuesta no cambió de forma. Ningún componente
   consumía `useRentByNeighborhood`, así que la UI no se toca.
-  **Verificado**: base limpia migrada de 0001 a 0004, PK confirmada en `pg_constraint`, dos meses del
-  mismo barrio conviviendo, `db check` diciendo que el esquema coincide con los modelos, y el endpoint
-  devolviendo sólo junio.
+  **El primer intento rompió el deploy**, y vale anotar por qué: la migración asumía que la PK se
+  llamaba `rent_by_neighborhood_pkey`, y la base de producción —que fue **adoptada** de un `create_all`
+  viejo, no creada por migraciones— no tiene esa constraint. El script de deploy abortó antes de
+  reiniciar servicios, así que producción siguió sirviendo el commit anterior. La migración ahora
+  **descubre el nombre de la PK del catálogo** (`pg_constraint`), tolera que no haya ninguna, borra
+  filas con `date` NULL y deduplica `(neighborhood, date)` antes de crear la PK nueva.
+  **Regla que queda:** contra la base de prod nunca asumir nombres de constraints; descubrirlos.
+  **Verificado** en tres escenarios: base limpia 0001→0004, base con el estado real de prod (sin PK,
+  con un duplicado y una fila con fecha NULL) y el downgrade 0004→0003. Más `db check` en verde y el
+  endpoint devolviendo sólo el último mes.
 - **Tests.** 10 nuevos sobre los helpers de variación que antes eran privados de un componente de 899
   líneas y ahora son un módulo puro (184 en el front).
 - **De paso:** la sección "desde un evento político" de 6.b no salía server-side porque usaba una
