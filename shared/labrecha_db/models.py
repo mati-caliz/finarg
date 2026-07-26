@@ -30,7 +30,7 @@ class IndicatorHistory(Base):
     source: Mapped[str] = mapped_column(String(40))
     date: Mapped[date] = mapped_column(Date)
     value: Mapped[Decimal] = mapped_column(Numeric(24, 6))
-    meta: Mapped[dict] = mapped_column(JSONB, default=dict)
+    meta: Mapped[dict[str, object]] = mapped_column(JSONB, default=dict)
 
     __table_args__ = (
         UniqueConstraint("indicator_code", "source", "date", name="uq_indicator_source_date"),
@@ -184,8 +184,8 @@ class RentByNeighborhood(Base):
     __tablename__ = "rent_by_neighborhood"
 
     neighborhood: Mapped[str] = mapped_column(String(80), primary_key=True)
+    date: Mapped[date] = mapped_column(Date, primary_key=True)
     commune: Mapped[str | None] = mapped_column(String(20), nullable=True)
-    date: Mapped[date] = mapped_column(Date)
     price: Mapped[Decimal] = mapped_column(Numeric(16, 2))
     rooms: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
@@ -246,7 +246,7 @@ class Post(Base):
     category: Mapped[str] = mapped_column(String(40))
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     content: Mapped[str] = mapped_column(Text)
-    impacts: Mapped[list | None] = mapped_column(JSONB, nullable=True)
+    impacts: Mapped[list[dict[str, object]] | None] = mapped_column(JSONB, nullable=True)
     published: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

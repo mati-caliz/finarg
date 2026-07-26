@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends
 from labrecha_db import RentByNeighborhood
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from labrecha_api.db import get_session
@@ -13,8 +13,22 @@ router = APIRouter(prefix="/housing", tags=["housing"])
 
 @router.get("/rent-by-neighborhood", response_model=list[RentByNeighborhoodOut])
 def rent_by_neighborhood(session: Session = Depends(get_session)) -> list[RentByNeighborhoodOut]:
+    latest_month = (
+        select(
+            RentByNeighborhood.neighborhood.label("neighborhood"),
+            func.max(RentByNeighborhood.date).label("date"),
+        )
+        .group_by(RentByNeighborhood.neighborhood)
+        .subquery()
+    )
     rows = session.scalars(
-        select(RentByNeighborhood).order_by(RentByNeighborhood.price.desc())
+        select(RentByNeighborhood)
+        .join(
+            latest_month,
+            (RentByNeighborhood.neighborhood == latest_month.c.neighborhood)
+            & (RentByNeighborhood.date == latest_month.c.date),
+        )
+        .order_by(RentByNeighborhood.price.desc())
     ).all()
     return [
         RentByNeighborhoodOut(

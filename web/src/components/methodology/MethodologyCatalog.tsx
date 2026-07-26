@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useIndicators } from "@/hooks/useLabrecha";
 import { freshnessForCode } from "@/lib/freshness";
 import {
+  CADENCE_LABELS,
   INDICATOR_FAMILY_LABELS,
   INDICATOR_FAMILY_ORDER,
   type IndicatorFamily,
@@ -68,7 +69,7 @@ function IndicatorRow({ indicator }: { indicator: IndicatorSummary }) {
           flexWrap: "wrap",
         }}
       >
-        <span>cadencia {cadence}</span>
+        <span>cadencia {CADENCE_LABELS[cadence]}</span>
         <span>
           {formatNumberAR(indicator.count)} {indicator.count === 1 ? "dato" : "datos"}
         </span>

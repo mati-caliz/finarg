@@ -41,15 +41,15 @@ describe("freshnessForCode", () => {
   });
 
   it("takes the cadence of the indicator", () => {
-    expect(freshnessForCode("dollar_blue", TODAY).cadence).toBe("diaria");
-    expect(freshnessForCode("cpi_monthly", TODAY).cadence).toBe("mensual");
-    expect(freshnessForCode("unemployment", TODAY).cadence).toBe("trimestral");
-    expect(freshnessForCode("poverty_persons", TODAY).cadence).toBe("semestral");
-    expect(freshnessForCode("big_mac_usd", TODAY).cadence).toBe("anual");
+    expect(freshnessForCode("dollar_blue", TODAY).cadence).toBe("daily");
+    expect(freshnessForCode("cpi_monthly", TODAY).cadence).toBe("monthly");
+    expect(freshnessForCode("unemployment", TODAY).cadence).toBe("quarterly");
+    expect(freshnessForCode("poverty_persons", TODAY).cadence).toBe("biannual");
+    expect(freshnessForCode("big_mac_usd", TODAY).cadence).toBe("annual");
   });
 
   it("considers a daily indicator fresh right at its limit", () => {
-    const limit = MAX_AGE_DAYS.diaria;
+    const limit = MAX_AGE_DAYS.daily;
     const lastDate = new Date(TODAY_MS - limit * 86_400_000).toISOString().slice(0, 10);
 
     const freshness = freshnessForCode("dollar_blue", lastDate);
@@ -59,7 +59,7 @@ describe("freshnessForCode", () => {
   });
 
   it("marks a daily indicator stale one day past its limit", () => {
-    const past = MAX_AGE_DAYS.diaria + 1;
+    const past = MAX_AGE_DAYS.daily + 1;
     const lastDate = new Date(TODAY_MS - past * 86_400_000).toISOString().slice(0, 10);
 
     expect(freshnessForCode("dollar_blue", lastDate).stale).toBe(true);
@@ -79,10 +79,10 @@ describe("freshnessForCode", () => {
   });
 
   it("orders the tolerated ages from the most to the least frequent cadence", () => {
-    expect(MAX_AGE_DAYS.diaria).toBeLessThan(MAX_AGE_DAYS.mensual);
-    expect(MAX_AGE_DAYS.mensual).toBeLessThan(MAX_AGE_DAYS.trimestral);
-    expect(MAX_AGE_DAYS.trimestral).toBeLessThan(MAX_AGE_DAYS.semestral);
-    expect(MAX_AGE_DAYS.semestral).toBeLessThan(MAX_AGE_DAYS.anual);
+    expect(MAX_AGE_DAYS.daily).toBeLessThan(MAX_AGE_DAYS.monthly);
+    expect(MAX_AGE_DAYS.monthly).toBeLessThan(MAX_AGE_DAYS.quarterly);
+    expect(MAX_AGE_DAYS.quarterly).toBeLessThan(MAX_AGE_DAYS.biannual);
+    expect(MAX_AGE_DAYS.biannual).toBeLessThan(MAX_AGE_DAYS.annual);
   });
 });
 

@@ -28,7 +28,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | 4 | Seguridad e infraestructura — 4.a/4.b ✅, 4.c y 4.d pendientes (decisión del usuario) | Medio | Medio |
 | ~~5~~ | ~~SEO y distribución~~ ✅ | Bajo | Medio — contenido que Google no ve |
 | 6 | Producto: recurrencia — 6.b/6.c ✅, 6.a omitida (falta dominio que pueda enviar mail) | Alto | — (es crecimiento, no deuda) |
-| 7 | Deuda de código | Bajo | Bajo |
+| ~~7~~ | ~~Deuda de código~~ ✅ (menos el DNS, que es del usuario) | Bajo | Bajo |
 
 ---
 
@@ -495,19 +495,40 @@ aclaración de que la correlación no es causalidad.
 
 ---
 
-## Fase 7 — Deuda de código
+## Fase 7 — Deuda de código ✅ HECHA (2026-07-26)
 
-- **`IndicatorDetail.tsx` (867 líneas)** e **`indicators.ts` (684 líneas)**: los dos archivos más
-  grandes del front. Partir por responsabilidad (header + gráfico + panel de brecha + tabla; y
-  metadata de catálogo vs. formateadores).
-- **`lib/freshness.ts`**: el tipo `Cadence` usa literales en español (`"diaria"`, `"mensual"`) como
-  identificadores de código, contra la regla del repo. Pasarlos a inglés y dejar el español sólo en
-  el copy.
-- **`shared/labrecha_db/models.py`**: `Mapped[dict]` y `Mapped[list | None]` sin parametrizar; y
-  `RentByNeighborhood` tiene PK sólo en `neighborhood` pese a tener columna `date`, así que no puede
-  guardar historia (hoy es una foto). Decidir si es intencional y, si no, migrar la PK.
-- **DNS**: `nginx/nginx.conf` sigue sirviendo `finlatamio.com`; `labrecha.ar` sigue pendiente de
-  registro/apuntado (ya anotado en `ROADMAP.md`). Es del usuario, no del código.
+- **`IndicatorDetail.tsx` de 899 a 262 líneas.** Se partió por responsabilidad en
+  `components/indicator/detail/`: `styles.ts` (los tokens compartidos que estaban repetidos),
+  `variation.ts` (helpers **puros** de variación: `computeVariation`, `valueBefore`, `shiftDate`,
+  `variationVsPreviousPoint`, `variationVsMonthsAgo`, `gapPercent`), `IndicatorHero.tsx`,
+  `RangeSelector.tsx`, `GapPanel.tsx` (+ `SourcePanel` y `RelatedGapLinks`), `SeriesTable.tsx` (+
+  `buildTableRows`) y `VariationRow.tsx`. El componente que queda sólo orquesta: queries, cálculo y
+  layout.
+- **`indicators.ts` de 716 a 10 líneas de re-export.** Los formateadores salieron a
+  `lib/numberFormat.ts` (52) y el catálogo a `lib/indicatorCatalog.ts` (665, casi todo la tabla de
+  `INDICATOR_META`). `lib/indicators.ts` queda como barril, así que **ninguno de los ~40 imports del
+  repo cambió**: el refactor no se pagó en un diff de 40 archivos.
+- **`lib/freshness.ts`**: `Cadence` pasó de literales en español a `daily`/`monthly`/`quarterly`/
+  `biannual`/`annual`, con `CADENCE_LABELS` para el copy. El valor se renderizaba directo en
+  `/metodologia` ("cadencia diaria"), así que hacía falta el mapa de labels: el español quedó sólo en
+  la UI, como manda la regla.
+- **`shared/labrecha_db/models.py`**: `Mapped[dict]` → `Mapped[dict[str, object]]` y
+  `Mapped[list | None]` → `Mapped[list[dict[str, object]] | None]`.
+- **`RentByNeighborhood` sí era un bug, no una decisión.** La PK era sólo `neighborhood` pese a tener
+  columna `date`, así que cada corrida sobreescribía el mes anterior; y el conector, coherente con eso,
+  se quedaba **sólo con el último mes** de un CSV que trae toda la historia. Migración `0004`: PK
+  `(neighborhood, date)`; el conector ahora ingiere todos los meses y `GET /housing/rent-by-neighborhood`
+  devuelve el último mes por barrio, así que la respuesta no cambió de forma. Ningún componente
+  consumía `useRentByNeighborhood`, así que la UI no se toca.
+  **Verificado**: base limpia migrada de 0001 a 0004, PK confirmada en `pg_constraint`, dos meses del
+  mismo barrio conviviendo, `db check` diciendo que el esquema coincide con los modelos, y el endpoint
+  devolviendo sólo junio.
+- **Tests.** 10 nuevos sobre los helpers de variación que antes eran privados de un componente de 899
+  líneas y ahora son un módulo puro (184 en el front).
+- **De paso:** la sección "desde un evento político" de 6.b no salía server-side porque usaba una
+  query sin params que la página no prefetcheaba; `indicatorDetailData` ahora la incluye.
+- **DNS**: `nginx/nginx.conf` sigue sirviendo `finlatamio.com` y `labrecha.ar` sigue sin resolver. Es
+  del usuario, no del código — y es lo que bloquea 6.a.
 
 ---
 
