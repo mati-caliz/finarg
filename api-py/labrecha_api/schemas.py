@@ -284,7 +284,15 @@ class IncomeTaxDeductionBreakdown(BaseModel):
     total: Decimal
 
 
+class IncomeTaxScaleInfo(BaseModel):
+    effective_from: date
+    period_label: str
+    source: str
+    source_url: str
+
+
 class IncomeTaxResponse(BaseModel):
+    scale: IncomeTaxScaleInfo
     gross_monthly_salary: Decimal
     gross_annual_salary: Decimal
     monthly_legal_deductions: Decimal
@@ -361,6 +369,11 @@ class GapMeasurement(BaseModel):
     value: Decimal
 
 
+class GapExclusion(BaseModel):
+    source: str
+    reason: str
+
+
 class GapOut(BaseModel):
     indicator_code: str
     date: date
@@ -370,7 +383,9 @@ class GapOut(BaseModel):
     lower_value: Decimal
     spread: Decimal
     gap_pct: float
+    unit: str
     measurements: list[GapMeasurement]
+    excluded_sources: list[GapExclusion] = []
 
 
 class TermMethod(StrEnum):

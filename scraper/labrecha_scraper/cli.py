@@ -15,7 +15,7 @@ from labrecha_db.migrate import (
 )
 from sqlalchemy import select
 
-from labrecha_scraper.base import run_job
+from labrecha_scraper.base import STATUS_SUCCESS, run_job
 from labrecha_scraper.config import settings
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.logging_setup import configure_logging
@@ -91,7 +91,7 @@ def _run(job: str) -> int:
             connector = get_connector(name)
             run = run_job(session, connector)
             print(f"{name:20s} {run.status:8s} filas={run.rows_upserted} {_first_line(run.error)}")
-            if run.status != "success":
+            if run.status != STATUS_SUCCESS:
                 failures += 1
     return failures
 

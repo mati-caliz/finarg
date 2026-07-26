@@ -8,8 +8,10 @@ sola fuente. Dos features definitorias que el producto hace brillar:
    vs datos.gob.ar; inflación oficial vs esperada). Mostrar la discrepancia ES la feature.
    Conviven dos tipos: las **curadas** en `web/src/lib/gaps.ts`, que enfrentan indicadores
    *distintos* (blue vs oficial, esperada vs medida), y las **automáticas** de `GET /gaps`, que
-   salen solas de los datos: todo `indicator_code` con ≥2 `source`, comparado en la última fecha
-   en que ambas midieron y rankeado por discrepancia.
+   salen solas de los datos: todo `indicator_code` con ≥2 `source` **que declaren la misma
+   `meta.unit`**, comparado en la última fecha en que ambas midieron y rankeado por discrepancia.
+   Las mediciones en otra unidad o sin unidad declarada quedan fuera del ranking (comparar millones
+   contra unidades inventa brechas de escala) y viajan en `excluded_sources` con el motivo.
 2. **Series anotadas con eventos políticos** — elecciones, cambios de gobierno, DNUs cruzados con lo
    económico sobre la misma línea de tiempo. Además `GET /terms/{code}` corta cualquier serie por
    mandato presidencial (`api-py/labrecha_api/government_terms.py`): las series de tasa se acumulan
@@ -50,7 +52,13 @@ No hay backend Java ni Redis: el stack Spring original fue retirado por completo
   indicadores en serie temporal; único por `(indicator_code, source, date)`. Un mismo
   `indicator_code` puede tener varias `source` (el comparador de mediciones sale de acá).
 - `scrape_runs` — tracking de cada corrida de conector (estado, filas, error). Todo scraper de
-  PDF/HTML es frágil: debe fallar ruidosamente acá, nunca escribir datos dudosos en silencio.
+  PDF/HTML es frágil: debe fallar ruidosamente acá, nunca escribir datos dudosos en silencio. Hay
+  tres estados posibles además de `running`: `success`, `error` y `empty` — la corrida terminó sin
+  excepción pero trajo menos filas que el `min_rows` del conector (default 1; los conectores que
+  legítimamente pueden no tener nada nuevo declaran `min_rows = 0`). `empty` se ve ámbar en
+  `/estado` y cuenta como fallo para `scripts/scrape-alert.sh`. Al arrancar cada job,
+  `close_interrupted_runs` cierra como `error` las corridas del mismo job que quedaron en `running`
+  más de 6 h (proceso muerto, deploy en el medio).
 - `political_events(date, title, category, description)` — para anotar las series.
 - Tablas propias para lo que no encaja en la genérica: `congress_votes`/`congress_vote_details`
   (votaciones nominales de Diputados), `senators`, `holidays`, `news_articles`.
@@ -64,7 +72,16 @@ No hay backend Java ni Redis: el stack Spring original fue retirado por completo
   la ventana acotada de cada corrida y el backfill nunca avanzaría. Se reintentan a los 30 días.
 
 **Regla dura de producto:** ningún dato se muestra sin su fuente + fecha visibles (requisito legal
-con algunas fuentes). El patrón de atribución es parte del diseño.
+con algunas fuentes). El patrón de atribución es parte del diseño. Aplica también a lo que la app
+*calcula*: la escala de Ganancias de `api-py/labrecha_api/income_tax.py` es un `IncomeTaxScale` con
+`effective_from` + `source`, viaja en la respuesta de la calculadora y la UI avisa sola cuando pasó
+un semestre (ARCA actualiza cada seis meses). Y las series `*_real` que deflacta
+`connectors/derived.py` usan un **mes base fijo** (`DEFLATED_BASE_MONTH`) para que un CSV descargado
+el mes pasado siga coincidiendo; el mes va en `meta.base_month` y se muestra en pantalla.
+
+**Corolario:** nunca fabricar dato. `web/src/lib/series.ts` devuelve `null` —no el primer valor, no
+cero— para las fechas del eje anteriores al primer punto de una fuente, y el chart corta la línea y
+sólo pinta la banda de brecha donde las dos fuentes midieron de verdad.
 
 ### Frontend (web/)
 

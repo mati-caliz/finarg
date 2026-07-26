@@ -2,9 +2,10 @@
 
 import { CalculatorHeader } from "@/components/calculators/CalculatorHeader";
 import { Button, Card, DataTable } from "@/components/core";
-import { formatMoneyAR, formatNumberAR } from "@/lib/indicators";
+import { isTaxScaleOutdated } from "@/lib/freshness";
+import { formatDateAR, formatMoneyAR, formatNumberAR } from "@/lib/indicators";
 import { calculatorsApi } from "@/lib/labrechaApi";
-import type { IncomeTaxRequest } from "@/lib/labrechaApi";
+import type { IncomeTaxRequest, IncomeTaxScaleInfo } from "@/lib/labrechaApi";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -27,6 +28,10 @@ const checkboxRow = {
   color: "var(--ink)",
 };
 
+const OUTDATED_SCALE_WARNING =
+  "Esta escala tiene más de 6 meses: ARCA la actualiza cada semestre, así que puede haber una " +
+  "versión posterior. Verificá contra ARCA antes de usar el número.";
+
 const DEDUCTION_LABELS: { key: string; label: string }[] = [
   { key: "retirement", label: "Jubilación (11%)" },
   { key: "health_insurance", label: "Obra social (3%)" },
@@ -35,6 +40,31 @@ const DEDUCTION_LABELS: { key: string; label: string }[] = [
   { key: "income_tax", label: "Impuesto a las Ganancias" },
   { key: "total", label: "Total descuentos" },
 ];
+
+function ScaleAttribution({ scale }: { scale: IncomeTaxScaleInfo }) {
+  const outdated = isTaxScaleOutdated(scale.effective_from);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
+        Cálculo estimativo con la escala y las deducciones de Ganancias del período{" "}
+        <b>{scale.period_label}</b> (vigentes desde {formatDateAR(scale.effective_from)}). Fuente:{" "}
+        <a
+          href={scale.source_url}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "var(--ink2)" }}
+        >
+          {scale.source}
+        </a>
+      </span>
+      {outdated && (
+        <span style={{ fontSize: "0.6875rem", color: "var(--gap)", fontWeight: 600 }}>
+          {OUTDATED_SCALE_WARNING}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function IncomeTaxPage() {
   const [grossSalary, setGrossSalary] = useState(2000000);
@@ -141,14 +171,7 @@ export default function IncomeTaxPage() {
         </Card>
 
         {result ? (
-          <Card
-            title="Tu sueldo de bolsillo"
-            footer={
-              <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
-                Cálculo estimativo según deducciones legales y escala vigente de Ganancias.
-              </span>
-            }
-          >
+          <Card title="Tu sueldo de bolsillo" footer={<ScaleAttribution scale={result.scale} />}>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <div style={{ fontSize: "0.75rem", color: "var(--ink3)" }}>Neto mensual</div>

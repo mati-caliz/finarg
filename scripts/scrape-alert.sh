@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Alerta cuando un conector del scraper falla N corridas seguidas.
+# Cuenta como fallo cualquier estado distinto de 'success': tanto 'error' como 'empty'
+# (corrió sin excepción pero no trajo el mínimo de filas esperado).
 # Pensado para el cron del host, después de las corridas (ver scrape-cron.sh).
 # Config por env:
 #   FAILURE_THRESHOLD   corridas fallidas seguidas para alertar (default 3)

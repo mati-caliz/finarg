@@ -101,6 +101,7 @@ def _build_prompt(batch: list[Notice]) -> str:
 class OfficialGazetteConnector(Connector):
     name = "official_gazette"
     source = "official_gazette"
+    min_rows = 0
 
     def fetch(self) -> GazetteData:
         target_date = today_in_argentina()

@@ -23,7 +23,7 @@ todas las demás: hoy no hay nada entre un `git push` y producción.
 | Fase | Qué cubre | Esfuerzo | Riesgo si no se hace |
 |---|---|---|---|
 | ~~1~~ | ~~Red de seguridad: CI real + tests de la lógica de plata~~ ✅ | Bajo | Alto — se deploya sin verificar |
-| 2 | Honestidad del dato: series, brechas, conectores mudos | Medio | Alto — contradice la regla dura del producto |
+| ~~2~~ | ~~Honestidad del dato: series, brechas, conectores mudos~~ ✅ | Medio | Alto — contradice la regla dura del producto |
 | 3 | Superficies muertas: service worker, manifest | Bajo | Medio — el PWA está roto y nadie se entera |
 | 4 | Seguridad e infraestructura | Medio | Medio |
 | 5 | SEO y distribución | Bajo | Medio — contenido que Google no ve |
@@ -117,103 +117,118 @@ esos dos casos se suman acá.
 
 ---
 
-## Fase 2 — Honestidad del dato
+## Fase 2 — Honestidad del dato ✅ HECHA (2026-07-26)
 
-Los bugs de esta fase contradicen la regla dura del producto. Son los más graves aunque no rompan
-ninguna pantalla.
+Los bugs de esta fase contradecían la regla dura del producto. Eran los más graves aunque no
+rompieran ninguna pantalla.
 
-### 2.a — Las series dejan de inventar datos
+**Desvíos respecto de lo planificado.**
 
-**Problema.** `web/src/lib/series.ts:53-70` (`resample`): arranca con `last = points[0].value` y hace
-forward-fill, así que para las fechas del eje **anteriores** al primer punto de una serie dibuja una
-línea plana con el primer valor. En el comparador de brechas —donde las dos patas casi nunca
-empiezan el mismo día— eso pinta una brecha que no existió. Si la serie viene vacía, devuelve un
+- El gráfico no usa Recharts (es SVG propio en `components/core/AnnotatedSeriesChart.tsx`), así que
+  en vez de `connectNulls={false}` el corte de línea y la banda de brecha se implementaron a mano:
+  `linePath` levanta la lapicera en cada `null` y `gapAreaPath` pinta un subpath por cada tramo en
+  que ambas series midieron.
+- 2.f se resolvió por **base fija** (la otra opción del plan era base móvil declarada). Con base
+  móvil cada corrida seguía reescribiendo la serie entera; la base fija es la única que hace que un
+  CSV descargado el mes pasado siga coincidiendo.
+- 2.e destapó una inconsistencia que el plan no preveía: la escala del art. 94 era la del período
+  anual 2025 pero las deducciones eran las del primer semestre de 2025, o sea que la calculadora
+  mezclaba dos períodos. Se unificó todo en el período vigente (julio a diciembre de 2026,
+  importes acumulados a diciembre) verificado contra los PDF de ARCA.
+- No se agregaron tests de Python al scraper (`_latest_at_or_before`, `close_interrupted_runs`): hoy
+  el CI sólo corre `pytest` sobre `api-py/tests` y sumar un paquete de tests del scraper es trabajo
+  de la red de seguridad, no de esta fase. Queda anotado como deuda en la Fase 7.
+
+### 2.a — Las series dejan de inventar datos ✅
+
+**Problema.** `web/src/lib/series.ts` (`resample`): arrancaba con `last = points[0].value` y hacía
+forward-fill, así que para las fechas del eje **anteriores** al primer punto de una serie dibujaba
+una línea plana con el primer valor. En el comparador de brechas —donde las dos patas casi nunca
+empiezan el mismo día— eso pintaba una brecha que no existió. Si la serie venía vacía, devolvía un
 array de **ceros**.
 
-**Trabajo.**
-- `resample` devuelve `number | null`: `null` antes del primer punto real y `null` para una serie
-  vacía, en vez de fabricar.
-- `AnnotatedSeriesChart` con `connectNulls={false}` para que Recharts corte la línea.
-- Revisar los consumidores que asumen `number[]` (comparador de brechas, `IndicatorDetail`,
-  sparkline de la OG image) y el cálculo de la banda `gapFill`, que no debe pintarse donde falta
-  una de las dos patas.
-- Tests: serie que arranca tarde, serie vacía, dos series con rangos disjuntos.
+**Hecho.** `resample` devuelve `(number | null)[]`: `null` antes del primer punto real y `null` en
+toda la serie si no hay ni un punto. El forward-fill *posterior* se mantiene (un dato mensual sigue
+vigente hasta la medición siguiente). `SeriesPoint.v` pasó a `number | null` y el chart corta la
+línea, no dibuja el punto de hover y muestra "sin dato" en el tooltip; la banda de brecha se pinta
+por tramos y su leyenda sólo aparece si existe al menos un tramo. La tabla del indicador muestra
+"—" y no calcula brecha donde falta una pata.
 
-**Criterio de salida.** Un gráfico multi-fuente muestra hueco donde no hay dato, y la banda de brecha
-sólo existe donde las dos fuentes midieron.
+**Tests.** Se sumaron los tres casos que 1.d dejó pendientes (serie que arranca tarde, serie vacía,
+fuentes con rangos disjuntos) y un suite nuevo del chart (`AnnotatedSeriesChart.test.tsx`): corte de
+la línea, serie sin ningún valor, banda sólo donde las dos midieron, leyenda ausente sin solape.
 
-### 2.b — Un conector que trae 0 filas no es "success"
+**Criterio de salida.** ✅ Un gráfico multi-fuente muestra hueco donde no hay dato y la banda de
+brecha sólo existe donde las dos fuentes midieron.
 
-**Problema.** `scraper/labrecha_scraper/base.py:121` marca `success` sin mirar `rows_upserted`. El
-caso vivo es `connectors/derived.py`: `_implicit_fx_points` cruza `monetary_base` (mensual) con
-`international_reserves` (diaria) por **igualdad exacta de fecha** y saltea en silencio lo que no
-matchea; si el BCRA corre una fecha de publicación, graba 0 filas, `/estado` lo muestra verde y
-`scripts/scrape-alert.sh` no avisa. Cualquier scraper de HTML/PDF que empiece a devolver vacío se
-comporta igual.
+### 2.b — Un conector que trae 0 filas no es "success" ✅
 
-**Trabajo.**
-- Mínimo esperado de filas por conector (atributo de la clase base, default 1). Si la corrida queda
-  por debajo, estado `empty` — distinto de `success` y de `error`.
-- `/estado` (`components/status/ScrapeStatus.tsx`) muestra `empty` en ámbar con su propio copy, y
-  `scrape-alert.sh` lo cuenta como fallo.
-- Arreglar de fondo el cruce de `implicit_fx_rate`: alinear por mes (o tomar el último dato de
-  reservas ≤ la fecha de base monetaria) en vez de exigir la misma fecha exacta.
+**Problema.** `scraper/labrecha_scraper/base.py` marcaba `success` sin mirar `rows_upserted`.
 
-**Criterio de salida.** Un conector que no trae datos se ve rojo/ámbar en `/estado` y dispara la
+**Hecho.** La clase base tiene `min_rows` (default 1) y `run_job` marca la corrida como `empty` —un
+estado propio, distinto de `success` y de `error`— cuando trae menos filas que el mínimo, con el
+motivo escrito en `error`. `official_gazette` y `congress_summaries` declaran `min_rows = 0`: son los
+dos únicos conectores que legítimamente pueden no tener nada nuevo que traer. `/estado` pinta `empty`
+en ámbar con su propio copy ("sin datos" + explicación), cuenta esas corridas en "con error o sin
+datos", y `scrape-alert.sh` ya las tomaba como fallo porque filtra por `status = 'success'`.
+
+El cruce de `implicit_fx_rate` dejó de exigir igualdad exacta de fecha: toma el último dato de
+reservas anterior o igual a la fecha de base monetaria, con un tope de 15 días de rezago, y guarda en
+`meta.reserves_date` qué día de reservas usó.
+
+**Criterio de salida.** ✅ Un conector que no trae datos se ve ámbar en `/estado` y entra en la
 alerta de Telegram.
 
-### 2.c — Corridas zombi
+### 2.c — Corridas zombi ✅
 
-**Problema.** Si el proceso muere (OOM, deploy en el medio), la fila queda en `status="running"` para
-siempre y `/estado` la pinta ámbar eternamente.
+**Hecho.** `close_interrupted_runs` corre al arrancar cada job: marca como `error` (motivo:
+interrumpida) las corridas del mismo `job_name` que sigan en `running` con más de 6 h de antigüedad.
 
-**Trabajo.** Al arrancar una corrida, marcar como `error` (motivo: interrumpida) las corridas del
-mismo `job_name` que sigan en `running` con más de N horas de antigüedad.
+**Criterio de salida.** ✅ `/estado` no tiene corridas "en curso" de días.
 
-**Criterio de salida.** `/estado` no tiene corridas "en curso" de días.
+### 2.d — `/gaps` automático: no comparar peras con manzanas ✅
 
-### 2.d — `/gaps` automático: no comparar peras con manzanas
+**Problema.** `_build_gap` ordenaba por valor crudo entre fuentes sin mirar la unidad.
 
-**Problema.** `api-py/labrecha_api/routers/gaps.py` (`_build_gap`) ordena por valor crudo entre
-fuentes sin mirar la unidad. Si dos fuentes miden el mismo `indicator_code` en escalas distintas
-(millones vs. unidades), el ranking de discrepancia se llena de brechas falsas que tapan las reales.
-
-**Trabajo.** Filtrar por `meta.unit` coincidente entre las mediciones; si una fuente no declara
-unidad, excluirla del ranking automático (o exponerla aparte, marcada). Documentar el criterio en
+**Hecho.** Las mediciones se leen con su `meta.unit`. Se compara la unidad con más fuentes (mínimo
+dos); las mediciones en otra unidad o sin unidad declarada quedan afuera y se devuelven en
+`excluded_sources` con el motivo, así que la exclusión se puede auditar. La respuesta expone la
+`unit` comparada y `/brechas` la muestra junto a la fecha, con las descartadas debajo. Documentado en
 `/metodologia`.
 
-**Criterio de salida.** El ranking de `/gaps` sólo compara mediciones de la misma unidad; las
-descartadas se pueden auditar.
+**Criterio de salida.** ✅ El ranking sólo compara mediciones de la misma unidad y las descartadas se
+ven.
 
-### 2.e — Vigencia visible de la escala de Ganancias
+### 2.e — Vigencia visible de la escala de Ganancias ✅
 
-**Problema.** `api-py/labrecha_api/income_tax.py:22-48` tiene la escala y todos los mínimos
-hardcodeados, **sin período de vigencia, sin fuente y sin tests**. Cuando ARCA actualiza (cada
-semestre) la calculadora devuelve números mal con total confianza. Es el único lugar de la app donde
-un dato se muestra sin fuente ni fecha.
+**Problema.** `income_tax.py` tenía la escala y los mínimos hardcodeados, sin período de vigencia,
+sin fuente y —además— mezclando dos períodos distintos: la escala del art. 94 era la del período
+anual 2025 y las deducciones del art. 30 las del primer semestre de 2025.
 
-**Trabajo.**
-- Agrupar escala + deducciones en una estructura con `effective_from` y `source` (RG de ARCA).
-- Devolver esos metadatos en la respuesta de la calculadora y renderizarlos en
-  `/calculadora-sueldo-neto` con el patrón de atribución del design system.
-- Aviso automático en la UI si la escala tiene más de 6 meses ("puede haber una actualización
-  posterior; verificá contra ARCA"), reusando la idea de `lib/freshness.ts`.
-- Los tests de 1.c cubren que el cálculo no cambió al refactorizar.
+**Hecho.** Escala + deducciones viven en un `IncomeTaxScale` con `effective_from`, `period_label`,
+`source` y `source_url`, y todos los importes se actualizaron al período vigente (julio a diciembre
+de 2026, importes acumulados a diciembre), verificados contra los PDF de ARCA del art. 94 y del
+art. 30 más el tope de seguro de vida de las deducciones generales 2026. La respuesta de la
+calculadora devuelve esa metadata en `scale` y `/calculadora-sueldo-neto` la renderiza con el patrón
+de atribución (período + fecha de vigencia + link a la fuente). `isTaxScaleOutdated`
+(`lib/freshness.ts`, 185 días) dispara solo el aviso de "puede haber una actualización posterior;
+verificá contra ARCA".
 
-**Criterio de salida.** La calculadora dice de qué período es su escala y de dónde salió; una escala
-vencida se avisa sola.
+**Criterio de salida.** ✅ La calculadora dice de qué período es su escala y de dónde salió; una
+escala vencida se avisa sola.
 
-### 2.f — Rebase de las series deflactadas
+### 2.f — Rebase de las series deflactadas ✅
 
-**Problema.** `scraper/labrecha_scraper/connectors/derived.py:50` toma como base el **último** mes de
-IPC, así que cada corrida reescribe toda la serie real: el CSV que alguien descargó el mes pasado ya
-no coincide con el de hoy, y un número compartido en redes queda inconsistente.
+**Problema.** `connectors/derived.py` tomaba como base el **último** mes de IPC, así que cada corrida
+reescribía toda la serie real.
 
-**Trabajo.** Decidir y documentar: o base fija (un mes elegido, constante en el código) o base móvil
-declarada en la UI ("pesos de <mes>"). El `meta.base_month` ya se graba; falta que la pantalla lo
-muestre y que la decisión esté en `/metodologia`.
+**Hecho.** Base fija: `DEFLATED_BASE_MONTH = 2024-12`, constante en el código. Si el IPC no tiene ese
+mes, el conector no escribe nada (y con `min_rows` eso se ve como `empty`) en vez de rebasar a
+ciegas. `meta.base_month` sigue grabándose y ahora la página del indicador lo muestra ("expresada en
+pesos de diciembre de 2024, base fija, deflactada por el IPC nivel general"). La decisión quedó
+escrita en `/metodologia`.
 
-**Criterio de salida.** Toda serie `*_real` dice en qué pesos está expresada.
+**Criterio de salida.** ✅ Toda serie `*_real` dice en qué pesos está expresada.
 
 ---
 

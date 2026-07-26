@@ -120,13 +120,28 @@ export default function MethodologyPage() {
           esa medición, no una corrección nuestra. Mostrar la discrepancia entre mediciones, en vez
           de elegir una, es justamente el punto del sitio.
         </Rule>
+        <Rule title="La brecha automática sólo compara la misma unidad">
+          El ranking de discrepancias que sale solo de los datos exige que las dos mediciones
+          declaren la misma unidad. Si una fuente publica en millones y otra en unidades, o si una no
+          declara unidad, queda afuera de la comparación y se lista aparte con el motivo: una brecha
+          de escala no es una brecha de medición.
+        </Rule>
+        <Rule title="Un hueco en la serie se dibuja como hueco">
+          Cuando una fuente todavía no empezó a medir, o dejó de hacerlo, el gráfico corta la línea
+          en vez de estirar el primer o el último valor conocido. La banda ámbar de brecha sólo se
+          pinta donde las dos fuentes midieron de verdad. Un dato mensual sí se mantiene vigente
+          hasta la medición siguiente, que es lo que significa una serie mensual.
+        </Rule>
         <Rule title="Hay series que calculamos nosotros">
           Algunas series no las publica nadie: las derivamos de otras dos que sí son oficiales y las
           marcamos con la fuente <b>La Brecha (calculado)</b>. El salario mínimo y la jubilación
-          mínima a precios constantes se deflactan por el IPC nivel general, tomando como base el
-          último mes disponible; el dólar de convertibilidad es la base monetaria dividida por las
-          reservas, ambas del BCRA y del mismo día. Cada dato guarda en su metadata de qué series
-          salió y con qué método.
+          mínima a precios constantes se deflactan por el IPC nivel general contra un{" "}
+          <b>mes base fijo</b>, elegido en el código y publicado en cada gráfico ("pesos de …"): con
+          base móvil, cada corrida reescribía toda la serie y un CSV descargado el mes pasado dejaba
+          de coincidir con el de hoy. El dólar de convertibilidad es la base monetaria dividida por
+          las reservas, ambas del BCRA, tomando el último dato de reservas anterior o igual a la
+          fecha de la base monetaria —las dos series se publican con cadencias distintas— y su
+          metadata guarda qué día de reservas se usó.
         </Rule>
         <Rule title="Las reservas netas no están porque nadie las publica">
           El BCRA publica reservas brutas. Las netas —descontando el swap con China, los encajes en
@@ -136,7 +151,10 @@ export default function MethodologyPage() {
         </Rule>
         <Rule title="El pipeline se puede auditar">
           Cada corrida de cada conector queda registrada con su estado, las filas que ingirió y el
-          error si falló. Está publicado en <b>/estado</b>: si una serie se congeló, se ve ahí.
+          error si falló. Está publicado en <b>/estado</b>: si una serie se congeló, se ve ahí. Una
+          corrida que termina sin excepción pero no trae filas no cuenta como exitosa: se marca{" "}
+          <b>sin datos</b> en ámbar y dispara la misma alerta que un error, porque un scraper mudo es
+          indistinguible de un scraper roto.
         </Rule>
       </section>
 

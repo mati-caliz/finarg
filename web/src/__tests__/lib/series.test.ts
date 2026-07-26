@@ -130,6 +130,51 @@ describe("alignSources", () => {
   it("returns an empty axis when there are no sources", () => {
     expect(alignSources([])).toEqual({ axis: [], lines: [] });
   });
+
+  it("leaves a hole before the first measurement instead of backfilling it", () => {
+    const aligned = alignSources([
+      { source: "bcra", points: [{ date: "2024-01-01", value: 10 }] },
+      { source: "datosgobar", points: [{ date: "2024-03-01", value: 30 }] },
+    ]);
+
+    expect(aligned.lines[1]?.data).toEqual([null, 30]);
+  });
+
+  it("fills a source without points with nulls, never with zeros", () => {
+    const aligned = alignSources([
+      { source: "bcra", points: [{ date: "2024-01-01", value: 10 }] },
+      { source: "datosgobar", points: [] },
+    ]);
+
+    expect(aligned.lines[1]?.data).toEqual([null]);
+  });
+
+  it("keeps a source out of the axis stretch measured only by the other one", () => {
+    const aligned = alignSources([
+      {
+        source: "bcra",
+        points: [
+          { date: "2024-01-01", value: 10 },
+          { date: "2024-02-01", value: 20 },
+        ],
+      },
+      {
+        source: "datosgobar",
+        points: [
+          { date: "2024-03-01", value: 30 },
+          { date: "2024-04-01", value: 40 },
+        ],
+      },
+    ]);
+
+    expect(aligned.lines[1]?.data.slice(0, 2)).toEqual([null, null]);
+    expect(
+      aligned.axis.filter(
+        (_date, index) =>
+          aligned.lines[0]?.data[index] !== null && aligned.lines[1]?.data[index] !== null,
+      ),
+    ).toEqual(["2024-03-01", "2024-04-01"]);
+  });
 });
 
 describe("eventsToChartEvents", () => {

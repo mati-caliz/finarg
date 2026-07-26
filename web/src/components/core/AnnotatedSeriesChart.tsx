@@ -4,7 +4,7 @@ import { type CSSProperties, type MouseEvent, useState } from "react";
 
 export interface SeriesPoint {
   t?: string;
-  v: number;
+  v: number | null;
 }
 
 export interface ChartSeries {
@@ -29,8 +29,61 @@ interface AnnotatedSeriesChartProps {
   style?: CSSProperties;
 }
 
+const NO_DATA_LABEL = "sin dato";
+
 function scale(value: number, d0: number, d1: number, r0: number, r1: number) {
   return r0 + ((value - d0) / (d1 - d0 || 1)) * (r1 - r0);
+}
+
+type Projection = (index: number, value: number) => string;
+
+function linePath(data: SeriesPoint[], project: Projection): string {
+  const commands: string[] = [];
+  let penDown = false;
+  for (const [index, point] of data.entries()) {
+    if (point.v === null) {
+      penDown = false;
+      continue;
+    }
+    commands.push(`${penDown ? "L" : "M"}${project(index, point.v)}`);
+    penDown = true;
+  }
+  return commands.join(" ");
+}
+
+function measuredTogether(first: SeriesPoint[], second: SeriesPoint[]): number[][] {
+  const segments: number[][] = [];
+  let segment: number[] = [];
+  const length = Math.min(first.length, second.length);
+  for (let index = 0; index < length; index += 1) {
+    const value = first[index]?.v;
+    const other = second[index]?.v;
+    if (value === null || value === undefined || other === null || other === undefined) {
+      if (segment.length >= 2) {
+        segments.push(segment);
+      }
+      segment = [];
+      continue;
+    }
+    segment.push(index);
+  }
+  if (segment.length >= 2) {
+    segments.push(segment);
+  }
+  return segments;
+}
+
+function gapAreaPath(
+  first: SeriesPoint[],
+  second: SeriesPoint[],
+  project: Projection,
+): string | null {
+  const subpaths = measuredTogether(first, second).map((segment) => {
+    const forward = segment.map((index) => project(index, first[index]?.v ?? 0));
+    const back = [...segment].reverse().map((index) => project(index, second[index]?.v ?? 0));
+    return `M${forward.join(" L")} L${back.join(" L")} Z`;
+  });
+  return subpaths.length > 0 ? subpaths.join(" ") : null;
 }
 
 export function AnnotatedSeriesChart({
@@ -49,9 +102,11 @@ export function AnnotatedSeriesChart({
   const padR = 16;
   const padT = 26;
   const padB = 26;
-  const all = series.flatMap((s) => s.data.map((p) => p.v));
-  const min = Math.min(...all);
-  const max = Math.max(...all);
+  const all = series.flatMap((s) =>
+    s.data.map((p) => p.v).filter((value): value is number => value !== null),
+  );
+  const min = all.length > 0 ? Math.min(...all) : 0;
+  const max = all.length > 0 ? Math.max(...all) : 1;
   const span = max - min || 1;
   const y0 = min - span * 0.08;
   const y1 = max + span * 0.1;
@@ -60,26 +115,13 @@ export function AnnotatedSeriesChart({
   const Y = (v: number) => scale(v, y0, y1, H - padB, padT);
   const fmt = yFormat || ((v: number) => v.toLocaleString("es-AR", { maximumFractionDigits: 1 }));
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => y0 + t * (y1 - y0));
-  const line = (s: ChartSeries) =>
-    s.data.map((p, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
-
-  let gapArea: string | null = null;
+  const project: Projection = (index, value) => `${X(index).toFixed(1)},${Y(value).toFixed(1)}`;
   const firstSeries = series[0];
   const secondSeries = series[1];
-  if (gapFill && firstSeries && secondSeries) {
-    const a = firstSeries.data;
-    const b = secondSeries.data;
-    const m = Math.min(a.length, b.length);
-    const fwd = Array.from(
-      { length: m },
-      (_, i) => `${X(i).toFixed(1)},${Y(a[i]?.v ?? 0).toFixed(1)}`,
-    );
-    const back = Array.from(
-      { length: m },
-      (_, i) => `${X(m - 1 - i).toFixed(1)},${Y(b[m - 1 - i]?.v ?? 0).toFixed(1)}`,
-    );
-    gapArea = `M${fwd.join(" L")} L${back.join(" L")} Z`;
-  }
+  const gapArea =
+    gapFill && firstSeries && secondSeries
+      ? gapAreaPath(firstSeries.data, secondSeries.data, project)
+      : null;
 
   const onMove = (event: MouseEvent<SVGSVGElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -162,7 +204,7 @@ export function AnnotatedSeriesChart({
         {series.map((s, si) => (
           <path
             key={`line-${s.name}`}
-            d={line(s)}
+            d={linePath(s.data, project)}
             fill="none"
             stroke={s.color || `var(--serie-${si + 1})`}
             strokeWidth="2"
@@ -181,19 +223,20 @@ export function AnnotatedSeriesChart({
               stroke="var(--ink3)"
               strokeWidth="1"
             />
-            {series.map((s, si) =>
-              s.data[hover] ? (
+            {series.map((s, si) => {
+              const value = s.data[hover]?.v;
+              return value === null || value === undefined ? null : (
                 <circle
                   key={`hover-${s.name}`}
                   cx={X(hover)}
-                  cy={Y(s.data[hover].v)}
+                  cy={Y(value)}
                   r="3.5"
                   fill={s.color || `var(--serie-${si + 1})`}
                   stroke="var(--raise)"
                   strokeWidth="1.5"
                 />
-              ) : null,
-            )}
+              );
+            })}
           </g>
         )}
       </svg>
@@ -217,8 +260,9 @@ export function AnnotatedSeriesChart({
           <div style={{ color: "var(--ink3)", marginBottom: 4, fontFamily: "var(--font-jb-mono)" }}>
             {series[0]?.data[hover]?.t}
           </div>
-          {series.map((s, si) =>
-            s.data[hover] ? (
+          {series.map((s, si) => {
+            const value = s.data[hover]?.v;
+            return value === undefined ? null : (
               <div
                 key={`tip-${s.name}`}
                 style={{
@@ -241,10 +285,12 @@ export function AnnotatedSeriesChart({
                   />
                   {s.name}
                 </span>
-                <b className="num">{fmt(s.data[hover].v)}</b>
+                <b className="num" style={value === null ? { color: "var(--ink3)" } : undefined}>
+                  {value === null ? NO_DATA_LABEL : fmt(value)}
+                </b>
               </div>
-            ) : null,
-          )}
+            );
+          })}
           {(() => {
             const event = events.find((e) => e.index === hover);
             return event ? (
@@ -303,7 +349,7 @@ export function AnnotatedSeriesChart({
             Evento político
           </span>
         )}
-        {gapFill && series.length >= 2 && (
+        {gapArea && (
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
             <span
               style={{

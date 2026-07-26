@@ -110,6 +110,7 @@ def _build_prompt(batch: list[PendingVote]) -> str:
 class CongressSummariesConnector(Connector):
     name = "congress_summaries"
     source = "hcdn"
+    min_rows = 0
 
     def fetch(self) -> list[dict]:
         pending = self._pending_votes()

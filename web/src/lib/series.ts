@@ -8,7 +8,7 @@ export interface ParsedPoint {
 
 export interface SourceLine {
   source: string;
-  data: number[];
+  data: (number | null)[];
 }
 
 export interface AlignedSeries {
@@ -50,13 +50,10 @@ function downsample(dates: string[], maxPoints: number): string[] {
   return sampled;
 }
 
-function resample(points: ParsedPoint[], axis: string[]): number[] {
-  if (points.length === 0) {
-    return axis.map(() => 0);
-  }
-  const out: number[] = [];
+function resample(points: ParsedPoint[], axis: string[]): (number | null)[] {
+  const out: (number | null)[] = [];
   let index = 0;
-  let last = points[0]?.value ?? 0;
+  let last: number | null = null;
   for (const date of axis) {
     let current = points[index];
     while (current && current.date <= date) {
