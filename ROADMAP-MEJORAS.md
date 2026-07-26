@@ -4,14 +4,6 @@ Plan de trabajo salido de una revisión completa del monorepo (scraper, api-py, 
 CI). No agrega indicadores nuevos: cierra **bugs que ya están en producción**, tapa el agujero de
 proceso (nada verifica lo que se deploya) y ataca la recurrencia del producto.
 
-Complementa a los otros dos roadmaps y no los reemplaza:
-
-- `ROADMAP.md` — el pivot FinArg → La Brecha y las fases 0-6 de construcción (todas cerradas).
-- `ROADMAP-REDISENO.md` — la migración visual a la dirección "Editorial" (cerrada).
-- `TODO.md` — ideas de indicadores y herramientas para después del MVP. Lo que acá se planifica
-  con detalle (tests de la lógica de plata, tests en CI, alertas por email, variación desde un
-  evento) se saca de `TODO.md` cuando se cierre la fase correspondiente.
-
 ## Principios
 
 Los mismos del resto del proyecto, que son justamente los que varios de estos bugs violan:
