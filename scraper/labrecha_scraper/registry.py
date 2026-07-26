@@ -4,6 +4,7 @@ from labrecha_scraper.base import Connector
 from labrecha_scraper.connectors.bcra_rates import BcraRatesConnector
 from labrecha_scraper.connectors.big_mac import BigMacConnector
 from labrecha_scraper.connectors.congress import CongressConnector
+from labrecha_scraper.connectors.congress_summaries import CongressSummariesConnector
 from labrecha_scraper.connectors.country_risk import CountryRiskConnector
 from labrecha_scraper.connectors.credit_bcra import CreditBcraConnector
 from labrecha_scraper.connectors.crypto import CryptoConnector
@@ -32,6 +33,7 @@ CONNECTORS: dict[str, Connector] = {
         BigMacConnector(),
         OfficialGazetteConnector(),
         CongressConnector(),
+        CongressSummariesConnector(),
         CreditBcraConnector(),
         CryptoConnector(),
         CryptoHistoricalConnector(),

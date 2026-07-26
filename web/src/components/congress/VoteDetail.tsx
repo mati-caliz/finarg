@@ -1,6 +1,7 @@
 "use client";
 
 import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congress/VoteBars";
+import { TopicChip, VoteSummary } from "@/components/congress/VoteSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVote, useCongressVoteDetails } from "@/hooks/useLabrecha";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
@@ -96,6 +97,7 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
             {vote.session_type ? ` · sesión ${vote.session_type.toLowerCase()}` : ""}
             {vote.president_name ? ` · preside ${vote.president_name}` : ""}
           </span>
+          {vote.topic ? <TopicChip topic={vote.topic} /> : null}
         </div>
         <h1
           style={{
@@ -110,6 +112,7 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
         >
           {vote.title ?? "Votación"}
         </h1>
+        {vote.summary ? <VoteSummary summary={vote.summary} showAttribution /> : null}
         <div style={{ marginBottom: 8 }}>
           <TallyBar tally={tally} />
         </div>

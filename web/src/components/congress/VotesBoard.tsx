@@ -1,6 +1,7 @@
 "use client";
 
 import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congress/VoteBars";
+import { TopicChip, VoteSummary } from "@/components/congress/VoteSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
@@ -71,6 +72,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
           {vote.date ? formatDateAR(vote.date) : "s/f"}
           {vote.vote_record_id ? ` · Acta ${vote.vote_record_id}` : ""}
         </span>
+        {vote.topic ? <TopicChip topic={vote.topic} /> : null}
       </div>
       <h2
         style={{
@@ -85,6 +87,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
       >
         {vote.title ?? "Votación sin título"}
       </h2>
+      {vote.summary ? <VoteSummary summary={vote.summary} /> : null}
 
       <div style={{ marginBottom: 8 }}>
         <TallyBar tally={tallyOf(vote)} />
@@ -190,7 +193,17 @@ function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties 
         >
           {chip.label}
         </span>
-        <span style={{ fontFamily: MONO, fontSize: "0.66rem", color: "var(--ink3)" }}>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontFamily: MONO,
+            fontSize: "0.66rem",
+            color: "var(--ink3)",
+          }}
+        >
+          {vote.topic ? <TopicChip topic={vote.topic} /> : null}
           {vote.date ? formatDateAR(vote.date) : "s/f"}
         </span>
       </div>
@@ -207,6 +220,19 @@ function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties 
       >
         {vote.title ?? "Votación sin título"}
       </div>
+      {vote.summary ? (
+        <p
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "0.9375rem",
+            lineHeight: 1.45,
+            color: "var(--ink2)",
+            margin: "0 0 8px",
+          }}
+        >
+          {vote.summary}
+        </p>
+      ) : null}
       <div style={{ fontFamily: MONO, fontSize: "0.7rem", color: "var(--ink3)" }}>
         {vote.affirmative_votes ?? "—"} · {vote.negative_votes ?? "—"} · {vote.abstentions ?? "—"}
       </div>

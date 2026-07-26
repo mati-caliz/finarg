@@ -109,6 +109,18 @@ class CongressVoteDetail(Base):
     )
 
 
+class CongressVoteSummary(Base):
+    __tablename__ = "congress_vote_summaries"
+
+    vote_record_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    summary: Mapped[str] = mapped_column(Text)
+    topic: Mapped[str] = mapped_column(String(40))
+    file_numbers: Mapped[str | None] = mapped_column(Text, nullable=True)
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+
 class NewsArticle(Base):
     __tablename__ = "news_articles"
 

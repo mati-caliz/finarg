@@ -99,6 +99,8 @@ export interface CongressVote {
   negative_votes: number | null;
   abstentions: number | null;
   absents: number | null;
+  summary: string | null;
+  topic: string | null;
 }
 
 export interface CongressVoteDetail {

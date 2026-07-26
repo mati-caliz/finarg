@@ -54,6 +54,11 @@ No hay backend Java ni Redis: el stack Spring original fue retirado por completo
 - `political_events(date, title, category, description)` — para anotar las series.
 - Tablas propias para lo que no encaja en la genérica: `congress_votes`/`congress_vote_details`
   (votaciones nominales de Diputados), `senators`, `holidays`, `news_articles`.
+- `congress_vote_summaries` — el título del acta de una votación es burocrático ("Expediente
+  0073-S-2019 - Votación en General"), así que el conector `congress_summaries` cruza los
+  expedientes citados contra el dataset de proyectos parlamentarios de HCDN y le pide a Claude
+  (vía `llm.py`, igual que el Boletín Oficial) una oración en lenguaje llano + un tema. El resumen
+  se muestra siempre junto al título oficial y aclarando que lo generó una IA.
 
 **Regla dura de producto:** ningún dato se muestra sin su fuente + fecha visibles (requisito legal
 con algunas fuentes). El patrón de atribución es parte del diseño.
