@@ -63,6 +63,32 @@ describe("computeGap", () => {
     expect(computeGap(pointsGap, 22, 30).formattedGap).toBe("8,0 pp");
     expect(computeGap(percentGap, 900, 1000).formattedGap).toBe("10,0 %");
   });
+
+  it("ranks a rate gap by the points it shows, not by the ratio between percentages", () => {
+    const result = computeGap(pointsGap, 30, 22);
+
+    expect(result.magnitude).toBe(8);
+    expect(result.formattedGap).toBe("8,0 pp");
+  });
+
+  it("ranks a level gap by its relative reading", () => {
+    const result = computeGap(percentGap, 1500, 1000);
+
+    expect(result.magnitude).toBe(50);
+    expect(result.formattedGap).toBe("50,0 %");
+  });
+
+  it("does not let a near-zero rate inflate its magnitude", () => {
+    const nearZero = computeGap(pointsGap, 0.4, 0.1);
+
+    expect(nearZero.gapPct).toBeCloseTo(300);
+    expect(nearZero.magnitude).toBeCloseTo(0.3);
+  });
+
+  it("caps the bar so a huge gap cannot overflow its track", () => {
+    expect(computeGap(percentGap, 10000, 1000).barWidth).toBe(100);
+    expect(computeGap(pointsGap, 40, 0).barWidth).toBe(100);
+  });
 });
 
 describe("the curated gaps catalog", () => {

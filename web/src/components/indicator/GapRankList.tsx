@@ -67,8 +67,8 @@ export function GapRankList() {
       valueBText: def.format(valueB),
       sourcesText: `${sourceLabel(def.legs[0].source)} · ${sourceLabel(def.legs[1].source)} · ${formatDateAR(pointA.date > pointB.date ? pointA.date : pointB.date)}`,
       formattedGap: gap.formattedGap,
-      gapMagnitude: Math.abs(gap.gapPct),
-      barWidth: Math.min(Math.abs(gap.gapPct), 100),
+      gapMagnitude: gap.magnitude,
+      barWidth: gap.barWidth,
     });
   });
   ranked.sort((a, b) => b.gapMagnitude - a.gapMagnitude);

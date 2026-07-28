@@ -103,6 +103,12 @@ def _comparable_unit(measurements: list[Measurement]) -> str | None:
     return min(comparable, key=lambda unit: (-len(by_unit[unit]), unit))
 
 
+def _gap_magnitude(unit: str, spread: Decimal, gap_pct: float) -> float:
+    if unit == PERCENT_UNIT:
+        return float(abs(spread))
+    return abs(gap_pct)
+
+
 def _exclusion_reason(measurement: Measurement, unit: str) -> str | None:
     if measurement.unit is None:
         return MISSING_UNIT_REASON
@@ -163,7 +169,7 @@ def list_gaps(
         for code, day in latest_by_code.items()
         if (gap := _build_gap(code, day, grouped.get(code, []))) is not None
     ]
-    gaps.sort(key=lambda item: abs(item.gap_pct), reverse=True)
+    gaps.sort(key=lambda item: _gap_magnitude(item.unit, item.spread, item.gap_pct), reverse=True)
     return gaps[:limit]
 
 
@@ -207,10 +213,8 @@ def _history_point(day: date, measurements: list[Measurement], unit: str) -> Gap
     )
 
 
-def _magnitude_for(unit: str) -> Callable[[GapHistoryPoint], Decimal | float]:
-    if unit == PERCENT_UNIT:
-        return lambda point: abs(point.spread)
-    return lambda point: abs(point.gap_pct)
+def _magnitude_for(unit: str) -> Callable[[GapHistoryPoint], float]:
+    return lambda point: _gap_magnitude(unit, point.spread, point.gap_pct)
 
 
 def _measurements_by_date(session: Session, indicator_code: str) -> dict[date, list[Measurement]]:

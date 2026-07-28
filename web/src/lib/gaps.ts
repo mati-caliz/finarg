@@ -89,27 +89,39 @@ export const GAP_BY_ID: Record<string, GapDef> = Object.fromEntries(
   GAPS.map((gap) => [gap.id, gap]),
 );
 
+export const PERCENT_UNIT = "%";
+
+const PP_BAR_FULL_SCALE = 10;
+const PCT_BAR_FULL_SCALE = 100;
+
+function barWidthForPoints(points: number): number {
+  return Math.min((points / PP_BAR_FULL_SCALE) * PCT_BAR_FULL_SCALE, PCT_BAR_FULL_SCALE);
+}
+
 export interface GapResult {
   gapPct: number;
   gapValue: number;
   formattedGap: string;
+  magnitude: number;
+  barWidth: number;
 }
 
 export function computeGap(def: GapDef, valueA: number, valueB: number): GapResult {
   const gapValue = valueA - valueB;
   const gapPct = valueB !== 0 ? (gapValue / Math.abs(valueB)) * 100 : 0;
-  const magnitude = Math.abs(gapValue);
-  const formattedGap =
-    def.gapMode === "pct"
-      ? `${formatNumberAR(Math.abs(gapPct), 1)} %`
-      : `${formatNumberAR(magnitude, 1)} pp`;
-  return { gapPct, gapValue, formattedGap };
+  const points = Math.abs(gapValue);
+  const relative = Math.abs(gapPct);
+  const measuredInPoints = def.gapMode === "pp";
+  return {
+    gapPct,
+    gapValue,
+    formattedGap: measuredInPoints
+      ? `${formatNumberAR(points, 1)} pp`
+      : `${formatNumberAR(relative, 1)} %`,
+    magnitude: measuredInPoints ? points : relative,
+    barWidth: measuredInPoints ? barWidthForPoints(points) : Math.min(relative, PCT_BAR_FULL_SCALE),
+  };
 }
-
-export const PERCENT_UNIT = "%";
-
-const PP_BAR_FULL_SCALE = 10;
-const PCT_BAR_FULL_SCALE = 100;
 
 export interface AutomaticGapMagnitude {
   headline: string;
@@ -127,7 +139,7 @@ export function automaticGapMagnitude(
     return {
       headline: `${formatNumberAR(points, 2)} pp`,
       caption: "entre la medición más alta y la más baja",
-      barWidth: Math.min((points / PP_BAR_FULL_SCALE) * PCT_BAR_FULL_SCALE, PCT_BAR_FULL_SCALE),
+      barWidth: barWidthForPoints(points),
     };
   }
   const relative = Math.abs(gapPct);

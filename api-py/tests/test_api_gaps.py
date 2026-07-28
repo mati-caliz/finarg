@@ -140,6 +140,48 @@ def test_ranking_is_sorted_by_gap_and_respects_limit(
     assert [item["indicator_code"] for item in limited] == ["country_risk"]
 
 
+def test_ranking_does_not_let_a_near_zero_percentage_inflate_its_way_to_the_top(
+    client: TestClient, db_session: Session
+) -> None:
+    seed(
+        db_session,
+        [
+            ("financial_balance", "a", date(2026, 1, 6), "0.1", PERCENT),
+            ("financial_balance", "b", date(2026, 1, 6), "0.4", PERCENT),
+            ("dollar_blue", "a", date(2026, 1, 6), "1000", PESOS),
+            ("dollar_blue", "b", date(2026, 1, 6), "1400", PESOS),
+        ],
+    )
+
+    ranked = client.get("/gaps").json()
+
+    assert [item["indicator_code"] for item in ranked] == ["dollar_blue", "financial_balance"]
+
+    limited = client.get("/gaps", params={"limit": 1}).json()
+    assert [item["indicator_code"] for item in limited] == ["dollar_blue"]
+
+
+def test_ranking_between_percent_indicators_goes_by_points(
+    client: TestClient, db_session: Session
+) -> None:
+    seed(
+        db_session,
+        [
+            ("cpi_monthly", "a", date(2026, 1, 6), "40.0", PERCENT),
+            ("cpi_monthly", "b", date(2026, 1, 6), "45.0", PERCENT),
+            ("inflation_expectations_rem", "a", date(2026, 1, 6), "1.0", PERCENT),
+            ("inflation_expectations_rem", "b", date(2026, 1, 6), "1.5", PERCENT),
+        ],
+    )
+
+    ranked = client.get("/gaps").json()
+
+    assert [item["indicator_code"] for item in ranked] == [
+        "cpi_monthly",
+        "inflation_expectations_rem",
+    ]
+
+
 def test_min_sources_filter_excludes_pairs(client: TestClient, db_session: Session) -> None:
     seed(
         db_session,
