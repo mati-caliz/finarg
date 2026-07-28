@@ -22,8 +22,11 @@ Dos features definitorias:
    de cobertura geográfica además de metodológica: `meta.geography` y `meta.agency` viajan en cada
    punto para poder decirlo. Para unidades en `%` la UI muestra la brecha en **pp**
    (`automaticGapMagnitude`), no como cociente entre porcentajes. `GET /gaps/{code}/history` recorre
-   toda la serie y devuelve la brecha más ancha, la más angosta y la última; rankea por **pp** cuando la
-   unidad es `%` y por brecha relativa cuando son niveles, que es exactamente lo que muestra la UI.
+   toda la serie y devuelve la brecha más ancha, la más angosta y la última. **Todo lo que rankea usa
+   la misma magnitud** (`_gap_magnitude` en la API, `computeGap`/`automaticGapMagnitude` en la web):
+   **pp** cuando la unidad es `%`, brecha relativa cuando son niveles — el número que se ordena es el
+   que se muestra. Ojo con volver al cociente: dos porcentajes cerca de cero (déficit 0,1 % vs 0,4 %)
+   dan 300 % de "brecha" y coparían el ranking mostrando 0,30 pp.
 2. **Series anotadas con eventos políticos.** `GET /terms/{code}` corta cualquier serie por mandato
    presidencial (`api-py/labrecha_api/government_terms.py`): las tasas se acumulan **componiendo**
    (`MONTHLY_RATE_INDICATORS`), los niveles comparan extremos; la respuesta dice qué método usó y la
@@ -46,6 +49,13 @@ Dos features definitorias:
 
 Monorepo de cuatro piezas; **PostgreSQL es el contrato** entre ellas (sin colas ni mensajería). No hay
 backend Java ni Redis: el stack Spring original fue retirado por completo.
+
+La base es además el único lugar donde vive la serie histórica completa —los IPC provinciales, los
+PDFs del BCRA y las votaciones viejas no siempre se pueden volver a scrapear hacia atrás—, así que
+`scripts/backup-db.sh` (cron diario del host) hace `pg_dump -Fc`, **verifica el volcado** con
+`pg_restore --list` antes de darlo por bueno y rota por `BACKUP_RETENTION_DAYS` sin bajar nunca de
+`BACKUP_MIN_KEEP` copias. Si algo falla, borra el archivo parcial y avisa (Telegram opcional, igual
+que `scrape-alert.sh`): un backup roto que se descubre el día que hace falta no es un backup.
 
 - `shared/` — paquete `labrecha_db`: modelos SQLAlchemy (**única** definición del esquema) +
   migraciones Alembic. Lo instalan el scraper y la API; ninguno de los dos define tablas propias. Todo
@@ -105,9 +115,11 @@ y `web/src/lib/clientIp.ts`.
   proxya a la FastAPI (`LABRECHA_API_INTERNAL_URL`) con ISR por ruta. El cliente
   (`src/lib/labrechaApi.ts`) es **isomórfico**: en el browser va por el proxy, en el servidor directo
   a la API vía `serverGet` (`src/lib/serverApi.ts`). Los TTL son únicos y viven en
-  `src/lib/cacheRules.ts`. El `POST` del proxy tiene whitelist (`WRITABLE_PATHS`): la API es de
-  lectura salvo `/errors`, y el proxy no debe ser el agujero por el que se llegue al próximo
-  endpoint de escritura que se agregue.
+  `src/lib/cacheRules.ts`. El `POST` del proxy tiene whitelist (`POSTABLE_PATHS`): lo único que
+  escribe es `/errors`; las calculadoras van por `POST` porque llevan cuerpo, pero no tocan la base,
+  y sus rutas salen de `src/lib/calculatorPaths.ts` para que el cliente y la whitelist no puedan
+  divergir —cuando divergieron, las cuatro calculadoras devolvían 404 en el navegador—. El proxy no
+  debe ser el agujero por el que se llegue al próximo endpoint de escritura que se agregue.
 - **Datos en el servidor:** cada `page.tsx` prefetchea sus queries y las hidrata con
   `<PrefetchedQueries>`, así el HTML sale con contenido real (no skeletons) y las páginas se
   prerenderizan. Para que la clave del prefetch no pueda divergir de la del hook, ambas salen de las
