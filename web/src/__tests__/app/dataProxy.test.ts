@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 import { POST } from "@/app/api/data/[...path]/route";
+import { CALCULATOR_PATH_LIST } from "@/lib/calculatorPaths";
 import { NextRequest } from "next/server";
 
 const NOT_FOUND = 404;
@@ -37,8 +38,17 @@ describe("the write side of the data proxy", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it("forwards every calculator the site posts to", async () => {
+    for (const path of CALCULATOR_PATH_LIST) {
+      const response = await POST(...postTo(path));
+
+      expect(response.status).toBe(CREATED);
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(CALCULATOR_PATH_LIST.length);
+  });
+
   it("refuses any other path without touching the backend", async () => {
-    for (const path of ["posts", "indicators/dollar_blue", "errors/../posts"]) {
+    for (const path of ["posts", "indicators/dollar_blue", "errors/../posts", "calculators"]) {
       const response = await POST(...postTo(path));
 
       expect(response.status).toBe(NOT_FOUND);

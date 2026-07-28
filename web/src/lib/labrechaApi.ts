@@ -1,3 +1,4 @@
+import { CALCULATOR_PATHS } from "@/lib/calculatorPaths";
 import type { ErrorReport } from "@/lib/errorReporter";
 import { buildQueryString, serverGet, serverPost } from "@/lib/serverApi";
 import axios from "axios";
@@ -531,9 +532,11 @@ export const housingApi = {
 
 export const calculatorsApi = {
   compoundInterest: (body: CompoundInterestRequest) =>
-    post<CompoundInterestResponse>("/calculators/compound-interest", body),
+    post<CompoundInterestResponse>(`/${CALCULATOR_PATHS.compoundInterest}`, body),
   inflationAdjustment: (body: InflationAdjustmentRequest) =>
-    post<InflationAdjustmentResponse>("/calculators/inflation-adjustment", body),
-  incomeTax: (body: IncomeTaxRequest) => post<IncomeTaxResponse>("/calculators/income-tax", body),
-  taxImpact: (body: TaxImpactRequest) => post<TaxImpactResponse>("/calculators/tax-impact", body),
+    post<InflationAdjustmentResponse>(`/${CALCULATOR_PATHS.inflationAdjustment}`, body),
+  incomeTax: (body: IncomeTaxRequest) =>
+    post<IncomeTaxResponse>(`/${CALCULATOR_PATHS.incomeTax}`, body),
+  taxImpact: (body: TaxImpactRequest) =>
+    post<TaxImpactResponse>(`/${CALCULATOR_PATHS.taxImpact}`, body),
 };

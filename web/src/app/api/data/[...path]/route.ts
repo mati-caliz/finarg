@@ -1,10 +1,12 @@
 import { getRevalidateTime } from "@/lib/cacheRules";
+import { CALCULATOR_PATH_LIST } from "@/lib/calculatorPaths";
 import { getBackendUrl } from "@/lib/serverApi";
 import type { NextRequest } from "next/server";
 
 const JSON_CONTENT_TYPE = "application/json";
 const CLIENT_IP_HEADERS = ["x-real-ip", "x-forwarded-for"];
-const WRITABLE_PATHS = new Set(["errors"]);
+const WRITABLE_PATHS = ["errors"];
+const POSTABLE_PATHS = new Set([...WRITABLE_PATHS, ...CALCULATOR_PATH_LIST]);
 
 function clientHeaders(request: NextRequest, accept: string): HeadersInit {
   const headers: Record<string, string> = { Accept: accept };
@@ -63,7 +65,7 @@ export async function POST(
 ) {
   const { path } = await params;
   const pathStr = path.join("/");
-  if (!WRITABLE_PATHS.has(pathStr)) {
+  if (!POSTABLE_PATHS.has(pathStr)) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
   const url = `${getBackendUrl()}/${pathStr}`;
