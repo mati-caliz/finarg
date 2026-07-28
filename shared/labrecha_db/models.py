@@ -17,6 +17,9 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+CHAMBER_DEPUTIES = "diputados"
+CHAMBER_SENATE = "senadores"
+
 
 class Base(DeclarativeBase):
     pass
@@ -93,6 +96,7 @@ class CongressVote(Base):
     __tablename__ = "congress_votes"
 
     vote_record_id: Mapped[str] = mapped_column(String(20), primary_key=True)
+    chamber: Mapped[str] = mapped_column(String(20))
     session_source_id: Mapped[str | None] = mapped_column(String(40), nullable=True)
     period_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
     period_type: Mapped[str | None] = mapped_column(String(40), nullable=True)
@@ -105,6 +109,7 @@ class CongressVote(Base):
     majority_base: Mapped[str | None] = mapped_column(String(60), nullable=True)
     majority_type: Mapped[str | None] = mapped_column(String(60), nullable=True)
     title: Mapped[str | None] = mapped_column(Text, nullable=True)
+    vote_type: Mapped[str | None] = mapped_column(String(60), nullable=True)
     result: Mapped[str | None] = mapped_column(String(40), nullable=True)
     president_name: Mapped[str | None] = mapped_column(String(160), nullable=True)
     affirmative_votes: Mapped[int | None] = mapped_column(Integer, nullable=True)
@@ -112,7 +117,10 @@ class CongressVote(Base):
     abstentions: Mapped[int | None] = mapped_column(Integer, nullable=True)
     absents: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
-    __table_args__ = (Index("ix_congress_votes_date", "date"),)
+    __table_args__ = (
+        Index("ix_congress_votes_date", "date"),
+        Index("ix_congress_votes_chamber_date", "chamber", "date"),
+    )
 
 
 class CongressVoteDetail(Base):
@@ -120,7 +128,7 @@ class CongressVoteDetail(Base):
 
     vote_detail_id: Mapped[str] = mapped_column(String(20), primary_key=True)
     vote_record_id: Mapped[str] = mapped_column(String(20))
-    deputy_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    legislator_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
     bloc: Mapped[str | None] = mapped_column(String(200), nullable=True)
     district: Mapped[str | None] = mapped_column(String(120), nullable=True)
     vote: Mapped[str | None] = mapped_column(String(20), nullable=True)

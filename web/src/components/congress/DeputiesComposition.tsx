@@ -10,12 +10,13 @@ import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
 import { blocColor } from "@/lib/congress";
+import { LATEST_VOTE_PARAMS } from "@/lib/queryParams";
 import { formatDateAR } from "@/lib/indicators";
 
 const UNKNOWN_BLOC = "Sin bloque";
 
 export function DeputiesComposition() {
-  const latestVoteQuery = useCongressVotes({ limit: 1 });
+  const latestVoteQuery = useCongressVotes(LATEST_VOTE_PARAMS);
   const latestVote = latestVoteQuery.data?.[0];
   const detailsQuery = useCongressVoteDetails(latestVote?.vote_record_id ?? "");
 
@@ -45,11 +46,11 @@ export function DeputiesComposition() {
       if (firstBloc !== secondBloc) {
         return firstBloc - secondBloc;
       }
-      return (first.deputy_name ?? "").localeCompare(second.deputy_name ?? "");
+      return (first.legislator_name ?? "").localeCompare(second.legislator_name ?? "");
     })
     .map((detail, index) => ({
-      id: `${detail.deputy_name ?? "banca"}-${index}`,
-      occupantName: detail.deputy_name ?? "Banca sin datos",
+      id: `${detail.legislator_name ?? "banca"}-${index}`,
+      occupantName: detail.legislator_name ?? "Banca sin datos",
       bloc: detail.bloc ?? UNKNOWN_BLOC,
       detailLines: [detail.district].filter((line): line is string => line !== null && line !== ""),
     }));

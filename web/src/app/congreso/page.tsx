@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 export const metadata: Metadata = {
   title: "Congreso - La Brecha",
   description:
-    "Votaciones nominales de la Cámara de Diputados y composición del Congreso de Argentina, con su fuente.",
+    "Votaciones nominales de Diputados y del Senado y composición del Congreso de Argentina, con su fuente.",
 };
 
 function SectionHeading({ children }: { children: ReactNode }) {
@@ -48,7 +48,7 @@ export default async function CongressPage() {
               marginBottom: 10,
             }}
           >
-            /congreso · Cámara de Diputados
+            /congreso · Diputados y Senado
           </div>
           <h1
             style={{

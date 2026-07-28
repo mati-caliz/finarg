@@ -13,6 +13,7 @@ from labrecha_scraper.connectors.crypto_historical import CryptoHistoricalConnec
 from labrecha_scraper.connectors.derived import DerivedIndicatorsConnector
 from labrecha_scraper.connectors.dollar import DollarConnector
 from labrecha_scraper.connectors.dollar_historical import DollarHistoricalConnector
+from labrecha_scraper.connectors.hcdn_votes import HcdnVotesConnector
 from labrecha_scraper.connectors.holidays import HolidaysConnector
 from labrecha_scraper.connectors.icg import IcgConnector
 from labrecha_scraper.connectors.icl_bcra import IclBcraConnector
@@ -24,6 +25,7 @@ from labrecha_scraper.connectors.official_gazette import OfficialGazetteConnecto
 from labrecha_scraper.connectors.rent_caba import RentCabaConnector
 from labrecha_scraper.connectors.reserves_bcra import ReservesBcraConnector
 from labrecha_scraper.connectors.senate import SenateConnector
+from labrecha_scraper.connectors.senate_votes import SenateVotesConnector
 from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
 
 CONNECTORS: dict[str, Connector] = {
@@ -41,6 +43,7 @@ CONNECTORS: dict[str, Connector] = {
         CryptoHistoricalConnector(),
         DollarConnector(),
         DollarHistoricalConnector(),
+        HcdnVotesConnector(),
         HolidaysConnector(),
         IclBcraConnector(),
         IcgConnector(),
@@ -51,6 +54,7 @@ CONNECTORS: dict[str, Connector] = {
         ReservesBcraConnector(),
         CountryRiskConnector(),
         SenateConnector(),
+        SenateVotesConnector(),
         SeriesDatosGobConnector(),
         DerivedIndicatorsConnector(),
     )

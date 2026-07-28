@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from datetime import date
 
 import httpx
-from labrecha_db import CongressVote, CongressVoteDetail
+from labrecha_db import CHAMBER_DEPUTIES, CongressVote, CongressVoteDetail
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
@@ -105,6 +105,7 @@ class CongressConnector(Connector):
             rows.append(
                 {
                     "vote_record_id": vote_record_id,
+                    "chamber": CHAMBER_DEPUTIES,
                     "session_source_id": _text(record.get("sesion_id")),
                     "period_number": _integer(record.get("nroperiodo")),
                     "period_type": _text(record.get("tipo_periodo")),
@@ -138,7 +139,7 @@ class CongressConnector(Connector):
                 {
                     "vote_detail_id": vote_detail_id,
                     "vote_record_id": vote_record_id,
-                    "deputy_name": _text(record.get("diputado_nombre")),
+                    "legislator_name": _text(record.get("diputado_nombre")),
                     "bloc": _text(record.get("bloque")),
                     "district": _text(record.get("distrito_nombre")),
                     "vote": _text(record.get("voto")),

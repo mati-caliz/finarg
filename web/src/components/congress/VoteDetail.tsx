@@ -4,6 +4,7 @@ import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congres
 import { TopicChip, VoteSummary } from "@/components/congress/VoteSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVote, useCongressVoteDetails } from "@/hooks/useLabrecha";
+import { chamberLabel, chamberMemberLabel } from "@/lib/chambers";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
 import { formatDateAR } from "@/lib/indicators";
 import Link from "next/link";
@@ -93,8 +94,9 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
             {chip.label}
           </span>
           <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
-            Diputados · {vote.date ? formatDateAR(vote.date) : "s/f"}
+            {chamberLabel(vote.chamber)} · {vote.date ? formatDateAR(vote.date) : "s/f"}
             {vote.session_type ? ` · sesión ${vote.session_type.toLowerCase()}` : ""}
+            {vote.vote_type ? ` · ${vote.vote_type.toLowerCase()}` : ""}
             {vote.president_name ? ` · preside ${vote.president_name}` : ""}
           </span>
           {vote.topic ? <TopicChip topic={vote.topic} /> : null}
@@ -160,7 +162,7 @@ export function VoteDetail({ voteRecordId }: VoteDetailProps) {
               margin: 0,
             }}
           >
-            No hay detalle de voto por diputado para esta votación.
+            No hay detalle de voto por {chamberMemberLabel(vote.chamber)} para esta votación.
           </p>
         ) : (
           <>

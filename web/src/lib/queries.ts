@@ -1,3 +1,4 @@
+import type { Chamber } from "@/lib/chambers";
 import {
   type IndicatorSeriesParams,
   type PoliticalEventsParams,
@@ -75,6 +76,7 @@ export const congressVotesQuery = (params?: {
   date_from?: string;
   date_to?: string;
   result?: string;
+  chamber?: Chamber;
   period_number?: number;
   limit?: number;
   offset?: number;

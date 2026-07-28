@@ -101,6 +101,25 @@ y `web/src/lib/clientIp.ts`.
   (`ERROR_RETENTION_DAYS`) y recorta al tope (`ERROR_MAX_ROWS`).
 - Tablas propias para lo que no encaja en la genérica: `congress_votes`/`congress_vote_details`,
   `senators`, `holidays`, `news_articles`, `congress_vote_summaries`.
+- `congress_votes.chamber` — las dos cámaras conviven en la misma tabla y **tres conectores
+  distintos** la llenan, porque ninguna fuente cubre todo:
+  - `connectors/congress` baja el dataset CKAN `votaciones_nominales` de HCDN, que **quedó congelado
+    el 03/02/2020** (última acta: 29/01/2020, períodos 129–137). Es el backfill histórico y nada más:
+    no trae una votación nueva desde entonces.
+  - `connectors/hcdn_votes` continúa esa serie scrapeando `votaciones.hcdn.gob.ar/votacion/{acta_id}`.
+    Clave: **ese `acta_id` es el mismo que el del dataset viejo** (verificado acta por acta), así que
+    se sigue la numeración desde la última cargada en vez de listar — la plataforma arma el listado por
+    JavaScript y no expone el endpoint. Tiene API oficial (OpenAPI, ver `/desarrolladores`) pero HCDN
+    dejó de emitir API-KEY. Ojo: el `/sistema/exportar-datos-completo` que aparece en el footer es un
+    link oculto (`class="link-secreto-legal"`, `rel=nofollow`, `tabindex=-1`), o sea una trampa para
+    crawlers: **no usarlo**.
+  - `connectors/senate_votes` scrapea `senado.gob.ar/votaciones/actas` (POST con `busqueda_actas[anio]`)
+    y el `detalleActa` de cada acta nueva. Los ids van prefijados `S-` para no chocar con los de HCDN.
+    Backfill de a un año por corrida hacia atrás, y `run_job` commitea una sola vez, así que un año
+    queda cargado entero o no queda nada y se reintenta.
+  El detalle guarda `legislator_name` (no `deputy_name`: también hay senadores) y el presentismo por
+  bloque se agrupa **por cámara además de por bloque**, porque un mismo nombre de bloque puede existir
+  en las dos y los denominadores no son comparables.
 - `congress_vote_summaries` — el título del acta es burocrático ("Expediente 0073-S-2019 - Votación en
   General"), así que `connectors/congress_summaries` cruza los expedientes citados contra el dataset de
   proyectos de HCDN y le pide a Claude (vía `llm.py`, igual que el Boletín Oficial) una oración en

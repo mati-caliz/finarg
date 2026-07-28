@@ -1,3 +1,4 @@
+import type { Chamber } from "@/lib/chambers";
 import type { IndicatorSeriesParams, PoliticalEventsParams, PostCategory } from "@/lib/labrechaApi";
 import {
   congressAttendanceQuery,
@@ -71,6 +72,7 @@ export function useCongressVotes(params?: {
   date_from?: string;
   date_to?: string;
   result?: string;
+  chamber?: Chamber;
   period_number?: number;
   limit?: number;
   offset?: number;

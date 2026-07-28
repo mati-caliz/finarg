@@ -51,10 +51,12 @@ class ScrapeRunOut(BaseModel):
 
 class CongressVoteOut(BaseModel):
     vote_record_id: str
+    chamber: str
     period_number: int | None
     session_type: str | None
     date: date | None
     title: str | None
+    vote_type: str | None
     result: str | None
     president_name: str | None
     affirmative_votes: int | None
@@ -67,7 +69,7 @@ class CongressVoteOut(BaseModel):
 
 class CongressVoteDetailOut(BaseModel):
     vote_record_id: str
-    deputy_name: str | None
+    legislator_name: str | None
     bloc: str | None
     district: str | None
     vote: str | None
@@ -108,6 +110,7 @@ class TaxChangeOut(BaseModel):
 
 
 class BlocAttendanceOut(BaseModel):
+    chamber: str
     bloc: str
     total_votes: int
     present_votes: int

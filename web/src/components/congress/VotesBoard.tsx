@@ -4,6 +4,7 @@ import { BlocRow, TallyBar, TallyCounts, VoteLegend } from "@/components/congres
 import { TopicChip, VoteSummary } from "@/components/congress/VoteSummary";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressVoteDetails, useCongressVotes } from "@/hooks/useLabrecha";
+import { type Chamber, chamberLabel, chamberMemberLabel, chamberSourceLabel } from "@/lib/chambers";
 import { normalizeResult, tallyByBloc } from "@/lib/congress";
 import { formatDateAR } from "@/lib/indicators";
 import type { CongressVote } from "@/lib/labrechaApi";
@@ -18,6 +19,26 @@ function resultChip(vote: CongressVote): { label: string; color: string; backgro
   return won
     ? { label: "Aprobado", color: "var(--pos)", background: "var(--pos-bg)" }
     : { label: "Rechazado", color: "var(--neg)", background: "var(--neg-bg)" };
+}
+
+function ChamberChip({ chamber }: { chamber: Chamber }) {
+  return (
+    <span
+      style={{
+        fontFamily: MONO,
+        fontSize: "0.62rem",
+        fontWeight: 700,
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        color: "var(--ink2)",
+        border: "1px solid var(--line)",
+        padding: "2px 8px",
+        borderRadius: "var(--radius-pill)",
+      }}
+    >
+      {chamberLabel(chamber)}
+    </span>
+  );
 }
 
 function tallyOf(vote: CongressVote) {
@@ -68,6 +89,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
         >
           {chip.label}
         </span>
+        <ChamberChip chamber={vote.chamber} />
         <span style={{ fontFamily: MONO, fontSize: "0.72rem", color: "var(--ink3)" }}>
           {vote.date ? formatDateAR(vote.date) : "s/f"}
           {vote.vote_record_id ? ` · Acta ${vote.vote_record_id}` : ""}
@@ -119,7 +141,7 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
             margin: 0,
           }}
         >
-          No hay detalle de voto por diputado para esta votación.
+          No hay detalle de voto por {chamberMemberLabel(vote.chamber)} para esta votación.
         </p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -149,7 +171,8 @@ function FeaturedFicha({ vote }: { vote: CongressVote }) {
             color: "var(--ink3)",
           }}
         >
-          Fuente: HCDN{vote.date ? ` · ${formatDateAR(vote.date)}` : ""}
+          Fuente: {chamberSourceLabel(vote.chamber)}
+          {vote.date ? ` · ${formatDateAR(vote.date)}` : ""}
         </span>
       </div>
     </div>
@@ -203,6 +226,7 @@ function RecentItem({ vote, style }: { vote: CongressVote; style: CSSProperties 
             color: "var(--ink3)",
           }}
         >
+          <ChamberChip chamber={vote.chamber} />
           {vote.topic ? <TopicChip topic={vote.topic} /> : null}
           {vote.date ? formatDateAR(vote.date) : "s/f"}
         </span>

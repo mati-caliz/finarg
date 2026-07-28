@@ -1,4 +1,5 @@
 import { CALCULATOR_PATHS } from "@/lib/calculatorPaths";
+import type { Chamber } from "@/lib/chambers";
 import type { ErrorReport } from "@/lib/errorReporter";
 import { buildQueryString, serverGet, serverPost } from "@/lib/serverApi";
 import axios from "axios";
@@ -130,10 +131,12 @@ export interface PoliticalEvent {
 
 export interface CongressVote {
   vote_record_id: string;
+  chamber: Chamber;
   period_number: number | null;
   session_type: string | null;
   date: string | null;
   title: string | null;
+  vote_type: string | null;
   result: string | null;
   president_name: string | null;
   affirmative_votes: number | null;
@@ -146,7 +149,7 @@ export interface CongressVote {
 
 export interface CongressVoteDetail {
   vote_record_id: string;
-  deputy_name: string | null;
+  legislator_name: string | null;
   bloc: string | null;
   district: string | null;
   vote: string | null;
@@ -165,6 +168,7 @@ export interface SanctionedLaw {
 }
 
 export interface BlocAttendance {
+  chamber: Chamber;
   bloc: string;
   total_votes: number;
   present_votes: number;
@@ -437,6 +441,7 @@ export const congressApi = {
     date_from?: string;
     date_to?: string;
     result?: string;
+    chamber?: Chamber;
     period_number?: number;
     limit?: number;
     offset?: number;
@@ -451,7 +456,8 @@ export const congressApi = {
     limit?: number;
     offset?: number;
   }) => get<SanctionedLaw[]>("/congress/laws", params),
-  attendance: () => get<BlocAttendance[]>("/congress/attendance"),
+  attendance: (params?: { chamber?: Chamber }) =>
+    get<BlocAttendance[]>("/congress/attendance", params),
 };
 
 export const senateApi = {

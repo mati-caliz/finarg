@@ -4,7 +4,14 @@ from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from labrecha_db import CongressVote, CongressVoteDetail, CongressVoteSummary, SanctionedLaw
+from labrecha_db import (
+    CHAMBER_DEPUTIES,
+    CHAMBER_SENATE,
+    CongressVote,
+    CongressVoteDetail,
+    CongressVoteSummary,
+    SanctionedLaw,
+)
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
@@ -17,6 +24,7 @@ from labrecha_api.schemas import (
 )
 
 ABSENT_VOTE = "AUSENTE"
+CHAMBERS = (CHAMBER_DEPUTIES, CHAMBER_SENATE)
 MIN_BLOC_VOTES = 1000
 PCT_PRECISION = Decimal("0.1")
 ONE_HUNDRED = Decimal(100)
@@ -27,10 +35,12 @@ router = APIRouter(prefix="/congress", tags=["congress"])
 def _to_vote_out(vote: CongressVote, summary: CongressVoteSummary | None) -> CongressVoteOut:
     return CongressVoteOut(
         vote_record_id=vote.vote_record_id,
+        chamber=vote.chamber,
         period_number=vote.period_number,
         session_type=vote.session_type,
         date=vote.date,
         title=vote.title,
+        vote_type=vote.vote_type,
         result=vote.result,
         president_name=vote.president_name,
         affirmative_votes=vote.affirmative_votes,
@@ -47,6 +57,7 @@ def list_votes(
     date_from: date | None = Query(default=None),
     date_to: date | None = Query(default=None),
     result: str | None = Query(default=None),
+    chamber: str | None = Query(default=None),
     period_number: int | None = Query(default=None),
     limit: int = Query(default=50, ge=1, le=500),
     offset: int = Query(default=0, ge=0),
@@ -59,6 +70,10 @@ def list_votes(
         conditions.append(CongressVote.date <= date_to)
     if result is not None:
         conditions.append(CongressVote.result == result)
+    if chamber is not None:
+        if chamber not in CHAMBERS:
+            raise HTTPException(status_code=422, detail=f"cámara desconocida: {chamber}")
+        conditions.append(CongressVote.chamber == chamber)
     if period_number is not None:
         conditions.append(CongressVote.period_number == period_number)
 
@@ -77,17 +92,35 @@ def list_votes(
 
 
 @router.get("/attendance", response_model=list[BlocAttendanceOut])
-def bloc_attendance(session: Session = Depends(get_session)) -> list[BlocAttendanceOut]:
+def bloc_attendance(
+    chamber: str | None = Query(default=None),
+    session: Session = Depends(get_session),
+) -> list[BlocAttendanceOut]:
+    # Se agrupa por cámara además de por bloque: un mismo nombre de bloque puede existir en
+    # las dos y sumarlos daría un porcentaje sobre denominadores que no son comparables.
+    conditions = [CongressVoteDetail.bloc.is_not(None)]
+    if chamber is not None:
+        if chamber not in CHAMBERS:
+            raise HTTPException(status_code=422, detail=f"cámara desconocida: {chamber}")
+        conditions.append(CongressVote.chamber == chamber)
+
     present = func.sum(case((CongressVoteDetail.vote != ABSENT_VOTE, 1), else_=0))
     total = func.count()
     statement = (
-        select(CongressVoteDetail.bloc, total.label("total"), present.label("present"))
-        .where(CongressVoteDetail.bloc.is_not(None))
-        .group_by(CongressVoteDetail.bloc)
+        select(
+            CongressVote.chamber,
+            CongressVoteDetail.bloc,
+            total.label("total"),
+            present.label("present"),
+        )
+        .join(CongressVote, CongressVote.vote_record_id == CongressVoteDetail.vote_record_id)
+        .where(*conditions)
+        .group_by(CongressVote.chamber, CongressVoteDetail.bloc)
         .having(total >= MIN_BLOC_VOTES)
     )
     rows = [
         BlocAttendanceOut(
+            chamber=vote_chamber,
             bloc=bloc,
             total_votes=int(total_votes),
             present_votes=int(present_votes),
@@ -97,7 +130,7 @@ def bloc_attendance(session: Session = Depends(get_session)) -> list[BlocAttenda
                 )
             ),
         )
-        for bloc, total_votes, present_votes in session.execute(statement).all()
+        for vote_chamber, bloc, total_votes, present_votes in session.execute(statement).all()
     ]
     return sorted(rows, key=lambda row: row.attendance_pct, reverse=True)
 
@@ -169,12 +202,12 @@ def list_vote_details(
     statement = (
         select(CongressVoteDetail)
         .where(*conditions)
-        .order_by(CongressVoteDetail.bloc, CongressVoteDetail.deputy_name)
+        .order_by(CongressVoteDetail.bloc, CongressVoteDetail.legislator_name)
     )
     return [
         CongressVoteDetailOut(
             vote_record_id=detail.vote_record_id,
-            deputy_name=detail.deputy_name,
+            legislator_name=detail.legislator_name,
             bloc=detail.bloc,
             district=detail.district,
             vote=detail.vote,

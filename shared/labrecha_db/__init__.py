@@ -1,4 +1,6 @@
 from labrecha_db.models import (
+    CHAMBER_DEPUTIES,
+    CHAMBER_SENATE,
     Base,
     CongressVote,
     CongressVoteDetail,
@@ -19,6 +21,8 @@ from labrecha_db.models import (
 )
 
 __all__ = [
+    "CHAMBER_DEPUTIES",
+    "CHAMBER_SENATE",
     "Base",
     "CongressVote",
     "CongressVoteDetail",

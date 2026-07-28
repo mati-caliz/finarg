@@ -3,6 +3,7 @@
 import { Card } from "@/components/core";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCongressAttendance } from "@/hooks/useLabrecha";
+import { chamberLabel } from "@/lib/chambers";
 import { formatNumberAR } from "@/lib/indicators";
 
 export function BlocAttendance() {
@@ -20,11 +21,11 @@ export function BlocAttendance() {
   return (
     <Card
       title="Presentismo por bloque"
-      subtitle="Cuántas veces estuvieron presentes en las votaciones nominales de Diputados"
+      subtitle="Cuántas veces estuvieron presentes en las votaciones nominales de cada cámara"
       footer={
         <span style={{ fontSize: "0.6875rem", color: "var(--ink3)" }}>
-          Presentismo = votos no ausentes sobre el total, por bloque, en votaciones nominales de
-          Diputados (2011–2020). Bloques con al menos 1.000 votos registrados. Fuente: HCDN.
+          Presentismo = votos no ausentes sobre el total, por bloque y por cámara. Bloques con al
+          menos 1.000 votos registrados. Fuentes: HCDN y Senado de la Nación.
         </span>
       }
     >
@@ -33,9 +34,12 @@ export function BlocAttendance() {
           const pct = Number.parseFloat(row.attendance_pct);
           const fill = Math.min(100, Math.max(0, pct));
           return (
-            <div key={row.bloc} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div
+              key={`${row.chamber}-${row.bloc}`}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
               <span
-                title={row.bloc}
+                title={`${row.bloc} · ${chamberLabel(row.chamber)}`}
                 style={{
                   width: 160,
                   fontSize: "0.6875rem",
@@ -49,6 +53,16 @@ export function BlocAttendance() {
                 }}
               >
                 {row.bloc}
+              </span>
+              <span
+                style={{
+                  fontSize: "0.625rem",
+                  color: "var(--ink3)",
+                  width: 62,
+                  flexShrink: 0,
+                }}
+              >
+                {chamberLabel(row.chamber)}
               </span>
               <div style={{ flex: 1, height: 13, background: "var(--surface)", borderRadius: 3 }}>
                 <div
