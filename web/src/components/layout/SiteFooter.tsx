@@ -1,4 +1,5 @@
 import { BrandMark } from "@/components/layout/SiteHeader";
+import { SITE_HOST } from "@/lib/site";
 import Link from "next/link";
 
 const SECTION_LINKS = [
@@ -107,7 +108,9 @@ export function SiteFooter() {
             color: "var(--ink3)",
           }}
         >
-          <span>© {new Date().getFullYear()} La Brecha · labrecha.ar</span>
+          <span>
+            © {new Date().getFullYear()} La Brecha · {SITE_HOST}
+          </span>
           <span>Sin fines de lucro · datos con atribución</span>
         </div>
       </div>

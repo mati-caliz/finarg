@@ -1,9 +1,9 @@
 import { INDICATOR_META } from "@/lib/indicators";
 import type { CongressVote, Post } from "@/lib/labrechaApi";
 import { congressVotesQuery, postsQuery } from "@/lib/queries";
+import { SITE_URL } from "@/lib/site";
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://labrecha.ar";
 const SITEMAP_VOTES_LIMIT = 300;
 const SITEMAP_POSTS_LIMIT = 200;
 
@@ -97,7 +97,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...postRoutes(posts),
     ...voteRoutes(votes),
   ]).map((route) => ({
-    url: `${BASE_URL}${route.path}`,
+    url: `${SITE_URL}${route.path}`,
     lastModified: route.lastModified === undefined ? now : new Date(route.lastModified),
     changeFrequency: route.changeFrequency,
     priority: route.priority,

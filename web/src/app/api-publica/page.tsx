@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/site";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const MONO = "var(--font-jb-mono)";
-const BASE = "https://labrecha.ar/api/data";
+const BASE = `${SITE_URL}/api/data`;
 
 interface Endpoint {
   method: string;

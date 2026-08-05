@@ -3,6 +3,7 @@
 import type { IndicatorDisplay } from "@/lib/indicators";
 import { formatDateAR, sourceLabel } from "@/lib/indicators";
 import type { ParsedPoint } from "@/lib/series";
+import { SITE_URL } from "@/lib/site";
 import { Check, Copy, Download } from "lucide-react";
 import { useState } from "react";
 
@@ -71,7 +72,7 @@ export function SeriesExport({ code, indicator, sources, latest }: SeriesExportP
     const unit = indicator.unit ? ` ${indicator.unit}` : "";
     const text = `${indicator.label}: ${indicator.format(latest.value)}${unit} — fuente ${sourceLabel(
       latest.source,
-    )}, ${formatDateAR(latest.date)}. Vía labrecha.ar/indicator/${code}`;
+    )}, ${formatDateAR(latest.date)}. Vía ${SITE_URL}/indicador/${code}`;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);

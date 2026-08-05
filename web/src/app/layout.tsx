@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
-    url: "https://labrecha.ar",
+    url: SITE_URL,
     siteName: "La Brecha",
     title: "La Brecha - Indicadores económicos de Argentina",
     description: "Inflación, reservas del BCRA, riesgo país y cotizaciones del dólar en Argentina",

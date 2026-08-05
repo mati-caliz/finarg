@@ -6,7 +6,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg2://labrecha:labrecha123@localhost:5432/labrecha"
     http_timeout_seconds: float = 30.0
-    http_user_agent: str = "labrecha-scraper/0.1 (+https://labrecha.ar)"
+    http_user_agent: str = "labrecha-scraper/0.1 (+https://labrecha.matiascaliz.com.ar)"
     log_dir: str = ""
     log_max_bytes: int = 5_000_000
     log_backup_count: int = 5
