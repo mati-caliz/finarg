@@ -1,7 +1,7 @@
 import type { GazetteSummary } from "@/lib/labrechaApi";
 import { serverGet } from "@/lib/serverApi";
+import { SITE_URL } from "@/lib/site";
 
-const SITE_URL = "https://labrecha.ar";
 const AI_DISCLAIMER = "Resumen generado por IA. Verificá siempre contra la fuente oficial.";
 const REVALIDATE_SECONDS = 3600;
 

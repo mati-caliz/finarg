@@ -44,7 +44,7 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg2://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://finlatamio.com,https://www.finlatamio.com}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://labrecha.matiascaliz.com.ar}
       ADMIN_TOKEN: ${ADMIN_TOKEN}
     networks:
       - db-network

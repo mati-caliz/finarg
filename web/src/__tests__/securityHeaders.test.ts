@@ -25,7 +25,7 @@ const FRAME_ANCESTORS = /frame-ancestors [^;]*/;
 const IMG_SRC = /img-src ([^;"]*)/;
 
 const NGINX_CONF_PATH = join(__dirname, "..", "..", "..", "nginx", "nginx.conf");
-const SITE_SERVER_NAME = "finlatamio.com";
+const SITE_SERVER_NAME = "labrecha.matiascaliz.com.ar";
 const NEWS_IMAGE_HOST = "https://statics.eleconomista.com.ar";
 const IMG_SRC_KEYWORDS = ["'self'", "data:"];
 
