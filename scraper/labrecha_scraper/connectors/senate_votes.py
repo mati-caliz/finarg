@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 import time
 from dataclasses import dataclass, field
@@ -46,6 +47,7 @@ PARAGRAPH = re.compile(r"<p[^>]*>(.*?)</p>", re.DOTALL)
 TITLE_PARAGRAPH = re.compile(r'<p style="font-size: 18px[^"]*"[^>]*>(.*?)</p>', re.DOTALL)
 MAJORITY_TYPE = re.compile(r"<SPAN[^>]*>\s*([A-ZÁÉÍÓÚÑ ]+?)\s*</SPAN>", re.IGNORECASE)
 SENATOR_LINK = re.compile(r"/senadores/senador/(\d+)")
+NAME_KEY_BYTES = 4
 
 AFFIRMATIVE_LABEL = "AFIRMATIVOS"
 NEGATIVE_LABEL = "NEGATIVOS"
@@ -78,9 +80,23 @@ def _text(fragment: str) -> str | None:
     return flattened or None
 
 
-def _senator_key(photo_cell: str, position: int) -> str:
+def _name_key(name: str) -> str:
+    return f"n{hashlib.blake2s(name.encode('utf-8'), digest_size=NAME_KEY_BYTES).hexdigest()}"
+
+
+def _senator_key(photo_cell: str, name: str | None, position: int) -> str:
     senator = SENATOR_LINK.search(photo_cell)
-    return senator.group(1) if senator else f"p{position}"
+    if senator:
+        return senator.group(1)
+    if name:
+        return _name_key(name)
+    return f"p{position}"
+
+
+def _same_senator_vote(one: dict, other: dict) -> bool:
+    return all(
+        one[column] == other[column] for column in ("legislator_name", "bloc", "district", "vote")
+    )
 
 
 class SenateVotesConnector(Connector):
@@ -202,20 +218,30 @@ class SenateVotesConnector(Connector):
         if body < 0:
             raise ValueError(f"acta {acta_id} del Senado sin tabla de votos por senador")
         rows: list[dict] = []
+        seen: dict[str, dict] = {}
         for position, row in enumerate(ROW.findall(html[body:])):
             cells = CELL.findall(row)
             if len(cells) < SENATOR_CELLS:
                 continue
-            rows.append(
-                {
-                    "vote_detail_id": f"{_record_id(acta_id)}-{_senator_key(cells[0], position)}",
-                    "vote_record_id": _record_id(acta_id),
-                    "legislator_name": _text(cells[NAME_CELL]),
-                    "bloc": _text(cells[BLOC_CELL]),
-                    "district": _text(cells[PROVINCE_CELL]),
-                    "vote": _text(cells[VOTE_CELL]),
-                }
-            )
+            name = _text(cells[NAME_CELL])
+            key = _senator_key(cells[0], name, position)
+            senator_vote = {
+                "vote_detail_id": f"{_record_id(acta_id)}-{key}",
+                "vote_record_id": _record_id(acta_id),
+                "legislator_name": name,
+                "bloc": _text(cells[BLOC_CELL]),
+                "district": _text(cells[PROVINCE_CELL]),
+                "vote": _text(cells[VOTE_CELL]),
+            }
+            previous = seen.get(key)
+            if previous is not None:
+                if _same_senator_vote(previous, senator_vote):
+                    continue
+                key = _name_key(f"{name}#{position}")
+                senator_vote["vote_detail_id"] = f"{_record_id(acta_id)}-{key}"
+            else:
+                seen[key] = senator_vote
+            rows.append(senator_vote)
         if not rows:
             raise ValueError(f"acta {acta_id} del Senado sin votos por senador")
         return rows

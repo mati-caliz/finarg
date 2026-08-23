@@ -63,6 +63,13 @@ class Connector(ABC):
 UPSERT_BATCH_SIZE = 5000
 
 
+def _last_per_key(rows: list[dict], index_elements: list[str]) -> list[dict]:
+    deduplicated: dict[tuple, dict] = {}
+    for row in rows:
+        deduplicated[tuple(row[column] for column in index_elements)] = row
+    return list(deduplicated.values())
+
+
 def upsert_rows(
     session: Session,
     model: type,
@@ -74,6 +81,7 @@ def upsert_rows(
 ) -> int:
     if not rows:
         return 0
+    rows = _last_per_key(rows, index_elements)
     update_columns = [column for column in rows[0] if column not in index_elements]
     total = 0
     for start in range(0, len(rows), batch_size):

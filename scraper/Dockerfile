@@ -1,5 +1,7 @@
 FROM python:3.12-slim
 
+LABEL keep=true
+
 WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \

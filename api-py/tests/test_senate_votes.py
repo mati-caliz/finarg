@@ -91,6 +91,25 @@ def test_every_senator_vote_gets_a_stable_id(connector: SenateVotesConnector, de
     assert details[0]["vote"] == "NEGATIVO"
 
 
+def test_an_acta_rendered_twice_keeps_one_vote_per_senator(
+    connector: SenateVotesConnector,
+) -> None:
+    details = connector._parse_senator_votes(
+        _fixture("senate_acta_detail_doble_render.html"), "2721"
+    )
+
+    assert [row["vote_detail_id"] for row in details] == [
+        "S-2721-nb839a395",
+        "S-2721-294",
+        "S-2721-n3dc9ab77",
+    ]
+    assert [row["legislator_name"] for row in details] == [
+        "ESTENSSORO, MARÍA EUGENIA",
+        "MAYANS, JOSÉ MIGUEL ÁNGEL",
+        "PICHETTO, MIGUEL ÁNGEL",
+    ]
+
+
 def test_an_acta_without_senator_votes_fails_loudly(connector: SenateVotesConnector) -> None:
     with pytest.raises(ValueError, match="sin votos por senador"):
         connector._parse_senator_votes("<html><body><tbody></tbody></body></html>", ACTA_ID)
