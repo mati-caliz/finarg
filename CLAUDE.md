@@ -178,15 +178,14 @@ y `web/src/lib/clientIp.ts`.
 
 ## Reglas de estilo de código
 
-- **No escribir comentarios.** El código se explica por nombres claros.
-- **Sin `any` ni casteos inseguros** (`as unknown as X`), sin `@ts-ignore`, sin `biome-ignore` /
-  `eslint-disable`: resolver la causa real (tipar bien, borrar código muerto).
-- Igualdad estricta (`===`/`!==`). Sin `var`; `const` por default. Sin magic numbers/strings.
-- **Nombres completos y semánticos** (`product` no `p`, `transaction` no `tx`); `i`/`j` sólo en loops
-  triviales.
-- **Todo identificador de código en inglés**, incluidos los términos de dominio (`quote` no
-  `cotizacion`, `gap` no `brecha`, `reserves` no `reservas`). El español queda **sólo** para el texto
-  que ve el usuario. "La Brecha" como nombre de producto no se traduce.
+Rigen las reglas globales. Lo propio de este repo:
+
+- **Los términos de dominio también van en inglés**: `quote` no `cotizacion`, `gap` no
+  `brecha`, `reserves` no `reservas`. "La Brecha" como nombre de producto no se traduce.
+- **Las URLs de la web van en español** (`/indicador/[code]`, `/brechas`,
+  `/calculadoras`); las viejas en inglés redirigen 301 en `next.config.js`. Los
+  endpoints de la FastAPI **sí** quedan en inglés.
+- Lint del front con **Biome**, no ESLint.
 - Python: inyección por módulo/función, tipado con pydantic.
 
 ## Verificación
@@ -207,8 +206,6 @@ y `web/src/lib/clientIp.ts`.
 
 ## Notas
 
-- Git: commits descriptivos en español, directo a `main`.
 - `nginx/nginx.conf` es **compartido** con otros sitios en producción (gastronova, portfolio,
   jobhunter): editarlo con cuidado quirúrgico, tocando sólo el server de este sitio.
-- En archivos `.md` no duplicar lo derivable del código o `package.json`: sólo contexto de negocio no
-  obvio. Aplica a este archivo — se carga entero en cada request.
+- Este archivo se carga entero en cada request: sólo contexto de negocio no obvio.
