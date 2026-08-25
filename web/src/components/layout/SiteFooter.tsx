@@ -5,6 +5,7 @@ import Link from "next/link";
 const SECTION_LINKS = [
   { label: "Indicadores", href: "/indicadores" },
   { label: "Brechas", href: "/brechas" },
+  { label: "Tasas", href: "/tasas" },
   { label: "Ideas", href: "/ideas" },
   { label: "Congreso", href: "/congreso" },
   { label: "Noticias", href: "/noticias" },

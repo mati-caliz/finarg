@@ -6,6 +6,7 @@ const CACHE_RULES: Array<{ pattern: RegExp; revalidate: number }> = [
   { pattern: /^scrape-runs/, revalidate: 300 },
   { pattern: /^news/, revalidate: 900 },
   { pattern: /^posts/, revalidate: 60 },
+  { pattern: /^rates/, revalidate: 900 },
   { pattern: /^indicators/, revalidate: 1800 },
 ];
 

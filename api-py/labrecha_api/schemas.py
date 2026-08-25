@@ -33,6 +33,17 @@ class IndicatorSeries(BaseModel):
     points: list[IndicatorPoint]
 
 
+class RateOut(BaseModel):
+    id: str
+    name: str
+    tna: Decimal
+    tea: Decimal | None = None
+    product: str
+    updated_at: date | None = None
+    details: dict[str, str | int | float] = {}
+    link: str | None = None
+
+
 class PoliticalEventOut(BaseModel):
     date: date
     title: str

@@ -23,6 +23,7 @@ from labrecha_api.routers import (
     indicators,
     news,
     posts,
+    rates,
     revenue_sharing,
     senate,
     status,
@@ -88,6 +89,7 @@ app.include_router(senate.router)
 app.include_router(holidays.router)
 app.include_router(news.router)
 app.include_router(posts.router)
+app.include_router(rates.router)
 app.include_router(gazette.router)
 app.include_router(revenue_sharing.router)
 app.include_router(taxes.router)
