@@ -132,6 +132,7 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg2://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       HTTP_TIMEOUT_SECONDS: ${HTTP_TIMEOUT_SECONDS:-30}
+      HTTP_MAX_ATTEMPTS: ${HTTP_MAX_ATTEMPTS:-6}
       HTTP_USER_AGENT: ${HTTP_USER_AGENT:-labrecha-scraper/0.1 (+https://labrecha.ar)}
       LOG_DIR: ${SCRAPER_LOG_DIR:-/var/log/labrecha}
     networks:

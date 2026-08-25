@@ -6,7 +6,9 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg2://labrecha:labrecha123@localhost:5432/labrecha"
     http_timeout_seconds: float = 30.0
-    http_max_attempts: int = 4
+    # Cinco pausas (1, 2, 4, 8 y 16 s) dan margen a las APIs públicas para
+    # recuperarse de un 5xx breve sin convertir una corrida periódica en alerta.
+    http_max_attempts: int = 6
     http_user_agent: str = "labrecha-scraper/0.1 (+https://labrecha.matiascaliz.com.ar)"
     log_dir: str = ""
     log_max_bytes: int = 5_000_000
