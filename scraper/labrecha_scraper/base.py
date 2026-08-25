@@ -14,6 +14,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.config import settings
+from labrecha_scraper.http_client import RetryingTransport
 
 logger = logging.getLogger("labrecha_scraper")
 
@@ -50,6 +51,10 @@ class Connector(ABC):
             timeout=settings.http_timeout_seconds,
             headers={"User-Agent": settings.http_user_agent},
             follow_redirects=True,
+            transport=RetryingTransport(
+                httpx.HTTPTransport(),
+                max_attempts=settings.http_max_attempts,
+            ),
         )
 
     @abstractmethod
