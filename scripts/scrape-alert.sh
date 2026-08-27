@@ -15,6 +15,9 @@ cd "$(dirname "$0")/.."
 
 COMPOSE_FILE="docker-compose.prod.yml"
 THRESHOLD="${FAILURE_THRESHOLD:-3}"
+# Conectores pausados hasta contar con una fuente accesible. Sus fallos históricos
+# no deben disparar alertas mientras quedan fuera de las corridas automáticas.
+DISABLED_JOBS="'hcdn_votes', 'official_gazette'"
 
 failing="$(
   docker compose -f "${COMPOSE_FILE}" exec -T postgres \
@@ -23,6 +26,7 @@ WITH ranked AS (
   SELECT job_name, status,
          row_number() OVER (PARTITION BY job_name ORDER BY started_at DESC) AS rn
   FROM scrape_runs
+  WHERE job_name NOT IN (${DISABLED_JOBS})
 )
 SELECT job_name
 FROM ranked

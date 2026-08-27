@@ -28,6 +28,8 @@ from labrecha_scraper.connectors.senate import SenateConnector
 from labrecha_scraper.connectors.senate_votes import SenateVotesConnector
 from labrecha_scraper.connectors.series_datosgob import SeriesDatosGobConnector
 
+DISABLED_CONNECTOR_NAMES = frozenset({"hcdn_votes", "official_gazette"})
+
 CONNECTORS: dict[str, Connector] = {
     connector.name: connector
     for connector in (
@@ -58,6 +60,10 @@ CONNECTORS: dict[str, Connector] = {
         SeriesDatosGobConnector(),
         DerivedIndicatorsConnector(),
     )
+}
+
+ACTIVE_CONNECTORS: dict[str, Connector] = {
+    name: connector for name, connector in CONNECTORS.items() if name not in DISABLED_CONNECTOR_NAMES
 }
 
 

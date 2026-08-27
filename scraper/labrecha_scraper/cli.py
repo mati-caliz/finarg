@@ -20,7 +20,7 @@ from labrecha_scraper.config import settings
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.logging_setup import configure_logging
 from labrecha_scraper.prune_errors import prune_error_events
-from labrecha_scraper.registry import CONNECTORS, get_connector
+from labrecha_scraper.registry import ACTIVE_CONNECTORS, CONNECTORS, get_connector
 from labrecha_scraper.seed_events import seed_events
 from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
 from labrecha_scraper.seed_taxes import seed_taxes
@@ -80,12 +80,12 @@ def _first_line(error: str | None) -> str:
 
 
 def _list_jobs() -> None:
-    for name in sorted(CONNECTORS):
-        print(f"{name:20s} source={CONNECTORS[name].source}")
+    for name in sorted(ACTIVE_CONNECTORS):
+        print(f"{name:20s} source={ACTIVE_CONNECTORS[name].source}")
 
 
 def _run(job: str) -> int:
-    jobs = list(CONNECTORS) if job == "all" else [job]
+    jobs = list(ACTIVE_CONNECTORS) if job == "all" else [job]
     failures = 0
     with SessionLocal() as session:
         for name in jobs:
@@ -130,7 +130,7 @@ def _prune_errors() -> None:
 
 def _status() -> None:
     with SessionLocal() as session:
-        for name in sorted(CONNECTORS):
+        for name in sorted(ACTIVE_CONNECTORS):
             run = session.scalars(
                 select(ScrapeRun)
                 .where(ScrapeRun.job_name == name)
