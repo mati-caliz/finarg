@@ -10,13 +10,16 @@ from labrecha_db import SanctionedLaw
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
+from labrecha_scraper.connectors.hcdn_ckan import (
+    LARGE_DOWNLOAD_TIMEOUT_SECONDS,
+    fetch_package_resources,
+    find_resource_url,
+)
 
-CKAN_PACKAGE_URL = "https://datos.hcdn.gob.ar/api/3/action/package_show"
 SANCTIONED_DATASET = "leyes-sancionadas"
 SUMMARY_DATASET = "leyes-sumario"
 PROJECTS_DATASET = "proyectos-parlamentarios"
 JSON_FORMAT = "JSON"
-LARGE_DOWNLOAD_TIMEOUT_SECONDS = 300.0
 
 BOM = "\ufeff"
 
@@ -60,9 +63,7 @@ class LawsConnector(Connector):
         with self.build_client() as client:
             sanctioned = self._download_records(client, SANCTIONED_DATASET)
             summaries = self._download_records(client, SUMMARY_DATASET)
-            projects = self._download_records(
-                client, PROJECTS_DATASET, timeout=LARGE_DOWNLOAD_TIMEOUT_SECONDS
-            )
+            projects = self._download_records(client, PROJECTS_DATASET)
 
             summary_by_law: dict[str, dict] = {}
             for record in summaries:
@@ -83,19 +84,10 @@ class LawsConnector(Connector):
         assert isinstance(data, LawsData)
         return upsert_rows(session, SanctionedLaw, data.laws, ["law_number"])
 
-    def _resolve_json_url(self, client: httpx.Client, dataset_id: str) -> str:
-        response = client.get(CKAN_PACKAGE_URL, params={"id": dataset_id})
-        response.raise_for_status()
-        for resource in response.json()["result"]["resources"]:
-            if (resource.get("format") or "").upper() == JSON_FORMAT and resource.get("url"):
-                return resource["url"]
-        raise ValueError(f"no se encontró recurso JSON en el dataset {dataset_id}")
-
-    def _download_records(
-        self, client: httpx.Client, dataset_id: str, timeout: float | None = None
-    ) -> list[dict]:
-        url = self._resolve_json_url(client, dataset_id)
-        response = client.get(url) if timeout is None else client.get(url, timeout=timeout)
+    def _download_records(self, client: httpx.Client, dataset_id: str) -> list[dict]:
+        resources = fetch_package_resources(client, dataset_id)
+        url = find_resource_url(resources, dataset_id, JSON_FORMAT)
+        response = client.get(url, timeout=LARGE_DOWNLOAD_TIMEOUT_SECONDS)
         response.raise_for_status()
         payload = json.loads(response.content.decode("utf-8-sig"))
         records = payload if isinstance(payload, list) else list(payload.values())

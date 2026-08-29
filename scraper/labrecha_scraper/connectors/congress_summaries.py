@@ -14,13 +14,16 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
+from labrecha_scraper.connectors.hcdn_ckan import (
+    LARGE_DOWNLOAD_TIMEOUT_SECONDS,
+    fetch_package_resources,
+    find_resource_url,
+)
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.llm import run_claude_json_array
 
-CKAN_PACKAGE_URL = "https://datos.hcdn.gob.ar/api/3/action/package_show"
 PROJECTS_DATASET = "proyectos-parlamentarios"
 CSV_FORMAT = "CSV"
-LARGE_DOWNLOAD_TIMEOUT_SECONDS = 300.0
 
 MAX_VOTES_PER_RUN = 40
 BATCH_SIZE = 5
@@ -160,19 +163,8 @@ class CongressSummariesConnector(Connector):
         ]
 
     def _download_project_titles(self, client: httpx.Client) -> dict[str, str]:
-        response = client.get(CKAN_PACKAGE_URL, params={"id": PROJECTS_DATASET})
-        response.raise_for_status()
-        url = next(
-            (
-                resource["url"]
-                for resource in response.json()["result"]["resources"]
-                if (resource.get("format") or "").upper() == CSV_FORMAT and resource.get("url")
-            ),
-            None,
-        )
-        if url is None:
-            raise ValueError(f"no se encontró recurso CSV en el dataset {PROJECTS_DATASET}")
-
+        resources = fetch_package_resources(client, PROJECTS_DATASET)
+        url = find_resource_url(resources, PROJECTS_DATASET, CSV_FORMAT)
         download = client.get(url, timeout=LARGE_DOWNLOAD_TIMEOUT_SECONDS)
         download.raise_for_status()
         reader = csv.DictReader(io.StringIO(download.content.decode("utf-8-sig")))

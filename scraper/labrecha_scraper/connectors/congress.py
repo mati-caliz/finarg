@@ -9,8 +9,11 @@ from labrecha_db import CHAMBER_DEPUTIES, CongressVote, CongressVoteDetail
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
+from labrecha_scraper.connectors.hcdn_ckan import (
+    LARGE_DOWNLOAD_TIMEOUT_SECONDS,
+    fetch_package_resources,
+)
 
-CKAN_PACKAGE_URL = "https://datos.hcdn.gob.ar/api/3/action/package_show"
 DATASET_ID = "votaciones_nominales"
 JSON_FORMAT = "JSON"
 HEADER_KEYWORD = "cabecera"
@@ -71,9 +74,7 @@ class CongressConnector(Connector):
         return votes + details
 
     def _resolve_resources(self, client: httpx.Client) -> tuple[list[str], list[str]]:
-        response = client.get(CKAN_PACKAGE_URL, params={"id": DATASET_ID})
-        response.raise_for_status()
-        resources = response.json()["result"]["resources"]
+        resources = fetch_package_resources(client, DATASET_ID)
         header_urls: list[str] = []
         detail_urls: list[str] = []
         for resource in resources:
@@ -92,7 +93,7 @@ class CongressConnector(Connector):
         return header_urls, detail_urls
 
     def _download_json(self, client: httpx.Client, url: str) -> dict:
-        response = client.get(url)
+        response = client.get(url, timeout=LARGE_DOWNLOAD_TIMEOUT_SECONDS)
         response.raise_for_status()
         return json.loads(response.content.decode("utf-8-sig"))
 
