@@ -13,7 +13,9 @@ from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
 from labrecha_scraper.clock import today_in_argentina
+from labrecha_scraper.config import settings
 from labrecha_scraper.db import SessionLocal
+from labrecha_scraper.http_client import InvalidResponseError, retry_invalid_response
 
 ACTAS_URL = "https://www.senado.gob.ar/votaciones/actas"
 DETAIL_URL = "https://www.senado.gob.ar/votaciones/detalleActa/{acta_id}"
@@ -109,8 +111,12 @@ class SenateVotesConnector(Connector):
         data = SenateVotesData()
         with self.build_client() as client:
             for year in years:
-                listing = self._download_listing(client, year)
-                for acta_id, session_date in self._parse_listing(listing, year):
+                actas = retry_invalid_response(
+                    lambda: self._download_and_parse_listing(client, year),
+                    source=ACTAS_URL,
+                    max_attempts=settings.http_max_attempts,
+                )
+                for acta_id, session_date in actas:
                     if len(data.votes) >= MAX_DETAILS_PER_RUN:
                         return data
                     if _record_id(acta_id) in loaded_record_ids:
@@ -148,6 +154,11 @@ class SenateVotesConnector(Connector):
             years.append(backfill_year)
         return years, record_ids
 
+    def _download_and_parse_listing(
+        self, client: httpx.Client, year: int
+    ) -> list[tuple[str, date]]:
+        return self._parse_listing(self._download_listing(client, year), year)
+
     def _download_listing(self, client: httpx.Client, year: int) -> str:
         response = client.post(ACTAS_URL, data={YEAR_FIELD: str(year)})
         response.raise_for_status()
@@ -161,7 +172,9 @@ class SenateVotesConnector(Connector):
     def _parse_listing(self, html: str, year: int) -> list[tuple[str, date]]:
         body = html.find(TABLE_BODY)
         if body < 0:
-            raise ValueError(f"el listado de actas del Senado {year} no trae tabla de resultados")
+            raise InvalidResponseError(
+                f"el listado de actas del Senado {year} no trae tabla de resultados"
+            )
         actas: list[tuple[str, date]] = []
         for row in ROW.findall(html[body:]):
             link = DETAIL_LINK.search(row)

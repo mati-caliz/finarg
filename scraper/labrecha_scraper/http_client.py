@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
+from typing import TypeVar
 
 import httpx
 
@@ -11,6 +13,38 @@ RETRYABLE_STATUS_CODES = frozenset({429, 500, 502, 503, 504})
 RETRYABLE_ERRORS = (httpx.TimeoutException, httpx.NetworkError)
 BACKOFF_BASE_SECONDS = 1.0
 BACKOFF_MAX_SECONDS = 20.0
+ResponseData = TypeVar("ResponseData")
+
+
+class InvalidResponseError(ValueError):
+    pass
+
+
+def _retry_delay(attempt: int) -> float:
+    return min(BACKOFF_BASE_SECONDS * 2 ** (attempt - 1), BACKOFF_MAX_SECONDS)
+
+
+def retry_invalid_response(
+    operation: Callable[[], ResponseData],
+    *,
+    source: str,
+    max_attempts: int,
+) -> ResponseData:
+    for attempt in range(1, max_attempts):
+        try:
+            return operation()
+        except InvalidResponseError as error:
+            delay = _retry_delay(attempt)
+            logger.warning(
+                "%s devolvio contenido invalido (%s); reintento %d/%d en %.1fs",
+                source,
+                error,
+                attempt + 1,
+                max_attempts,
+                delay,
+            )
+            time.sleep(delay)
+    return operation()
 
 
 class RetryingTransport(httpx.BaseTransport):
@@ -37,7 +71,7 @@ class RetryingTransport(httpx.BaseTransport):
         self._wrapped.close()
 
     def _wait_before_retry(self, request: httpx.Request, attempt: int, reason: str) -> None:
-        delay = min(BACKOFF_BASE_SECONDS * 2 ** (attempt - 1), BACKOFF_MAX_SECONDS)
+        delay = _retry_delay(attempt)
         logger.warning(
             "%s fallo por %s; reintento %d/%d en %.1fs",
             request.url,

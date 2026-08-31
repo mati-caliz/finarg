@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+import httpx
 import pytest
 from labrecha_db import CHAMBER_SENATE
 from labrecha_scraper.connectors.senate_votes import SenateVotesConnector
@@ -41,6 +42,32 @@ def test_the_listing_pairs_every_acta_with_its_session_date(
 def test_a_listing_without_results_table_fails_loudly(connector: SenateVotesConnector) -> None:
     with pytest.raises(ValueError, match="tabla de resultados"):
         connector._parse_listing("<html><body>mantenimiento</body></html>", 2026)
+
+
+def test_an_invalid_listing_is_downloaded_again(
+    connector: SenateVotesConnector,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    responses = iter(
+        ["<html><body>mantenimiento</body></html>", _fixture("senate_actas_listing.html")]
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text=next(responses), request=request)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    monkeypatch.setattr("labrecha_scraper.http_client.time.sleep", lambda _: None)
+    monkeypatch.setattr(
+        connector,
+        "_pending_scope",
+        lambda: ([2026], {"S-2623", "S-2624", "S-2625"}),
+    )
+    monkeypatch.setattr(connector, "build_client", lambda: client)
+
+    result = connector.fetch()
+
+    assert result.votes == []
+    assert result.details == []
 
 
 def test_the_acta_header_carries_what_the_senate_publishes(

@@ -2,10 +2,13 @@ from __future__ import annotations
 
 from datetime import date
 
+import httpx
 from labrecha_db import Senator
 from sqlalchemy.orm import Session
 
 from labrecha_scraper.base import Connector, upsert_rows
+from labrecha_scraper.config import settings
+from labrecha_scraper.http_client import InvalidResponseError, retry_invalid_response
 
 SENATORS_URL = "https://www.senado.gob.ar/micrositios/DatosAbiertos/ExportarListadoSenadores/json"
 
@@ -35,12 +38,14 @@ class SenateConnector(Connector):
 
     def fetch(self) -> list[dict]:
         with self.build_client() as client:
-            response = client.get(SENATORS_URL)
-            response.raise_for_status()
-            payload = response.json()
+            records = retry_invalid_response(
+                lambda: self._download_records(client),
+                source=SENATORS_URL,
+                max_attempts=settings.http_max_attempts,
+            )
 
         rows: list[dict] = []
-        for record in payload.get("table", {}).get("rows", []):
+        for record in records:
             senator_id = _text(record.get("ID"))
             if senator_id is None:
                 continue
@@ -59,6 +64,25 @@ class SenateConnector(Connector):
                 }
             )
         return rows
+
+    def _download_records(self, client: httpx.Client) -> list[dict]:
+        response = client.get(SENATORS_URL)
+        response.raise_for_status()
+        try:
+            payload = response.json()
+        except ValueError as error:
+            raise InvalidResponseError("el listado de senadores no es JSON") from error
+        if not isinstance(payload, dict):
+            raise InvalidResponseError("el listado de senadores no es un objeto")
+        table = payload.get("table")
+        if not isinstance(table, dict):
+            raise InvalidResponseError("el listado de senadores no contiene table")
+        records = table.get("rows")
+        if not isinstance(records, list) or not records:
+            raise InvalidResponseError("el listado de senadores no contiene filas")
+        if not all(isinstance(record, dict) for record in records):
+            raise InvalidResponseError("el listado de senadores contiene filas invalidas")
+        return records
 
     def persist(self, session: Session, data: object) -> int:
         assert isinstance(data, list)
