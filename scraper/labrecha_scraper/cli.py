@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 from collections.abc import Callable
 
 from labrecha_db import ScrapeRun
@@ -20,10 +21,12 @@ from labrecha_scraper.config import settings
 from labrecha_scraper.db import SessionLocal
 from labrecha_scraper.logging_setup import configure_logging
 from labrecha_scraper.prune_errors import prune_error_events
-from labrecha_scraper.registry import ACTIVE_CONNECTORS, CONNECTORS, get_connector
+from labrecha_scraper.registry import ACTIVE_CONNECTORS, get_connector
 from labrecha_scraper.seed_events import seed_events
 from labrecha_scraper.seed_revenue_sharing import seed_revenue_sharing
 from labrecha_scraper.seed_taxes import seed_taxes
+
+FAILED_JOB_RETRY_DELAY_SECONDS = 60
 
 
 def _db_upgrade() -> int:
@@ -84,17 +87,31 @@ def _list_jobs() -> None:
         print(f"{name:20s} source={ACTIVE_CONNECTORS[name].source}")
 
 
-def _run(job: str) -> int:
-    jobs = list(ACTIVE_CONNECTORS) if job == "all" else [job]
-    failures = 0
+def _run_jobs(names: list[str]) -> list[str]:
+    failures: list[str] = []
     with SessionLocal() as session:
-        for name in jobs:
+        for name in names:
             connector = get_connector(name)
             run = run_job(session, connector)
             print(f"{name:20s} {run.status:8s} filas={run.rows_upserted} {_first_line(run.error)}")
             if run.status != STATUS_SUCCESS:
-                failures += 1
+                failures.append(name)
     return failures
+
+
+def _run(job: str) -> int:
+    jobs = list(ACTIVE_CONNECTORS) if job == "all" else [job]
+    failures = _run_jobs(jobs)
+    if job == "all" and failures:
+        print(
+            f"\nReintentando {len(failures)} job(s) fallido(s) "
+            f"en {FAILED_JOB_RETRY_DELAY_SECONDS} segundos: {', '.join(failures)}"
+        )
+        time.sleep(FAILED_JOB_RETRY_DELAY_SECONDS)
+        failures = _run_jobs(failures)
+    if failures:
+        print(f"\nFallos definitivos: {', '.join(failures)}")
+    return len(failures)
 
 
 def _seed_events() -> None:
